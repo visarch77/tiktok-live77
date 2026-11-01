@@ -11,6 +11,10 @@
     document.body.classList.add('obs-mode');
   }
 
+  // Phòng đang hiển thị: /room/<id> hoặc ?room=<id>; mặc định là phòng "main" (địa chỉ cũ http://localhost:3000)
+  const roomMatch = window.location.pathname.match(/^\/room\/([^/?#]+)/);
+  const ROOM_ID = decodeURIComponent((roomMatch && roomMatch[1]) || params.get('room') || 'main');
+
   // 1. Tự động co giãn khung 1080x1920 vừa khít Stage Wrapper (9:16)
   const stageWrapper = document.getElementById('stageWrapper');
   const stage9x16 = document.getElementById('stage9x16');
@@ -28,6 +32,7 @@
   const canvas = document.getElementById('templeCanvas');
   const particles = new window.TempleParticleEngine(canvas);
   const audio = new window.TempleAudioEngine();
+  audio.roomId = ROOM_ID;
 
   function unlockAudioOnce() {
     audio.ensureContext();
@@ -369,9 +374,20 @@
   let autoSimState = false;
 
   let lastState = null;
+  let roomInfoApplied = false;
   function updateUIState(st) {
     if (!st) return;
     lastState = st;
+
+    // Lần đầu nhận state: điền tên phòng & tài khoản TikTok của phòng này vào bảng điều khiển
+    if (!roomInfoApplied && st.room) {
+      roomInfoApplied = true;
+      document.title = `${st.room.name} — TikTok Live (${st.room.modeName})`;
+      const ttInput = document.getElementById('inputTikTokUser');
+      if (ttInput && st.tiktok?.username) ttInput.value = `@${st.tiktok.username}`;
+      const dockTitle = document.querySelector('.dock-title');
+      if (dockTitle) dockTitle.textContent = `🎛️ ${st.room.name} (phòng: ${st.room.id})`;
+    }
 
     document.getElementById('statIncense').textContent = Number(st.totalIncense || 0).toLocaleString('vi-VN');
     document.getElementById('statMerit').textContent = Number(st.totalMerit || 0).toLocaleString('vi-VN');
@@ -642,7 +658,7 @@
 
   function connectWebSocket() {
     const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    ws = new WebSocket(`${proto}//${window.location.host}/ws`);
+    ws = new WebSocket(`${proto}//${window.location.host}/ws?room=${encodeURIComponent(ROOM_ID)}`);
 
     ws.onmessage = (event) => {
       try {
@@ -651,12 +667,15 @@
           console.warn('[RPC]', msg.error.message);
           return;
         }
-        if (msg.method === 'temple.state') {
+        if (msg.method === 'room.state') {
           updateUIState(msg.params);
-        } else if (msg.method === 'temple.event') {
+        } else if (msg.method === 'room.notFound') {
+          const liveText = document.getElementById('liveStatusText');
+          if (liveText) liveText.textContent = `KHÔNG TÌM THẤY PHÒNG "${ROOM_ID}"`;
+        } else if (msg.method === 'room.event') {
           if (msg.params?.state) updateUIState(msg.params.state);
           if (msg.params?.event) triggerRitualVisuals(msg.params.event);
-        } else if (msg.method === 'temple.viewerCount') {
+        } else if (msg.method === 'room.viewerCount') {
           if (lastState?.tiktok?.connected) {
             lastState.tiktok.viewerCount = msg.params?.viewerCount || 0;
             const liveText = document.getElementById('liveStatusText');
@@ -690,7 +709,7 @@
       jsonrpc: '2.0',
       id: rpcId++,
       method,
-      params
+      params: { roomId: ROOM_ID, ...params }
     };
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify(payload));

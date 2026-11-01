@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bảng Điều Khiển JSON-RPC 2.0 — Chùa Linh Ứng TikTok Live</title>
+  <title>Quản Lý Phòng TikTok Live</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&family=Noto+Serif:wght@700;900&display=swap" rel="stylesheet">
@@ -124,38 +124,70 @@
       overflow-x: auto;
       max-height: 280px;
     }
+    .full { grid-column: 1 / -1; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid rgba(244, 193, 80, 0.15); vertical-align: middle; }
+    th { color: var(--muted); font-weight: 600; font-size: 12.5px; text-transform: uppercase; letter-spacing: .04em; }
+    td .btn { padding: 6px 10px; font-size: 12.5px; }
+    .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); }
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: #6b5a40; display: inline-block; }
+    .dot.on { background: #3ddc84; box-shadow: 0 0 8px #3ddc84; }
+    .dot.wait { background: #f4c150; }
+    .err { color: #ff9a8a; font-size: 12px; max-width: 280px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .row label { display: flex; align-items: center; gap: 6px; white-space: nowrap; color: var(--muted); font-size: 13px; }
+    .row label input { width: auto; }
+    select.room-select { width: auto; min-width: 220px; font-weight: 700; color: var(--gold-light); }
+    .hint { font-size: 13px; color: var(--muted); }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } body { padding: 14px; } .top-bar { flex-direction: column; align-items: flex-start; gap: 12px; } }
   </style>
 </head>
 <body>
   <div class="container">
     <header class="top-bar">
       <div>
-        <div class="top-title">🪷 BẢNG ĐIỀU KHIỂN CHÙA ONLINE TIKTOK LIVE RPC (BUN.JS + ZEROTTS MAI CHI)</div>
+        <div class="top-title">🎛️ QUẢN LÝ PHÒNG TIKTOK LIVE</div>
         <div class="top-sub" id="statusBanner">Đang tải trạng thái hệ thống...</div>
       </div>
       <div class="top-links">
-        <a class="btn" href="/?obs=1" target="_blank">📺 Mở Màn Hình OBS 9:16 Sạch (?obs=1)</a>
-        <a class="btn gold" href="/" target="_blank">🪷 Mở Màn Hình Live Chính</a>
+        <label class="pill">Đang điều khiển phòng:
+          <select id="roomSelect" class="room-select"></select>
+        </label>
+        <a class="btn gold" id="linkOverlay" href="/" target="_blank">📺 Mở màn hình phòng</a>
       </div>
     </header>
 
     <div class="grid">
-      <section class="card">
-        <h2>📡 1. Kết Nối Phòng TikTok Live & Giọng Đọc ZeroTTS (Mai Chi)</h2>
+      <section class="card full">
+        <h2>🏠 1. Danh Sách Phòng Live</h2>
+        <table>
+          <thead>
+            <tr><th>Phòng</th><th>Chế độ</th><th>TikTok</th><th>Trạng thái</th><th>Người xem đã lưu</th><th>Thao tác</th></tr>
+          </thead>
+          <tbody id="roomsBody"></tbody>
+        </table>
         <div class="row">
-          <input type="text" id="ttUser" placeholder="Nhập @username TikTok đang phát Live..." />
-          <button class="btn gold" id="btnConn">Kết Nối Live</button>
-          <button class="btn" id="btnDisc">Ngắt</button>
+          <input type="text" id="newRoomId" placeholder="Mã phòng (vd: chua-2)" />
+          <input type="text" id="newRoomName" placeholder="Tên hiển thị (vd: Chùa Hương Online)" />
+          <select id="newRoomMode"></select>
+          <input type="text" id="newRoomTikTok" placeholder="@username TikTok (để trống nếu chưa có)" />
+          <label><input type="checkbox" id="newRoomAuto" checked /> Tự kết nối</label>
+          <button class="btn gold" id="btnCreateRoom">＋ Tạo phòng</button>
         </div>
+        <p class="hint">Mỗi phòng có màn hình riêng tại <code>/room/&lt;mã phòng&gt;</code> (thêm <code>?obs=1</code> cho OBS) và bảng xếp hạng riêng. Xoá phòng sẽ ngắt kết nối; dữ liệu được đổi tên thành <code>data/rooms/&lt;mã&gt;.deleted-*.json</code> để có thể khôi phục.</p>
+      </section>
+
+      <section class="card">
+        <h2>📡 2. Giọng Đọc ZeroTTS</h2>
         <div class="row">
           <input type="text" id="ttsDirectText" value="Nam mô A Di Đà Phật. Chùa Linh Ứng Online xin kính chào quý thí chủ thập phương." />
-          <button class="btn gold" id="btnSpeakMaiChi">🎙️ Đọc thử Giọng Mai Chi</button>
+          <button class="btn gold" id="btnSpeakMaiChi">🎙️ Đọc thử trên phòng</button>
         </div>
         <audio id="adminAudioPreview" controls style="width: 100%; height: 38px;"></audio>
       </section>
 
-      <section class="card">
-        <h2>🙏 2. Gửi Lệnh Tương Tác JSON-RPC 2.0</h2>
+      <section class="card" id="templeCard">
+        <h2>🙏 3. Lệnh Chế Độ Đi Chùa</h2>
         <div class="row">
           <input type="text" id="rpcUser" value="Đại Thí Chủ Minh Tâm" placeholder="Tên người xem..." />
           <input type="text" id="rpcWish" value="Cầu gia đạo bình an, tài lộc vượng phát" placeholder="Lời cầu nguyện..." />
@@ -168,66 +200,187 @@
           <button class="btn" onclick="sendRpc('temple.drawFortune', {})">🎋 Xin Xăm / Gieo Quẻ</button>
           <button class="btn" onclick="sendRpc('temple.offerGift', { giftType: 'fruit', coins: 30, giftName: 'Mâm Ngũ Quả Cát Tường' })">🍑 Dâng Mâm Ngũ Quả</button>
           <button class="btn gold" onclick="sendRpc('temple.grandCeremony', { coins: 500, giftName: 'Đại Lễ Kim Long Chầu Phật' })">🐉 Đại Lễ Kim Long</button>
-          <button class="btn" onclick="confirm('Xóa toàn bộ Bảng Công Đức? Không thể hoàn tác.') && sendRpc('temple.resetMerit', {})">♻️ Đặt Lại Bảng Công Đức</button>
+          <button class="btn" onclick="confirm('Xóa toàn bộ Bảng Công Đức của phòng này? Không thể hoàn tác.') && sendRpc('temple.resetMerit', {})">♻️ Đặt Lại Bảng Công Đức</button>
         </div>
       </section>
 
       <section class="card">
-        <h2>💬 3. Giả Lập Bình Luận Người Xem TikTok</h2>
+        <h2>💬 4. Giả Lập Bình Luận Người Xem</h2>
         <div class="row">
           <input type="text" id="simComment" value="Con xin gieo quẻ cầu tài lộc đầu tháng ạ" placeholder="Nhập nội dung bình luận TikTok..." />
           <button class="btn gold" id="btnSendComment">Gửi Comment</button>
         </div>
-        <p style="font-size: 13px; color: var(--muted);">
-          Từ khóa tự động nhận diện: <code>thắp hương</code>, <code>bái phật</code>, <code>cầu ...</code>, <code>xin xăm / gieo quẻ</code>, <code>thỉnh chuông</code>, <code>gõ mõ</code>.
-        </p>
+        <div class="row">
+          <button class="btn" id="btnAutoSim">🤖 Tự động giả lập: …</button>
+        </div>
+        <p class="hint">Bình luận được gửi vào phòng đang chọn và xử lý theo chế độ của phòng đó.</p>
       </section>
 
       <section class="card">
-        <h2>🔌 4. Nhật Ký Phản Hồi JSON-RPC 2.0 (`/rpc`)</h2>
+        <h2>🔌 5. Nhật Ký Phản Hồi JSON-RPC 2.0 (<code>/rpc</code>)</h2>
         <pre id="rpcOutput">{ "status": "Sẵn sàng nhận lệnh JSON-RPC 2.0" }</pre>
       </section>
     </div>
   </div>
 
   <script>
-    async function sendRpc(method, extraParams = {}) {
-      const user = document.getElementById('rpcUser').value.trim() || 'Thí Chủ';
-      const wish = document.getElementById('rpcWish').value.trim();
-      const body = {
-        jsonrpc: '2.0',
-        id: Date.now(),
-        method,
-        params: { user, wish, ...extraParams }
-      };
-      let data;
+    const qs = new URLSearchParams(location.search);
+    let currentRoom = qs.get('room') || localStorageGet('admin_room') || 'main';
+    let roomsCache = [];
+    let modesCache = [];
+
+    function localStorageGet(k) { try { return localStorage.getItem(k); } catch (_) { return null; } }
+    function localStorageSet(k, v) { try { localStorage.setItem(k, v); } catch (_) {} }
+    function esc(str) {
+      return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    async function rpc(method, params = {}) {
       try {
         const res = await fetch('/rpc', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
+          body: JSON.stringify({ jsonrpc: '2.0', id: Date.now(), method, params })
         });
-        data = await res.json();
+        return await res.json();
       } catch (err) {
-        data = { error: { message: `Không gọi được server: ${err.message}` } };
+        return { error: { message: `Không gọi được server: ${err.message}` } };
       }
+    }
+
+    function showOutput(data) {
       document.getElementById('rpcOutput').textContent = JSON.stringify(data, null, 2);
-      refreshStatus();
+    }
+
+    // Lệnh theo phòng đang chọn
+    async function sendRpc(method, extraParams = {}) {
+      const user = document.getElementById('rpcUser').value.trim() || 'Thí Chủ';
+      const wish = document.getElementById('rpcWish').value.trim();
+      const data = await rpc(method, { roomId: currentRoom, user, wish, ...extraParams });
+      showOutput(data);
+      refresh();
       return data;
     }
 
-    document.getElementById('btnConn').onclick = () => {
-      const username = document.getElementById('ttUser').value.trim();
-      sendRpc('live.connect', { username });
+    async function roomAction(method, params, confirmText) {
+      if (confirmText && !confirm(confirmText)) return;
+      const data = await rpc(method, params);
+      showOutput(data);
+      if (data.error) alert(data.error.message);
+      refresh();
+      return data;
+    }
+
+    function statusCell(r) {
+      const t = r.tiktok || {};
+      if (t.connected) return `<span class="pill"><span class="dot on"></span>LIVE • ${t.viewerCount || 0} mắt</span>`;
+      if (t.connecting) return `<span class="pill"><span class="dot wait"></span>Đang kết nối...</span>`;
+      return `<span class="pill"><span class="dot"></span>Chưa kết nối</span>${t.lastError ? `<span class="err" title="${esc(t.lastError)}">${esc(t.lastError)}</span>` : ''}`;
+    }
+
+    function renderRooms() {
+      const body = document.getElementById('roomsBody');
+      body.innerHTML = roomsCache.map((r) => `
+        <tr>
+          <td><strong>${esc(r.name)}</strong><br><span class="hint">${esc(r.id)}</span></td>
+          <td>${esc(r.modeName)}${r.autoSim ? ' <span class="hint">(giả lập)</span>' : ''}</td>
+          <td>${r.tiktokUsername ? '@' + esc(r.tiktokUsername) : '<span class="hint">—</span>'}${r.autoConnect ? '' : '<br><span class="hint">không tự kết nối</span>'}</td>
+          <td>${statusCell(r)}</td>
+          <td>${Number(r.viewers || 0).toLocaleString('vi-VN')}</td>
+          <td><div class="actions">
+            ${r.tiktok?.connected || r.tiktok?.connecting
+              ? `<button class="btn" data-act="disconnect" data-id="${esc(r.id)}">Ngắt</button>`
+              : `<button class="btn gold" data-act="connect" data-id="${esc(r.id)}">Kết nối</button>`}
+            <a class="btn" href="${esc(r.overlayUrl)}" target="_blank">Mở</a>
+            <a class="btn" href="${esc(r.overlayUrl)}?obs=1" target="_blank">OBS</a>
+            <button class="btn" data-act="edit" data-id="${esc(r.id)}">Sửa</button>
+            <button class="btn" data-act="delete" data-id="${esc(r.id)}">Xoá</button>
+          </div></td>
+        </tr>`).join('');
+
+      const sel = document.getElementById('roomSelect');
+      const prev = sel.value;
+      sel.innerHTML = roomsCache.map((r) => `<option value="${esc(r.id)}">${esc(r.name)} (${esc(r.id)})</option>`).join('');
+      if (!roomsCache.some((r) => r.id === currentRoom) && roomsCache[0]) currentRoom = roomsCache[0].id;
+      sel.value = currentRoom || prev;
+
+      const room = roomsCache.find((r) => r.id === currentRoom);
+      document.getElementById('linkOverlay').href = room ? room.overlayUrl : '/';
+      document.getElementById('templeCard').style.display = !room || room.mode === 'temple' ? '' : 'none';
+      document.getElementById('btnAutoSim').textContent = `🤖 Tự động giả lập: ${room?.autoSim ? 'ĐANG BẬT' : 'TẮT'}`;
+    }
+
+    document.getElementById('roomsBody').addEventListener('click', async (e) => {
+      const btn = e.target.closest('button[data-act]');
+      if (!btn) return;
+      const id = btn.dataset.id;
+      const room = roomsCache.find((r) => r.id === id);
+      switch (btn.dataset.act) {
+        case 'connect': {
+          let username = room.tiktokUsername;
+          if (!username) {
+            username = (prompt('Nhập @username TikTok cho phòng này:') || '').trim();
+            if (!username) return;
+            await rpc('rooms.update', { id, tiktokUsername: username });
+          }
+          roomAction('live.connect', { roomId: id, username });
+          break;
+        }
+        case 'disconnect':
+          roomAction('live.disconnect', { roomId: id });
+          break;
+        case 'edit': {
+          const name = prompt('Tên phòng:', room.name);
+          if (name === null) return;
+          const tiktokUsername = prompt('@username TikTok (để trống nếu chưa có):', room.tiktokUsername || '');
+          if (tiktokUsername === null) return;
+          const modeIds = modesCache.map((m) => m.id).join(', ');
+          const mode = prompt(`Chế độ (${modeIds}):`, room.mode);
+          if (mode === null) return;
+          if (mode !== room.mode && !confirm('Đổi chế độ sẽ khởi động lại phòng; trạng thái riêng của chế độ cũ sẽ mất (bảng xếp hạng người xem được giữ). Tiếp tục?')) return;
+          roomAction('rooms.update', { id, name, tiktokUsername, mode });
+          break;
+        }
+        case 'delete':
+          roomAction('rooms.delete', { id }, `Xoá phòng "${room.name}" (${id})? Phòng sẽ ngắt kết nối và biến mất khỏi danh sách.`);
+          break;
+      }
+    });
+
+    document.getElementById('btnCreateRoom').onclick = async () => {
+      const data = await roomAction('rooms.create', {
+        id: document.getElementById('newRoomId').value.trim(),
+        name: document.getElementById('newRoomName').value.trim(),
+        mode: document.getElementById('newRoomMode').value,
+        tiktokUsername: document.getElementById('newRoomTikTok').value.trim(),
+        autoConnect: document.getElementById('newRoomAuto').checked
+      });
+      if (data?.result?.id) {
+        ['newRoomId', 'newRoomName', 'newRoomTikTok'].forEach((id) => (document.getElementById(id).value = ''));
+        currentRoom = data.result.id;
+        localStorageSet('admin_room', currentRoom);
+        refresh();
+      }
     };
-    document.getElementById('btnDisc').onclick = () => sendRpc('live.disconnect', {});
+
+    document.getElementById('roomSelect').onchange = (e) => {
+      currentRoom = e.target.value;
+      localStorageSet('admin_room', currentRoom);
+      renderRooms();
+      refreshState();
+    };
+
     document.getElementById('btnSendComment').onclick = () => {
       const comment = document.getElementById('simComment').value.trim();
-      sendRpc('temple.comment', { comment });
+      sendRpc('room.comment', { comment });
+    };
+    document.getElementById('btnAutoSim').onclick = () => {
+      const room = roomsCache.find((r) => r.id === currentRoom);
+      sendRpc('live.setAutoSim', { enabled: !room?.autoSim });
     };
     document.getElementById('btnSpeakMaiChi').onclick = async () => {
       const text = document.getElementById('ttsDirectText').value.trim();
-      const data = await sendRpc('temple.speak', { text, voice: 'maichi', broadcast: true });
+      const data = await sendRpc('room.speak', { text, broadcast: true });
       if (data?.result?.url) {
         const player = document.getElementById('adminAudioPreview');
         player.src = data.result.url;
@@ -235,23 +388,35 @@
       }
     };
 
-    async function refreshStatus() {
+    async function refreshState() {
       try {
-        const res = await fetch('/api/state');
+        const res = await fetch(`/api/state?room=${encodeURIComponent(currentRoom)}`);
+        if (!res.ok) throw new Error('not found');
         const st = await res.json();
-        const live = st.tiktok?.connected
-          ? `LIVE @${st.tiktok.username} (${st.tiktok.viewerCount || 0} mắt)`
-          : st.tiktok?.connecting
-            ? `Đang kết nối @${st.tiktok.username}...`
-            : `Chưa kết nối${st.tiktok?.lastError ? ` — ${st.tiktok.lastError}` : ''}`;
+        const total = st.totalMerit != null ? ` | Tổng Công Đức: ${Number(st.totalMerit).toLocaleString('vi-VN')}` : '';
         document.getElementById('statusBanner').textContent =
-          `Hương đã thắp: ${st.totalIncense} | Tổng Công Đức: ${st.totalMerit} | ZeroTTS: ${st.tts?.status} (Giọng: ${st.tts?.voice}) | TikTok: ${live}`;
+          `${st.room?.name} [${st.room?.modeName}]${total} | ZeroTTS: ${st.tts?.status} (Giọng: ${st.tts?.voice}) | ${roomsCache.length} phòng`;
       } catch (_) {
         document.getElementById('statusBanner').textContent = '⚠️ Mất kết nối tới server...';
       }
     }
-    refreshStatus();
-    setInterval(refreshStatus, 4000);
+
+    async function refresh() {
+      try {
+        const res = await fetch('/api/rooms');
+        const data = await res.json();
+        roomsCache = data.rooms || [];
+        if (!modesCache.length) {
+          modesCache = data.modes || [];
+          document.getElementById('newRoomMode').innerHTML = modesCache
+            .map((m) => `<option value="${esc(m.id)}" title="${esc(m.description)}">${esc(m.name)}</option>`).join('');
+        }
+        renderRooms();
+      } catch (_) {}
+      refreshState();
+    }
+    refresh();
+    setInterval(refresh, 4000);
   </script>
 </body>
 </html>

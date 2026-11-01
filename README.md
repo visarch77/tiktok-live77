@@ -1,6 +1,6 @@
 # 🪷 Chùa Linh Ứng Online — TikTok Live RPC (9:16 Interactive Buddhist Sanctuary)
 
-Hệ thống phát trực tiếp tương tác (**Interactive TikTok Live Stream & JSON-RPC 2.0**) chuẩn khung dọc **9:16 (`1080×1920`)** dành cho **OBS Studio / TikTok Live Studio**, chạy siêu nhẹ trên **Bun.js** và tích hợp giọng đọc AI tiếng Việt **ZeroTTS (`zeroweight-ai/ZeroTTS`)**.
+Hệ thống phát trực tiếp tương tác (**Interactive TikTok Live Stream & JSON-RPC 2.0**) chuẩn khung dọc **9:16 (`1080×1920`)** dành cho **OBS Studio / TikTok Live Studio**, chạy siêu nhẹ trên **Node.js / Bun.js** và tích hợp giọng đọc AI tiếng Việt **ZeroTTS (`zeroweight-ai/ZeroTTS`)**.
 
 Người xem trên TikTok Live tương tác trực tiếp qua **Bình luận (Comment)**, **Thả tim (Like)**, **Chia sẻ / Follow** và **Tặng quà (Gift)** để thực hiện các nghi thức tâm linh trên màn hình Chánh Điện **Đức Phật A Di Đà**:
 - 🔥 **Thắp hương & Đảnh lễ Tam Bái (8-Frame Walking & Prostration)**: Nhân vật Phật tử mặc áo lam bước đi từng bước dọc thảm đỏ hoa sen lên trước Lư Hương Đỉnh Đồng, hạ gối quỳ và thực hiện 3 lạy Ngũ thể đầu địa hướng về Đức Phật A Di Đà.
@@ -28,7 +28,7 @@ Người xem trên TikTok Live tương tác trực tiếp qua **Bình luận (Co
 
 ## ⚡ Kiến Trúc & Tối Ưu Hóa Hiệu Suất (Siêu Nhẹ CPU/GPU)
 
-- **Runtime**: Chạy trực tiếp trên **Bun.js** (`~0.1% CPU` khi chờ).
+- **Runtime**: Chạy trực tiếp trên **Node.js** hoặc **Bun.js** (`~0.1% CPU` khi chờ).
 - **Canvas Particle Engine (`public/js/particles.js`)**:
   - Khóa tốc độ vẽ ở **30 FPS** ổn định, tự động tạm dừng khi ẩn tab (`document.hidden`).
   - Pre-render toàn bộ Khói hương, Hạt vàng và Cánh hoa sen ra Offscreen Canvas 1 lần duy nhất lúc khởi tạo (`drawImage`), không gọi `createRadialGradient` hay `shadowBlur` trong vòng lặp frame.
@@ -46,30 +46,48 @@ Người xem trên TikTok Live tương tác trực tiếp qua **Bình luận (Co
 ## 🚀 Hướng Dẫn Cài Đặt & Chạy Nhanh
 
 ### 1. Yêu cầu hệ thống
-- [Bun.js](https://bun.sh/) (`>= 1.1`)
-- Python `3.10+` & [`uv`](https://github.com/astral-sh/uv) (để tạo môi trường `.venv` chạy `zerotts`)
+- [Node.js](https://nodejs.org/) (`>= 20`) — hoặc [Bun.js](https://bun.sh/) (`>= 1.1`) nếu muốn
+- Python `3.10`–`3.13` (để tạo môi trường `.venv` chạy `zerotts`)
+  > ⚠️ Python 3.14 chưa có bản `onnxruntime` (thư viện ZeroTTS cần) cho macOS Intel — hãy dùng 3.10–3.13.
 
 ### 2. Cài đặt thư viện
 ```bash
-# Cài đặt dependencies cho Bun / Node
-bun install
+# Cài đặt dependencies Node
+npm install
 
 # Tạo môi trường Python .venv và cài đặt ZeroTTS
-uv venv .venv
-uv pip install --python .venv/bin/python zerotts pillow
+python3.10 -m venv .venv
+.venv/bin/pip install zerotts pillow
 ```
+Lần chạy đầu, ZeroTTS tự tải model (~38 file) từ Hugging Face.
 
 ### 3. Khởi chạy Server
 ```bash
-bun start
+npm start
 # Hoặc chế độ tự động reload khi sửa code:
-bun run dev
+npm run dev
+# Dùng Bun thay cho Node:
+npm run start:bun
 ```
 
 Mặc định server chạy tại cổng `3000`:
-- **Màn hình Live + Điều khiển nhanh**: [http://localhost:3000](http://localhost:3000)
-- **Màn hình OBS Browser Source (Sạch 9:16)**: [http://localhost:3000/?obs=1](http://localhost:3000/?obs=1) *(Đặt kích thước Browser Source trong OBS là `1080 × 1920`)*
-- **Bảng điều khiển Admin & RPC**: [http://localhost:3000/admin](http://localhost:3000/admin)
+- **Quản lý phòng & RPC Admin**: [http://localhost:3000/admin](http://localhost:3000/admin)
+- **Màn hình phòng mặc định (`main`)**: [http://localhost:3000](http://localhost:3000) — OBS: [http://localhost:3000/?obs=1](http://localhost:3000/?obs=1) *(Browser Source `1080 × 1920`)*
+- **Màn hình phòng bất kỳ**: `http://localhost:3000/room/<mã phòng>` — OBS: thêm `?obs=1`
+
+---
+
+## 🏠 Nhiều Phòng Live & Chế Độ Chơi
+
+Một server chạy được nhiều phòng cùng lúc. Mỗi phòng = **1 tài khoản TikTok + 1 chế độ chơi + bảng xếp hạng riêng**.
+
+- Tạo / sửa / xoá phòng, kết nối TikTok, mở màn hình OBS của từng phòng tại **`/admin`**.
+- Danh sách phòng lưu ở `data/rooms.json`, trạng thái từng phòng ở `data/rooms/<mã>.json`.
+  Lần đầu chạy, dữ liệu cũ `data/merit-state.json` được tự chuyển sang phòng `main`.
+- Mỗi phòng live cần một nguồn phát riêng: mở thêm một OBS / TikTok Live Studio trỏ vào `/room/<mã>?obs=1`.
+- Chế độ hiện có: **Đi Chùa** (`temple`). Thêm chế độ mới (chạy bộ, battle quốc gia...) theo hướng dẫn
+  [`src/modes/README.md`](src/modes/README.md).
+- Biến môi trường: `PORT`, `TIKTOK_USER` (tài khoản của phòng `main` khi tạo lần đầu), `DATA_DIR`, `CORS_ORIGINS`.
 
 ---
 
@@ -90,7 +108,10 @@ Mặc định server chạy tại cổng `3000`:
 
 ## 🔌 Giao Thức JSON-RPC 2.0 (`POST /rpc` & `ws://localhost:3000/ws`)
 
-Bạn có thể gọi trực tiếp từ **TikFinity**, **Streamer.bot**, webhook hoặc `curl`:
+Bạn có thể gọi trực tiếp từ **TikFinity**, **Streamer.bot**, webhook hoặc `curl`.
+Thêm `"roomId": "<mã phòng>"` vào `params` để chọn phòng; bỏ trống = phòng `main`.
+Qua WebSocket, kết nối `ws://localhost:3000/ws?room=<mã phòng>` để chỉ nhận sự kiện của phòng đó
+(`room.state`, `room.event`, `room.viewerCount`, `tts.play`, `tts.status`).
 
 ```bash
 # 1. Thắp hương cầu an
@@ -134,7 +155,17 @@ curl -X POST http://localhost:3000/rpc \
 ```
 
 ### Danh sách JSON-RPC Methods hỗ trợ:
-- `temple.getState`: Lấy toàn bộ trạng thái Chánh Điện và Bảng Vàng Công Đức.
+**Quản lý phòng (toàn cục):**
+- `rooms.list`, `modes.list`
+- `rooms.create` (`id`, `name`, `mode`, `tiktokUsername`, `autoConnect`)
+- `rooms.update` (`id` + các trường cần đổi; đổi `mode` sẽ khởi động lại phòng)
+- `rooms.delete` (`id`)
+
+**Chung cho mọi phòng** (`room.*`, hoặc `<chế độ>.*` như bản cũ):
+- `room.getState`, `room.updateSettings`, `room.comment` (`comment`, `user`) — giả lập bình luận, `room.speak` (`text`)
+- `live.connect` (`username`) / `live.disconnect` / `live.setAutoSim` (`enabled`)
+
+**Chế độ Đi Chùa:**
 - `temple.burnIncense`: Thắp nhang & bước lên đảnh lễ (`user`, `avatar`, `count`, `wish`).
 - `temple.sendPrayer`: Thả đèn hoa đăng cầu nguyện (`user`, `avatar`, `wish`).
 - `temple.drawFortune`: Lắc ống xăm & gieo quẻ (`user`, `avatar`, `topic`).
@@ -142,23 +173,38 @@ curl -X POST http://localhost:3000/rpc \
 - `temple.ringBell`: Thỉnh Đại Hồng Chung (`user`, `count`, `wish`).
 - `temple.offerGift`: Dâng lễ vật (`user`, `giftType`: `lotus` | `fruit` | `lamp` | `dragon`, `coins`, `giftName`).
 - `temple.grandCeremony`: Kích hoạt Đại Lễ Kim Long Chầu Phật (`user`, `coins`, `giftName`).
-- `temple.updateSettings`: Cập nhật âm lượng nhạc nền (`musicVolume`), giọng đọc (`ttsVolume`), bật/tắt TTS.
-- `temple.resetMerit`: Đặt lại bảng thống kê Công Đức.
-- `live.connect` / `live.disconnect`: Kết nối / Ngắt kết nối phòng TikTok Live.
+- `temple.resetMerit`: Đặt lại bảng thống kê Công Đức của phòng.
 
 ---
 
 ## 📁 Cấu Trúc Thư Mục
 
 ```text
-├── server.js                  # Bun.js HTTP + WebSocket JSON-RPC 2.0 Server & TikTok Live Connector
+├── server.js                  # Điểm khởi động (gọi src/index.js)
+├── src/
+│   ├── index.js               # HTTP + WebSocket JSON-RPC 2.0, định tuyến /room/:id
+│   ├── config.js
+│   ├── core/
+│   │   ├── roomManager.js     # Tạo / sửa / xoá phòng, lưu data/rooms.json
+│   │   ├── room.js            # Một phòng: kết nối TikTok + chế độ chơi + cài đặt + lưu trạng thái
+│   │   ├── tiktokSource.js    # Kết nối TikTok Live, tự kết nối lại
+│   │   ├── normalize.js       # Chuẩn hoá sự kiện (chat / like / gift / follow / share / join), gộp tim, combo quà
+│   │   ├── viewers.js         # Bảng điểm người xem dùng chung
+│   │   ├── hub.js             # WebSocket theo phòng
+│   │   ├── store.js           # Lưu trữ JSON (ghi throttle + atomic)
+│   │   └── tts.js             # Quản lý worker ZeroTTS dùng chung
+│   ├── modes/
+│   │   ├── README.md          # Hướng dẫn viết chế độ chơi mới
+│   │   └── temple/            # Chế độ Đi Chùa (nghi lễ, quẻ xăm, giả lập)
+│   └── util/sanitize.js       # Lọc tên / lời khấn / spam
 ├── tts_worker.py              # Tiến trình Python ZeroTTS thường trú (48kHz, chống rè/clipping, lọc ký tự lạ)
 ├── data/
-│   ├── merit-state.json       # Lưu trữ bền vững Bảng Vàng Công Đức của người xem thật
+│   ├── rooms.json             # Danh sách phòng
+│   ├── rooms/<mã>.json        # Trạng thái & bảng xếp hạng từng phòng
 │   └── tts-cache/             # Bộ đệm file âm thanh WAV đã tổng hợp
 ├── public/
 │   ├── index.html             # Giao diện Chánh Điện 9:16 + Bảng điều khiển nhanh
-│   ├── admin.html             # Trang quản trị JSON-RPC 2.0 đầy đủ
+│   ├── admin.html             # Quản lý phòng + bảng lệnh JSON-RPC 2.0
 │   ├── css/live.css           # Stylesheet tối ưu GPU Compositor
 │   ├── js/
 │   │   ├── live.js            # Điều phối 8-frame prostration, Đạo Tràng 40 chỗ ngồi & WebSocket RPC

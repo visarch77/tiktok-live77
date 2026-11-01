@@ -349,7 +349,7 @@ class TempleAudioEngine {
       const res = await fetch('/api/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, voice })
+        body: JSON.stringify({ text, voice, roomId: this.roomId || undefined })
       });
       const data = await res.json();
       if (data && data.ok && data.url) {
