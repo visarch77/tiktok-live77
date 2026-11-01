@@ -1,4 +1,7 @@
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
+const { TTS_CACHE_DIR } = require('../../config');
 const { LITURGY, SUTRAS, RECITATION_LINE, DEFAULT_INVOCATION, DEFAULT_ROTATION, toLines, lineSyllables } = require('./texts');
 const timeline = require('./timeline');
 const { isBlockedSpamOrToxic, sanitizeUserName, sanitizeWishText } = require('../../util/sanitize');
@@ -15,8 +18,51 @@ const { isBlockedSpamOrToxic, sanitizeUserName, sanitizeWishText } = require('..
 const SEAT_LAYOUT = require('../../../public/js/seat-layout').buildSeatLayout();
 const SEAT_COUNT = SEAT_LAYOUT.length;
 const { guessGender, parseSelfGender } = require('./gender');
+const { createSimulator, SIM_LEVELS, SIM_PREFIX } = require('./sim');
+const { giftOffering, isSmallGift, OFFERINGS } = require('./gifts');
+const { createWishBag } = require('./wishes');
+const { ANNOUNCE, nextSessionLine, splitForSpeech, createAnnouncer } = require('./announcements');
 // Nam ngồi bên trái thảm, nữ bên phải
 const SIDE_FOR = { m: 'L', f: 'R' };
+
+// Thứ tự xếp chỗ RẢI ĐỀU cho mỗi bên: chỗ kế tiếp luôn là chỗ xa nhất so với các chỗ đã chọn (farthest-point).
+// Ít người thì ngồi rải khắp chánh điện; càng đông càng lấp dần khoảng trống cho tới khi kín chỗ.
+// Khoảng cách tính trên màn hình nên hàng gần (người to) được giãn rộng hơn hàng xa — đúng phối cảnh.
+const SPREAD_ORDER = (() => {
+  const out = {};
+  for (const side of ['L', 'R']) {
+    const idx = SEAT_LAYOUT.map((p, i) => (p.side === side ? i : -1)).filter((i) => i >= 0);
+    if (!idx.length) {
+      out[side] = [];
+      continue;
+    }
+    const order = [idx[0]]; // bắt đầu từ chỗ hàng đầu, sát thảm đỏ
+    const minD = new Map(idx.map((i) => [i, Infinity]));
+    let last = idx[0];
+    minD.delete(last);
+    while (minD.size) {
+      const a = SEAT_LAYOUT[last];
+      let best = -1;
+      let bestD = -1;
+      for (const [i, d] of minD) {
+        const b = SEAT_LAYOUT[i];
+        const nd = Math.min(d, (a.x - b.x) ** 2 + (a.y - b.y) ** 2);
+        minD.set(i, nd);
+        // ưu tiên nhẹ hàng gần hơn khi hai chỗ cách đều nhau
+        const score = nd * (0.85 + 0.3 * b.scale);
+        if (score > bestD) {
+          bestD = score;
+          best = i;
+        }
+      }
+      order.push(best);
+      minD.delete(best);
+      last = best;
+    }
+    out[side] = order;
+  }
+  return out;
+})();
 const INCENSE_COOLDOWN_MS = 3 * 60 * 1000; // mỗi người lên thắp nhang tối đa 1 lần / 3 phút
 const PRESENCE_GAP_MS = 2 * 60 * 1000; // hai lần tương tác cách nhau ≤ 2 phút = vẫn đang ở trong đạo tràng
 const BELL_RESPONSE_MS = 6000; // thả tim trong 6 giây sau tiếng chuông = "chắp tay theo chuông"
@@ -26,7 +72,7 @@ const MAX_TRACKED = 5000;
 const CHANTING_WINDOW_MS = 6000; // thả tim trong 6 giây gần nhất = "đang tụng kinh"
 const COMMENT_COOLDOWN_MS = 4000;
 const CHANT_FLUSH_MS = 1500;
-const THANKS_FLUSH_MS = 8000;
+const THANKS_FLUSH_MS = 2500; // gom quà trong 2,5 giây rồi đọc tên + lời chúc
 const MAX_DEDICATION_NAMES = 300;
 const VOTE_RE = /(?:^|[^\p{L}])kinh\s*(?:số\s*)?([1-9])(?![0-9])/iu;
 // Cú pháp lên thắp nhang trước Phật
@@ -35,8 +81,24 @@ const INCENSE_RE = /(?:^|[^\p{L}])(?:thắp|thap|dâng|dang)\s+(?:nhang|hương|
 // Mỗi loại quà là một biểu tượng tượng trưng — cùng kích thước, cùng ánh sáng, không theo giá trị
 const LAMP_SYMBOLS = ['🪷', '🏮', '🕯️', '🌸', '🌼', '💮', '🍃', '🌺'];
 
+const GIFT_FOCUS_MS = 20000; // mỗi người được camera đưa cận cảnh tối đa 1 lần / 20 giây
+
+// Lời chúc "thật tâm" để đọc thành tiếng (đã qua lọc khiếm nhã / spam): có ý chúc, nguyện, cảm ơn
+const SINCERE_RE = /(nguy[eệ]n|c[aầ]u|ch[uú]c|mong|b[iì]nh an|an l[aà]nh|an l[aạ]c|an vui|s[uứ]c kh[oỏ]e|kh[oỏ]e m[aạ]nh|h[aạ]nh ph[uú]c|may m[aắ]n|c[aả]m [oơ]n|tu[yỳ] h[yỷ]|di [dđ][aà]|nam m[oô]|si[eê]u|h[oồ]i h[uướ][oớ]ng|b[iì]nh y[eê]n|t[aâ]m an|th[aà]nh t[aâ]m|t[uừ] bi)/iu;
+const SPEECH_QUEUE_MAX = 6;
+const WELCOME_SPEAK_MS = 25000; // lời chào người mới (dâng lễ) gom lại, tối đa 1 lần / 25 giây
+
+// Công đức tụng kinh trong ngày: chủ yếu theo thời gian cùng tụng và số tim; quà đóng góp rất ít
+const MERIT_PER_MINUTE = 2;
+const MERIT_PER_HEART = 0.25;
+const MERIT_PER_GIFT = 1;
+const MERIT_BROADCAST_MS = 8000;
+// Hào quang: tụng lâu / thả tim nhiều thì hào quang đổi màu
+const AURA_MINUTES = [10, 30, 60];
+const AURA_HEARTS = [150, 500, 1500];
+
 const PHASE_TITLES = {
-  gather: 'Tụ hội',
+  gather: 'Dâng lễ',
   bell_open: 'Khai chuông',
   incense: LITURGY.incense.title,
   khai_chuong_mo: 'Khai chuông mõ',
@@ -48,26 +110,6 @@ const PHASE_TITLES = {
   silence: 'Tĩnh lặng'
 };
 const PHASE_ORDER = ['gather', 'bell_open', 'incense', 'khai_chuong_mo', 'opening', 'sutra', 'recitation', 'dedication', 'silence', 'bell_close'];
-
-const SIM_USERS = [
-  { user: 'Ngọc Anh', uniqueId: 'sim_ngocanh' },
-  { user: 'Minh Quân', uniqueId: 'sim_minhquan' },
-  { user: 'Tâm An', uniqueId: 'sim_taman' },
-  { user: 'Hoàng Nam', uniqueId: 'sim_hoangnam' },
-  { user: 'Thanh Hà', uniqueId: 'sim_thanhha' },
-  { user: 'Đức Thịnh', uniqueId: 'sim_ducthinh' },
-  { user: 'Bảo Ngọc', uniqueId: 'sim_baongoc' },
-  { user: 'Gia Huy', uniqueId: 'sim_giahuy' }
-];
-const SIM_WISHES = [
-  'Nguyện cho mọi người được bình an',
-  'Mong cả nhà luôn mạnh khỏe, sống hiền lành',
-  'Con nguyện sống tử tế hơn mỗi ngày',
-  'Nam mô A Di Đà Phật',
-  'Cảm ơn đạo tràng, tâm con thấy nhẹ nhàng',
-  'kinh 2',
-  'kinh 3'
-];
 
 function todayKey() {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' }).format(new Date());
@@ -112,6 +154,7 @@ function create(ctx, saved = {}) {
   let bellWindow = null; // { at, count, keys:Set } phản hồi theo tiếng chuông gần nhất
   let bellWindowTimer = null;
   const readerClips = new Map(); // chữ -> url (giọng đọc từng chữ)
+  const lineClips = new Map(); // câu -> { url, durMs } (đọc tự nhiên cả câu)
   let readerPreparing = false;
 
   const people = new Map(); // key -> { key, name, avatar, lastActive, lastLike, slot }
@@ -279,30 +322,42 @@ function create(ctx, saved = {}) {
 
   // Chọn chỗ trống phía của mình (nam: trái, nữ: phải), hàng gần trước; hết chỗ thì nhường chỗ của người
   // lâu nhất chưa tương tác cùng phía
+  // Chọn chỗ phía của mình (nam: trái, nữ: phải) theo thứ tự rải đều. Hết chỗ thì nhường chỗ của người
+  // ít tương tác nhất cùng phía: trước hết người chưa từng thả tim, rồi người lâu nhất không thả tim / tương tác.
+  // Người vừa tương tác trong 2 phút gần đây không bị thay.
+  const REPLACE_PROTECT_MS = 2 * 60 * 1000;
+  const rankLess = (a, b) => {
+    for (let k = 0; k < a.length; k++) if (a[k] !== b[k]) return a[k] < b[k];
+    return false;
+  };
   function assignSlot(person) {
     const side = SIDE_FOR[person.gender] || 'R';
-    let slot = -1;
-    for (let i = 0; i < SEAT_COUNT; i++) {
-      if (slots[i] === null && SEAT_LAYOUT[i].side === side) {
-        slot = i;
-        break;
-      }
-    }
-    if (slot < 0) {
-      let oldest = null;
-      for (let i = 0; i < SEAT_COUNT; i++) {
-        if (SEAT_LAYOUT[i].side !== side) continue;
+    let slot = SPREAD_ORDER[side].find((i) => slots[i] === null);
+    if (slot === undefined) {
+      const now = Date.now();
+      let victim = null;
+      let victimRank = null;
+      for (const i of SPREAD_ORDER[side]) {
         const p = people.get(slots[i]);
-        if (p && p !== person && (!oldest || p.lastActive < oldest.lastActive)) oldest = p;
+        if (!p || p === person) continue;
+        const lastTouch = Math.max(p.lastActive || 0, p.lastLike || 0);
+        const protectedNow = now - lastTouch < REPLACE_PROTECT_MS;
+        // Hạng nhường chỗ: [đang được bảo vệ?, đã từng thả tim?, lần thả tim gần nhất, lần tương tác gần nhất]
+        const rank = [protectedNow ? 1 : 0, p.lastLike ? 1 : 0, p.lastLike || 0, p.lastActive || 0];
+        if (!victimRank || rankLess(rank, victimRank)) {
+          victim = p;
+          victimRank = rank;
+        }
       }
-      if (oldest) {
-        slot = oldest.slot;
-        oldest.slot = -1;
+      if (victim) {
+        slot = victim.slot;
+        victim.slot = -1;
       } else {
-        slot = slots.indexOf(null);
+        const free = slots.indexOf(null);
+        slot = free >= 0 ? free : undefined;
       }
     }
-    if (slot < 0) return;
+    if (slot === undefined || slot < 0) return;
     slots[slot] = person.key;
     person.slot = slot;
   }
@@ -322,8 +377,127 @@ function create(ctx, saved = {}) {
   }
 
   function seatView(person) {
-    return { slot: person.slot, key: person.key, name: person.name, avatar: person.avatar, gender: person.gender };
+    return { slot: person.slot, key: person.key, name: person.name, avatar: person.avatar, gender: person.gender, tier: auraTier(person) };
   }
+
+  // ------------------------------------------------------------------------
+  // Công đức & hào quang
+  // ------------------------------------------------------------------------
+  function meritOf(st) {
+    if (!st) return 0;
+    return Math.round((st.activeMs / 60000) * MERIT_PER_MINUTE + st.hearts * MERIT_PER_HEART + (st.gifts || 0) * MERIT_PER_GIFT);
+  }
+
+  function auraTier(person) {
+    const st = person && person.stat;
+    if (!st) return 0;
+    const minutes = st.activeMs / 60000;
+    let tier = 0;
+    for (let i = 0; i < 3; i++) if (minutes >= AURA_MINUTES[i] || st.hearts >= AURA_HEARTS[i]) tier = i + 1;
+    return tier;
+  }
+
+  function topMerit(limit = 5) {
+    return [...dayStats.values()]
+      .map((st) => ({ name: st.name, merit: meritOf(st), minutes: Math.round(st.activeMs / 60000), hearts: st.hearts }))
+      .filter((r) => r.merit > 0)
+      .sort((a, b) => b.merit - a.merit)
+      .slice(0, limit);
+  }
+
+  let meritSig = '';
+  let meritTimer = null;
+  function scheduleMerit() {
+    if (meritTimer) return;
+    meritTimer = setTimeout(() => {
+      meritTimer = null;
+      const top = topMerit();
+      const sig = top.map((r) => `${r.name}:${r.merit}`).join('|');
+      if (sig === meritSig) return;
+      meritSig = sig;
+      ctx.broadcast('chant.activity', { kind: 'merit', top });
+    }, MERIT_BROADCAST_MS);
+  }
+
+  function checkAura(person) {
+    const tier = auraTier(person);
+    if (tier > (person.tier || 0)) {
+      person.tier = tier;
+      if (person.slot >= 0) ctx.broadcast('chant.activity', { kind: 'aura', slot: person.slot, key: person.key, name: person.name, tier });
+    }
+  }
+
+  // ------------------------------------------------------------------------
+  // Hai chế độ: DÂNG LỄ (lúc tụ hội) — nhạc nền + đọc lời chúc thật tâm, cảm ơn người ủng hộ;
+  // TỤNG KINH (mọi bước còn lại) — chỉ tiếng pháp, lời chúc/cảm ơn hiện trên bảng bên trái
+  // ------------------------------------------------------------------------
+  function offeringTime() {
+    return !phase || phase.id === 'gather' || phase.id === 'paused';
+  }
+
+  const speechQueue = [];
+  const announceQueue = []; // lời dẫn: ưu tiên, đọc cả khi đang tụng kinh
+  let speaking = false;
+  let lastWelcomeSpeak = 0;
+  let welcomeBuffer = [];
+
+  const speakName = (name) => String(name || '').replace(/[._\-\d]+/g, ' ').replace(/\s+/g, ' ').trim();
+
+  function isSincere(text) {
+    const t = String(text || '').trim();
+    if (t.length < 6 || t.split(/\s+/).length < 2) return false;
+    if (/https?:|www\.|@/i.test(t)) return false;
+    return SINCERE_RE.test(t);
+  }
+
+  function enqueueSpeech(text) {
+    if (!offeringTime() || ctx.settings.speakWishes === false || !ctx.tts) return;
+    if (speechQueue.length >= SPEECH_QUEUE_MAX) speechQueue.shift();
+    speechQueue.push(String(text).slice(0, 150));
+    if (!speaking) pumpSpeech();
+  }
+
+  /** Lời dẫn: chia theo câu, xếp trước mọi lời chúc đang chờ */
+  function announce(text) {
+    if (!text || !ctx.tts) return;
+    splitForSpeech(text).forEach((t) => announceQueue.push(t));
+    if (!speaking) pumpSpeech();
+  }
+
+  async function pumpSpeech() {
+    if (speaking) return;
+    speaking = true;
+    try {
+      while ((announceQueue.length || speechQueue.length) && !disposed) {
+        const isAnnounce = announceQueue.length > 0;
+        if (!isAnnounce && !offeringTime()) {
+          speechQueue.length = 0;
+          break;
+        }
+        const text = isAnnounce ? announceQueue.shift() : speechQueue.shift();
+        if (!ctx.tts.ready) continue;
+        const res = await ctx.tts.synthesize(text, readerVoice()).catch(() => null);
+        if (!res || !res.ok || !res.url || (!isAnnounce && !offeringTime())) continue;
+        const durMs = res.durationSec ? Math.round(res.durationSec * 1000) : wavDurationMs(res.url) || 3000;
+        ctx.broadcast('chant.activity', { kind: 'speak', url: res.url, text, durMs, announce: isAnnounce });
+        await new Promise((r) => setTimeout(r, durMs + (isAnnounce ? 350 : 900)));
+      }
+    } finally {
+      speaking = false;
+    }
+  }
+
+  function noteWelcome(person) {
+    welcomeBuffer.push(person.name);
+    if (welcomeBuffer.length > 4) welcomeBuffer.shift();
+    const now = Date.now();
+    if (now - lastWelcomeSpeak < WELCOME_SPEAK_MS) return;
+    lastWelcomeSpeak = now;
+    const names = welcomeBuffer.map(speakName).filter(Boolean);
+    welcomeBuffer = [];
+    if (names.length) enqueueSpeech(`Chào mừng ${names.join(', ')} đã vào đạo tràng. A Di Đà Phật.`);
+  }
+
 
   function announceSeat(person) {
     ctx.broadcast('chant.activity', { kind: 'seat', seat: seatView(person), counters });
@@ -331,7 +505,10 @@ function create(ctx, saved = {}) {
 
   function seatAndAnnounce(user) {
     const { person, isNewSeat } = touch(user);
-    if (isNewSeat) announceSeat(person);
+    if (isNewSeat) {
+      announceSeat(person);
+      noteWelcome(person);
+    }
     return person;
   }
 
@@ -395,9 +572,65 @@ function create(ctx, saved = {}) {
   function withTimeline(lines, tl, extraMs = 0) {
     return {
       text: lines ? { lines, syllables: lineSyllables(lines), times: tl.syllableTimes } : null,
+      ...(tl.voiceTimes && tl.voiceTimes.length ? { voicePlan: { times: tl.voiceTimes, clips: tl.voiceClips } } : {}),
       cues: [...tl.cues].sort((x, y) => x.t - y.t),
       durationMs: Math.round(tl.endAt + extraMs)
     };
+  }
+
+  // Đọc tự nhiên cả câu (mặc định) hay đọc từng chữ theo nhịp mõ
+  function naturalReader() {
+    return ctx.settings.readerEnabled !== false && ctx.settings.readerStyle !== 'syllable';
+  }
+  function lineGap() {
+    return Number(ctx.settings.lineGapMs) || 700;
+  }
+  // Gộp các dòng kinh thành CÂU trọn ý để đọc liền mạch, truyền cảm:
+  //  - kệ (dòng nào cũng viết hoa đầu, ngắn, không dấu phẩy): đọc theo cặp hai dòng
+  //  - kinh tiếng Việt: dòng sau viết thường là nối tiếp câu trước
+  //  - danh hiệu lặp lại (single): mỗi dòng một câu
+  //  - "breaks": luôn ngắt câu sau các dòng này (chỗ có tiếng chuông)
+  // Tối đa 3 dòng / 22 chữ mỗi câu (đủ một hơi đọc, trong giới hạn của bộ đọc).
+  function groupLines(lines, { breaks = [], single = false } = {}) {
+    const isCap = (w) => /^\p{Lu}/u.test(w);
+    const verse = lines.length > 1 && lines.every((l) => isCap(l[0]) && l.length <= 8 && !l.join(' ').includes(','));
+    const groups = [];
+    let start = 0;
+    for (let i = 0; i < lines.length; i++) {
+      const next = lines[i + 1];
+      const size = i + 1 - start;
+      const syl = lines.slice(start, i + 1).reduce((n, l) => n + l.length, 0);
+      let end = single || !next || breaks.includes(i) || size >= 3 || syl + next.length > 22;
+      if (!end) end = verse ? size >= 2 : isCap(next[0]);
+      if (end) {
+        groups.push({ start, end: i + 1 });
+        start = i + 1;
+      }
+    }
+    return groups;
+  }
+
+  function groupText(lines, g) {
+    return lines
+      .slice(g.start, g.end)
+      .map((l) => l.join(' '))
+      .join(', ')
+      .replace(/,\s*,/g, ',');
+  }
+
+  // Các câu đọc của một đoạn, kèm độ dài thật; chưa đủ giọng thì null (dùng nhịp tụng theo bpm)
+  function spokenPlan(lines, opts) {
+    if (!naturalReader()) return null;
+    if (!lines.length) return [];
+    const voice = readerVoice();
+    const groups = groupLines(lines, opts);
+    for (const g of groups) {
+      const c = lineClips.get(`${voice}::${groupText(lines, g)}`);
+      if (!c || !c.durMs) return null;
+      g.durMs = c.durMs;
+      g.url = c.url;
+    }
+    return groups;
   }
 
   function buildPhase(id) {
@@ -410,15 +643,19 @@ function create(ctx, saved = {}) {
     };
     switch (id) {
       case 'gather':
-        return { ...base, subtitle: 'Mời mọi người vào đạo tràng — thả tim để cùng tụng', cues: [], durationMs: (Number(ctx.settings.gatherSeconds) || 90) * 1000 };
+        // Chế độ DÂNG LỄ: nhạc nền, đọc lời chúc, cảm ơn người dâng lễ; camera cận cảnh người dâng
+        return { ...base, subtitle: 'Mời mọi người vào đạo tràng — dâng lễ, gửi lời chúc, thả tim', cues: [], durationMs: offeringMs() };
       case 'bell_open': {
         const tl = timeline.openingBells();
         return { ...base, subtitle: 'Mời đại chúng cùng an tọa', cues: tl.cues, durationMs: tl.endAt };
       }
       case 'incense': {
-        // Niệm hương: xướng chậm, KHÔNG mõ; một tiếng chuông khi xướng xong
+        // Niệm hương: xướng (không mõ); một tiếng chuông khi xướng xong
         const lines = toLines(LITURGY.incense);
-        const tl = timeline.intoned(lines, { spm: Number(ctx.settings.intonedSpm) || 54, linePauseMs: 1100, bellAfterLines: [lines.length - 1], startAt: 1500, gesture: 'chap' });
+        const d = spokenPlan(lines, { breaks: [lines.length - 1] });
+        const tl = d
+          ? timeline.spoken(lines, d, { startAt: 1500, gapMs: lineGap(), bellAfterLines: [lines.length - 1], gesture: 'chap' })
+          : timeline.intoned(lines, { spm: Number(ctx.settings.intonedSpm) || 54, linePauseMs: 1100, bellAfterLines: [lines.length - 1], startAt: 1500, gesture: 'chap' });
         return { ...base, subtitle: LITURGY.incense.meaning, voice: 'intoned', ...withTimeline(lines, tl, 3000) };
       }
       case 'khai_chuong_mo': {
@@ -426,36 +663,49 @@ function create(ctx, saved = {}) {
         return { ...base, subtitle: 'Chuông mõ mở đầu — mời đại chúng cùng tụng', cues: tl.cues, durationMs: tl.endAt };
       }
       case 'opening': {
-        // Khai kinh kệ: có mõ nhưng chậm
+        // Khai kinh kệ: có mõ (đọc tự nhiên: mõ mỗi dòng; đọc từng chữ: mõ chậm mỗi chữ)
         const lines = toLines(LITURGY.opening);
-        const tl = timeline.chantedWithMo(lines, { ...tempoFor('slow'), startAt: 300 });
+        const d = spokenPlan(lines);
+        const tl = d
+          ? timeline.spoken(lines, d, { startAt: 300, gapMs: lineGap(), mo: true, endBell: true })
+          : timeline.chantedWithMo(lines, { ...tempoFor('slow'), startAt: 300 });
         return { ...base, subtitle: LITURGY.opening.meaning, voice: 'mo', ...withTimeline(lines, tl) };
       }
       case 'sutra': {
         // Xướng danh hiệu 3 lần (mỗi lần một chuông, không mõ) rồi đồng tụng kinh có mõ
         const invocationText = currentSutra.invocation === null ? null : currentSutra.invocation || DEFAULT_INVOCATION;
         const invLines = invocationText ? toLines({ repeat: { line: invocationText, times: 3 } }) : [];
-        const inv = timeline.intoned(invLines, { gesture: 'xa', spm: (Number(ctx.settings.intonedSpm) || 54) * 1.4, linePauseMs: 800, bellAfterLines: [0, 1, 2], startAt: 800, bellWaitMs: 2200 });
         const lines = toLines(currentSutra);
+        const bowBreaks = lines.map((_, i) => i).filter((i) => i % 2 === 1);
+        const dInv = spokenPlan(invLines, { single: true });
+        const dBody = spokenPlan(lines, currentSutra.style === 'bow' ? { breaks: bowBreaks } : {});
+        const natural = Boolean(dInv && dBody);
+        const inv = natural
+          ? timeline.spoken(invLines, dInv, { startAt: 800, gapMs: lineGap(), bellAfterLines: [0, 1, 2], gesture: 'xa', bellWaitMs: 2200 })
+          : timeline.intoned(invLines, { gesture: 'xa', spm: (Number(ctx.settings.intonedSpm) || 54) * 1.4, linePauseMs: 800, bellAfterLines: [0, 1, 2], startAt: 800, bellWaitMs: 2200 });
         let body;
         if (currentSutra.style === 'bow') {
           // Tam quy: xướng, sau mỗi câu quy y một tiếng chuông để chắp tay xá
           const bellAfter = lines.map((_, i) => i).filter((i) => i % 2 === 1);
-          body = timeline.intoned(lines, {
-            spm: Number(ctx.settings.intonedSpm) || 54,
-            linePauseMs: 900,
-            bellAfterLines: bellAfter,
-            startAt: inv.endAt + 600,
-            bellWaitMs: 3500,
-            gesture: 'xa'
-          });
+          body = natural
+            ? timeline.spoken(lines, dBody, { startAt: inv.endAt + 600, gapMs: lineGap(), bellAfterLines: bellAfter, gesture: 'xa', bellWaitMs: 3500 })
+            : timeline.intoned(lines, {
+                spm: Number(ctx.settings.intonedSpm) || 54,
+                linePauseMs: 900,
+                bellAfterLines: bellAfter,
+                startAt: inv.endAt + 600,
+                bellWaitMs: 3500,
+                gesture: 'xa'
+              });
           body.endAt += 3000;
         } else {
-          body = timeline.chantedWithMo(lines, {
-            ...tempoFor(currentSutra.style),
-            startAt: inv.endAt + 1200,
-            moPerLine: currentSutra.lang === 'vi' && ctx.settings.vietMoStyle === 'line'
-          });
+          body = natural
+            ? timeline.spoken(lines, dBody, { startAt: inv.endAt + 1200, gapMs: lineGap(), mo: true, endBell: true })
+            : timeline.chantedWithMo(lines, {
+                ...tempoFor(currentSutra.style),
+                startAt: inv.endAt + 1200,
+                moPerLine: currentSutra.lang === 'vi' && ctx.settings.vietMoStyle === 'line'
+              });
         }
         const tl = { ...timeline.merge(inv, body), endAt: body.endAt };
         return {
@@ -471,14 +721,20 @@ function create(ctx, saved = {}) {
       case 'recitation': {
         const times = Math.max(3, Math.min(108, Number(ctx.settings.niemPhatCount) || 10));
         const lines = toLines({ repeat: { line: RECITATION_LINE, times } });
-        const tl = timeline.chantedWithMo(lines, { ...tempoFor('recitation'), startAt: 600 });
+        const d = spokenPlan(lines, { single: true });
+        const tl = d
+          ? timeline.spoken(lines, d, { startAt: 600, gapMs: Math.round(lineGap() * 0.6), mo: true, endBell: true })
+          : timeline.chantedWithMo(lines, { ...tempoFor('recitation'), startAt: 600 });
         return { ...base, subtitle: 'Nhất tâm niệm Phật, để tâm lắng lại', voice: 'mo', ...withTimeline(lines, tl) };
       }
       case 'dedication': {
-        // Hồi hướng: xướng chậm, không mõ; chuông giữa bài và ngay sau chữ cuối (lối Làng Mai)
+        // Hồi hướng: xướng, không mõ; chuông giữa bài và ngay sau chữ cuối (lối Làng Mai)
         const names = [...sessionNames.values()].slice(0, MAX_DEDICATION_NAMES);
         const lines = toLines(LITURGY.dedication);
-        const tl = timeline.intoned(lines, { spm: (Number(ctx.settings.intonedSpm) || 54) * 0.95, linePauseMs: 1000, bellAfterLines: [1, lines.length - 1], startAt: 1000, gesture: 'xa' });
+        const d = spokenPlan(lines, { breaks: [1, lines.length - 1] });
+        const tl = d
+          ? timeline.spoken(lines, d, { startAt: 1000, gapMs: lineGap(), bellAfterLines: [1, lines.length - 1], gesture: 'xa' })
+          : timeline.intoned(lines, { spm: (Number(ctx.settings.intonedSpm) || 54) * 0.95, linePauseMs: 1000, bellAfterLines: [1, lines.length - 1], startAt: 1000, gesture: 'xa' });
         const minMs = 6000 + Math.min(names.length, 120) * 250;
         const timed = withTimeline(lines, tl, 3000);
         return {
@@ -513,7 +769,34 @@ function create(ctx, saved = {}) {
     dedication: 'useDedication'
   };
 
+  // ------------------------------------------------------------------------
+  // Lịch tự động: DÂNG LỄ (offeringMinutes) ⇄ TỤNG KINH (chantMinutes).
+  // Tụng kinh = một khoá đầy đủ; sau mỗi bài kinh, nếu còn đủ thời gian thì tụng tiếp bài kế trong lịch
+  // (trước phần niệm Phật – hồi hướng – kết chuông), để cả khoá dài gần đúng số phút đã đặt.
+  // ------------------------------------------------------------------------
+  const TAIL_ESTIMATE_MS = 4 * 60 * 1000; // niệm Phật + hồi hướng + tĩnh lặng + kết chuông (ước lượng)
+  let chantBlockStart = 0;
+  let repeatSutra = false;
+  let sutrasThisBlock = 0;
+
+  function offeringMs() {
+    const m = Number(ctx.settings.offeringMinutes);
+    if (m > 0) return Math.round(m * 60000);
+    return (Number(ctx.settings.gatherSeconds) || 90) * 1000;
+  }
+  function chantBudgetMs() {
+    return Math.round((Number(ctx.settings.chantMinutes) || 20) * 60000);
+  }
+
   function nextPhaseId(id) {
+    if (id === 'sutra' && chantBlockStart) {
+      const elapsed = Date.now() - chantBlockStart;
+      const lastSutraMs = (phase && phase.durationMs) || 4 * 60000;
+      if (sutrasThisBlock < 12 && elapsed + lastSutraMs + TAIL_ESTIMATE_MS <= chantBudgetMs()) {
+        repeatSutra = true;
+        return 'sutra';
+      }
+    }
     let idx = PHASE_ORDER.indexOf(id);
     for (let i = 0; i < PHASE_ORDER.length; i++) {
       idx = (idx + 1) % PHASE_ORDER.length;
@@ -529,9 +812,19 @@ function create(ctx, saved = {}) {
   function enterPhase(id) {
     if (disposed) return;
     clearTimeout(phaseTimer);
+    const prevId = phase && phase.id;
     paused = false;
+    clearAnnounceTimers();
     if (id !== 'bell_open' && id !== 'gather' && !currentSutra) currentSutra = pickNextSutra();
+    if (id === 'sutra' && repeatSutra) {
+      repeatSutra = false;
+      currentSutra = pickNextSutra(); // bài kế tiếp trong cùng khoá tụng
+    }
+    if (id === 'sutra') sutrasThisBlock += 1;
+    if (id === 'gather') chantBlockStart = 0;
     if (id === 'bell_open') {
+      chantBlockStart = Date.now();
+      sutrasThisBlock = 0;
       currentSutra = pickNextSutra();
       sessionNames = new Map();
       sessionLamps = new Set();
@@ -553,9 +846,34 @@ function create(ctx, saved = {}) {
     attachReader(phase);
     ctx.broadcast('chant.phase', { phase, serverNow: Date.now(), nextUp: nextUp() });
     ctx.scheduleStateBroadcast();
+    if (id === 'gather') scheduleTransitionSpeech(prevId);
     // Chế độ "điều phối tay": tụ hội đến khi người trực bấm "Bắt đầu khoá tụng"
     if (id === 'gather' && ctx.settings.autoRun === false) return;
     phaseTimer = setTimeout(() => enterPhase(nextPhaseId(id)), phase.durationMs);
+  }
+
+  // ------------------------------------------------------------------------
+  // Lời dẫn chuyển chế độ: sau kết chuông (sang dâng lễ), báo trước 1 phút, và ngay trước khi vào khoá tụng
+  // ------------------------------------------------------------------------
+  const pickAnnouncement = createAnnouncer();
+  let announceTimers = [];
+  function clearAnnounceTimers() {
+    announceTimers.forEach(clearTimeout);
+    announceTimers = [];
+  }
+  function scheduleTransitionSpeech(prevId) {
+    if (ctx.settings.speakTransitions === false) return;
+    const dur = phase.durationMs;
+    const fromChant = prevId && prevId !== 'gather' && prevId !== 'paused';
+    if (fromChant) {
+      announceTimers.push(setTimeout(() => {
+        announce(pickAnnouncement('toOffering'));
+        if (ctx.settings.autoRun !== false) announce(nextSessionLine(dur / 60000));
+      }, 1500));
+    }
+    if (ctx.settings.autoRun === false) return; // điều phối tay: không biết lúc nào vào khoá tụng
+    if (dur >= 150000) announceTimers.push(setTimeout(() => announce(pickAnnouncement('soon')), dur - 75000));
+    if (dur >= 50000) announceTimers.push(setTimeout(() => announce(pickAnnouncement('toChant')), dur - 38000));
   }
 
   function pauseRoom() {
@@ -568,40 +886,96 @@ function create(ctx, saved = {}) {
   }
 
   // ------------------------------------------------------------------------
-  // Giọng đọc: tổng hợp TỪNG CHỮ bằng ZeroTTS (đặt đúng lên mỗi nhịp mõ — ZeroTTS không chỉnh được tốc độ,
-  // đọc nguyên câu sẽ nhanh gấp ~3 lần nhịp tụng). Chuẩn bị trước toàn bộ chữ của các bài, lưu cache đĩa.
+  // Giọng đọc (ZeroTTS). Mặc định: ĐỌC TỰ NHIÊN cả câu với nhịp bình thường — mốc thời gian lấy theo độ dài
+  // thật của từng câu. Tuỳ chọn "đọc từng chữ": mỗi chữ đặt lên một nhịp mõ (ZeroTTS không chỉnh được tốc độ).
+  // Chuẩn bị trước toàn bộ câu / chữ của các bài, lưu cache đĩa.
   // ------------------------------------------------------------------------
+  function readerVoice() {
+    return ctx.settings.readerVoice || ctx.settings.ttsVoice || 'maichi';
+  }
+
   function syllableKey(w) {
     return String(w).toLowerCase().replace(/[.,;:!?“”"()…]/g, '').trim();
   }
 
   function allTextLines() {
+    return readerBlocks().flatMap((b) => b.lines);
+  }
+
+  // Mọi đoạn có thể được đọc, cùng cách ngắt câu như khi dựng phase
+  function readerBlocks() {
+    const rep = (line) => toLines({ repeat: { line, times: 1 } });
     const out = [];
-    for (const k of Object.keys(LITURGY)) out.push(...toLines(LITURGY[k]));
+    const inc = toLines(LITURGY.incense);
+    out.push({ lines: inc, opts: { breaks: [inc.length - 1] } });
+    out.push({ lines: toLines(LITURGY.opening), opts: {} });
+    const ded = toLines(LITURGY.dedication);
+    out.push({ lines: ded, opts: { breaks: [1, ded.length - 1] } });
     for (const sut of SUTRAS) {
-      out.push(...toLines({ repeat: { line: sut.invocation || DEFAULT_INVOCATION, times: 1 } }));
-      out.push(...toLines(sut));
+      if (sut.invocation !== null) out.push({ lines: rep(sut.invocation || DEFAULT_INVOCATION), opts: { single: true } });
+      const ls = toLines(sut);
+      out.push({ lines: ls, opts: sut.style === 'bow' ? { breaks: ls.map((_, i) => i).filter((i) => i % 2 === 1) } : {} });
     }
-    out.push(...toLines({ repeat: { line: RECITATION_LINE, times: 1 } }));
+    out.push({ lines: rep(RECITATION_LINE), opts: { single: true } });
+    out.push({ lines: rep(DEFAULT_INVOCATION), opts: { single: true } });
     return out;
+  }
+
+  function allSentences() {
+    const set = new Set();
+    for (const b of readerBlocks()) for (const g of groupLines(b.lines, b.opts)) set.add(groupText(b.lines, g));
+    return [...set];
+  }
+
+  // Độ dài file WAV (đọc header) — kết quả lấy từ cache không kèm durationSec
+  function wavDurationMs(url) {
+    try {
+      const file = path.join(TTS_CACHE_DIR, path.basename(String(url)));
+      const buf = fs.readFileSync(file);
+      let pos = 12;
+      let byteRate = 0;
+      while (pos + 8 <= buf.length) {
+        const id = buf.toString('ascii', pos, pos + 4);
+        const size = buf.readUInt32LE(pos + 4);
+        if (id === 'fmt ') byteRate = buf.readUInt32LE(pos + 16);
+        if (id === 'data' && byteRate) return Math.round((Math.min(size, buf.length - pos - 8) / byteRate) * 1000);
+        pos += 8 + size + (size % 2);
+      }
+    } catch (_) {}
+    return 0;
+  }
+
+  async function waitForTts() {
+    while (!ctx.tts.ready && !disposed) await new Promise((r) => setTimeout(r, 5000));
   }
 
   async function prepareReader() {
     if (readerPreparing || !ctx.tts) return;
     readerPreparing = true;
     try {
-      const voice = ctx.settings.readerVoice || ctx.settings.ttsVoice || 'maichi';
-      const words = [...new Set(allTextLines().flat().map(syllableKey).filter(Boolean))];
-      for (const w of words) {
-        if (disposed) break;
-        const key = `${voice}::${w}`;
-        if (readerClips.has(key)) continue;
-        if (!ctx.tts.ready) {
-          await new Promise((r) => setTimeout(r, 5000));
-          continue;
+      const voice = readerVoice();
+      if (naturalReader()) {
+        for (const text of allSentences()) {
+          if (disposed) break;
+          const key = `${voice}::${text}`;
+          if (lineClips.has(key)) continue;
+          await waitForTts();
+          const res = await ctx.tts.synthesize(text, voice);
+          if (res && res.ok && res.url) {
+            const durMs = res.durationSec ? Math.round(res.durationSec * 1000) : wavDurationMs(res.url);
+            if (durMs) lineClips.set(key, { url: res.url, durMs });
+          }
         }
-        const res = await ctx.tts.synthesize(w, voice);
-        if (res && res.ok && res.url) readerClips.set(key, res.url);
+      } else {
+        const words = [...new Set(allTextLines().flat().map(syllableKey).filter(Boolean))];
+        for (const w of words) {
+          if (disposed) break;
+          const key = `${voice}::${w}`;
+          if (readerClips.has(key)) continue;
+          await waitForTts();
+          const res = await ctx.tts.synthesize(w, voice);
+          if (res && res.ok && res.url) readerClips.set(key, res.url);
+        }
       }
     } catch (err) {
       console.warn('[Chanting] Chuẩn bị giọng đọc lỗi:', err.message);
@@ -612,11 +986,31 @@ function create(ctx, saved = {}) {
 
   function attachReader(p) {
     if (!p.text || ctx.settings.readerEnabled === false) return;
-    const voice = ctx.settings.readerVoice || ctx.settings.ttsVoice || 'maichi';
+    const voice = readerVoice();
+    if (naturalReader()) {
+      // Chỉ phát giọng khi phase đã được dựng theo độ dài câu thật
+      if (p.voicePlan) p.reader = { mode: 'line', clips: p.voicePlan.clips, times: p.voicePlan.times };
+      else prepareReader();
+      delete p.voicePlan;
+      return;
+    }
     p.reader = {
+      mode: 'syllable',
       clips: p.text.lines.flat().map((w) => readerClips.get(`${voice}::${syllableKey(w)}`) || null)
     };
     if (p.reader.clips.some((c) => !c)) prepareReader();
+  }
+
+  function readerStatus() {
+    const voice = readerVoice();
+    if (naturalReader()) {
+      const keys = allSentences();
+      const ready = keys.filter((k) => lineClips.has(`${voice}::${k}`)).length;
+      return { voice, mode: 'natural', ready, total: keys.length, unit: 'câu', preparing: readerPreparing };
+    }
+    const words = [...new Set(allTextLines().flat().map(syllableKey).filter(Boolean))];
+    const ready = words.filter((w) => readerClips.has(`${voice}::${w}`)).length;
+    return { voice, mode: 'syllable', ready, total: words.length, unit: 'chữ', preparing: readerPreparing };
   }
 
   // ------------------------------------------------------------------------
@@ -632,12 +1026,25 @@ function create(ctx, saved = {}) {
     ctx.save();
   }
 
+  // Lời chúc khi dâng lễ: rút ngẫu nhiên từ bộ 100 câu chúc chung (sức khoẻ, bình an, công việc, may mắn…)
+  const nextWish = createWishBag();
+
   function flushThanks() {
     thanksTimer = null;
     if (thanksBuffer.size === 0) return;
-    const names = [...thanksBuffer.values()];
+    const items = [...thanksBuffer.values()];
     thanksBuffer = new Map();
-    ctx.broadcast('chant.activity', { kind: 'thanks', names, counters });
+    const names = items.map((i) => i.name);
+    ctx.broadcast('chant.activity', { kind: 'thanks', names, items: items.slice(0, 8), counters });
+    // Đọc tên + lời chúc riêng cho 2 người đầu; nhiều hơn thì cảm ơn chung kèm một lời chúc
+    const spoken = items.map((i) => ({ ...i, say: speakName(i.name) })).filter((i) => i.say);
+    spoken.slice(0, 2).forEach((i) => enqueueSpeech(`Cảm ơn ${i.say} đã ${i.offering}. ${nextWish()}`));
+    const rest = spoken.slice(2);
+    if (rest.length) {
+      const shown = rest.slice(0, 3).map((i) => i.say).join(', ');
+      const more = rest.length - 3;
+      enqueueSpeech(`Cảm ơn ${shown}${more > 0 ? ` và ${more} bạn` : ''} đã dâng lễ cùng đạo tràng. ${nextWish()}`);
+    }
   }
 
   function addVote(key, num, { replace = true } = {}) {
@@ -662,6 +1069,8 @@ function create(ctx, saved = {}) {
       }
       if (noteBellResponse(person, n)) st.heartsAtBell += n;
       checkMilestones(person, st);
+      checkAura(person);
+      scheduleMerit();
     }
     chantBuffer.set(person.key, person.name);
     if (!chantFlushTimer) chantFlushTimer = setTimeout(flushChant, CHANT_FLUSH_MS);
@@ -684,7 +1093,7 @@ function create(ctx, saved = {}) {
     }
 
     // "thắp nhang" / "thắp hương" / "dâng hương": phật tử bước lên thảm đỏ, thắp nhang trước Phật rồi về chỗ
-    if (INCENSE_RE.test(raw)) {
+    if (INCENSE_RE.test(raw) || /🔥/u.test(raw)) {
       const now = Date.now();
       if (now - (incenseCooldown.get(person.key) || 0) < INCENSE_COOLDOWN_MS) return null;
       incenseCooldown.set(person.key, now);
@@ -711,8 +1120,11 @@ function create(ctx, saved = {}) {
     if (!wish && !voted) return null;
     counters.wishes += 1;
     if (person.stat) person.stat.wishes += 1;
+    const sincere = Boolean(wish) && isSincere(wish);
+    if (sincere) enqueueSpeech(`${speakName(person.name)}: ${wish}`);
     return ctx.emitEvent({
       type: 'wish',
+      sincere,
       key: person.key,
       user: person.name,
       avatar: person.avatar,
@@ -724,25 +1136,45 @@ function create(ctx, saved = {}) {
     });
   }
 
+  const giftFocusAt = new Map();
   function handleGift(user, evt = {}) {
     const person = seatAndAnnounce(user);
-    thanksBuffer.set(person.key, person.name);
+    const offering = giftOffering(evt);
+    thanksBuffer.set(person.key, { name: person.name, offering: offering.text });
     if (!thanksTimer) thanksTimer = setTimeout(flushThanks, THANKS_FLUSH_MS);
-    if (sessionLamps.has(person.key)) return null; // mỗi người 1 đèn sen mỗi khoá — quà thêm chỉ được cảm ơn chung
-    sessionLamps.add(person.key);
-    counters.lamps += 1;
-    if (person.stat) person.stat.lamps += 1;
-    const giftKey = String(evt.giftId || evt.giftName || 'gift');
-    // Quà cũng là 1 phiếu chọn kinh (như một bình luận), chỉ khi người đó chưa đề nghị bài nào
-    const symbolicNum = 1 + hashIndex(giftKey, SUTRAS.length);
-    addVote(person.key, symbolicNum, { replace: false });
+    if (person.stat) {
+      person.stat.gifts = (person.stat.gifts || 0) + 1;
+      scheduleMerit();
+    }
+    const firstLamp = !sessionLamps.has(person.key); // đèn sen: mỗi người 1 đèn mỗi khoá
+    if (firstLamp) {
+      sessionLamps.add(person.key);
+      counters.lamps += 1;
+      if (person.stat) person.stat.lamps += 1;
+      // Quà cũng là 1 phiếu chọn kinh (như một bình luận), chỉ khi người đó chưa đề nghị bài nào
+      const giftKey = String(evt.giftId || evt.giftName || 'gift');
+      addVote(person.key, 1 + hashIndex(giftKey, SUTRAS.length), { replace: false });
+    }
+    // Quà nhỏ: lễ vật bay lên cùng tên (mỗi người tối đa 1 lần / 4 giây). Quà lớn: camera cận cảnh +
+    // màn dâng lễ riêng của món đó (mỗi người tối đa 1 lần / 20 giây để không bị lặp khi tặng liên tục)
+    const small = isSmallGift(evt);
+    const now = Date.now();
+    const gap = small ? 4000 : GIFT_FOCUS_MS;
+    if (!firstLamp && now - (giftFocusAt.get(person.key) || 0) < gap) return null;
+    giftFocusAt.set(person.key, now);
+    if (giftFocusAt.size > 2000) giftFocusAt.delete(giftFocusAt.keys().next().value);
     return ctx.emitEvent({
       type: 'lamp',
       key: person.key,
       user: person.name,
       avatar: person.avatar,
       slot: person.slot,
-      symbol: LAMP_SYMBOLS[hashIndex(giftKey, LAMP_SYMBOLS.length)],
+      symbol: offering.icon,
+      offering: offering.text,
+      cat: offering.cat,
+      img: offering.img,
+      small,
+      tier: auraTier(person),
       counters,
       nextUp: nextUp()
     });
@@ -756,6 +1188,50 @@ function create(ctx, saved = {}) {
     return ctx.emitEvent({ type: 'invite', key: person.key, user: person.name, avatar: person.avatar, slot: person.slot, counters });
   }
 
+  // ------------------------------------------------------------------------
+  // Giả lập người xem (sim.js) — chỉ dùng khi chưa live
+  // ------------------------------------------------------------------------
+  let simSnapshot = null;
+  const simulator = createSimulator({
+    seat: (u) => {
+      seatAndAnnounce(u);
+      ctx.scheduleStateBroadcast();
+    },
+    like: (u, n) => handleLike(u, n),
+    comment: (u, text) => handleComment(u, text),
+    gift: (u, evt) => handleGift(u, evt),
+    invite: (u) => handleInvite(u),
+    phase: () => phase,
+    seatedSimKeys: () => slots.filter((k) => k && k.startsWith(SIM_PREFIX)),
+    simulated: (fn) => (ctx.simulated ? ctx.simulated(fn) : fn())
+  });
+
+  function clearSimPeople() {
+    let removed = 0;
+    for (const [key, p] of [...people]) {
+      if (!key.startsWith(SIM_PREFIX)) continue;
+      if (p.slot >= 0 && slots[p.slot] === key) slots[p.slot] = null;
+      people.delete(key);
+      dayStats.delete(key);
+      sessionNames.delete(key);
+      votes.delete(key);
+      sessionLamps.delete(key);
+      sessionInvites.delete(key);
+      commentCooldown.delete(key);
+      incenseCooldown.delete(key);
+      chantBuffer.delete(key);
+      participantHashes.delete(hashKey(key));
+      removed++;
+    }
+    if (simSnapshot) counters = { ...simSnapshot };
+    simSnapshot = null;
+    if (removed) {
+      ctx.save();
+      ctx.broadcastState();
+    }
+    return removed;
+  }
+
   function testUser(params = {}) {
     const name = params.user || 'Người thử';
     return { user: name, uniqueId: params.uniqueId || `test_${name}`, avatar: params.avatar || '' };
@@ -764,9 +1240,22 @@ function create(ctx, saved = {}) {
   // ------------------------------------------------------------------------
   // Khởi động
   // ------------------------------------------------------------------------
+  // Tổng hợp sẵn mọi lời dẫn (lưu cache đĩa) để tới giờ chuyển chế độ là đọc được ngay
+  async function warmAnnouncements() {
+    const texts = [...Object.values(ANNOUNCE).flat(), nextSessionLine(offeringMs() / 60000)];
+    for (const t of texts) {
+      for (const chunk of splitForSpeech(t)) {
+        if (disposed) return;
+        await waitForTts();
+        await ctx.tts.synthesize(chunk, readerVoice()).catch(() => null);
+      }
+    }
+  }
+
   setImmediate(() => {
     enterPhase('gather');
     if (ctx.settings.readerEnabled !== false) prepareReader();
+    if (ctx.tts && ctx.settings.speakTransitions !== false) setTimeout(() => warmAnnouncements().catch(() => {}), 20000);
   });
 
   return {
@@ -836,11 +1325,9 @@ function create(ctx, saved = {}) {
           .slice(0, limit);
       },
       readerStatus() {
-        const voice = ctx.settings.readerVoice || ctx.settings.ttsVoice || 'maichi';
-        const words = [...new Set(allTextLines().flat().map(syllableKey).filter(Boolean))];
-        const ready = words.filter((w) => readerClips.has(`${voice}::${w}`)).length;
-        if (ready < words.length) prepareReader();
-        return { voice, ready, total: words.length, preparing: readerPreparing };
+        const st = readerStatus();
+        if (st.ready < st.total) prepareReader();
+        return st;
       },
       setNextSutra(params = {}) {
         const s = sutraByNum(params.num);
@@ -862,22 +1349,53 @@ function create(ctx, saved = {}) {
         ctx.scheduleStateBroadcast();
         return { ok: true };
       },
+      // Thử cảnh lên thảm đỏ dâng hương (bỏ qua giới hạn 3 phút/người của bình luận thật)
+      // Đọc thử lời dẫn (soon | toChant | toOffering)
+      announceTest(params = {}) {
+        const kind = ['soon', 'toChant', 'toOffering'].includes(params.kind) ? params.kind : 'toChant';
+        announce(pickAnnouncement(kind));
+        if (kind === 'toOffering') announce(nextSessionLine(offeringMs() / 60000));
+        return { ok: true };
+      },
+      // Hiện đường chạy ngang ngay một lượt (người trực bấm trong lúc live)
+      showMarquee() {
+        ctx.broadcast('chant.activity', { kind: 'marquee' });
+        return { ok: true };
+      },
+      testIncense(params) {
+        const u = testUser(params);
+        const person = seatAndAnnounce(u);
+        incenseCooldown.delete(person.key);
+        return handleComment(u, 'thắp nhang') || { ok: true };
+      },
       testLike(params) {
         handleLike(testUser(params), 5);
         return { ok: true };
       },
       testGift(params) {
-        return handleGift(testUser(params), { giftName: params.giftName || 'Rose' }) || { ok: true, note: 'Đã thả đèn sen trong khoá này (mỗi người 1 đèn mỗi khoá)' };
+        // Không chỉ định quà: chọn ngẫu nhiên một món để xem đủ các loại lễ vật & hiệu ứng
+        const names = Object.keys(OFFERINGS);
+        const giftName = params.giftName || names[Math.floor(Math.random() * names.length)];
+        return handleGift(testUser(params), { giftName }) || { ok: true, note: 'Người này vừa dâng lễ — camera cận cảnh mỗi người tối đa 1 lần / 20 giây' };
       }
     },
 
     simulate() {
-      const pick = SIM_USERS[Math.floor(Math.random() * SIM_USERS.length)];
-      const roll = Math.random();
-      if (roll < 0.6) handleLike(pick, 1 + Math.floor(Math.random() * 5));
-      else if (roll < 0.85) handleComment(pick, SIM_WISHES[Math.floor(Math.random() * SIM_WISHES.length)]);
-      else if (roll < 0.95) handleGift(pick, { giftName: ['Rose', 'TikTok', 'Heart Me', 'Lotus'][Math.floor(Math.random() * 4)] });
-      else handleInvite(pick);
+      simulator.tick({
+        intervalMs: Number(ctx.settings.autoSimIntervalMs) || 9500,
+        level: ctx.settings.simLevel,
+        crowd: Math.max(10, Math.min(SEAT_COUNT, Number(ctx.settings.simCrowd) || 200))
+      });
+    },
+
+    // Bật giả lập: chụp lại bộ đếm thật. Tắt: dọn hết người giả lập và trả bộ đếm như cũ.
+    onAutoSimChange(enabled) {
+      if (enabled) {
+        if (!simSnapshot) simSnapshot = { ...counters };
+        return;
+      }
+      simulator.stop();
+      clearSimPeople();
     },
 
     getPublicState() {
@@ -893,6 +1411,13 @@ function create(ctx, saved = {}) {
         seats,
         chantingNow: chantingNow(),
         nextUp: nextUp(),
+        merit: topMerit(),
+        schedule: {
+          mode: !phase || phase.id === 'gather' || phase.id === 'paused' ? 'offering' : 'chanting',
+          offeringMinutes: offeringMs() / 60000,
+          chantMinutes: chantBudgetMs() / 60000,
+          chantBlockStart
+        },
         catalog: SUTRAS.map(sutraSummary),
         // Cho trang admin: danh sách người đang ngồi trong đạo tràng (không xếp hạng)
         leaderboard: seats
@@ -916,6 +1441,9 @@ function create(ctx, saved = {}) {
 
     dispose() {
       disposed = true;
+      clearAnnounceTimers();
+      clearTimeout(meritTimer);
+      simulator.stop();
       clearTimeout(phaseTimer);
       clearTimeout(chantFlushTimer);
       clearTimeout(thanksTimer);
@@ -923,7 +1451,7 @@ function create(ctx, saved = {}) {
     },
 
     onSettingsChanged(changed) {
-      if ('readerVoice' in changed || 'readerEnabled' in changed) prepareReader();
+      if ('readerVoice' in changed || 'readerEnabled' in changed || 'readerStyle' in changed) prepareReader();
       // Bật lại chạy tự động khi đang tụ hội: bắt đầu đếm giờ tụ hội
       if (changed.autoRun === true && phase && phase.id === 'gather') enterPhase('gather');
     }
@@ -939,6 +1467,8 @@ module.exports = {
     bpm: [50, 140],
     intonedSpm: [30, 100],
     gatherSeconds: [15, 600],
+    offeringMinutes: [1, 120],
+    chantMinutes: [5, 180],
     silenceSeconds: [0, 600],
     niemPhatCount: [3, 108],
     autoRun: 'boolean',
@@ -954,6 +1484,24 @@ module.exports = {
     natureSound: 'boolean',
     showRhythmGuide: 'boolean',
     commentDisplay: { type: 'enum', values: ['head', 'lantern', 'both'] },
+    readerStyle: { type: 'enum', values: ['natural', 'syllable'] },
+    simLevel: { type: 'enum', values: Object.keys(SIM_LEVELS) },
+    simCrowd: [10, SEAT_COUNT],
+    cameraFollow: 'boolean',
+    speakWishes: 'boolean',
+    speakTransitions: 'boolean',
+    showMeritBoard: 'boolean',
+    showFeedPanel: 'boolean',
+    showStats: 'boolean',
+    showTicker: 'boolean',
+    marqueeMode: { type: 'enum', values: ['interval', 'always', 'off'] },
+    marqueeEveryMin: [1, 30],
+    uiOpacity: [20, 100],
+    fxLevel: { type: 'enum', values: ['off', 'light', 'normal', 'rich'] },
+    musicTrack: 'track', // nhạc nền lúc DÂNG LỄ
+    musicTrackChant: 'track', // nhạc nền lúc TỤNG KINH ("preset:none" = chỉ tiếng pháp)
+    cameraZoom: [120, 400],
+    lineGapMs: [200, 3000],
     vietMoStyle: { type: 'enum', values: ['syllable', 'line'] },
     rotation: { type: 'intList', min: 1, maxValue: 9, max: 30 }
   },
@@ -961,6 +1509,8 @@ module.exports = {
     ttsEnabled: false,
     bpm: 90,
     gatherSeconds: 90,
+    offeringMinutes: 5,
+    chantMinutes: 20,
     silenceSeconds: 60,
     niemPhatCount: 21,
     intonedSpm: 54,
@@ -979,6 +1529,24 @@ module.exports = {
     natureSound: true,
     showRhythmGuide: true,
     commentDisplay: 'head',
+    readerStyle: 'natural',
+    simLevel: 'busy',
+    simCrowd: 200,
+    cameraFollow: true,
+    speakWishes: true,
+    speakTransitions: true,
+    showMeritBoard: true,
+    showFeedPanel: true,
+    showStats: true,
+    showTicker: true,
+    marqueeMode: 'interval',
+    marqueeEveryMin: 5,
+    uiOpacity: 55,
+    fxLevel: 'normal',
+    musicTrack: 'preset:still',
+    musicTrackChant: 'preset:breath',
+    cameraZoom: 300,
+    lineGapMs: 700,
     rotation: [1, 2, 3, 5, 6, 4, 8, 1, 2, 9, 3, 7]
   },
   create

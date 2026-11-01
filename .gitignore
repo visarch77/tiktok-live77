@@ -7,3 +7,6 @@ embedded-assets.js
 *.log
 *.m4a
 public/assets/bg_chant.m4a
+# nhạc nền nhập từ YouTube / file riêng (chỉ giữ README)
+public/music/*
+!public/music/README.md

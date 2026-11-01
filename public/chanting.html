@@ -6,7 +6,7 @@
   <title>Phòng Tụng Kinh Chung — TikTok Live (9:16)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Noto+Serif:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Noto+Serif:wght@500;700&family=Dancing+Script:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/chanting.css" />
 </head>
 <body>
@@ -14,27 +14,19 @@
     <!-- ================= KHUNG 9:16 (1080 x 1920) ================= -->
     <div class="stage-wrapper" id="stageWrapper">
       <div class="stage" id="stage">
-        <img src="/assets/chanh_dien_rong.jpg" alt="" class="bg-img" />
-        <div class="bg-vignette"></div>
-
-        <!-- Đầu màn hình: tên phòng + bộ đếm chung của cả đạo tràng -->
-        <!-- Hai góc trên (chừa khoảng giữa cho tượng Phật) -->
-        <header class="top-corner left">
-          <div class="room-pill"><span class="live-dot" id="liveDot"></span><span id="roomName">PHÒNG TỤNG KINH CHUNG</span></div>
-          <div class="counter"><span class="c-icon">🙏</span><b id="cParticipants">0</b><span>người cùng tụng</span></div>
-          <div class="counter"><span class="c-icon">📿</span><b id="cRecitations">0</b><span>lượt niệm chung</span></div>
-        </header>
-        <header class="top-corner right">
-          <div class="counter"><span class="c-icon">🔥</span><b id="cIncense">0</b><span>lượt thắp nhang</span></div>
-          <div class="counter"><span class="c-icon">🏮</span><b id="cWishes">0</b><span>lời nguyện thiện</span></div>
-          <div class="counter"><span class="c-icon">🪷</span><b id="cLamps">0</b><span>đèn sen</span></div>
-        </header>
+        <!-- Lớp cảnh: "camera" phóng to / lia theo người lên dâng hương. Chữ và khung kinh nằm ngoài lớp này nên đứng yên -->
+        <div class="world" id="world">
+        <img src="/assets/chanh_dien_rong_2x.jpg" alt="" class="bg-img" />
 
         <!-- Lư hương: mỗi người vào đạo tràng thắp một nén -->
         <div class="incense-burner"><div class="incense-holder" id="incenseHolder"></div></div>
 
         <!-- Đạo tràng: chỗ ngồi mang tên người tham gia (xếp theo người vừa tương tác, không theo giá trị) -->
         <div class="hall" id="hall"></div>
+        <!-- Tên người tham gia: xếp chỗ để không đè lên nhau -->
+        <div class="name-layer" id="nameLayer"></div>
+        <!-- Vùng sáng camera chiếu vào người đang được cận cảnh -->
+        <div class="cam-spot" id="camSpot"></div>
 
         <!-- Phật tử bước lên thảm đỏ thắp nhang (bình luận "thắp nhang") -->
         <div class="walker-layer" id="walkerLayer"></div>
@@ -46,16 +38,69 @@
         <div class="float-layer" id="floatLayer"></div>
 
         <canvas id="smokeCanvas"></canvas>
+        </div>
+        <div class="bg-vignette"></div>
+        <div class="cam-vignette" id="camVignette"></div>
+        <!-- Màn dâng lễ tiên cảnh: cột sáng, hào quang hoa sen, mây lành, lễ vật bay lên dâng Phật -->
+        <div class="heaven" id="heaven">
+          <div class="hv-beam"></div>
+          <img class="hv-mandala" src="/assets/heaven/mandala.webp" alt="" />
+          <img class="hv-star" src="/assets/heaven/starburst.webp" alt="" />
+          <img class="hv-cloud l" src="/assets/heaven/cloud1.webp" alt="" />
+          <img class="hv-cloud r" src="/assets/heaven/cloud2.webp" alt="" />
+          <img class="hv-item" id="hvItem" alt="" />
+        </div>
+        <canvas id="fxCanvas" class="fx-canvas"></canvas>
+        <!-- Mô phỏng vùng giao diện TikTok LIVE che (chỉ hiện khi bật "Vùng TikTok" trong trang quản lý) -->
+        <div class="tt-safe" id="ttSafe">
+          <div style="left:16px;top:40px;width:430px;height:110px;border-radius:60px">Tên &amp; ảnh chủ phòng</div>
+          <div style="right:16px;top:40px;width:400px;height:110px;border-radius:60px">Người xem · ✕</div>
+          <div style="left:16px;top:165px;width:520px;height:80px;border-radius:40px">Xếp hạng · nhãn TikTok</div>
+          <div style="left:16px;top:1060px;width:720px;height:200px;border-radius:24px">Thông báo quà · người mới vào</div>
+          <div style="left:16px;top:1280px;width:740px;height:450px;border-radius:24px">Khung bình luận</div>
+          <div style="left:0;right:0;top:1745px;height:175px">Ô bình luận · nút quà · chia sẻ</div>
+        </div>
+        <!-- Tên người dâng: nằm trên mọi hiệu ứng để luôn đọc rõ -->
+        <div class="hv-name" id="hvName"><div class="hv-who" id="hvWho"></div><div class="hv-what" id="hvWhat"></div></div>
+        <!-- Bảng trái: lời chào, lời chúc, lời cảm ơn. Bảng phải: tinh tấn tụng kinh hôm nay -->
+        <aside class="side-panel left" id="feedPanel">
+          <div class="pn-title" id="feedTitle">🤍 Tâm tình đạo tràng</div>
+          <ul class="pn-feed" id="feedList"></ul>
+        </aside>
+        <aside class="side-panel right" id="meritPanel">
+          <div class="pn-board">
+            <div class="pn-title">📿 Tinh tấn hôm nay</div>
+            <ol class="pn-merit" id="meritList"></ol>
+          </div>
+          <!-- Chỉ số chung của đạo tràng hôm nay -->
+          <div class="pn-stats">
+            <span title="người cùng tụng">🙏 <b id="cParticipants">0</b> người</span>
+            <span title="lượt niệm chung">📿 <b id="cRecitations">0</b> niệm</span>
+            <span title="lượt thắp nhang">🔥 <b id="cIncense">0</b> nhang</span>
+            <span title="lời nguyện">🏮 <b id="cWishes">0</b> nguyện</span>
+            <span title="đèn sen">🪷 <b id="cLamps">0</b> đèn sen</span>
+          </div>
+        </aside>
+        <!-- Thẻ mô tả người đang được camera cận cảnh (dâng lễ) -->
+        <div class="focus-card" id="focusCard"><img class="fc-img" id="fcImg" alt="" /><div><div class="fc-kind" id="fcKind"></div><div class="fc-name" id="fcName"></div><div class="fc-text" id="fcText"></div></div></div>
+        <!-- Tên phòng (ẩn: TikTok đã hiện tên chủ phòng ở góc trên — vùng 0–260px để trống cho giao diện TikTok) -->
+        <header class="top-corner left"><div class="room-pill"><span class="live-dot" id="liveDot"></span><span id="roomName">PHÒNG TỤNG KINH CHUNG</span></div></header>
+
 
         <!-- Thông báo nhẹ -->
 
         <!-- Lời mời chắp tay khi chuông vang -->
         <div class="bell-prompt" id="bellPrompt"><div class="bp-icon">🔔</div><div class="bp-text">Cùng chắp tay — thả tim</div><div class="bp-sub" id="bellPromptSub">theo tiếng chuông</div></div>
         <div class="heart-burst" id="heartBurst"></div>
+        <!-- Đường chạy ngang: hướng dẫn tham gia (nằm ngay dưới khung kinh, ngoài vùng giao diện TikTok) -->
+        <div class="marquee" id="marquee"><div class="mq-track" id="mqTrack"></div></div>
         <div class="ticker" id="ticker"></div>
+        <!-- Lời dẫn chuyển chế độ: hiện chữ theo giọng đọc -->
+        <div class="announce" id="announce"><span class="an-icon">🎙</span><span id="announceText"></span></div>
 
         <!-- Khung kinh: chữ sáng dần theo nhịp mõ -->
         <section class="sutra-panel" id="sutraPanel">
+          <div class="sp-quiet" id="spQuiet">🙏 Đang tụng kinh — xin tạm ngưng bình luận, cùng thả tim theo nhịp mõ</div>
           <div class="sp-head">
             <div>
               <div class="sp-phase" id="spPhase">Tụ hội</div>
@@ -74,7 +119,13 @@
           </div>
         </section>
 
-        <div class="guide" id="guide">Thả tim để cùng tụng · “thắp nhang” để lên dâng hương · “kinh 1–9” đề nghị bài kinh · Mọi tương tác đều quý như nhau 🤍</div>
+        <aside class="guide" id="guide">
+          <div class="gd-title">Cùng tham gia</div>
+          <div>🤍 <b>Thả tim</b> — cùng tụng kinh</div>
+          <div>🔥 <b>“thắp nhang”</b> — lên dâng hương</div>
+          <div>📜 <b>“kinh 1–9”</b> — đề nghị bài kinh</div>
+          <div>👤 <b>“nam” / “nữ”</b> — đổi hình</div>
+        </aside>
       </div>
     </div>
 
@@ -93,6 +144,8 @@
   <script src="/js/audio.js"></script>
   <script src="/js/ambient.js"></script>
   <script src="/js/particles.js"></script>
+  <script src="/js/fx.js"></script>
+  <script src="/js/giftsound.js"></script>
   <script src="/js/seat-layout.js"></script>
   <script src="/js/chanting.js"></script>
 </body>

@@ -149,7 +149,7 @@ Biết kính trọng khiêm nhường, biết đủ và biết ơn
 đúng lúc nghe lời hay, là phúc lành cao nhất
 Nhẫn nại và dễ nghe, được gần bậc tu hành
 đúng lúc bàn đạo lý, là phúc lành cao nhất
-Tự chế và tu tập, thấy rõ lẽ khổ vui
+Tự chế và tu tập, thấy rõ bốn chân lý
 hướng về nơi an tịnh, là phúc lành cao nhất
 Gặp thăng trầm cuộc đời, lòng vẫn không dao động
 không sầu, sạch, an ổn, là phúc lành cao nhất

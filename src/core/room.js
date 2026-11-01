@@ -33,6 +33,10 @@ function sanitizeSettings(params, schema) {
     const val = params[key];
     if (rule === 'boolean') {
       if (typeof val === 'boolean') out[key] = val;
+    } else if (rule === 'track') {
+      // Nhạc nền: "preset:<id>" (nhạc thiền tự tạo) hoặc "file:<tên file>" trong public/music
+      const v = String(val || '').trim();
+      if (/^preset:[a-z]{2,20}$/.test(v) || /^file:[\p{L}\p{N} ._()\-]{1,100}\.(mp3|m4a|ogg|wav|webm|opus)$/iu.test(v)) out[key] = v;
     } else if (rule === 'voice') {
       const v = String(val || '').trim().toLowerCase();
       if (/^[a-z0-9_-]{1,32}$/.test(v)) out[key] = v;
@@ -118,7 +122,17 @@ class Room {
       save: () => room.save(),
       broadcastState: () => room.broadcastState(),
       scheduleStateBroadcast: () => room.scheduleStateBroadcast(),
-      broadcast: (method, params) => room.broadcast(method, params)
+      broadcast: (method, params) => room.broadcast(method, params),
+      // Chạy fn như một tương tác giả lập (sự kiện được gắn simulated: true) — cho các hoạt động hẹn giờ
+      simulated: (fn) => {
+        const prev = room.simulating;
+        room.simulating = true;
+        try {
+          return fn();
+        } finally {
+          room.simulating = prev;
+        }
+      }
     };
   }
 
@@ -242,9 +256,12 @@ class Room {
     return Boolean(this.source.status.connected);
   }
 
-  configureAutoSim(enabled) {
+  configureAutoSim(enabled, was = Boolean(this.settings.autoSim)) {
     this.settings.autoSim =
       Boolean(enabled) && typeof this.mode.simulate === 'function' && !this.isLiveConnected();
+    if (was !== this.settings.autoSim && typeof this.mode.onAutoSimChange === 'function') {
+      this.mode.onAutoSimChange(this.settings.autoSim);
+    }
     clearInterval(this.autoSimTimer);
     this.autoSimTimer = null;
     if (this.settings.autoSim) {
@@ -265,6 +282,7 @@ class Room {
 
   updateSettings(params = {}) {
     const prevInterval = this.settings.autoSimIntervalMs;
+    const prevAutoSim = Boolean(this.settings.autoSim);
     const clean = sanitizeSettings(params, this.settingsSchema);
     // TikTok coi lượt dâng quà / bảng xếp hạng ảo trên phòng đang live là tương tác giả (fake engagement)
     if (clean.autoSim === true && this.isLiveConnected()) {
@@ -272,7 +290,7 @@ class Room {
     }
     this.settings = { ...this.settings, ...clean };
     if (typeof clean.autoSim === 'boolean') {
-      this.configureAutoSim(clean.autoSim);
+      this.configureAutoSim(clean.autoSim, prevAutoSim);
     } else if (this.settings.autoSim && this.settings.autoSimIntervalMs !== prevInterval) {
       this.configureAutoSim(true);
     }

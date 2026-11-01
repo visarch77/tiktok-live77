@@ -171,11 +171,62 @@ function closingBells() {
   };
 }
 
+/**
+ * Đọc tự nhiên (người đọc đọc cả câu với nhịp bình thường): mốc thời gian lấy theo độ dài thật của từng câu.
+ * Chữ sáng rải đều trong lúc câu được đọc; nếu có mõ thì gõ một tiếng ở đầu mỗi dòng (lối Làng Mai) vì đọc tự nhiên
+ * quá nhanh để gõ mõ từng chữ. Chuông giữ đúng vị trí theo nghi thức.
+ * @param {string[][]} lines
+ * @param {number[]} durs  độ dài (ms) của từng câu đã đọc
+ * @param {{ startAt?: number, gapMs?: number, mo?: boolean, bellAfterLines?: number[], gesture?: string|null,
+ *           endBell?: boolean, bellWaitMs?: number }} opts
+ */
+function spoken(lines, groups, { startAt = 0, gapMs = 700, mo = false, bellAfterLines = [], gesture = null, endBell = false, bellWaitMs = 2600 } = {}) {
+  // groups: [{ start, end (không gồm), durMs, url }] — mỗi nhóm là MỘT CÂU đọc liền mạch (có thể gồm nhiều dòng).
+  // Giọng đọc làm chuẩn thời gian; mõ (nếu có) chỉ điểm nhẹ ở đầu câu; chữ sáng dần theo tỉ lệ số chữ trong câu.
+  const syllableTimes = [];
+  const lineTimes = [];
+  const voiceTimes = [];
+  const voiceClips = [];
+  const cues = [];
+  let t = startAt;
+  groups.forEach((g, gi) => {
+    const dur = Math.max(400, g.durMs || 0);
+    voiceTimes.push(Math.round(t));
+    voiceClips.push(g.url || null);
+    if (mo) cues.push({ t: Math.max(startAt, Math.round(t) - MO_LEAD_MS), k: gi === 0 ? 'moSoft' : gi === groups.length - 1 ? 'moLoud' : 'mo' });
+    const gl = lines.slice(g.start, g.end);
+    const PAUSE = 1.6; // chỗ ngắt giữa hai dòng trong câu ≈ 1,6 chữ
+    const units = gl.reduce((n, l) => n + l.length, 0) + PAUSE * (gl.length - 1);
+    const speech = dur * 0.94;
+    let u = 0;
+    gl.forEach((line, k) => {
+      if (k > 0) u += PAUSE;
+      lineTimes.push(Math.round(t + (speech * u) / units));
+      for (let i = 0; i < line.length; i++) syllableTimes.push(Math.round(t + (speech * (u + i)) / units));
+      u += line.length;
+    });
+    t += dur;
+    if (bellAfterLines.includes(g.end - 1)) {
+      cues.push({ t: Math.round(t + 150), k: 'bell', ...(gesture ? { g: gesture } : {}) });
+      t += Math.max(gapMs, bellWaitMs);
+    } else t += gapMs;
+  });
+  let endAt = Math.round(t);
+  if (endBell) {
+    cues.push({ t: endAt, k: 'bell', g: 'xa' });
+    endAt += BELL_RING_MS;
+  }
+  return { syllableTimes, lineTimes, voiceTimes, voiceClips, cues, endAt };
+}
+
 function merge(...parts) {
   return {
     syllableTimes: parts.flatMap((p) => p.syllableTimes),
-    cues: parts.flatMap((p) => p.cues).sort((a, b) => a.t - b.t)
+    cues: parts.flatMap((p) => p.cues).sort((a, b) => a.t - b.t),
+    lineTimes: parts.flatMap((p) => p.lineTimes || []),
+    voiceTimes: parts.flatMap((p) => p.voiceTimes || []),
+    voiceClips: parts.flatMap((p) => p.voiceClips || [])
   };
 }
 
-module.exports = { intoned, chantedWithMo, khaiChuongMo, openingBells, sittingStartBells, closingBells, merge, BELL_RING_MS };
+module.exports = { intoned, chantedWithMo, spoken, khaiChuongMo, openingBells, sittingStartBells, closingBells, merge, BELL_RING_MS };

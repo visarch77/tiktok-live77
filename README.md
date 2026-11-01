@@ -58,6 +58,8 @@ npm install
 # Tạo môi trường Python .venv và cài đặt ZeroTTS
 python3.10 -m venv .venv
 .venv/bin/pip install zerotts pillow
+# (tuỳ chọn) nhập nhạc nền từ link YouTube trong trang quản lý
+.venv/bin/pip install yt-dlp yt-dlp-ejs
 ```
 Lần chạy đầu, ZeroTTS tự tải model (~38 file) từ Hugging Face.
 

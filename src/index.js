@@ -4,6 +4,7 @@ const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const config = require('./config');
+const music = require('./core/musicLibrary');
 const { ZeroTTSManager } = require('./core/tts');
 const { RoomManager } = require('./core/roomManager');
 const { Hub } = require('./core/hub');
@@ -74,6 +75,13 @@ async function handleRpc(method, params = {}, defaultRoomId = config.DEFAULT_ROO
       return rooms.remove(params.id);
     case 'modes.list':
       return rooms.modes();
+    // Nhạc nền riêng: nhập từ link YouTube (chạy nền), xem tiến trình, xoá
+    case 'music.importYoutube':
+      return music.importYoutube(params.url);
+    case 'music.jobs':
+      return { jobs: music.jobList(), files: music.list() };
+    case 'music.delete':
+      return music.remove(params.file);
     default: {
       const room = rooms.require(params.roomId || defaultRoomId);
       return room.rpc(method, params);
@@ -111,6 +119,8 @@ app.get('/admin', (_req, res) => {
   res.sendFile(path.join(config.PUBLIC_DIR, 'admin.html'));
 });
 
+// Ảnh nhân vật, lễ vật, nền: ít khi đổi — cho trình duyệt / OBS lưu đệm để không tải lại mỗi lần đổi khung hình
+app.use('/assets', express.static(path.join(config.PUBLIC_DIR, 'assets'), { maxAge: '1d' }));
 app.use(express.static(config.PUBLIC_DIR, { index: false }));
 
 app.post('/rpc', async (req, res) => {
@@ -149,6 +159,11 @@ app.get('/api/state', (req, res) => {
   const room = rooms.get(req.query.room || config.DEFAULT_ROOM_ID);
   if (!room) return res.status(404).json({ error: 'Không tìm thấy phòng' });
   res.json(room.getPublicState());
+});
+
+// Danh sách nhạc nền riêng (public/music) để chọn trong trang quản lý
+app.get('/api/music', (_req, res) => {
+  res.json({ files: music.list() });
 });
 
 app.get('/api/rooms', (_req, res) => {

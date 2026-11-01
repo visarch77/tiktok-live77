@@ -46,7 +46,7 @@
     return seats;
   }
 
-  const api = { buildSeatLayout, scaleAt, HORIZON_Y };
+  const api = { buildSeatLayout, scaleAt, carpetLeft, carpetRight, HORIZON_Y };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.SeatLayout = api;
 })(typeof window !== 'undefined' ? window : globalThis);

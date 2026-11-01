@@ -309,39 +309,78 @@ class TempleAudioEngine {
     try {
       const ctx = this.ensureContext();
       const now = Math.max(ctx.currentTime, when || 0);
+      const amt = Math.min(1.0, intensity);
 
-      const base = 174;
-      const partials = [
-        { ratio: 0.5, amp: 0.22, decay: 4.2 },
-        { ratio: 1.0, amp: 0.35, decay: 3.6 },
-        { ratio: 1.506, amp: 0.16, decay: 2.4 },
-        { ratio: 2.0, amp: 0.18, decay: 1.9 }
+      // Chuông gia trì bằng đồng: các mode của chuông bát (tỉ lệ ~1 : 2,7 : 5,2 : 8,4), mỗi mode là
+      // một cặp hơi lệch tần số tạo tiếng ngân "wah-wah"; mode thấp ngân lâu, mode cao tắt nhanh.
+      // Nằm trong dải 260 Hz – 2,2 kHz để loa điện thoại / laptop vẫn nghe rõ.
+      const base = 262;
+      const modes = [
+        { ratio: 1.0, amp: 0.42, decay: 9.5, beat: 1.3 },
+        { ratio: 2.71, amp: 0.3, decay: 6.5, beat: 2.1 },
+        { ratio: 5.18, amp: 0.15, decay: 3.6, beat: 3.0 },
+        { ratio: 8.43, amp: 0.07, decay: 2.0, beat: 4.2 }
       ];
 
       const master = ctx.createGain();
-      master.gain.setValueAtTime(0.28 * Math.min(1.0, intensity) * this.sfxVolume, now);
-      master.connect(ctx.destination);
+      master.gain.setValueAtTime(1.3 * (0.35 + 0.65 * amt) * this.sfxVolume, now);
+      const comp = ctx.createDynamicsCompressor();
+      comp.threshold.setValueAtTime(-9, now);
+      comp.ratio.setValueAtTime(6, now);
+      master.connect(comp);
+      comp.connect(ctx.destination);
+      const longest = Math.max(...modes.map((m) => m.decay)) + 0.2;
+      setTimeout(() => {
+        try {
+          master.disconnect();
+          comp.disconnect();
+        } catch (_) {}
+      }, (longest + Math.max(0, now - ctx.currentTime)) * 1000);
 
-      partials.forEach((p, idx) => {
-        const osc = ctx.createOscillator();
-        const g = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(base * p.ratio, now);
-
-        g.gain.setValueAtTime(0.0001, now);
-        g.gain.linearRampToValueAtTime(p.amp, now + 0.015);
-        g.gain.exponentialRampToValueAtTime(0.0001, now + p.decay);
-
-        osc.connect(g);
-        g.connect(master);
-        osc.onended = () => {
-          osc.disconnect();
-          g.disconnect();
-          if (idx === 0) master.disconnect();
-        };
-        osc.start(now);
-        osc.stop(now + p.decay + 0.05);
+      modes.forEach((m) => {
+        const f = base * m.ratio;
+        [f, f + m.beat].forEach((freq, j) => {
+          const osc = ctx.createOscillator();
+          const g = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now);
+          const peak = m.amp * (j === 0 ? 0.6 : 0.4);
+          g.gain.setValueAtTime(0.0001, now);
+          g.gain.linearRampToValueAtTime(peak, now + 0.006);
+          g.gain.exponentialRampToValueAtTime(0.0001, now + m.decay);
+          osc.connect(g);
+          g.connect(master);
+          osc.onended = () => {
+            osc.disconnect();
+            g.disconnect();
+          };
+          osc.start(now);
+          osc.stop(now + m.decay + 0.05);
+        });
       });
+
+      // Tiếng dùi gõ vào miệng chuông: một nhịp nhiễu ngắn, lọc quanh 2,6 kHz
+      const len = Math.floor(ctx.sampleRate * 0.04);
+      const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+      const noise = ctx.createBufferSource();
+      noise.buffer = buf;
+      const bp = ctx.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.frequency.setValueAtTime(2600, now);
+      bp.Q.setValueAtTime(1.2, now);
+      const ng = ctx.createGain();
+      ng.gain.setValueAtTime(0.35 * amt, now);
+      noise.connect(bp);
+      bp.connect(ng);
+      ng.connect(master);
+      noise.onended = () => {
+        noise.disconnect();
+        bp.disconnect();
+        ng.disconnect();
+      };
+      noise.start(now);
     } catch (_) {}
   }
 
@@ -355,13 +394,13 @@ class TempleAudioEngine {
       const now = Math.max(ctx.currentTime, when || 0);
       const master = ctx.createGain();
       master.gain.setValueAtTime(0.0001, now);
-      master.gain.linearRampToValueAtTime(0.06 * this.sfxVolume, now + 0.01);
-      master.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
+      master.gain.linearRampToValueAtTime(0.16 * this.sfxVolume, now + 0.006);
+      master.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
       master.connect(ctx.destination);
-      [1.0, 2.0].forEach((ratio, idx) => {
+      [1.0, 2.71].forEach((ratio, idx) => {
         const osc = ctx.createOscillator();
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(174 * ratio, now);
+        osc.frequency.setValueAtTime(262 * ratio, now);
         osc.connect(master);
         osc.onended = () => {
           osc.disconnect();

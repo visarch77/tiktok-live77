@@ -105,7 +105,8 @@
     .sidebar-foot { padding: 12px 18px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-3); display: flex; align-items: center; gap: 8px; }
 
     .main { min-width: 0; padding: 24px 28px 48px; }
-    .main-inner { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+
+    .main-inner { max-width: 1560px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
 
     /* ---------- Status dot ---------- */
     .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-3); flex: none; }
@@ -143,6 +144,36 @@
     .card-body { padding: 16px 18px; }
     .grid-2 { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 18px; align-items: start; }
     .stack { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+
+    /* ---------- Studio: màn hình live | điều chỉnh ---------- */
+    .studio { display: grid; grid-template-columns: minmax(300px, 420px) minmax(0, 1fr); gap: 18px; align-items: start; }
+    .preview-col { position: sticky; top: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .preview-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+    .preview-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-weight: 600; font-size: 13.5px; }
+    .preview-head .ph-left { display: inline-flex; align-items: center; gap: 8px; }
+    .preview-frame {
+      position: relative; width: min(100%, calc((100vh - 250px) * 9 / 16)); aspect-ratio: 9 / 16; margin: 0 auto;
+      border-radius: 12px; overflow: hidden; background: #120604; border: 1px solid #3a2617;
+    }
+    .preview-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+    .preview-tools { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+    .preview-tools .btn.on { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); }
+    .preview-obs { font-size: 12px; }
+    .preview-obs code { font-size: 12px; }
+    .control-col { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+    .control-card > .card-head { padding: 10px 12px; overflow-x: auto; }
+    .control-card .tabs button { height: 32px; padding: 0 14px; font-size: 13px; }
+    .spanel.hidden { display: none; }
+    .sp-section + .sp-section { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--border); }
+    .sp-section > h3 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--text-3); margin: 0 0 8px; }
+    .feed-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+    .feed-grid .feed { max-height: 520px; }
+    @media (max-width: 1080px) {
+      .studio { grid-template-columns: 1fr; }
+      .preview-col { position: static; }
+      .preview-frame { width: min(100%, 340px); }
+      .feed-grid { grid-template-columns: 1fr; }
+    }
 
     /* ---------- Room header ---------- */
     .room-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
@@ -319,6 +350,60 @@
     .bar { height: 6px; border-radius: 99px; background: var(--surface-2); overflow: hidden; margin-top: 8px; }
     .bar > div { height: 100%; background: var(--primary); transition: width 1s linear; }
     .ctl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+    /* ---------- Cài đặt phòng tụng kinh: menu mục + nội dung ---------- */
+    .set-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 22px; align-items: start; }
+    .set-nav { position: sticky; top: 12px; display: flex; flex-direction: column; gap: 4px; }
+    .set-nav button { display: flex; align-items: flex-start; gap: 10px; width: 100%; padding: 9px 10px; border: 1px solid transparent; border-radius: 10px; background: none; text-align: left; cursor: pointer; color: var(--text-2); }
+    .set-nav button:hover { background: var(--surface-2); }
+    .set-nav button.active { background: var(--primary-soft); border-color: var(--primary); color: var(--text); }
+    .sn-icon { font-size: 18px; line-height: 1.2; }
+    .sn-title { display: block; font-weight: 600; font-size: 13.5px; }
+    .sn-desc { display: block; font-size: 11.5px; color: var(--text-3); margin-top: 1px; }
+    .set-saved { margin-top: 10px; padding: 0 6px; }
+    .set-body { min-width: 0; }
+    .set-section { display: flex; flex-direction: column; gap: 14px; }
+    .set-head { display: flex; align-items: center; gap: 12px; padding-bottom: 4px; }
+    .set-head-icon { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; font-size: 20px; background: var(--surface-2); border: 1px solid var(--border); }
+    .set-head h3 { font-size: 17px; margin: 0; }
+    .set-head p { margin: 2px 0 0; font-size: 12.5px; color: var(--text-3); }
+    .set-group { border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; background: var(--surface); }
+    .set-group-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--text-3); margin-bottom: 8px; }
+    .set-note { margin: 10px 0 0; }
+    .set-group .setting select.input { width: 200px; }
+    .num-wrap { display: flex; align-items: center; gap: 6px; }
+    .num-wrap .input.num { width: 76px; }
+    .step-line { list-style: none; margin: 0; padding: 0; position: relative; }
+    .step-line::before { content: ''; position: absolute; left: 13px; top: 14px; bottom: 14px; width: 2px; background: var(--border); }
+    .step-line li { position: relative; display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 8px 0; }
+    .step-dot { position: relative; z-index: 1; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; background: var(--primary); color: #fff; }
+    .step-ctl { display: flex; align-items: center; gap: 10px; }
+    .step-line li.off .step-dot { background: var(--surface-2); color: var(--text-3); border: 1px solid var(--border); }
+    .step-line li.off .step-txt { opacity: .5; text-decoration: line-through; }
+    .control-card { container-type: inline-size; }
+    @container (max-width: 720px) {
+      .set-layout { grid-template-columns: 1fr; gap: 14px; }
+      .set-nav { position: static; flex-direction: row; overflow-x: auto; padding-bottom: 4px; }
+      .set-nav button { flex: none; width: auto; align-items: center; padding: 7px 12px; }
+      .sn-desc, .set-saved { display: none; }
+    }
+    .live-ui-grid { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+    .music-lib { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+    .ml-row { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2); font-size: 13px; }
+    .ml-row.on { border-color: var(--primary); background: var(--primary-soft); }
+    .ml-row.busy { border-style: dashed; }
+    .ml-row.err { border-color: var(--danger); color: var(--danger); }
+    .ml-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .track-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; margin-top: 10px; }
+    .track { text-align: left; padding: 9px 11px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface-2); cursor: pointer; color: var(--text-2); }
+    .track b { display: block; font-size: 13px; color: var(--text); }
+    .track { cursor: default; }
+    .track-btns { display: flex; gap: 6px; margin-top: 8px; }
+    .track-btns .btn, .ml-row .btn.on { height: 26px; padding: 0 8px; font-size: 12px; }
+    .btn.sm.on { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
+    .track span { display: block; font-size: 11.5px; color: var(--text-3); margin-top: 2px; }
+    .track:hover { border-color: var(--border-strong); }
+    .track.on { border-color: var(--primary); background: var(--primary-soft); }
+    .live-ui-grid .check { font-size: 13.5px; }
     .ctl-group h4 { font-size: 12.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-3); margin-bottom: 6px; }
     .num { width: 90px; height: 34px; }
     .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 10px; }
@@ -348,6 +433,10 @@
       .form-row { grid-template-columns: 1fr; }
       .rh-title h1 { font-size: 19px; }
       .setting { flex-wrap: wrap; }
+      .set-layout { grid-template-columns: 1fr; }
+      .set-nav { position: static; flex-direction: row; overflow-x: auto; padding-bottom: 4px; }
+      .set-nav button { flex: none; width: auto; }
+      .sn-desc, .set-saved { display: none; }
       .range-wrap { min-width: 0; width: 100%; }
     }
   </style>
@@ -447,9 +536,10 @@
         listTitle: 'Đang trong đạo tràng',
         pointsLabel: 'Không xếp hạng — theo người vừa tương tác',
         actions: [
-          { icon: '🙏', name: 'Vào đạo tràng', desc: 'Thắp nhang, nhận chỗ ngồi', method: 'chanting.testJoin' },
+          { icon: '🙏', name: 'Vào đạo tràng', desc: 'Nhận chỗ ngồi, cắm một nén vào lư', method: 'chanting.testJoin' },
+          { icon: '🔥', name: 'Lên dâng hương', desc: 'Đi lên thảm đỏ, lạy, thắp nhang (như bình luận “thắp nhang”)', method: 'chanting.testIncense' },
           { icon: '📿', name: 'Thả tim', desc: 'Cùng tụng kinh', method: 'chanting.testLike' },
-          { icon: '🪷', name: 'Thả đèn sen', desc: 'Như một món quà bất kỳ', method: 'chanting.testGift' },
+          { icon: '🎁', name: 'Tặng quà (ngẫu nhiên)', desc: 'Quy đổi thành lễ vật: hoa, đèn, hương, trà, quả, phóng sinh…', method: 'chanting.testGift' },
           { icon: '⏭', name: 'Sang bước tiếp', desc: 'Chuyển bước thời khoá', method: 'chanting.nextPhase' }
         ],
         commentHint: 'Ví dụ: thắp nhang · kinh 2 · nam / nữ · hoặc một lời nguyện',
@@ -648,6 +738,54 @@
         </div>`;
     }
 
+    // Các thẻ điều chỉnh của phòng (bên phải màn hình live)
+    function studioTabs(room) {
+      return room.mode === 'chanting'
+        ? [
+            { id: 'control', label: '🎛 Điều phối' },
+            { id: 'settings', label: '⚙️ Cài đặt' },
+            { id: 'interact', label: '🧪 Thử tương tác' },
+            { id: 'feed', label: '📡 Hoạt động' },
+            { id: 'people', label: '👥 Người tham gia' }
+          ]
+        : [
+            { id: 'interact', label: '🧪 Thử tương tác' },
+            { id: 'feed', label: '📡 Hoạt động' },
+            { id: 'settings', label: '⚙️ Cài đặt' }
+          ];
+    }
+    let studioTab = lsGet('admin_studio_tab') || 'control';
+    let pvAudioOn = false;
+    let pvSafeOn = false;
+
+    function showStudioTab(id) {
+      const room = currentRoom();
+      if (!room) return;
+      const ids = studioTabs(room).map((t) => t.id);
+      if (!ids.includes(id)) id = ids[0];
+      studioTab = id;
+      lsSet('admin_studio_tab', id);
+      document.querySelectorAll('#studioTabs [data-stab]').forEach((b) => b.classList.toggle('active', b.dataset.stab === id));
+      document.querySelectorAll('[data-spanel]').forEach((p) => p.classList.toggle('hidden', p.dataset.spanel !== id));
+      if (id === 'people') {
+        peopleCache = null;
+        renderChantPeople($('#peopleBody'));
+      }
+      if (id === 'control') renderChantPanel();
+      if (id === 'interact' && $('[data-panel="comment"]:not(.hidden)')) $('#simComment')?.focus();
+    }
+
+    function setPreviewAudio(on) {
+      pvAudioOn = on;
+      const f = $('#pvFrame');
+      if (f && f.contentWindow) f.contentWindow.postMessage({ type: 'preview-audio', on }, location.origin);
+      const b = $('#pvAudio');
+      if (b) {
+        b.textContent = on ? '🔊 Đang nghe' : '🔇 Nghe thử';
+        b.classList.toggle('on', on);
+      }
+    }
+
     function renderRoomShell() {
       const room = currentRoom();
       if (!room) return renderEmpty();
@@ -666,7 +804,6 @@
           </div>
           <div class="btn-row">
             <span id="connectSlot"></span>
-            <a class="btn" id="btnOpenScreen" target="_blank" rel="noopener">Mở màn hình ↗</a>
             <div class="menu-wrap">
               <button class="btn icon" id="btnMore" aria-label="Thêm thao tác">⋯</button>
               <div class="menu" id="moreMenu">
@@ -682,53 +819,70 @@
 
         <div id="alertSlot"></div>
 
-        <section class="stats" id="statsRow"></section>
+        <div class="studio">
+          <!-- Bên trái: màn hình live đang phát (giống hệt trên OBS) -->
+          <aside class="preview-col">
+            <div class="preview-card">
+              <div class="preview-head">
+                <span class="ph-left"><span class="dot" id="pvDot"></span>Màn hình live</span>
+                <span class="muted" style="font-weight:500;font-size:12px">9:16 · 1080 × 1920</span>
+              </div>
+              <div class="preview-frame"><iframe id="pvFrame" src="${esc(overlayUrl(room, false))}?preview=1" title="Màn hình live của phòng"></iframe></div>
+              <div class="preview-tools">
+                <button class="btn sm" data-act="pv-audio" id="pvAudio">🔇 Nghe thử</button>
+                <button class="btn sm" data-act="pv-safe" id="pvSafe" title="Hiện các vùng giao diện TikTok LIVE sẽ che lên màn hình">▦ Vùng TikTok</button>
+                <button class="btn sm" data-act="pv-reload">↻ Tải lại</button>
+                <a class="btn sm" id="btnOpenScreen" target="_blank" rel="noopener">↗ Mở riêng</a>
+              </div>
+              <div class="copy-field preview-obs">
+                <code id="obsUrl"></code>
+                <button class="btn sm primary" data-act="copy-obs">Sao chép link OBS</button>
+              </div>
+              <span class="help">OBS / TikTok LIVE Studio: thêm nguồn <b>Browser</b> 1080 × 1920 với link trên.</span>
+            </div>
+          </aside>
 
-        ${room.mode === 'chanting' ? `
-        <section class="card" id="chantPanel">
-          <div class="card-head">
-            <div>
-              <div class="card-title">Điều phối phòng tụng kinh</div>
-              <div class="card-sub">Chạy tự động theo thời khoá, hoặc can thiệp bất cứ lúc nào</div>
-            </div>
-            <div class="tabs" role="tablist" id="chantTabs">
-              <button data-ctab="control" class="active">Điều phối</button>
-              <button data-ctab="settings">Cài đặt</button>
-              <button data-ctab="people">Người tham gia</button>
-            </div>
-          </div>
-          <div class="card-body" id="chantBody"></div>
-        </section>` : ''}
-
-        <section class="card">
-          <div class="card-head">
-            <div>
-              <div class="card-title">Đưa vào OBS / TikTok Live Studio</div>
-              <div class="card-sub">Thêm nguồn <b>Browser</b>, kích thước <b>1080 × 1920</b>, dán địa chỉ bên dưới</div>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="copy-field">
-              <code id="obsUrl"></code>
-              <button class="btn sm primary" data-act="copy-obs">Sao chép</button>
-            </div>
-          </div>
-        </section>
-
-        <div class="grid-2">
-          <div class="stack">
-            <section class="card">
+          <!-- Bên phải: điều chỉnh -->
+          <div class="control-col">
+            <section class="stats" id="statsRow"></section>
+            <section class="card control-card">
               <div class="card-head">
-                <div>
-                  <div class="card-title">Thử tương tác</div>
-                  <div class="card-sub">Hiện ngay trên màn hình live của phòng</div>
-                </div>
-                <div class="tabs" role="tablist">
-                  <button class="active" data-tab="actions">Hành động</button>
-                  <button data-tab="comment">Bình luận</button>
+                <div class="tabs" role="tablist" id="studioTabs">
+                  ${studioTabs(room).map((t) => `<button data-stab="${t.id}" class="${t.id === studioTab ? 'active' : ''}">${t.label}</button>`).join('')}
                 </div>
               </div>
               <div class="card-body">
+                ${room.mode === 'chanting' ? `
+                <div class="spanel" data-spanel="control"><div id="chantBody"></div></div>
+                <div class="spanel" data-spanel="people"><div id="peopleBody"></div></div>` : ''}
+
+                <div class="spanel" data-spanel="settings">
+                  ${room.mode === 'chanting' ? '<div id="chantSettingsBody"></div>' : `
+                  <div class="sp-section">
+                    <h3>${room.mode === 'chanting' ? 'Thử nghiệm' : 'Âm thanh & giọng đọc'}</h3>
+                    <div id="settingsBody"></div>
+                  </div>
+                  <div class="sp-section">
+                    <h3>Giọng đọc thử</h3>
+                    <div class="field">
+                      <div class="input-group">
+                        <input class="input" id="speakText" value="Nam mô A Di Đà Phật. Xin kính chào quý vị." />
+                        <button class="btn" data-act="speak">▶ Đọc</button>
+                      </div>
+                      <span class="help">Phát trên màn hình live của phòng và tại đây.</span>
+                    </div>
+                    <audio id="speakAudio" class="hidden"></audio>
+                  </div>`}
+                </div>
+
+                <div class="spanel" data-spanel="interact">
+                  <div class="btn-row" style="justify-content:space-between;margin-bottom:12px">
+                    <span class="help">Hiện ngay trên màn hình live bên trái</span>
+                    <div class="tabs" role="tablist">
+                      <button class="active" data-tab="actions">Hành động</button>
+                      <button data-tab="comment">Bình luận</button>
+                    </div>
+                  </div>
                 <div data-panel="actions">
                   ${ui.actions.length ? `<div class="action-grid">${ui.actions.map((a, i) => `
                     <button class="action" data-act="mode-action" data-idx="${i}">
@@ -754,45 +908,21 @@
                     <span class="help">Được xử lý giống hệt bình luận thật (lọc spam, từ khoá, giới hạn 3,5 giây/người).</span>
                   </div>
                 </div>
-              </div>
-            </section>
-
-            <section class="card">
-              <div class="card-head">
-                <div>
-                  <div class="card-title">Hoạt động trực tiếp</div>
-                  <div class="card-sub" id="feedSub">Cập nhật theo thời gian thực</div>
                 </div>
-              </div>
-              <ul class="feed" id="feed"></ul>
-            </section>
-          </div>
 
-          <div class="stack">
-            <section class="card">
-              <div class="card-head">
-                <div class="card-title">${esc(ui.listTitle || 'Bảng xếp hạng')}</div>
-                <div class="card-sub">${esc(ui.pointsLabel)}</div>
-              </div>
-              <ul class="lb" id="leaderboard"></ul>
-            </section>
-
-            <section class="card">
-              <div class="card-head"><div class="card-title">Cài đặt phòng</div></div>
-              <div class="card-body" id="settingsBody"></div>
-            </section>
-
-            <section class="card">
-              <div class="card-head"><div class="card-title">Giọng đọc thử</div></div>
-              <div class="card-body">
-                <div class="field">
-                  <div class="input-group">
-                    <input class="input" id="speakText" value="Nam mô A Di Đà Phật. Xin kính chào quý vị." />
-                    <button class="btn" data-act="speak">▶ Đọc</button>
+                <div class="spanel" data-spanel="feed">
+                  <div class="feed-grid">
+                    <div>
+                      <div class="sp-section"><h3 id="feedSub">Hoạt động trực tiếp</h3></div>
+                      <ul class="feed" id="feed"></ul>
+                    </div>
+                    <div>
+                      <div class="sp-section"><h3>${esc(ui.listTitle || 'Bảng xếp hạng')}</h3></div>
+                      <p class="help" style="margin-bottom:6px">${esc(ui.pointsLabel)}</p>
+                      <ul class="lb" id="leaderboard"></ul>
+                    </div>
                   </div>
-                  <span class="help">Phát trên màn hình live của phòng và tại đây.</span>
                 </div>
-                <audio id="speakAudio" class="hidden"></audio>
               </div>
             </section>
           </div>
@@ -803,9 +933,15 @@
           <pre id="rpcLog">${lastLog ? esc(JSON.stringify(lastLog, null, 2)) : 'Chưa có lệnh nào.'}</pre>
         </details>`;
 
+      readerStatusCache = null;
+      chantSettingsRenderedFor = null;
+      peopleCache = null;
+      pvAudioOn = false;
+      showStudioTab(studioTab);
+
       // Người thử: nhớ theo trình duyệt
       const user = lsGet('admin_test_user') || 'Thí Chủ Minh Tâm';
-      const wish = lsGet('admin_test_wish') || 'Cầu gia đạo bình an, tài lộc vượng phát';
+      const wish = lsGet('admin_test_wish') || 'Nguyện mọi người luôn bình an, mạnh khoẻ';
       $('#testUser').value = user;
       $('#testWish').value = wish;
       const syncSummary = () => { $('#idSummary').textContent = $('#testUser').value.trim() || 'Thí Chủ'; };
@@ -813,7 +949,7 @@
       $('#testUser').addEventListener('input', () => { lsSet('admin_test_user', $('#testUser').value); syncSummary(); });
       $('#testWish').addEventListener('input', () => lsSet('admin_test_wish', $('#testWish').value));
       $('#simComment').addEventListener('keydown', (e) => { if (e.key === 'Enter') sendComment(); });
-      $('#speakText').addEventListener('keydown', (e) => { if (e.key === 'Enter') speak(); });
+      // (#speakText có thể được vẽ sau — xử lý phím Enter bằng sự kiện chung bên dưới)
 
       renderRoomHeader();
       renderRoomState();
@@ -828,6 +964,7 @@
       const badge = $('#rhStatus');
       badge.className = `badge ${st.cls}`;
       badge.innerHTML = `<span class="dot ${st.dot}"></span>${esc(st.text)}`;
+      if ($('#pvDot')) $('#pvDot').className = `dot ${st.dot}`;
       $('#rhMeta').innerHTML = `
         <span>🧩 ${esc(room.modeName)}</span>
         <span>${room.tiktokUsername ? `🎵 @${esc(room.tiktokUsername)}` : '<span class="muted">🎵 Chưa gắn tài khoản TikTok</span>'}</span>
@@ -890,6 +1027,7 @@
       renderFeed();
       renderSettings();
       renderChantPanel();
+      renderChantSettingsPanel();
       renderTtsFoot(roomState.tts);
     }
 
@@ -922,10 +1060,21 @@
       if (currentRoom()?.mode === 'chanting') {
         body.innerHTML = `
         <div class="setting">
-          <div><div class="setting-name">Giả lập người xem</div><div class="setting-desc">Chỉ để thử khi chưa live — tự tắt khi phòng kết nối TikTok</div></div>
+          <div><div class="setting-name">Bật giả lập</div><div class="setting-desc">Tắt là dọn hết người ảo, trả lại bộ đếm thật</div></div>
           <label class="switch"><input type="checkbox" data-setting="autoSim" ${s.autoSim ? 'checked' : ''} /><span></span></label>
         </div>
-        <p class="help" style="margin-top:10px">Các cài đặt khác của phòng tụng kinh nằm ở thẻ <b>Điều phối → Cài đặt</b>.</p>`;
+        <div class="setting">
+          <div><div class="setting-name">Mức nhộn nhịp</div><div class="setting-desc">Thả tim, lời nguyện, thắp nhang, đề nghị kinh, quà, mời bạn, sửa nam/nữ — và cả phòng thả tim theo chuông</div></div>
+          <select class="input" data-setting="simLevel">
+            ${[['calm', 'Yên tĩnh · ~12 lượt/phút'], ['normal', 'Vừa · ~35 lượt/phút'], ['busy', 'Đông vui · ~90 lượt/phút'], ['festival', 'Ngày rằm · ~200 lượt/phút']]
+              .map(([v, l]) => `<option value="${v}" ${(s.simLevel || 'busy') === v ? 'selected' : ''}>${l}</option>`).join('')}
+          </select>
+        </div>
+        <div class="setting">
+          <div><div class="setting-name">Số người trong đạo tràng</div><div class="setting-desc">Người ảo vào dần cho tới số này (tối đa 596 chỗ)</div></div>
+          <div class="range-wrap"><input type="range" min="10" max="596" step="2" value="${esc(s.simCrowd || 200)}" data-setting="simCrowd" data-raw="1" data-unit=" người" /><output>${esc(s.simCrowd || 200)} người</output></div>
+        </div>
+        `;
         return;
       }
       body.innerHTML = `
@@ -959,6 +1108,8 @@
     document.addEventListener('change', async (e) => {
       const el = e.target.closest('[data-setting]');
       if (!el || !currentId) return;
+      const stepRow = el.closest('.step-line li');
+      if (stepRow && el.type === 'checkbox') stepRow.classList.toggle('off', !el.checked);
       const key = el.dataset.setting;
       let value;
       if (el.type === 'checkbox') value = el.checked;
@@ -977,7 +1128,6 @@
     // ======================================================================
     // ĐIỀU PHỐI PHÒNG TỤNG KINH
     // ======================================================================
-    let chantTab = 'control';
     let chantSettingsRenderedFor = null;
     let peopleCache = null;
     let readerStatusCache = null;
@@ -991,14 +1141,15 @@
     function renderChantPanel() {
       const body = $('#chantBody');
       if (!body || !roomState) return;
-      document.querySelectorAll('#chantTabs [data-ctab]').forEach((b) => b.classList.toggle('active', b.dataset.ctab === chantTab));
-      if (chantTab === 'control') return renderChantControl(body);
-      if (chantTab === 'settings') {
-        // Không vẽ lại khi đang chỉnh (tránh mất thao tác)
-        if (chantSettingsRenderedFor === currentId && body.querySelector('[data-chant-settings]')) return;
-        return renderChantSettings(body);
-      }
-      if (chantTab === 'people') return renderChantPeople(body);
+      renderChantControl(body);
+    }
+
+    // Cài đặt phòng tụng kinh ở panel phải — không vẽ lại khi đang chỉnh (tránh mất thao tác)
+    function renderChantSettingsPanel() {
+      const body = $('#chantSettingsBody');
+      if (!body || !roomState) return;
+      if (chantSettingsRenderedFor === currentId && body.querySelector('[data-chant-settings]')) return;
+      renderChantSettings(body);
     }
 
     function renderChantControl(body) {
@@ -1015,6 +1166,7 @@
       const manualGather = ph.id === 'gather' && s.autoRun === false;
       body.innerHTML = `
         <div class="now-line">
+          <span class="badge ${ph.id === 'gather' || isPaused ? 'wait' : 'live'}">${ph.id === 'gather' ? '🌸 Dâng lễ' : isPaused ? 'Tạm dừng' : '📿 Tụng kinh'}</span>
           <span>Bước hiện tại:</span>
           <b>${esc(ph.sutra ? `${ph.title} (bài ${ph.sutra.num})` : ph.title || '—')}</b>
           ${ph.sessionSutra && !ph.sutra ? `<span class="muted">· khoá này: ${esc(ph.sessionSutra.name)}</span>` : ''}
@@ -1048,80 +1200,273 @@
             <h4>Hôm nay</h4>
             <p class="help">🙏 ${fmt(st.counters?.participants)} người · 📿 ${fmt(st.counters?.recitations)} tim (${fmt(st.counters?.heartsWithMo)} theo nhịp mõ) · 🔔 ${fmt(st.counters?.bellResponses)} lượt chắp tay theo chuông · 🔥 ${fmt(st.counters?.incenseOffers)} lượt thắp nhang · ${fmt(st.counters?.sessions)} khoá viên mãn</p>
           </div>
+        </div>
+        <div class="ctl-group live-ui" style="margin-top:16px">
+          <h4>Hiển thị trên màn hình live <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:500">— đổi lúc nào cũng được, áp dụng ngay</span></h4>
+          <div class="live-ui-grid">
+            ${[['showFeedPanel', '🤍 Bảng Dâng lễ / Tâm tình'], ['showMeritBoard', '📿 Bảng tinh tấn (top 5)'], ['showStats', '📊 Chỉ số chung'], ['showTicker', '💬 Dòng thông báo'], ['cameraFollow', '🎥 Camera cận cảnh']]
+              .map(([k, l]) => `<label class="check"><input type="checkbox" data-setting="${k}" ${s[k] !== false ? 'checked' : ''} /> ${l}</label>`).join('')}
+          </div>
+          <div class="btn-row" style="margin-top:10px">
+            <span class="muted">Dòng chữ chạy:</span>
+            <select class="input" data-setting="marqueeMode" style="width:auto;height:32px">
+              ${[['interval', 'Thỉnh thoảng'], ['always', 'Luôn hiện'], ['off', 'Tắt (chỉ khi bấm)']].map(([v, l]) => `<option value="${v}" ${(s.marqueeMode || 'interval') === v ? 'selected' : ''}>${l}</option>`).join('')}
+            </select>
+            ${(s.marqueeMode || 'interval') === 'interval' ? `<span class="muted">mỗi</span><input class="input num" type="number" min="1" max="30" value="${esc(s.marqueeEveryMin ?? 5)}" data-setting="marqueeEveryMin" style="width:64px;height:32px" /><span class="muted">phút</span>` : ''}
+            <button class="btn sm" data-act="chant-marquee">📣 Hiện ngay</button>
+          </div>
+          <div class="btn-row" style="margin-top:10px">
+            <span class="muted">🔊 Nhạc nền:</span>
+            <div class="range-wrap" style="min-width:220px"><input type="range" min="0" max="100" value="${Math.round((typeof s.musicVolume === 'number' ? s.musicVolume : 0.45) * 100)}" data-setting="musicVolume" /><output>${Math.round((typeof s.musicVolume === 'number' ? s.musicVolume : 0.45) * 100)}%</output></div>
+            <span class="muted">🪵 Mõ & chuông:</span>
+            <div class="range-wrap" style="min-width:180px"><input type="range" min="0" max="100" value="${Math.round((typeof s.sfxVolume === 'number' ? s.sfxVolume : 0.8) * 100)}" data-setting="sfxVolume" /><output>${Math.round((typeof s.sfxVolume === 'number' ? s.sfxVolume : 0.8) * 100)}%</output></div>
+          </div>
+          <div class="btn-row" style="margin-top:10px">
+            <span class="muted">Độ đậm bảng & chữ:</span>
+            <div class="range-wrap" style="min-width:220px"><input type="range" min="20" max="100" value="${esc(s.uiOpacity ?? 55)}" data-setting="uiOpacity" data-raw="1" data-unit="%" /><output>${esc(s.uiOpacity ?? 55)}%</output></div>
+            <span class="muted">thấp = trong suốt, ưu tiên chánh điện</span>
+          </div>
         </div>`;
     }
 
+    // Các mục cài đặt của phòng tụng kinh: menu bên trái, nội dung bên phải (mỗi lần xem một mục)
+    const CHANT_SECTIONS = [
+      { id: 'schedule', icon: '🗓', title: 'Thời khoá', desc: 'Các bước của khoá tụng, lịch bài kinh' },
+      { id: 'rhythm', icon: '🪘', title: 'Nhịp tụng & mõ', desc: 'Tốc độ tụng, cách gõ mõ' },
+      { id: 'reader', icon: '🎙', title: 'Giọng dẫn tụng', desc: 'Người đọc, giọng, âm lượng' },
+      { id: 'offering', icon: '🌸', title: 'Dâng lễ & tương tác', desc: 'Lời chúc, bình luận, bảng tinh tấn' },
+      { id: 'visual', icon: '🎥', title: 'Hình ảnh & camera', desc: 'Camera cận cảnh, hiệu ứng' },
+      { id: 'sound', icon: '🔊', title: 'Âm thanh', desc: 'Nhạc nền, mõ & chuông' },
+      { id: 'test', icon: '🧪', title: 'Thử nghiệm', desc: 'Giả lập người xem' }
+    ];
+    let chantSection = lsGet('admin_chant_section') || 'schedule';
+
+    function showChantSection(id) {
+      if (!CHANT_SECTIONS.some((x) => x.id === id)) id = 'schedule';
+      chantSection = id;
+      lsSet('admin_chant_section', id);
+      document.querySelectorAll('[data-csec]').forEach((b) => b.classList.toggle('active', b.dataset.csec === id));
+      document.querySelectorAll('[data-csection]').forEach((p) => p.classList.toggle('hidden', p.dataset.csection !== id));
+    }
+
+    function rotationChipsHtml() {
+      const s = roomState.settings || {};
+      const catalog = roomState.catalog || [];
+      const nameOf = (n) => (catalog.find((c) => c.num === n) || {}).name || `Bài ${n}`;
+      return (s.rotation || []).map((n, i) => `<span class="chip"><b>${i + 1}</b> ${esc(nameOf(n))}<button data-act="rot-remove" data-idx="${i}" aria-label="Bỏ">×</button></span>`).join('')
+        || '<span class="muted">Trống — dùng lịch mặc định</span>';
+    }
+
+    // Danh sách bài nhạc thiền tự tạo (khớp AmbientMusic.STYLES trong public/js/ambient.js)
+    const MUSIC_PRESETS = [
+      ['still', 'Tĩnh lặng', 'Kalimba ngũ cung, nền êm, chuông bát thỉnh thoảng, tiếng suối'],
+      ['flute', 'Sáo trúc chùa núi', 'Sáo trúc ngũ cung thứ, có hơi gió núi'],
+      ['zither', 'Đàn tranh bên suối', 'Đàn tranh nhấn nhá, luyến láy; suối chảy'],
+      ['bowls', 'Chuông bát Tây Tạng', 'Chuông bát ngân dài, tiếng trầm sâu, không giai điệu'],
+      ['night', 'Đêm trăng thiền viện', 'Dương cầm thưa, nền trầm, tiếng dế đêm'],
+      ['rain', 'Mưa rừng an tịnh', 'Mưa rơi nhẹ, kalimba thưa thớt'],
+      ['breath', 'Hơi thở chánh niệm', 'Nền phồng lên 4 giây – lắng xuống 6 giây, theo nhịp thở'],
+      ['chimes', 'Chuông gió hiên chùa', 'Chuông gió lác đác, gió nhẹ']
+    ];
+    let musicFiles = null;
+    function musicOptionsHtml(current, allowNone = false) {
+      const none = allowNone ? `<option value="preset:none" ${current === 'preset:none' ? 'selected' : ''}>🔕 Không nhạc — chỉ tiếng pháp (mõ, chuông, giọng tụng)</option>` : '';
+      const pre = MUSIC_PRESETS.map(([id, name]) => `<option value="preset:${id}" ${current === 'preset:' + id ? 'selected' : ''}>🎼 ${esc(name)}</option>`).join('');
+      const files = (musicFiles || []).map((f) => `<option value="file:${esc(f.file)}" ${current === 'file:' + f.file ? 'selected' : ''}>${f.source === 'youtube' ? '▶️' : '🎵'} ${esc(f.title)}</option>`).join('');
+      return `${none}<optgroup label="Nhạc thiền tự tạo">${pre}</optgroup>${files ? `<optgroup label="Nhạc của bạn (YouTube / file)">${files}</optgroup>` : ''}`;
+    }
+    let musicJobs = [];
+    let musicPoll = null;
+    async function loadMusicFiles() {
+      try {
+        const r = await rpc('music.jobs', {}, { silent: true });
+        musicFiles = r.files || [];
+        musicJobs = r.jobs || [];
+      } catch (_) {
+        musicFiles = musicFiles || [];
+      }
+      const sel = $('#musicTrackSel');
+      if (sel) sel.innerHTML = musicOptionsHtml(roomState?.settings?.musicTrack || 'preset:still');
+      const selC = $('#musicTrackChantSel');
+      if (selC) selC.innerHTML = musicOptionsHtml(roomState?.settings?.musicTrackChant || 'preset:breath', true);
+      renderMusicLibrary();
+      // Đang tải: hỏi lại sau 3 giây
+      clearTimeout(musicPoll);
+      if (musicJobs.some((j) => j.status === 'running')) musicPoll = setTimeout(loadMusicFiles, 3000);
+    }
+    function renderMusicLibrary() {
+      const box = $('#musicLib');
+      if (!box) return;
+      const cur = roomState?.settings?.musicTrack || '';
+      const curC = roomState?.settings?.musicTrackChant || '';
+      const running = musicJobs.filter((j) => j.status === 'running');
+      const failed = musicJobs.filter((j) => j.status === 'error' && Date.now() - j.startedAt < 10 * 60000);
+      box.innerHTML = `
+        ${running.map((j) => `<div class="ml-row busy">⏳ Đang tải âm thanh từ YouTube (${esc(j.id)})… <span class="muted">có thể mất 10–60 giây</span></div>`).join('')}
+        ${failed.map((j) => `<div class="ml-row err">⚠️ Không tải được ${esc(j.id)}: ${esc(j.error || '')}</div>`).join('')}
+        ${(musicFiles || []).map((f) => `
+          <div class="ml-row ${cur === 'file:' + f.file || curC === 'file:' + f.file ? 'on' : ''}">
+            <span class="ml-title">${f.source === 'youtube' ? '▶️' : '🎵'} ${esc(f.title)}</span>
+            ${f.url ? `<a class="muted" href="${esc(f.url)}" target="_blank" rel="noopener">nguồn ↗</a>` : ''}
+            <button class="btn sm ${cur === 'file:' + f.file ? 'on' : ''}" data-act="pick-track" data-key="musicTrack" data-track="file:${esc(f.file)}">${cur === 'file:' + f.file ? '✓ ' : ''}🌸 Dâng lễ</button>
+            <button class="btn sm ${curC === 'file:' + f.file ? 'on' : ''}" data-act="pick-track" data-key="musicTrackChant" data-track="file:${esc(f.file)}">${curC === 'file:' + f.file ? '✓ ' : ''}📿 Tụng kinh</button>
+            <button class="btn sm danger" data-act="music-delete" data-file="${esc(f.file)}">Xoá</button>
+          </div>`).join('') || (running.length ? '' : '<div class="muted">Chưa có nhạc riêng.</div>')}`;
+    }
+
     function renderChantSettings(body) {
+      setTimeout(loadMusicFiles, 0);
       const s = roomState.settings || {};
       const voices = roomState.tts?.voices || [s.readerVoice || 'maichi'];
       const catalog = roomState.catalog || [];
-      const nameOf = (n) => (catalog.find((c) => c.num === n) || {}).name || `Bài ${n}`;
       const pct = (v, d) => Math.round((typeof v === 'number' ? v : d) * 100);
-      const sw = (key, label, desc = '') => `
-        <div class="setting"><div><div class="setting-name">${label}</div>${desc ? `<div class="setting-desc">${desc}</div>` : ''}</div>
+      const label = (name, desc) => `<div><div class="setting-name">${name}</div>${desc ? `<div class="setting-desc">${desc}</div>` : ''}</div>`;
+      const sw = (key, name, desc = '') => `
+        <div class="setting">${label(name, desc)}
         <label class="switch"><input type="checkbox" data-setting="${key}" ${s[key] !== false ? 'checked' : ''} /><span></span></label></div>`;
-      const num = (key, label, min, max, unit) => `
-        <div class="setting"><div><div class="setting-name">${label}</div></div>
-        <div style="display:flex;align-items:center;gap:6px"><input class="input num" type="number" min="${min}" max="${max}" value="${esc(s[key])}" data-setting="${key}" /><span class="muted">${unit}</span></div></div>`;
-      const raw = (key, label, min, max, unit, desc = '') => `
-        <div class="setting"><div><div class="setting-name">${label}</div>${desc ? `<div class="setting-desc">${desc}</div>` : ''}</div>
+      const num = (key, name, min, max, unit, desc = '') => `
+        <div class="setting">${label(name, desc)}
+        <div class="num-wrap"><input class="input num" type="number" min="${min}" max="${max}" value="${esc(s[key])}" data-setting="${key}" /><span class="muted">${unit}</span></div></div>`;
+      const raw = (key, name, min, max, unit, desc = '') => `
+        <div class="setting">${label(name, desc)}
         <div class="range-wrap"><input type="range" min="${min}" max="${max}" value="${esc(s[key])}" data-setting="${key}" data-raw="1" data-unit="${unit}" /><output>${esc(s[key])}${unit}</output></div></div>`;
-      const vol = (key, label, d) => `
-        <div class="setting"><div><div class="setting-name">${label}</div></div>
+      const vol = (key, name, d, desc = '') => `
+        <div class="setting">${label(name, desc)}
         <div class="range-wrap"><input type="range" min="0" max="100" value="${pct(s[key], d)}" data-setting="${key}" /><output>${pct(s[key], d)}%</output></div></div>`;
+      const sel = (key, name, options, def, desc = '') => `
+        <div class="setting">${label(name, desc)}
+        <select class="input" data-setting="${key}">${options.map(([v, l]) => `<option value="${esc(v)}" ${(s[key] ?? def) === v ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select></div>`;
+      const group = (title, inner, note = '') => `<div class="set-group">${title ? `<div class="set-group-title">${title}</div>` : ''}${inner}${note ? `<p class="help set-note">${note}</p>` : ''}</div>`;
+      const section = (id, inner) => {
+        const meta = CHANT_SECTIONS.find((x) => x.id === id);
+        return `<section class="set-section ${chantSection === id ? '' : 'hidden'}" data-csection="${id}">
+          <header class="set-head"><span class="set-head-icon">${meta.icon}</span><div><h3>${meta.title}</h3><p>${meta.desc}</p></div></header>${inner}</section>`;
+      };
+      // Dòng thời gian các bước của một khoá tụng: bước nào bật/tắt được thì có công tắc
+      const STEPS = [
+        ['🌸 Dâng lễ', 'Nhạc nền, đọc lời chúc & cảm ơn, camera cận cảnh người dâng, âm thanh lễ vật', `<div class="num-wrap"><input class="input num" type="number" min="1" max="120" value="${esc(s.offeringMinutes ?? 5)}" data-setting="offeringMinutes" /><span class="muted">phút</span></div>`],
+        ['Khai chuông', 'Thỉnh chuông mời đại chúng an toạ', '<span class="badge">Luôn có</span>'],
+        ['Niệm hương', 'Xướng bài niệm hương', 'useIncense'],
+        ['Khai chuông mõ', 'Chuông mõ mở đầu', 'useKhaiChuongMo'],
+        ['Khai kinh kệ', '“Vô thượng thậm thâm…”', 'useOpening'],
+        ['📿 Tụng kinh', 'Tụng tiếp bài kế trong lịch cho đủ thời gian của khoá tụng', '<span class="badge">Luôn có</span>'],
+        ['Niệm Phật', 'Niệm danh hiệu sau kinh', 'useRecitation', `<div class="num-wrap"><input class="input num" type="number" min="3" max="108" value="${esc(s.niemPhatCount)}" data-setting="niemPhatCount" /><span class="muted">câu</span></div>`],
+        ['Hồi hướng', 'Đọc tên mọi người trong khoá', 'useDedication'],
+        ['Tĩnh lặng', 'Ngồi yên, thở nhẹ', `<div class="num-wrap"><input class="input num" type="number" min="0" max="600" value="${esc(s.silenceSeconds)}" data-setting="silenceSeconds" /><span class="muted">giây</span></div>`],
+        ['Kết chuông', 'Khoá tụng viên mãn, mưa hoa', '<span class="badge">Luôn có</span>']
+      ];
+      const stepCtl = (c) => (c.startsWith('use') ? `<label class="switch"><input type="checkbox" data-setting="${c}" ${s[c] !== false ? 'checked' : ''} /><span></span></label>` : c);
+      const timeline = `<ol class="step-line">${STEPS.map(([name, desc, ctl, extra], i) => `
+        <li class="${ctl.startsWith('use') && s[ctl] === false ? 'off' : ''}"><span class="step-dot">${i + 1}</span>
+          <div class="step-txt"><div class="setting-name">${name}</div><div class="setting-desc">${desc}</div></div>
+          <div class="step-ctl">${extra && !(ctl.startsWith('use') && s[ctl] === false) ? extra : ''}${stepCtl(ctl)}</div></li>`).join('')}</ol>`;
       const rs = readerStatusCache;
       chantSettingsRenderedFor = currentId;
       body.innerHTML = `
-        <div class="ctl-grid" data-chant-settings>
-          <div class="ctl-group">
-            <h4>Thời khoá</h4>
-            ${sw('autoRun', 'Chạy tự động', 'Tắt: phòng tụ hội và chờ người trực bấm “Bắt đầu khoá tụng”')}
-            ${num('gatherSeconds', 'Thời gian tụ hội', 15, 600, 'giây')}
-            ${num('silenceSeconds', 'Ngồi tĩnh lặng', 0, 600, 'giây')}
-            ${num('niemPhatCount', 'Số câu niệm Phật', 3, 108, 'câu')}
-            ${sw('useIncense', 'Niệm hương')}
-            ${sw('useKhaiChuongMo', 'Khai chuông mõ')}
-            ${sw('useOpening', 'Khai kinh kệ')}
-            ${sw('useRecitation', 'Niệm Phật sau kinh')}
-            ${sw('useDedication', 'Hồi hướng')}
-          </div>
-          <div class="ctl-group">
-            <h4>Nhịp tụng</h4>
-            ${raw('bpm', 'Nhịp đồng tụng (có mõ)', 50, 140, ' chữ/phút', 'Kinh tiếng Việt; kệ ×0,7 · Tâm Kinh ×1,3 · niệm danh hiệu ×0,95')}
-            ${raw('intonedSpm', 'Nhịp xướng (không mõ)', 30, 100, ' chữ/phút', 'Niệm hương, xướng danh hiệu, hồi hướng, Tam quy')}
-            <div class="setting"><div><div class="setting-name">Mõ cho kinh tiếng Việt</div><div class="setting-desc">Bắc tông: mỗi chữ một tiếng · Làng Mai: mỗi dòng một tiếng</div></div>
-              <select class="input" data-setting="vietMoStyle">
-                <option value="syllable" ${s.vietMoStyle !== 'line' ? 'selected' : ''}>Mỗi chữ</option>
-                <option value="line" ${s.vietMoStyle === 'line' ? 'selected' : ''}>Mỗi dòng</option>
-              </select></div>
-            <h4 style="margin-top:16px">Giọng đọc</h4>
-            ${sw('readerEnabled', 'Người đọc dẫn tụng', 'Giọng tổng hợp đọc từng chữ theo nhịp, nhỏ nhẹ')}
-            <div class="setting"><div><div class="setting-name">Giọng</div></div>
-              <select class="input" data-setting="readerVoice">${voices.map((v) => `<option value="${esc(v)}" ${v === s.readerVoice ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select></div>
-            ${vol('readerVolume', 'Âm lượng người đọc', 0.35)}
-            <p class="help" id="readerStatus">${rs ? `Đã chuẩn bị ${fmt(rs.ready)}/${fmt(rs.total)} chữ cho giọng ${esc(rs.voice)}${rs.preparing ? ' — đang chuẩn bị…' : ''}` : 'Đang kiểm tra…'}</p>
-          </div>
-          <div class="ctl-group">
-            <h4>Âm thanh</h4>
-            ${vol('musicVolume', 'Nhạc nền', 0.45)}
-            ${vol('sfxVolume', 'Mõ & chuông', 0.8)}
-            ${sw('natureSound', 'Tiếng suối nhẹ')}
-            ${sw('showRhythmGuide', 'Hiện hướng dẫn thả tim theo nhịp')}
-            <div class="setting"><div><div class="setting-name">Bình luận hiện ở đâu</div><div class="setting-desc">Trên đầu phật tử, hoặc đèn hoa đăng bay lên</div></div>
-              <select class="input" data-setting="commentDisplay">
-                <option value="head" ${!s.commentDisplay || s.commentDisplay === 'head' ? 'selected' : ''}>Trên đầu</option>
-                <option value="lantern" ${s.commentDisplay === 'lantern' ? 'selected' : ''}>Đèn hoa đăng</option>
-                <option value="both" ${s.commentDisplay === 'both' ? 'selected' : ''}>Cả hai</option>
-              </select></div>
-            <h4 style="margin-top:16px">Lịch xoay vòng bài kinh</h4>
-            <p class="help">Dùng khi không ai đề nghị bài (bình luận “kinh 1–9”).</p>
-            <div class="chips" id="rotationChips">${(s.rotation || []).map((n, i) => `<span class="chip">${esc(nameOf(n))}<button data-act="rot-remove" data-idx="${i}" aria-label="Bỏ">×</button></span>`).join('') || '<span class="muted">Trống — dùng lịch mặc định</span>'}</div>
-            <div class="input-group">
-              <select class="input" id="rotAddSel">${catalog.map((c) => `<option value="${c.num}">${c.num}. ${esc(c.name)}</option>`).join('')}</select>
-              <button class="btn" data-act="rot-add">Thêm</button>
-            </div>
+        <div class="set-layout" data-chant-settings>
+          <nav class="set-nav" aria-label="Mục cài đặt">
+            ${CHANT_SECTIONS.map((x) => `<button data-csec="${x.id}" class="${chantSection === x.id ? 'active' : ''}"><span class="sn-icon">${x.icon}</span><span><span class="sn-title">${x.title}</span><span class="sn-desc">${x.desc}</span></span></button>`).join('')}
+            <p class="help set-saved">Mọi thay đổi được lưu ngay và áp dụng cho phòng này.</p>
+          </nav>
+          <div class="set-body">
+            ${section('schedule', `
+              ${group('Lịch tự động', `
+                ${sw('autoRun', 'Chạy tự động', 'Luân phiên Dâng lễ ⇄ Tụng kinh. Tắt: phòng ở chế độ Dâng lễ và chờ người trực bấm “Bắt đầu khoá tụng”')}
+                ${num('offeringMinutes', '🌸 Dâng lễ mỗi lượt', 1, 120, 'phút', 'Nhạc nền + đọc lời chúc, cảm ơn; quà có hiệu ứng & âm thanh; camera cận cảnh')}
+                ${num('chantMinutes', '📿 Tụng kinh mỗi khoá', 5, 180, 'phút', 'Khai chuông → kinh (tụng tiếp bài kế cho đủ giờ) → niệm Phật → hồi hướng → kết chuông. Chỉ tiếng pháp, camera giữ toàn cảnh')}`,
+                `Một vòng ≈ ${fmt((Number(s.offeringMinutes) || 5) + (Number(s.chantMinutes) || 20))} phút. Lúc tụng kinh: người dâng hương vẫn đi lên, quà vẫn hiện, nhưng không có tiếng và camera không cận cảnh.`)}
+              ${group('Các bước trong một khoá tụng', timeline)}
+              ${group('Lịch xoay vòng bài kinh', `
+                <div class="chips" id="rotationChips">${rotationChipsHtml()}</div>
+                <div class="input-group">
+                  <select class="input" id="rotAddSel">${catalog.map((c) => `<option value="${c.num}">${c.num}. ${esc(c.name)}</option>`).join('')}</select>
+                  <button class="btn" data-act="rot-add">＋ Thêm bài</button>
+                </div>`, 'Dùng khi không ai đề nghị bài (người xem bình luận “kinh 1–9” để đề nghị).')}
+            `)}
+            ${section('rhythm', `
+              ${group('Tốc độ', `
+                ${raw('bpm', 'Nhịp đồng tụng (có mõ)', 50, 140, ' chữ/phút', 'Kinh tiếng Việt; kệ ×0,7 · Tâm Kinh ×1,3 · niệm danh hiệu ×0,95')}
+                ${raw('intonedSpm', 'Nhịp xướng (không mõ)', 30, 100, ' chữ/phút', 'Niệm hương, xướng danh hiệu, hồi hướng, Tam quy')}`)}
+              ${group('Mõ', `
+                ${sel('vietMoStyle', 'Mõ cho kinh tiếng Việt', [['syllable', 'Mỗi chữ một tiếng'], ['line', 'Mỗi dòng một tiếng']], 'syllable', 'Bắc tông: mỗi chữ · Làng Mai: mỗi dòng (khi giọng đọc ở kiểu “từng chữ”)')}
+                ${sw('showRhythmGuide', 'Hướng dẫn thả tim theo nhịp mõ', 'Chấm nhịp và lời nhắc trên khung kinh')}`)}
+            `)}
+            ${section('reader', `
+              ${group('Người đọc', `
+                ${sw('readerEnabled', 'Bật giọng dẫn tụng', 'Giọng tổng hợp đọc kinh, nhỏ nhẹ dưới tiếng mõ')}
+                ${sel('readerStyle', 'Kiểu đọc', [['natural', 'Tự nhiên từng câu'], ['syllable', 'Từng chữ theo mõ']], 'natural', 'Tự nhiên: đọc liền mạch cả câu, mõ điểm đầu câu')}
+                ${raw('lineGapMs', 'Nghỉ giữa các câu', 200, 3000, ' ms', 'Chỉ dùng khi đọc tự nhiên')}`)}
+              ${group('Giọng & âm lượng', `
+                ${sel('readerVoice', 'Giọng', voices.map((v) => [v, v]), s.readerVoice || 'maichi', 'Giọng nam ấm: giahuy, huuduc')}
+                ${vol('readerVolume', 'Âm lượng người đọc', 0.35)}`, `<span id="readerStatus">${rs ? `Đã chuẩn bị ${fmt(rs.ready)}/${fmt(rs.total)} ${esc(rs.unit || 'chữ')} cho giọng ${esc(rs.voice)}${rs.preparing ? ' — đang chuẩn bị…' : ''}` : 'Đang kiểm tra…'}</span>`)}
+              ${group('Nghe thử giọng', `
+                <div class="input-group">
+                  <input class="input" id="speakText" value="Nam mô A Di Đà Phật. Xin kính chào quý vị." />
+                  <button class="btn" data-act="speak">▶ Đọc</button>
+                </div>
+                <audio id="speakAudio" class="hidden"></audio>`, 'Phát trên màn hình live của phòng và tại đây.')}
+            `)}
+            ${section('offering', `
+              ${group('Lúc dâng lễ (tụ hội)', sw('speakWishes', 'Đọc lời chúc & lời cảm ơn', 'Đọc lời chúc thật tâm (bỏ qua bình luận khiếm nhã), chào người mới, cảm ơn người dâng lễ. Lúc tụng kinh chỉ có tiếng pháp — lời chúc hiện ở bảng trái'))}
+              ${group('Lời dẫn chuyển chế độ', `
+                ${sw('speakTransitions', 'Đọc lời dẫn khi chuyển Dâng lễ ⇄ Tụng kinh', 'Sau kết chuông: tuỳ hỷ & mời dâng lễ, báo giờ khoá sau · Còn 1 phút: nhắc gửi lời chúc · Trước khi tụng: mời ngồi ngay ngắn, tạm ngưng bình luận, thả tim theo mõ')}
+                <div class="btn-row" style="margin-top:8px">
+                  <span class="muted">Nghe thử:</span>
+                  <button class="btn sm" data-act="announce-test" data-kind="toChant">📿 Vào tụng kinh</button>
+                  <button class="btn sm" data-act="announce-test" data-kind="soon">⏳ Còn 1 phút</button>
+                  <button class="btn sm" data-act="announce-test" data-kind="toOffering">🌸 Sang dâng lễ</button>
+                </div>`, 'Lời dẫn phát cả trên màn hình live của phòng. Nên thử ở Phòng Thử Nghiệm.')}
+              ${group('Bình luận & bảng', `
+                ${sel('commentDisplay', 'Bình luận hiện ở đâu', [['head', 'Trên đầu phật tử'], ['lantern', 'Đèn hoa đăng bay lên'], ['both', 'Cả hai']], 'head')}
+                ${sw('showMeritBoard', 'Bảng tinh tấn tụng kinh (bên phải)', 'Top 5 theo thời gian cùng tụng và thả tim; quà chỉ góp rất ít')}`)}
+            `)}
+            ${section('visual', `
+              ${group('Camera', `
+                ${sw('cameraFollow', 'Camera cận cảnh', 'Theo người đi lên chánh điện thắp hương và người tặng quà (kèm thẻ lễ vật), rồi lùi ra toàn cảnh')}
+                ${raw('cameraZoom', 'Mức phóng to tối đa', 120, 400, '%', '250–300% vẫn nét; cao hơn ảnh nền hơi mềm')}`)}
+              ${group('Hiệu ứng', sel('fxLevel', 'Hoa rơi, lá vàng, lấp lánh', [['off', 'Tắt'], ['light', 'Nhẹ'], ['normal', 'Vừa'], ['rich', 'Nhiều']], 'normal', 'Máy phát live yếu nên chọn Nhẹ'))}
+              ${group('Bảng & chữ trên màn hình', `
+                ${raw('uiOpacity', 'Độ đậm bảng & chữ', 20, 100, '%', 'Thấp = nền trong suốt, chữ dịu — ưu tiên không gian chánh điện')}
+                ${sw('showFeedPanel', 'Bảng Dâng lễ / Tâm tình (trái)')}
+                ${sw('showStats', 'Chỉ số chung (người, niệm, nhang…)')}
+                ${sw('showTicker', 'Dòng thông báo (người vào, dâng hương…)')}
+                ${sel('marqueeMode', 'Dòng chữ chạy hướng dẫn', [['interval', 'Thỉnh thoảng'], ['always', 'Luôn hiện'], ['off', 'Tắt (chỉ khi bấm “Hiện ngay”)']], 'interval')}
+                ${num('marqueeEveryMin', 'Thỉnh thoảng: mỗi', 1, 30, 'phút', 'Mỗi lần chạy hết một lượt rồi tự ẩn; cũng hiện khi đổi Dâng lễ ⇄ Tụng kinh')}`, 'Tất cả đổi được ngay trong lúc live (tab Điều phối có bản rút gọn).')}
+            `)}
+            ${section('sound', `
+              ${group('Nhạc nền theo chế độ', `
+                ${vol('musicVolume', '🔊 Âm lượng nhạc nền', 0.45, 'Cho cả nhạc tự tạo và nhạc YouTube / file — nhạc tải về được tự cân bằng độ to')}
+                <div class="setting"><div><div class="setting-name">🌸 Khi Dâng lễ</div><div class="setting-desc">Nhạc nền lúc tụ hội, đọc lời chúc, dâng lễ</div></div>
+                  <select class="input" data-setting="musicTrack" id="musicTrackSel" style="width:300px">${musicOptionsHtml(s.musicTrack || 'preset:still')}</select></div>
+                <div class="setting"><div><div class="setting-name">📿 Khi Tụng kinh</div><div class="setting-desc">Nên chọn bài êm, ít giai điệu (Hơi thở, Chuông bát) hoặc tắt nhạc để chỉ còn tiếng pháp</div></div>
+                  <select class="input" data-setting="musicTrackChant" id="musicTrackChantSel" style="width:300px">${musicOptionsHtml(s.musicTrackChant || 'preset:breath', true)}</select></div>
+                <div class="track-list">${MUSIC_PRESETS.map(([id, name, desc]) => {
+                  const onO = (s.musicTrack || 'preset:still') === 'preset:' + id;
+                  const onC = (s.musicTrackChant || 'preset:breath') === 'preset:' + id;
+                  return `<div class="track ${onO || onC ? 'on' : ''}"><b>${esc(name)}</b><span>${esc(desc)}</span>
+                    <div class="track-btns">
+                      <button class="btn sm ${onO ? 'on' : ''}" data-act="pick-track" data-key="musicTrack" data-track="preset:${id}">${onO ? '✓ ' : ''}🌸 Dâng lễ</button>
+                      <button class="btn sm ${onC ? 'on' : ''}" data-act="pick-track" data-key="musicTrackChant" data-track="preset:${id}">${onC ? '✓ ' : ''}📿 Tụng kinh</button>
+                    </div></div>`;
+                }).join('')}
+                </div>`, 'Nhạc tự đổi khi phòng chuyển Dâng lễ ⇄ Tụng kinh. Bật “🔇 Nghe thử” dưới khung live để nghe.')}
+              ${group('Nhạc của bạn — nhập từ YouTube', `
+                <div class="input-group">
+                  <input class="input" id="ytUrl" placeholder="Dán link YouTube, ví dụ https://www.youtube.com/watch?v=…" />
+                  <button class="btn primary" data-act="music-import">⬇ Nhập nhạc</button>
+                </div>
+                <div class="music-lib" id="musicLib"></div>`, 'Chỉ tải phần âm thanh (tối đa 3 giờ), lưu vào thư mục <code>public/music</code> để phát ổn định khi live. <b>Chỉ nhập nhạc không bản quyền / được phép phát trên livestream</b> — nhạc có bản quyền có thể bị TikTok tắt tiếng. Cũng có thể thả file .mp3/.m4a vào thư mục đó.')}
+              ${group('Âm lượng', `
+                ${vol('musicVolume', 'Nhạc nền', 0.45, 'Nhạc thiền không lời, tự nhỏ lại khi có chuông và giọng đọc')}
+                ${vol('sfxVolume', 'Mõ & chuông', 0.8)}`)}
+              ${group('Không gian', sw('natureSound', 'Tiếng thiên nhiên đi kèm bài nhạc', 'Suối, mưa, gió núi, dế đêm… tuỳ bài — lẫn rất nhỏ trong nhạc nền'))}
+            `)}
+            ${section('test', `
+              ${group('Giả lập người xem', '<div id="settingsBody"></div>', 'Chỉ dùng khi chưa live — tự tắt khi phòng kết nối TikTok (TikTok coi tương tác ảo trên phòng live là tương tác giả).')}
+            `)}
           </div>
         </div>`;
+      renderSettings();
       if (!rs) loadReaderStatus();
     }
 
@@ -1129,7 +1474,7 @@
       try {
         readerStatusCache = await rpc('chanting.readerStatus', { roomId: currentId }, { silent: true });
         const el = $('#readerStatus');
-        if (el) el.textContent = `Đã chuẩn bị ${fmt(readerStatusCache.ready)}/${fmt(readerStatusCache.total)} chữ cho giọng ${readerStatusCache.voice}${readerStatusCache.preparing ? ' — đang chuẩn bị…' : ''}`;
+        if (el) el.textContent = `Đã chuẩn bị ${fmt(readerStatusCache.ready)}/${fmt(readerStatusCache.total)} ${readerStatusCache.unit || 'chữ'} cho giọng ${readerStatusCache.voice}${readerStatusCache.preparing ? ' — đang chuẩn bị…' : ''}`;
       } catch (_) {}
     }
 
@@ -1137,8 +1482,8 @@
       try {
         await rpc('room.updateSettings', { roomId: currentId, rotation: list });
         roomState.settings.rotation = list;
-        chantSettingsRenderedFor = null;
-        renderChantPanel();
+        const chips = $('#rotationChips');
+        if (chips) chips.innerHTML = rotationChipsHtml();
         toast('Đã lưu lịch xoay vòng');
       } catch (_) {}
     }
@@ -1167,15 +1512,10 @@
     }
 
     document.addEventListener('click', async (e) => {
-      const tab = e.target.closest('[data-ctab]');
-      if (tab) {
-        chantTab = tab.dataset.ctab;
-        chantSettingsRenderedFor = null;
-        if (chantTab === 'people') peopleCache = null;
-        if (chantTab === 'settings') readerStatusCache = null;
-        renderChantPanel();
-        return;
-      }
+      const stab = e.target.closest('[data-stab]');
+      if (stab) return showStudioTab(stab.dataset.stab);
+      const csec = e.target.closest('[data-csec]');
+      if (csec) return showChantSection(csec.dataset.csec);
       const btn = e.target.closest('[data-act]');
       if (!btn || !currentId) return;
       const call = async (method, params = {}, okMsg) => {
@@ -1191,6 +1531,38 @@
         case 'chant-resume': return call('chanting.resume', {}, 'Đã tiếp tục');
         case 'chant-jump': return call('chanting.jumpTo', { phase: btn.dataset.phase }, `Đã chuyển đến: ${btn.textContent.trim()}`);
         case 'chant-set-next': return call('chanting.setNextSutra', { num: Number($('#chantNextSel').value) }, 'Đã chọn bài cho khoá sau');
+        case 'chant-marquee': return call('chanting.showMarquee', {}, 'Đã hiện dòng chữ chạy trên màn hình live');
+        case 'announce-test': return call('chanting.announceTest', { kind: btn.dataset.kind }, 'Đang đọc lời dẫn trên màn hình live');
+        case 'music-import': {
+          const url = ($('#ytUrl')?.value || '').trim();
+          if (!url) return toast('Hãy dán link YouTube', 'error');
+          try {
+            const r = await rpc('music.importYoutube', { url });
+            if (r.status === 'done') toast(`Đã có trong thư viện: ${r.title}`);
+            else toast('Đang tải nhạc từ YouTube…');
+            $('#ytUrl').value = '';
+          } catch (_) {}
+          return loadMusicFiles();
+        }
+        case 'music-delete': {
+          const file = btn.dataset.file;
+          if (!(await confirmDialog({ title: 'Xoá bài nhạc này?', text: 'File nhạc sẽ bị xoá khỏi thư mục public/music. Phòng nào đang dùng sẽ chuyển về nhạc thiền tự tạo khi tải lại.', ok: 'Xoá' }))) return;
+          try {
+            if ((roomState?.settings?.musicTrack || '') === 'file:' + file) await rpc('room.updateSettings', { roomId: currentId, musicTrack: 'preset:still' });
+            await rpc('music.delete', { file });
+            toast('Đã xoá bài nhạc');
+          } catch (_) {}
+          return loadMusicFiles();
+        }
+        case 'pick-track': {
+          const track = btn.dataset.track;
+          const key = btn.dataset.key || 'musicTrack';
+          await call('room.updateSettings', { [key]: track }, key === 'musicTrackChant' ? 'Đã đổi nhạc khi tụng kinh' : 'Đã đổi nhạc khi dâng lễ');
+          if (roomState?.settings) roomState.settings[key] = track;
+          chantSettingsRenderedFor = null;
+          renderChantSettingsPanel(); // vẽ lại để dấu ✓ đúng chỗ
+          return;
+        }
         case 'rot-remove': {
           const list = [...(roomState.settings.rotation || [])];
           list.splice(Number(btn.dataset.idx), 1);
@@ -1199,13 +1571,29 @@
         case 'rot-add': return saveRotation([...(roomState.settings.rotation || []), Number($('#rotAddSel').value)]);
         case 'people-refresh':
           peopleCache = null;
-          return renderChantPanel();
+          return renderChantPeople($('#peopleBody'));
+        case 'pv-audio':
+          return setPreviewAudio(!pvAudioOn);
+        case 'pv-safe': {
+          pvSafeOn = !pvSafeOn;
+          const f = $('#pvFrame');
+          if (f && f.contentWindow) f.contentWindow.postMessage({ type: 'preview-safe', on: pvSafeOn }, location.origin);
+          btn.classList.toggle('on', pvSafeOn);
+          return;
+        }
+        case 'pv-reload': {
+          const f = $('#pvFrame');
+          if (!f) return;
+          f.addEventListener('load', () => pvAudioOn && setTimeout(() => setPreviewAudio(true), 600), { once: true });
+          f.src = f.src;
+          return;
+        }
       }
     });
 
     // Cập nhật thời gian còn lại mỗi giây trên thẻ Điều phối
     setInterval(() => {
-      if (chantTab === 'control' && $('#chantBody') && !$('#chantBody').contains(document.activeElement)) renderChantPanel();
+      if (studioTab === 'control' && $('#chantBody') && !$('#chantBody').contains(document.activeElement)) renderChantPanel();
     }, 1000);
 
     // ======================================================================
@@ -1278,7 +1666,9 @@
           toast('Đã gửi bình luận');
           $('#simComment').value = '';
         } else {
-          toast('Bình luận bị bỏ qua (lọc spam, quá ngắn hoặc gửi quá nhanh)', 'error');
+          toast(/th[aắ]p|d[aâ]ng/i.test(text)
+            ? 'Người này vừa lên dâng hương — mỗi người 1 lần / 3 phút. Đổi tên người thử hoặc bấm “Lên dâng hương”.'
+            : 'Bình luận bị bỏ qua (lọc spam, quá ngắn hoặc gửi quá nhanh)', 'error');
         }
       } catch (_) {}
     }
@@ -1391,6 +1781,9 @@
       }
     });
     $('#btnNewRoom').addEventListener('click', () => openRoomModal(null));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && e.target && e.target.id === 'speakText') speak();
+    });
 
     // ======================================================================
     // MODAL TẠO / SỬA PHÒNG
