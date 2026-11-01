@@ -70,9 +70,10 @@ def clean_and_normalize_text(raw_text: str) -> str:
     text = REPEATED_CHARS_RE.sub(r"\1\1", text)
     text = MULTI_SPACE_RE.sub(" ", text).strip(" .,!?-")
 
-    # Phải có ít nhất 2 chữ cái hợp lệ mới đọc
+    # Phải có ít nhất 1 chữ cái hợp lệ (âm tiết đơn như "a", "y", "ở" trong kinh). Nội dung của người xem
+    # đã được lọc ở Node (sanitizeWishText / sanitizeUserName yêu cầu ≥ 2 chữ cái) trước khi tới đây.
     letters = re.findall(r"[a-zA-ZÀ-ỹĂăĐđĨĩŨũƠơƯư]", text)
-    if len(letters) < 2:
+    if len(letters) < 1:
         return ""
 
     # Giới hạn độ dài an toàn cho 1 câu đọc TTS (tối đa 160 ký tự)

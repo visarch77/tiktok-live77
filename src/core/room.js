@@ -39,6 +39,16 @@ function sanitizeSettings(params, schema) {
     } else if (Array.isArray(rule)) {
       const n = Number(val);
       if (Number.isFinite(n)) out[key] = Math.max(rule[0], Math.min(rule[1], n));
+    } else if (rule && rule.type === 'enum') {
+      if (rule.values.includes(val)) out[key] = val;
+    } else if (rule && rule.type === 'intList') {
+      // Danh sách số nguyên (ví dụ lịch xoay vòng bài kinh): lọc theo khoảng, tối đa `max` phần tử
+      if (Array.isArray(val)) {
+        out[key] = val
+          .map((x) => Math.round(Number(x)))
+          .filter((x) => Number.isFinite(x) && x >= rule.min && x <= rule.maxValue)
+          .slice(0, rule.max || 50);
+      }
     }
   }
   return out;

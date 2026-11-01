@@ -28,17 +28,114 @@
   // ------------------------------------------------------------------------
   // Âm thanh: nhạc nền tổng hợp không lời + mõ + chuông (không TTS)
   // ------------------------------------------------------------------------
-  const audio = new window.TempleAudioEngine({ musicUrl: null, ambient: 'pad' });
+  // audio.js chỉ lo mõ & chuông; nhạc nền do AmbientMusic (ambient.js) tạo
+  const audio = new window.TempleAudioEngine({ musicUrl: null });
   audio.ttsEnabled = false;
+  audio.bgMusicEnabled = false;
   const particles = new window.TempleParticleEngine($('smokeCanvas'));
   particles.smokeDensity = 0.8;
 
+  let ambient = null;
+  let musicOn = true;
+  let natureOn = true;
+  let musicVolume = (() => {
+    try {
+      const v = parseFloat(localStorage.getItem('chant_music_vol'));
+      return Number.isFinite(v) ? v : 0.45;
+    } catch (_) {
+      return 0.45;
+    }
+  })();
+
+  function startMusic() {
+    const ctx = audio.ensureContext();
+    if (!ambient) ambient = new window.AmbientMusic(ctx, { volume: musicVolume, nature: natureOn });
+    if (musicOn) ambient.start();
+  }
+
+  // ------------------------------------------------------------------------
+  // Giọng đọc từng chữ (ZeroTTS) — nhỏ, có vang nhẹ, không lấn tiếng mõ
+  // ------------------------------------------------------------------------
+  let readerVolume = 0.35;
+  let readerBus = null;
+  const clipCache = new Map(); // url -> Promise<AudioBuffer|null>
+
+  function ensureReaderBus() {
+    if (readerBus) return readerBus;
+    const ctx = audio.ensureContext();
+    const gain = ctx.createGain();
+    gain.gain.value = readerVolume;
+    const lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = 6000;
+    const hp = ctx.createBiquadFilter();
+    hp.type = 'highpass';
+    hp.frequency.value = 120;
+    const verb = ctx.createConvolver();
+    const len = Math.floor(ctx.sampleRate * 1.6);
+    const ir = ctx.createBuffer(2, len, ctx.sampleRate);
+    for (let ch = 0; ch < 2; ch++) {
+      const d = ir.getChannelData(ch);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3.5);
+    }
+    verb.buffer = ir;
+    const wet = ctx.createGain();
+    wet.gain.value = 0.22;
+    gain.connect(hp);
+    hp.connect(lp);
+    lp.connect(ctx.destination);
+    lp.connect(verb);
+    verb.connect(wet);
+    wet.connect(ctx.destination);
+    readerBus = gain;
+    return gain;
+  }
+
+  function loadClip(url) {
+    if (!url) return null;
+    if (!clipCache.has(url)) {
+      const ctx = audio.ensureContext();
+      clipCache.set(
+        url,
+        fetch(url)
+          .then((r) => r.arrayBuffer())
+          .then((buf) => ctx.decodeAudioData(buf))
+          .then((ab) => {
+            clipCache.set(url, ab);
+            return ab;
+          })
+          .catch(() => null)
+      );
+      if (clipCache.size > 1500) clipCache.delete(clipCache.keys().next().value);
+    }
+    const v = clipCache.get(url);
+    return v instanceof AudioBuffer ? v : null;
+  }
+
+  function playClip(buffer, when, maxDur) {
+    const ctx = audio.ctx;
+    const src = ctx.createBufferSource();
+    const env = ctx.createGain();
+    src.buffer = buffer;
+    const dur = Math.min(buffer.duration, Math.max(0.15, maxDur));
+    env.gain.setValueAtTime(1, when);
+    env.gain.setValueAtTime(1, when + Math.max(0.05, dur - 0.06));
+    env.gain.linearRampToValueAtTime(0.0001, when + dur);
+    src.connect(env);
+    env.connect(ensureReaderBus());
+    src.onended = () => {
+      src.disconnect();
+      env.disconnect();
+    };
+    src.start(when, 0, dur + 0.01);
+  }
+
   function unlockAudio() {
-    audio.ensureContext();
+    startMusic();
     $('btnAudio').textContent = '✅ Âm thanh đã bật';
   }
   addEventListener('pointerdown', unlockAudio, { once: true });
-  if (document.body.classList.contains('obs-mode')) audio.ensureContext();
+  if (document.body.classList.contains('obs-mode')) startMusic();
 
   // ------------------------------------------------------------------------
   // Đồng bộ giờ với server
@@ -236,14 +333,12 @@
   let lineStarts = []; // chỉ số chữ đầu tiên của mỗi dòng
   let lastRenderedLine = -2;
   let lastRenderedWord = -2;
-  let scheduledBeat = -1;
-  let bellsScheduledFor = null;
+  let cueIdx = 0; // tiếng chuông / mõ kế tiếp cần hẹn giờ
+  let voiceIdx = 0; // chữ kế tiếp cần đọc
+  let showRhythm = true;
+  let lastBellPromptAt = 0;
 
   const TEXT_PHASES = new Set(['incense', 'opening', 'sutra', 'recitation', 'dedication']);
-
-  function beatMs() {
-    return 60000 / ((phase && phase.text && phase.text.bpm) || 84);
-  }
 
   function setPhase(p) {
     if (!p) return;
@@ -252,7 +347,6 @@
     if (!changed) return;
     lastRenderedLine = -2;
     lastRenderedWord = -2;
-    scheduledBeat = -1;
     lineStarts = [];
     if (p.text) {
       let acc = 0;
@@ -261,12 +355,23 @@
         acc += line.length;
       }
     }
-    $('spPhase').textContent = p.sutra ? `Tụng kinh · Bài ${p.sutra.num}` : p.title;
+    // Vào giữa chừng: bỏ qua các tiếng đã qua
+    const elapsed = serverNow() - p.startedAt;
+    cueIdx = 0;
+    const cues = p.cues || [];
+    while (cueIdx < cues.length && cues[cueIdx].t < elapsed - 150) cueIdx++;
+    voiceIdx = 0;
+    const times = (p.text && p.text.times) || [];
+    while (voiceIdx < times.length && times[voiceIdx] < elapsed - 150) voiceIdx++;
+    if (p.reader && audio.ctx) p.reader.clips.slice(voiceIdx, voiceIdx + 40).forEach(loadClip);
+    renderRhythmGuide();
+
+    const style = p.voice === 'intoned' ? ' · xướng' : p.voice === 'mo' ? ' · đồng tụng' : '';
+    $('spPhase').textContent = p.sutra ? `Tụng kinh · Bài ${p.sutra.num}${style}` : `${p.title}${style}`;
     $('spTitle').textContent = p.sutra ? p.sutra.name : p.title;
     $('spSub').textContent = p.subtitle || '';
     renderPhaseBody();
     renderNextUp();
-    scheduleBells();
   }
 
   function renderPhaseBody() {
@@ -287,11 +392,17 @@
       }</div>`;
       return;
     }
+    if (phase.id === 'paused') {
+      body.innerHTML = '<div class="sp-message">Thời khoá đang tạm dừng — mời đại chúng ngồi yên trong giây lát</div>';
+      return;
+    }
     if (phase.id === 'silence') {
       body.innerHTML = '<div class="breath"></div><div class="sp-message" style="margin-top:10px">Hít vào… thở ra… nhẹ nhàng</div>';
       return;
     }
-    const session = phase.sessionSutra && phase.id === 'bell_open' ? `<br>Khoá này cùng tụng <b>${esc(phase.sessionSutra.name)}</b>` : '';
+    const session = phase.sessionSutra && (phase.id === 'bell_open' || phase.id === 'khai_chuong_mo')
+      ? `<br>Khoá này cùng tụng <b>${esc(phase.sessionSutra.name)}</b>`
+      : '';
     body.innerHTML = `<div class="sp-message">${esc(phase.subtitle || '')}${session}</div>`;
   }
 
@@ -319,15 +430,31 @@
     }
   }
 
+  // Chữ đang tụng = chữ cuối cùng có mốc thời gian ≤ hiện tại (mốc do server tính theo nhịp từng đoạn)
+  function currentWordIndex(elapsed) {
+    const times = phase.text.times || [];
+    if (!times.length || elapsed < times[0]) return -1;
+    let lo = 0;
+    let hi = times.length - 1;
+    while (lo < hi) {
+      const mid = (lo + hi + 1) >> 1;
+      if (times[mid] <= elapsed) lo = mid;
+      else hi = mid - 1;
+    }
+    if (lo === times.length - 1 && elapsed > times[lo] + 1500) return times.length; // đã tụng xong
+    return lo;
+  }
+
   function renderKaraoke() {
     if (!phase || !phase.text) return;
-    const elapsed = serverNow() - phase.startedAt;
-    const beat = Math.floor(elapsed / beatMs()) - phase.text.leadInBeats;
-    const total = phase.text.syllables;
-    const wordIdx = Math.min(Math.max(beat, -1), total);
+    const wordIdx = currentWordIndex(serverNow() - phase.startedAt);
     let lineIdx = 0;
     for (let i = 0; i < lineStarts.length; i++) if (lineStarts[i] <= Math.max(wordIdx, 0)) lineIdx = i;
     if (lineIdx === lastRenderedLine && wordIdx === lastRenderedWord) return;
+    if (phase.sutra && phase.introLines && lineIdx !== lastRenderedLine) {
+      const intro = lineIdx < phase.introLines;
+      $('spPhase').textContent = `Tụng kinh · Bài ${phase.sutra.num} · ${intro ? 'xướng danh hiệu' : 'đồng tụng'}`;
+    }
 
     const lines = phase.text.lines;
     const renderLine = (i, isCurrent) => {
@@ -361,41 +488,114 @@
     $('spProgress').style.width = `${pct}%`;
   }
 
-  // Mõ: mỗi chữ một tiếng, hẹn giờ trước ~350ms trên đồng hồ âm thanh để nhịp đều tuyệt đối
-  function scheduleWoodfish() {
-    if (!phase || !phase.text || !audio.ctx || audio.ctx.state !== 'running') return;
-    const ms = beatMs();
-    const lead = phase.text.leadInBeats;
-    const total = phase.text.syllables;
-    const nowS = serverNow();
-    const horizon = nowS + 350;
-    let k = Math.max(scheduledBeat + 1, Math.ceil((nowS - phase.startedAt) / ms) - lead);
-    for (; k < total; k++) {
-      const t = phase.startedAt + (k + lead) * ms;
-      if (t > horizon) break;
-      const when = audio.ctx.currentTime + Math.max(0, (t - nowS) / 1000);
-      const lineStart = lineStarts.includes(k);
-      audio.playWoodenFish(lineStart ? 0.94 : 1.0, when);
-      scheduledBeat = k;
+  // Chuông & mõ: hẹn giờ trước ~350 ms trên đồng hồ âm thanh theo dòng thời gian của server
+  function playCue(cue, when) {
+    switch (cue.k) {
+      case 'mo': audio.playWoodenFish(1.0, when, 1.0); pulseMo(when); break;
+      case 'moSoft': audio.playWoodenFish(1.0, when, 0.55); pulseMo(when); break;
+      case 'moLoud': audio.playWoodenFish(0.96, when, 1.3); pulseMo(when); break;
+      case 'bell':
+        audio.playTempleBell(0.9, when);
+        if (ambient) ambient.duck(6, when);
+        if (cue.g === 'xa' || cue.g === 'chap') atAudioTime(when, () => showBellPrompt(cue.g));
+        break;
+      case 'bellSoft':
+        audio.playTempleBell(0.4, when);
+        if (ambient) ambient.duck(3, when);
+        break;
+      case 'wake': audio.playBellWake(when); break;
     }
   }
 
-  function scheduleBells() {
-    if (!phase || !phase.bells || bellsScheduledFor === phase.startedAt) return;
-    if (!audio.ctx || audio.ctx.state !== 'running') return;
-    bellsScheduledFor = phase.startedAt;
-    const nowS = serverNow();
-    phase.bells.forEach((offset) => {
-      const t = phase.startedAt + offset;
-      if (t < nowS - 500) return;
-      audio.playTempleBell(0.9, audio.ctx.currentTime + Math.max(0, (t - nowS) / 1000));
+  // Gọi hàm đúng lúc âm thanh vang (đổi từ giờ AudioContext sang setTimeout)
+  function atAudioTime(when, fn) {
+    const delay = Math.max(0, (when - audio.ctx.currentTime) * 1000);
+    setTimeout(fn, delay);
+  }
+
+  function pulseMo(when) {
+    if (!showRhythm) return;
+    atAudioTime(when, () => {
+      const dot = $('moDot');
+      dot.classList.add('hit');
+      setTimeout(() => dot.classList.remove('hit'), 140);
     });
+  }
+
+  function renderRhythmGuide() {
+    const el = $('rhythm');
+    if (!phase || !showRhythm) {
+      el.classList.remove('show');
+      return;
+    }
+    if (phase.voice === 'mo') $('rhythmText').textContent = 'Thả tim theo nhịp mõ';
+    else if (phase.voice === 'intoned') $('rhythmText').textContent = 'Lắng nghe · chắp tay khi chuông vang';
+    else if (phase.id === 'silence') $('rhythmText').textContent = 'Ngồi yên · không cần thả tim';
+    else $('rhythmText').textContent = 'Chắp tay khi chuông vang';
+    el.classList.add('show');
+  }
+
+  // Tiếng chuông lớn: mời mọi người cùng chắp tay (thả tim) — như cúi xá theo chuông trong chánh điện
+  function showBellPrompt(gesture) {
+    const now = Date.now();
+    if (now - lastBellPromptAt < 4000) return;
+    lastBellPromptAt = now;
+    const el = $('bellPrompt');
+    el.querySelector('.bp-text').textContent = gesture === 'xa' ? 'Chắp tay xá — thả tim' : 'Chắp tay — thả tim';
+    $('bellPromptSub').textContent = phase && phase.id === 'bell_close' ? 'khoá tụng viên mãn' : 'theo tiếng chuông';
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 3800);
+  }
+
+  function burstHearts(n) {
+    const layer = $('heartBurst');
+    const count = Math.min(14, Math.max(3, n));
+    for (let i = 0; i < count; i++) {
+      const h = document.createElement('span');
+      h.textContent = ['🤍', '🙏', '🪷'][i % 3];
+      h.style.left = `${380 + Math.random() * 320}px`;
+      h.style.top = `${1080 + Math.random() * 80}px`;
+      h.style.animationDelay = `${(i * 0.12).toFixed(2)}s`;
+      layer.appendChild(h);
+      setTimeout(() => h.remove(), 3200 + i * 120);
+    }
+  }
+
+  function scheduleVoice(elapsed) {
+    if (!phase.reader || !phase.text || !phase.text.times) return;
+    const times = phase.text.times;
+    const clips = phase.reader.clips;
+    while (voiceIdx < times.length && times[voiceIdx] <= elapsed + 350) {
+      const i = voiceIdx++;
+      if (times[i] < elapsed - 150) continue;
+      const buf = loadClip(clips[i]);
+      if (!buf) continue;
+      const gap = i + 1 < times.length ? (times[i + 1] - times[i]) / 1000 : 0.8;
+      playClip(buf, audio.ctx.currentTime + Math.max(0, (times[i] - elapsed) / 1000), Math.min(gap * 0.97, 1.2));
+    }
+    // Tải trước các chữ sắp đọc
+    clips.slice(voiceIdx, voiceIdx + 30).forEach(loadClip);
+  }
+
+  function scheduleCues() {
+    if (!phase || !phase.cues || !audio.ctx || audio.ctx.state !== 'running') return;
+    const nowS = serverNow();
+    const elapsed = nowS - phase.startedAt;
+    scheduleVoice(elapsed);
+    const cues = phase.cues;
+    while (cueIdx < cues.length && cues[cueIdx].t <= elapsed + 350) {
+      const cue = cues[cueIdx];
+      if (cue.t >= elapsed - 150) {
+        const when = audio.ctx.currentTime + Math.max(0, (cue.t - elapsed) / 1000);
+        playCue(cue, when);
+      }
+      cueIdx++;
+    }
   }
 
   setInterval(() => {
     renderKaraoke();
-    scheduleWoodfish();
-    scheduleBells();
+    scheduleCues();
   }, 90);
   setInterval(renderProgress, 1000);
 
@@ -418,9 +618,24 @@
     if (st.nextUp) nextUpList = st.nextUp;
     setPhase(st.phase);
     renderNextUp();
+    if (st.settings) {
+      if (typeof st.settings.sfxVolume === 'number') {
+        audio.setSfxVolume(st.settings.sfxVolume);
+        syncSlider('volSfx', st.settings.sfxVolume);
+      }
+      if (typeof st.settings.readerVolume === 'number') {
+        readerVolume = st.settings.readerVolume;
+        if (readerBus) readerBus.gain.setTargetAtTime(readerVolume, audio.ctx.currentTime, 0.2);
+      }
+      if (typeof st.settings.natureSound === 'boolean' && ambient) ambient.setNature(st.settings.natureSound);
+      if (typeof st.settings.natureSound === 'boolean') natureOn = st.settings.natureSound;
+      showRhythm = st.settings.showRhythmGuide !== false;
+      renderRhythmGuide();
+    }
     if (st.settings && typeof st.settings.musicVolume === 'number') {
-      audio.setMusicVolume(st.settings.musicVolume);
-      syncSlider('volMusic', st.settings.musicVolume);
+      musicVolume = st.settings.musicVolume;
+      if (ambient) ambient.setVolume(musicVolume);
+      syncSlider('volMusic', musicVolume);
     }
   }
 
@@ -435,6 +650,13 @@
       case 'chant':
         (a.keys || []).forEach(markChanting);
         renderChantingLine(a.chantingNow || a.names || []);
+        break;
+      case 'milestone':
+        ticker(`🌼 <b>${esc(a.name)}</b> ${esc(a.text)} — tuỳ hỷ`);
+        break;
+      case 'bellResponse':
+        burstHearts(a.people);
+        ticker(`🙏 ${fmt(a.people)} bạn cùng chắp tay theo tiếng chuông`);
         break;
       case 'thanks':
         if (a.names && a.names.length > 1) {
@@ -527,11 +749,13 @@
     el.value = String(Math.round(v * 100));
     $(`${id}Out`).textContent = `${el.value}%`;
   }
-  syncSlider('volMusic', audio.bgBaseVolume);
+  syncSlider('volMusic', musicVolume);
   syncSlider('volSfx', audio.sfxVolume);
   $('volMusic').addEventListener('input', (e) => {
     $('volMusicOut').textContent = `${e.target.value}%`;
-    audio.setMusicVolume(Number(e.target.value) / 100);
+    musicVolume = Number(e.target.value) / 100;
+    try { localStorage.setItem('chant_music_vol', String(musicVolume)); } catch (_) {}
+    if (ambient) ambient.setVolume(musicVolume);
   });
   $('volMusic').addEventListener('change', (e) => rpc('room.updateSettings', { musicVolume: Number(e.target.value) / 100 }));
   $('volSfx').addEventListener('input', (e) => {
@@ -540,13 +764,9 @@
   });
   $('btnAudio').addEventListener('click', unlockAudio);
   $('btnMusic').addEventListener('click', (e) => {
-    audio.bgMusicEnabled = !audio.bgMusicEnabled;
-    if (audio.bgMusicEnabled) {
-      audio.ensureContext();
-      audio.startZenAmbience();
-    } else {
-      audio.stopZenAmbience();
-    }
-    e.currentTarget.textContent = `🎵 Nhạc nền: ${audio.bgMusicEnabled ? 'BẬT' : 'TẮT'}`;
+    musicOn = !musicOn;
+    if (musicOn) startMusic();
+    else if (ambient) ambient.stop();
+    e.currentTarget.textContent = `🎵 Nhạc nền: ${musicOn ? 'BẬT' : 'TẮT'}`;
   });
 })();

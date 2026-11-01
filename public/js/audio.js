@@ -262,7 +262,7 @@ class TempleAudioEngine {
   // --------------------------------------------------------------------------
   // 2. TIẾNG MÕ GỖ TỤNG KINH (WOODEN FISH PERCUSSION SYNTH)
   // --------------------------------------------------------------------------
-  playWoodenFish(pitchMultiplier = 1.0, when = 0) {
+  playWoodenFish(pitchMultiplier = 1.0, when = 0, velocity = 1) {
     if (!this.sfxEnabled || this.sfxVolume <= 0) return;
     try {
       const ctx = this.ensureContext();
@@ -283,7 +283,7 @@ class TempleAudioEngine {
       filter.Q.setValueAtTime(4.0, now);
 
       gain.gain.setValueAtTime(0.001, now);
-      gain.gain.linearRampToValueAtTime(0.28 * this.sfxVolume, now + 0.006);
+      gain.gain.linearRampToValueAtTime(0.28 * this.sfxVolume * velocity, now + 0.006);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
 
       osc1.connect(filter);
@@ -341,6 +341,34 @@ class TempleAudioEngine {
         };
         osc.start(now);
         osc.stop(now + p.decay + 0.05);
+      });
+    } catch (_) {}
+  }
+
+  /**
+   * "Thức chuông" (nhập chuông): chạm nhẹ, chặn tiếng ngay — báo trước sắp có tiếng chuông lớn.
+   */
+  playBellWake(when = 0) {
+    if (!this.sfxEnabled || this.sfxVolume <= 0) return;
+    try {
+      const ctx = this.ensureContext();
+      const now = Math.max(ctx.currentTime, when || 0);
+      const master = ctx.createGain();
+      master.gain.setValueAtTime(0.0001, now);
+      master.gain.linearRampToValueAtTime(0.06 * this.sfxVolume, now + 0.01);
+      master.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
+      master.connect(ctx.destination);
+      [1.0, 2.0].forEach((ratio, idx) => {
+        const osc = ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(174 * ratio, now);
+        osc.connect(master);
+        osc.onended = () => {
+          osc.disconnect();
+          if (idx === 0) master.disconnect();
+        };
+        osc.start(now);
+        osc.stop(now + 0.5);
       });
     } catch (_) {}
   }

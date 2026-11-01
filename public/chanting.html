@@ -41,6 +41,10 @@
 
         <!-- Dòng "đang cùng tụng" + thông báo nhẹ -->
         <div class="chanting-line" id="chantingLine"></div>
+
+        <!-- Lời mời chắp tay khi chuông vang -->
+        <div class="bell-prompt" id="bellPrompt"><div class="bp-icon">🔔</div><div class="bp-text">Cùng chắp tay — thả tim</div><div class="bp-sub" id="bellPromptSub">theo tiếng chuông</div></div>
+        <div class="heart-burst" id="heartBurst"></div>
         <div class="ticker" id="ticker"></div>
 
         <!-- Khung kinh: chữ sáng dần theo nhịp mõ -->
@@ -51,7 +55,10 @@
               <div class="sp-title" id="spTitle">Phòng Tụng Kinh Chung</div>
               <div class="sp-sub" id="spSub">Mời mọi người vào đạo tràng</div>
             </div>
-            <div class="sp-progress"><div class="sp-progress-bar" id="spProgress"></div></div>
+            <div class="sp-side">
+              <div class="rhythm" id="rhythm"><span class="mo-dot" id="moDot"></span><span id="rhythmText">Thả tim theo nhịp mõ</span></div>
+              <div class="sp-progress"><div class="sp-progress-bar" id="spProgress"></div></div>
+            </div>
           </div>
           <div class="sp-body" id="spBody"></div>
           <div class="sp-foot">
@@ -76,6 +83,7 @@
   </div>
 
   <script src="/js/audio.js"></script>
+  <script src="/js/ambient.js"></script>
   <script src="/js/particles.js"></script>
   <script src="/js/chanting.js"></script>
 </body>

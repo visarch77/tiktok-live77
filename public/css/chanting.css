@@ -120,3 +120,18 @@ body.obs-mode .stage-wrapper { height: 100vh; border: none; border-radius: 0; }
 .dock-row output { text-align: right; font-variant-numeric: tabular-nums; }
 .dock-note { font-size: 12.5px; color: rgba(255, 248, 236, 0.55); line-height: 1.5; }
 @media (max-width: 900px) { .dock { display: none; } }
+
+/* ---------- Nhịp mõ & lời mời theo chuông ---------- */
+.sp-side { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex: none; }
+.rhythm { display: inline-flex; align-items: center; gap: 9px; padding: 6px 14px; border-radius: 999px; background: rgba(246, 213, 138, 0.12); border: 1px solid var(--line); font-size: 15px; color: var(--ivory); opacity: 0; transition: opacity 0.6s ease; }
+.rhythm.show { opacity: 1; }
+.mo-dot { width: 16px; height: 16px; border-radius: 50%; background: rgba(246, 213, 138, 0.35); transition: transform 0.08s ease-out, background 0.08s; }
+.mo-dot.hit { transform: scale(1.5); background: var(--gold); }
+.bell-prompt { position: absolute; left: 50%; top: 1040px; z-index: 30; transform: translate(-50%, -50%) scale(0.92); padding: 22px 42px; border-radius: 26px; background: rgba(14, 6, 3, 0.86); border: 1.5px solid rgba(246, 213, 138, 0.7); text-align: center; opacity: 0; pointer-events: none; transition: opacity 0.5s ease, transform 0.5s ease; }
+.bell-prompt.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+.bp-icon { font-size: 54px; line-height: 1; }
+.bp-text { font-family: 'Noto Serif', serif; font-size: 36px; color: var(--gold); margin-top: 8px; }
+.bp-sub { font-size: 18px; color: rgba(255, 248, 236, 0.75); margin-top: 4px; }
+.heart-burst { position: absolute; inset: 0; z-index: 29; pointer-events: none; overflow: hidden; }
+.heart-burst span { position: absolute; font-size: 30px; animation: heartUp 2.6s ease-out forwards; }
+@keyframes heartUp { 0% { transform: translateY(0) scale(0.6); opacity: 0; } 15% { opacity: 1; } 100% { transform: translateY(-360px) scale(1.1); opacity: 0; } }

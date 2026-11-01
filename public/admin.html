@@ -308,6 +308,26 @@
     details.log[open] summary::after { content: '▴'; }
     details.log pre { margin: 0 18px 18px; padding: 12px; border-radius: 8px; background: var(--surface-2); border: 1px solid var(--border); font-size: 12px; max-height: 260px; overflow: auto; color: var(--text-2); }
 
+    /* ---------- Điều phối phòng tụng kinh ---------- */
+    .flow { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 14px; }
+    .flow button { border: 1px solid var(--border); background: var(--surface); border-radius: 999px; padding: 6px 12px; font-size: 12.5px; font-weight: 600; color: var(--text-2); cursor: pointer; }
+    .flow button.current { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .flow button.off { opacity: 0.45; text-decoration: line-through; }
+    .flow button:hover:not(.current) { border-color: var(--primary); }
+    .now-line { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 14px; }
+    .now-line b { font-weight: 700; }
+    .bar { height: 6px; border-radius: 99px; background: var(--surface-2); overflow: hidden; margin-top: 8px; }
+    .bar > div { height: 100%; background: var(--primary); transition: width 1s linear; }
+    .ctl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+    .ctl-group h4 { font-size: 12.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-3); margin-bottom: 6px; }
+    .num { width: 90px; height: 34px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 10px; }
+    .chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 6px 4px 10px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); font-size: 12.5px; }
+    .chip button { border: none; background: none; cursor: pointer; color: var(--text-3); font-size: 14px; line-height: 1; padding: 0 4px; }
+    table.people { width: 100%; border-collapse: collapse; font-size: 13px; }
+    table.people th, table.people td { padding: 8px 6px; border-bottom: 1px solid var(--border); text-align: right; white-space: nowrap; }
+    table.people th:first-child, table.people td:first-child { text-align: left; }
+    table.people th { color: var(--text-3); font-weight: 600; font-size: 12px; }
     .mobile-bar { display: none; }
     .hidden { display: none !important; }
     .muted { color: var(--text-3); }
@@ -664,6 +684,22 @@
 
         <section class="stats" id="statsRow"></section>
 
+        ${room.mode === 'chanting' ? `
+        <section class="card" id="chantPanel">
+          <div class="card-head">
+            <div>
+              <div class="card-title">Điều phối phòng tụng kinh</div>
+              <div class="card-sub">Chạy tự động theo thời khoá, hoặc can thiệp bất cứ lúc nào</div>
+            </div>
+            <div class="tabs" role="tablist" id="chantTabs">
+              <button data-ctab="control" class="active">Điều phối</button>
+              <button data-ctab="settings">Cài đặt</button>
+              <button data-ctab="people">Người tham gia</button>
+            </div>
+          </div>
+          <div class="card-body" id="chantBody"></div>
+        </section>` : ''}
+
         <section class="card">
           <div class="card-head">
             <div>
@@ -853,6 +889,7 @@
 
       renderFeed();
       renderSettings();
+      renderChantPanel();
       renderTtsFoot(roomState.tts);
     }
 
@@ -882,6 +919,15 @@
       if (body.contains(document.activeElement) && document.activeElement.matches('input[type=range], select')) return;
       const voices = roomState.tts?.voices || [s.ttsVoice || 'maichi'];
       const pct = (v, d) => Math.round((typeof v === 'number' ? v : d) * 100);
+      if (currentRoom()?.mode === 'chanting') {
+        body.innerHTML = `
+        <div class="setting">
+          <div><div class="setting-name">Giả lập người xem</div><div class="setting-desc">Chỉ để thử khi chưa live — tự tắt khi phòng kết nối TikTok</div></div>
+          <label class="switch"><input type="checkbox" data-setting="autoSim" ${s.autoSim ? 'checked' : ''} /><span></span></label>
+        </div>
+        <p class="help" style="margin-top:10px">Các cài đặt khác của phòng tụng kinh nằm ở thẻ <b>Điều phối → Cài đặt</b>.</p>`;
+        return;
+      }
       body.innerHTML = `
         <div class="setting">
           <div><div class="setting-name">Giọng đọc</div><div class="setting-desc">Đọc tên & lời nhắn của người xem</div></div>
@@ -908,7 +954,7 @@
     // Lưu cài đặt ngay khi thay đổi
     document.addEventListener('input', (e) => {
       const el = e.target.closest('input[type=range][data-setting]');
-      if (el) el.nextElementSibling.textContent = `${el.value}%`;
+      if (el) el.nextElementSibling.textContent = el.dataset.raw ? `${el.value}${el.dataset.unit || ''}` : `${el.value}%`;
     });
     document.addEventListener('change', async (e) => {
       const el = e.target.closest('[data-setting]');
@@ -916,7 +962,8 @@
       const key = el.dataset.setting;
       let value;
       if (el.type === 'checkbox') value = el.checked;
-      else if (el.type === 'range') value = +(Number(el.value) / 100).toFixed(2);
+      else if (el.type === 'range') value = el.dataset.raw ? Number(el.value) : +(Number(el.value) / 100).toFixed(2);
+      else if (el.type === 'number') value = Number(el.value);
       else value = el.value;
       try {
         await rpc('room.updateSettings', { roomId: currentId, [key]: value });
@@ -926,6 +973,234 @@
         if (el.type === 'checkbox') el.checked = !value;
       }
     });
+
+    // ======================================================================
+    // ĐIỀU PHỐI PHÒNG TỤNG KINH
+    // ======================================================================
+    let chantTab = 'control';
+    let chantSettingsRenderedFor = null;
+    let peopleCache = null;
+    let readerStatusCache = null;
+    const SKIPPABLE_FLAGS = { incense: 'useIncense', khai_chuong_mo: 'useKhaiChuongMo', opening: 'useOpening', recitation: 'useRecitation', dedication: 'useDedication' };
+
+    function fmtDuration(ms) {
+      const s = Math.max(0, Math.round(ms / 1000));
+      return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+    }
+
+    function renderChantPanel() {
+      const body = $('#chantBody');
+      if (!body || !roomState) return;
+      document.querySelectorAll('#chantTabs [data-ctab]').forEach((b) => b.classList.toggle('active', b.dataset.ctab === chantTab));
+      if (chantTab === 'control') return renderChantControl(body);
+      if (chantTab === 'settings') {
+        // Không vẽ lại khi đang chỉnh (tránh mất thao tác)
+        if (chantSettingsRenderedFor === currentId && body.querySelector('[data-chant-settings]')) return;
+        return renderChantSettings(body);
+      }
+      if (chantTab === 'people') return renderChantPeople(body);
+    }
+
+    function renderChantControl(body) {
+      const st = roomState;
+      const ph = st.phase || {};
+      const s = st.settings || {};
+      const order = st.phaseOrder || [];
+      const titles = st.phaseTitles || {};
+      const remaining = ph.durationMs ? ph.startedAt + ph.durationMs - (Date.now() + ((st.serverNow || Date.now()) - Date.now())) : 0;
+      const pct = ph.durationMs ? Math.min(100, Math.max(0, ((Date.now() - ph.startedAt) / ph.durationMs) * 100)) : 0;
+      const catalog = st.catalog || [];
+      const next = (st.nextUp || [])[0];
+      const isPaused = ph.id === 'paused';
+      const manualGather = ph.id === 'gather' && s.autoRun === false;
+      body.innerHTML = `
+        <div class="now-line">
+          <span>Bước hiện tại:</span>
+          <b>${esc(ph.sutra ? `${ph.title} (bài ${ph.sutra.num})` : ph.title || '—')}</b>
+          ${ph.sessionSutra && !ph.sutra ? `<span class="muted">· khoá này: ${esc(ph.sessionSutra.name)}</span>` : ''}
+          ${ph.durationMs && !manualGather ? `<span class="muted">· còn khoảng ${fmtDuration(remaining)}</span>` : ''}
+          ${manualGather ? '<span class="badge wait">Chờ người trực bắt đầu</span>' : ''}
+          ${isPaused ? '<span class="badge err">Đang tạm dừng</span>' : ''}
+        </div>
+        <div class="bar"><div style="width:${manualGather || isPaused ? 0 : pct}%"></div></div>
+        <div class="flow">${order.map((id) => {
+          const off = SKIPPABLE_FLAGS[id] && s[SKIPPABLE_FLAGS[id]] === false;
+          return `<button data-act="chant-jump" data-phase="${esc(id)}" class="${id === ph.id ? 'current' : ''} ${off ? 'off' : ''}" title="Nhảy đến bước này">${esc(titles[id] || id)}</button>`;
+        }).join('')}</div>
+        <div class="btn-row">
+          <button class="btn primary" data-act="chant-start">▶ Bắt đầu khoá tụng ngay</button>
+          <button class="btn" data-act="chant-next">⏭ Sang bước tiếp</button>
+          ${isPaused
+            ? '<button class="btn" data-act="chant-resume">▶ Tiếp tục</button>'
+            : '<button class="btn" data-act="chant-pause">⏸ Tạm dừng</button>'}
+          <label class="check" style="margin-left:auto"><input type="checkbox" data-setting="autoRun" ${s.autoRun !== false ? 'checked' : ''} /> Chạy tự động</label>
+        </div>
+        <div class="ctl-grid" style="margin-top:16px">
+          <div class="ctl-group">
+            <h4>Bài kinh khoá sau</h4>
+            <div class="input-group">
+              <select class="input" id="chantNextSel">${catalog.map((c) => `<option value="${c.num}" ${next && next.num === c.num ? 'selected' : ''}>${c.num}. ${esc(c.name)}</option>`).join('')}</select>
+              <button class="btn" data-act="chant-set-next">Chọn</button>
+            </div>
+            <p class="help" style="margin-top:6px">${next ? `Hiện tại: <b>${esc(next.name)}</b> — ${next.chosen ? 'người trực chọn' : `${fmt(next.votes)} bạn đề nghị`}` : 'Chưa có đề nghị — sẽ theo lịch xoay vòng'}</p>
+          </div>
+          <div class="ctl-group">
+            <h4>Hôm nay</h4>
+            <p class="help">🙏 ${fmt(st.counters?.participants)} người · 📿 ${fmt(st.counters?.recitations)} tim (${fmt(st.counters?.heartsWithMo)} theo nhịp mõ) · 🔔 ${fmt(st.counters?.bellResponses)} lượt chắp tay theo chuông · ${fmt(st.counters?.sessions)} khoá viên mãn</p>
+          </div>
+        </div>`;
+    }
+
+    function renderChantSettings(body) {
+      const s = roomState.settings || {};
+      const voices = roomState.tts?.voices || [s.readerVoice || 'maichi'];
+      const catalog = roomState.catalog || [];
+      const nameOf = (n) => (catalog.find((c) => c.num === n) || {}).name || `Bài ${n}`;
+      const pct = (v, d) => Math.round((typeof v === 'number' ? v : d) * 100);
+      const sw = (key, label, desc = '') => `
+        <div class="setting"><div><div class="setting-name">${label}</div>${desc ? `<div class="setting-desc">${desc}</div>` : ''}</div>
+        <label class="switch"><input type="checkbox" data-setting="${key}" ${s[key] !== false ? 'checked' : ''} /><span></span></label></div>`;
+      const num = (key, label, min, max, unit) => `
+        <div class="setting"><div><div class="setting-name">${label}</div></div>
+        <div style="display:flex;align-items:center;gap:6px"><input class="input num" type="number" min="${min}" max="${max}" value="${esc(s[key])}" data-setting="${key}" /><span class="muted">${unit}</span></div></div>`;
+      const raw = (key, label, min, max, unit, desc = '') => `
+        <div class="setting"><div><div class="setting-name">${label}</div>${desc ? `<div class="setting-desc">${desc}</div>` : ''}</div>
+        <div class="range-wrap"><input type="range" min="${min}" max="${max}" value="${esc(s[key])}" data-setting="${key}" data-raw="1" data-unit="${unit}" /><output>${esc(s[key])}${unit}</output></div></div>`;
+      const vol = (key, label, d) => `
+        <div class="setting"><div><div class="setting-name">${label}</div></div>
+        <div class="range-wrap"><input type="range" min="0" max="100" value="${pct(s[key], d)}" data-setting="${key}" /><output>${pct(s[key], d)}%</output></div></div>`;
+      const rs = readerStatusCache;
+      chantSettingsRenderedFor = currentId;
+      body.innerHTML = `
+        <div class="ctl-grid" data-chant-settings>
+          <div class="ctl-group">
+            <h4>Thời khoá</h4>
+            ${sw('autoRun', 'Chạy tự động', 'Tắt: phòng tụ hội và chờ người trực bấm “Bắt đầu khoá tụng”')}
+            ${num('gatherSeconds', 'Thời gian tụ hội', 15, 600, 'giây')}
+            ${num('silenceSeconds', 'Ngồi tĩnh lặng', 0, 600, 'giây')}
+            ${num('niemPhatCount', 'Số câu niệm Phật', 3, 108, 'câu')}
+            ${sw('useIncense', 'Niệm hương')}
+            ${sw('useKhaiChuongMo', 'Khai chuông mõ')}
+            ${sw('useOpening', 'Khai kinh kệ')}
+            ${sw('useRecitation', 'Niệm Phật sau kinh')}
+            ${sw('useDedication', 'Hồi hướng')}
+          </div>
+          <div class="ctl-group">
+            <h4>Nhịp tụng</h4>
+            ${raw('bpm', 'Nhịp đồng tụng (có mõ)', 50, 140, ' chữ/phút', 'Kinh tiếng Việt; kệ ×0,7 · Tâm Kinh ×1,3 · niệm danh hiệu ×0,95')}
+            ${raw('intonedSpm', 'Nhịp xướng (không mõ)', 30, 100, ' chữ/phút', 'Niệm hương, xướng danh hiệu, hồi hướng, Tam quy')}
+            <div class="setting"><div><div class="setting-name">Mõ cho kinh tiếng Việt</div><div class="setting-desc">Bắc tông: mỗi chữ một tiếng · Làng Mai: mỗi dòng một tiếng</div></div>
+              <select class="input" data-setting="vietMoStyle">
+                <option value="syllable" ${s.vietMoStyle !== 'line' ? 'selected' : ''}>Mỗi chữ</option>
+                <option value="line" ${s.vietMoStyle === 'line' ? 'selected' : ''}>Mỗi dòng</option>
+              </select></div>
+            <h4 style="margin-top:16px">Giọng đọc</h4>
+            ${sw('readerEnabled', 'Người đọc dẫn tụng', 'Giọng tổng hợp đọc từng chữ theo nhịp, nhỏ nhẹ')}
+            <div class="setting"><div><div class="setting-name">Giọng</div></div>
+              <select class="input" data-setting="readerVoice">${voices.map((v) => `<option value="${esc(v)}" ${v === s.readerVoice ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select></div>
+            ${vol('readerVolume', 'Âm lượng người đọc', 0.35)}
+            <p class="help" id="readerStatus">${rs ? `Đã chuẩn bị ${fmt(rs.ready)}/${fmt(rs.total)} chữ cho giọng ${esc(rs.voice)}${rs.preparing ? ' — đang chuẩn bị…' : ''}` : 'Đang kiểm tra…'}</p>
+          </div>
+          <div class="ctl-group">
+            <h4>Âm thanh</h4>
+            ${vol('musicVolume', 'Nhạc nền', 0.45)}
+            ${vol('sfxVolume', 'Mõ & chuông', 0.8)}
+            ${sw('natureSound', 'Tiếng suối nhẹ')}
+            ${sw('showRhythmGuide', 'Hiện hướng dẫn thả tim theo nhịp')}
+            <h4 style="margin-top:16px">Lịch xoay vòng bài kinh</h4>
+            <p class="help">Dùng khi không ai đề nghị bài (bình luận “kinh 1–9”).</p>
+            <div class="chips" id="rotationChips">${(s.rotation || []).map((n, i) => `<span class="chip">${esc(nameOf(n))}<button data-act="rot-remove" data-idx="${i}" aria-label="Bỏ">×</button></span>`).join('') || '<span class="muted">Trống — dùng lịch mặc định</span>'}</div>
+            <div class="input-group">
+              <select class="input" id="rotAddSel">${catalog.map((c) => `<option value="${c.num}">${c.num}. ${esc(c.name)}</option>`).join('')}</select>
+              <button class="btn" data-act="rot-add">Thêm</button>
+            </div>
+          </div>
+        </div>`;
+      if (!rs) loadReaderStatus();
+    }
+
+    async function loadReaderStatus() {
+      try {
+        readerStatusCache = await rpc('chanting.readerStatus', { roomId: currentId }, { silent: true });
+        const el = $('#readerStatus');
+        if (el) el.textContent = `Đã chuẩn bị ${fmt(readerStatusCache.ready)}/${fmt(readerStatusCache.total)} chữ cho giọng ${readerStatusCache.voice}${readerStatusCache.preparing ? ' — đang chuẩn bị…' : ''}`;
+      } catch (_) {}
+    }
+
+    async function saveRotation(list) {
+      try {
+        await rpc('room.updateSettings', { roomId: currentId, rotation: list });
+        roomState.settings.rotation = list;
+        chantSettingsRenderedFor = null;
+        renderChantPanel();
+        toast('Đã lưu lịch xoay vòng');
+      } catch (_) {}
+    }
+
+    async function renderChantPeople(body) {
+      if (!peopleCache) {
+        body.innerHTML = '<div class="empty">Đang tải…</div>';
+        try {
+          peopleCache = await rpc('chanting.stats', { roomId: currentId, limit: 300 }, { silent: true });
+        } catch (_) {
+          peopleCache = [];
+        }
+      }
+      const rows = peopleCache;
+      body.innerHTML = `
+        <div class="btn-row" style="justify-content:space-between;margin-bottom:10px">
+          <span class="help">Thời gian cùng tụng = tổng các quãng giữa hai lần tương tác cách nhau ≤ 2 phút (TikTok không báo khi người xem rời phòng). Chỉ lưu trong ngày, tự xoá khi sang ngày mới. Chỉ người trực xem được — màn hình live không xếp hạng.</span>
+          <button class="btn sm" data-act="people-refresh">↻ Làm mới</button>
+        </div>
+        ${rows.length ? `<div style="overflow-x:auto"><table class="people">
+          <thead><tr><th>Người tham gia</th><th>Phút cùng tụng</th><th>Tim</th><th>Theo nhịp mõ</th><th>Theo chuông</th><th>Lời nguyện</th><th>Đèn sen</th><th>Lần cuối</th></tr></thead>
+          <tbody>${rows.map((r) => `<tr>
+            <td>${esc(r.name)}</td><td>${fmt(r.minutes)}</td><td>${fmt(r.hearts)}</td><td>${fmt(r.heartsWithMo)}</td><td>${fmt(r.heartsAtBell)}</td>
+            <td>${fmt(r.wishes)}</td><td>${fmt(r.lamps)}</td><td class="muted">${timeAgo(new Date(r.lastAt).toISOString())}</td></tr>`).join('')}</tbody>
+        </table></div>` : '<div class="empty">Hôm nay chưa có ai tham gia.</div>'}`;
+    }
+
+    document.addEventListener('click', async (e) => {
+      const tab = e.target.closest('[data-ctab]');
+      if (tab) {
+        chantTab = tab.dataset.ctab;
+        chantSettingsRenderedFor = null;
+        if (chantTab === 'people') peopleCache = null;
+        if (chantTab === 'settings') readerStatusCache = null;
+        renderChantPanel();
+        return;
+      }
+      const btn = e.target.closest('[data-act]');
+      if (!btn || !currentId) return;
+      const call = async (method, params = {}, okMsg) => {
+        try {
+          await rpc(method, { roomId: currentId, ...params });
+          if (okMsg) toast(okMsg);
+        } catch (_) {}
+      };
+      switch (btn.dataset.act) {
+        case 'chant-start': return call('chanting.startSession', {}, 'Đã bắt đầu khoá tụng');
+        case 'chant-next': return call('chanting.nextPhase', {}, 'Đã sang bước tiếp');
+        case 'chant-pause': return call('chanting.pause', {}, 'Đã tạm dừng');
+        case 'chant-resume': return call('chanting.resume', {}, 'Đã tiếp tục');
+        case 'chant-jump': return call('chanting.jumpTo', { phase: btn.dataset.phase }, `Đã chuyển đến: ${btn.textContent.trim()}`);
+        case 'chant-set-next': return call('chanting.setNextSutra', { num: Number($('#chantNextSel').value) }, 'Đã chọn bài cho khoá sau');
+        case 'rot-remove': {
+          const list = [...(roomState.settings.rotation || [])];
+          list.splice(Number(btn.dataset.idx), 1);
+          return saveRotation(list);
+        }
+        case 'rot-add': return saveRotation([...(roomState.settings.rotation || []), Number($('#rotAddSel').value)]);
+        case 'people-refresh':
+          peopleCache = null;
+          return renderChantPanel();
+      }
+    });
+
+    // Cập nhật thời gian còn lại mỗi giây trên thẻ Điều phối
+    setInterval(() => {
+      if (chantTab === 'control' && $('#chantBody') && !$('#chantBody').contains(document.activeElement)) renderChantPanel();
+    }, 1000);
 
     // ======================================================================
     // MÔ TẢ SỰ KIỆN

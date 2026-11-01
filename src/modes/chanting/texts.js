@@ -8,7 +8,10 @@
  *    HT. Thích Minh Châu, HT. Thích Trí Tịnh, HT. Thích Thanh Từ hay Làng Mai (các bản này có bản quyền).
  *  - Tất cả cần một vị tu sĩ hoặc cư sĩ am hiểu Phật học duyệt lại trước khi phát chính thức.
  *
- * Mỗi chữ (âm tiết) = một tiếng mõ khi tụng. Xuống dòng = ngắt câu trên màn hình.
+ * Khi đồng tụng có mõ: mỗi chữ (âm tiết) một tiếng mõ. Xuống dòng = ngắt câu trên màn hình.
+ * style: 'sutra' (mặc định, kinh tiếng Việt) | 'fast' (Tâm Kinh, thần chú) | 'slow' (kệ) | 'recitation' (niệm danh hiệu)
+ *        | 'bow' (Tam quy: xướng, chuông + xá sau mỗi câu quy y)
+ * lang: 'vi' cho bài tiếng Việt (có thể gõ mõ mỗi dòng theo lối Làng Mai)
  * Muốn thêm kinh (ví dụ Phẩm Phổ Môn, Kinh A Di Đà) khi đã có văn bản được phép: thêm mục vào SUTRAS.
  */
 
@@ -56,6 +59,8 @@ const SUTRAS = [
     id: 'tam-kinh',
     name: 'Bát Nhã Tâm Kinh',
     source: 'han-viet-co',
+    style: 'fast', // Tâm Kinh / thần chú: tụng nhanh, dồn hơn, giọng trầm đều
+    invocation: 'Nam mô Bát Nhã Hội Thượng Phật Bồ Tát',
     meaning: 'Thấy rõ mọi sự đều đổi thay, để buông bớt bám chấp',
     text: `Quán Tự Tại Bồ Tát hành thâm Bát Nhã Ba La Mật Đa thời
 chiếu kiến ngũ uẩn giai không, độ nhất thiết khổ ách
@@ -79,11 +84,14 @@ cố tri Bát Nhã Ba La Mật Đa thị đại thần chú
 thị đại minh chú, thị vô thượng chú, thị vô đẳng đẳng chú
 năng trừ nhất thiết khổ, chân thật bất hư
 cố thuyết Bát Nhã Ba La Mật Đa chú, tức thuyết chú viết
+Yết đế yết đế, ba la yết đế, ba la tăng yết đế, Bồ đề tát bà ha
+Yết đế yết đế, ba la yết đế, ba la tăng yết đế, Bồ đề tát bà ha
 Yết đế yết đế, ba la yết đế, ba la tăng yết đế, Bồ đề tát bà ha`
   },
   {
     num: 2,
     id: 'tu-bi',
+    lang: 'vi',
     name: 'Kinh Từ Bi',
     source: 'tu-soan',
     meaning: 'Gửi tình thương không giới hạn đến mọi loài',
@@ -121,6 +129,7 @@ mà bậc hiền trí vẫn ngợi khen`
   {
     num: 3,
     id: 'hanh-phuc',
+    lang: 'vi',
     name: 'Kinh Hạnh Phúc',
     source: 'tu-soan',
     meaning: 'Những phúc lành đến từ cách mình sống mỗi ngày',
@@ -150,6 +159,7 @@ Ai sống được như vậy, đi đâu cũng vững vàng
   {
     num: 4,
     id: 'bat-dai-nhan-giac',
+    lang: 'vi',
     name: 'Tám Điều Giác Ngộ',
     source: 'tu-soan',
     meaning: 'Tám điều tỉnh thức: vô thường, biết đủ, tinh tấn, trí tuệ, sẻ chia…',
@@ -175,6 +185,7 @@ nguyện chúng ta cùng ghi nhớ và thực hành mỗi ngày`
   {
     num: 5,
     id: 'phap-cu',
+    lang: 'vi',
     name: 'Pháp Cú (trích)',
     source: 'tu-soan',
     meaning: 'Tâm đi trước mọi việc — giữ tâm trong sáng thì an vui theo ta',
@@ -201,6 +212,7 @@ lấy chân thật thắng dối gian`
   {
     num: 6,
     id: 'song-tron-hom-nay',
+    lang: 'vi',
     name: 'Sống Trọn Hôm Nay',
     source: 'tu-soan',
     meaning: 'Diễn ý Kinh Bhaddekaratta: sống trọn vẹn với giây phút hiện tại',
@@ -222,6 +234,8 @@ bậc an tịnh gọi là người biết sống trọn một ngày an lành`
     id: 'niem-phat',
     name: 'Niệm Phật A Di Đà',
     source: 'han-viet-co',
+    style: 'recitation',
+    invocation: 'Nam mô Liên Trì Hải Hội Phật Bồ Tát',
     meaning: 'Nhớ nghĩ về đức Phật để tâm lắng lại, nhất tâm',
     repeat: { line: 'Nam mô A Di Đà Phật', times: 54 }
   },
@@ -230,6 +244,8 @@ bậc an tịnh gọi là người biết sống trọn một ngày an lành`
     id: 'tam-quy',
     name: 'Tam Tự Quy Y',
     source: 'han-viet-co',
+    style: 'bow', // xướng, không mõ; mỗi câu quy y một tiếng chuông + chắp tay xá
+    invocation: null,
     meaning: 'Nương tựa Phật, Pháp, Tăng — hướng về hiểu biết và từ bi',
     text: `Tự quy y Phật, đương nguyện chúng sanh
 thể giải đại đạo, phát vô thượng tâm
@@ -243,10 +259,15 @@ thống lý đại chúng, nhất thiết vô ngại`
     id: 'niem-quan-am',
     name: 'Niệm Quán Thế Âm',
     source: 'han-viet-co',
+    style: 'recitation',
+    invocation: 'Nam mô Đại Bi Hội Thượng Phật Bồ Tát',
     meaning: 'Học hạnh lắng nghe và thương yêu của Bồ Tát Quán Thế Âm',
     repeat: { line: 'Nam mô Đại Bi Quán Thế Âm Bồ Tát', times: 27 }
   }
 ];
+
+// Xướng danh hiệu trước kinh (3 lần, mỗi lần một tiếng chuông) khi bài không ghi riêng
+const DEFAULT_INVOCATION = 'Nam mô Bổn Sư Thích Ca Mâu Ni Phật';
 
 // Niệm Phật ngắn trong mỗi khoá (sau kinh chính)
 const RECITATION_LINE = 'Nam mô A Di Đà Phật';
@@ -269,4 +290,4 @@ function lineSyllables(lines) {
   return lines.reduce((n, l) => n + l.length, 0);
 }
 
-module.exports = { LITURGY, SUTRAS, RECITATION_LINE, DEFAULT_ROTATION, toLines, lineSyllables };
+module.exports = { LITURGY, SUTRAS, RECITATION_LINE, DEFAULT_INVOCATION, DEFAULT_ROTATION, toLines, lineSyllables };
