@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phòng Tụng Kinh Chung — TikTok Live (9:16)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Noto+Serif:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/chanting.css" />
+</head>
+<body>
+  <div class="app-workspace">
+    <!-- ================= KHUNG 9:16 (1080 x 1920) ================= -->
+    <div class="stage-wrapper" id="stageWrapper">
+      <div class="stage" id="stage">
+        <img src="/assets/amitabha_stage.png" alt="" class="bg-img" />
+        <div class="bg-vignette"></div>
+
+        <!-- Đầu màn hình: tên phòng + bộ đếm chung của cả đạo tràng -->
+        <header class="top">
+          <div class="room-pill"><span class="live-dot" id="liveDot"></span><span id="roomName">PHÒNG TỤNG KINH CHUNG</span></div>
+          <div class="counters">
+            <div class="counter"><span class="c-icon">🙏</span><b id="cParticipants">0</b><span>người cùng tụng</span></div>
+            <div class="counter"><span class="c-icon">📿</span><b id="cRecitations">0</b><span>lượt niệm chung</span></div>
+            <div class="counter"><span class="c-icon">🏮</span><b id="cWishes">0</b><span>lời nguyện thiện</span></div>
+            <div class="counter"><span class="c-icon">🪷</span><b id="cLamps">0</b><span>đèn sen</span></div>
+          </div>
+        </header>
+
+        <!-- Lư hương: mỗi người vào đạo tràng thắp một nén -->
+        <div class="incense-burner"><div class="incense-holder" id="incenseHolder"></div></div>
+
+        <!-- Đạo tràng: chỗ ngồi mang tên người tham gia (xếp theo người vừa tương tác, không theo giá trị) -->
+        <div class="hall" id="hall"></div>
+
+        <!-- Đèn hoa đăng (bình luận) và đèn sen (quà) bay lên từ chỗ ngồi -->
+        <div class="float-layer" id="floatLayer"></div>
+
+        <canvas id="smokeCanvas"></canvas>
+
+        <!-- Dòng "đang cùng tụng" + thông báo nhẹ -->
+        <div class="chanting-line" id="chantingLine"></div>
+        <div class="ticker" id="ticker"></div>
+
+        <!-- Khung kinh: chữ sáng dần theo nhịp mõ -->
+        <section class="sutra-panel" id="sutraPanel">
+          <div class="sp-head">
+            <div>
+              <div class="sp-phase" id="spPhase">Tụ hội</div>
+              <div class="sp-title" id="spTitle">Phòng Tụng Kinh Chung</div>
+              <div class="sp-sub" id="spSub">Mời mọi người vào đạo tràng</div>
+            </div>
+            <div class="sp-progress"><div class="sp-progress-bar" id="spProgress"></div></div>
+          </div>
+          <div class="sp-body" id="spBody"></div>
+          <div class="sp-foot">
+            <span id="spNext">Khoá sau: —</span>
+          </div>
+        </section>
+
+        <div class="guide" id="guide">Thả tim để cùng tụng · Bình luận để thắp nhang &amp; gửi lời nguyện · “kinh 1–9” để đề nghị bài kinh · Mọi tương tác đều quý như nhau 🤍</div>
+      </div>
+    </div>
+
+    <!-- ================= BẢNG ĐIỀU KHIỂN NHANH (ẩn khi ?obs=1) ================= -->
+    <aside class="dock">
+      <div class="dock-title" id="dockTitle">🪷 Phòng Tụng Kinh</div>
+      <a class="dock-link" href="/admin" target="_blank">Mở trang quản lý ↗</a>
+      <button class="dock-btn primary" id="btnAudio">🔔 Bật âm thanh</button>
+      <label class="dock-row"><span>🎵 Nhạc nền</span><input type="range" id="volMusic" min="0" max="100" /><output id="volMusicOut"></output></label>
+      <label class="dock-row"><span>🪵 Mõ &amp; chuông</span><input type="range" id="volSfx" min="0" max="100" /><output id="volSfxOut"></output></label>
+      <button class="dock-btn" id="btnMusic">🎵 Nhạc nền: BẬT</button>
+      <p class="dock-note">Thả tim, bình luận, tặng quà… trên TikTok sẽ hiện tại đây. Thử tương tác ở trang quản lý.</p>
+    </aside>
+  </div>
+
+  <script src="/js/audio.js"></script>
+  <script src="/js/particles.js"></script>
+  <script src="/js/chanting.js"></script>
+</body>
+</html>

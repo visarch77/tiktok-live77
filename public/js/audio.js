@@ -6,7 +6,15 @@
  * - Giọng đọc: Hàng đợi ZeroTTS phát tuần tự mượt mà.
  */
 class TempleAudioEngine {
-  constructor() {
+  /**
+   * @param {{ musicUrl?: string | null, ambient?: 'chime' | 'pad' }} [options]
+   *   musicUrl: file nhạc nền; null = dùng nhạc tổng hợp (không lời, không vướng bản quyền)
+   *   ambient: kiểu nhạc tổng hợp — 'chime' (bản cũ) hoặc 'pad' (nền êm, chậm cho phòng tụng kinh)
+   */
+  constructor(options = {}) {
+    const musicUrl = options.musicUrl === undefined ? '/assets/bg_chant.m4a' : options.musicUrl;
+    this.ambientStyle = options.ambient || 'chime';
+    this.sfxVolume = 1;
     this.ctx = null;
     this.unlocked = false;
     this.sfxEnabled = true;
@@ -23,16 +31,23 @@ class TempleAudioEngine {
     } catch (_) {}
     this.bgBaseVolume = Number.isFinite(savedMusicVol) ? Math.max(0, Math.min(1, savedMusicVol)) : 0.65;
     this.ttsVolume = Number.isFinite(savedTtsVol) ? Math.max(0, Math.min(1, savedTtsVol)) : 0.95;
+    try {
+      const savedSfx = parseFloat(localStorage.getItem('temple_sfx_vol'));
+      if (Number.isFinite(savedSfx)) this.sfxVolume = Math.max(0, Math.min(1, savedSfx));
+    } catch (_) {}
 
-    this.useSynthMusicFallback = false;
+    this.useSynthMusicFallback = !musicUrl;
     this.synthBgTimer = null;
-    this.bgAudio = new Audio('/assets/bg_chant.m4a');
-    this.bgAudio.loop = true;
-    this.bgAudio.preload = 'auto';
-    this.bgAudio.volume = this.bgBaseVolume;
-    this.bgAudio.onerror = () => {
-      this.useSynthMusicFallback = true;
-    };
+    this.bgAudio = musicUrl ? new Audio(musicUrl) : null;
+    if (this.bgAudio) {
+      this.bgAudio.loop = true;
+      this.bgAudio.preload = 'auto';
+      this.bgAudio.volume = this.bgBaseVolume;
+      this.bgAudio.onerror = () => {
+        this.useSynthMusicFallback = true;
+        if (this.bgMusicEnabled && this.ctx) this.startDefaultZenSynthLoop();
+      };
+    }
     this.ttsQueue = [];
     this.ttsPlaying = false;
     this.currentAudio = null;
@@ -89,7 +104,7 @@ class TempleAudioEngine {
 
   startZenAmbience() {
     if (!this.bgMusicEnabled) return;
-    if (this.useSynthMusicFallback) {
+    if (this.useSynthMusicFallback || !this.bgAudio) {
       this.startDefaultZenSynthLoop();
       return;
     }
@@ -114,6 +129,10 @@ class TempleAudioEngine {
 
   startDefaultZenSynthLoop() {
     if (!this.bgMusicEnabled || this.synthBgTimer) return;
+    if (this.ambientStyle === 'pad') {
+      this.startPadAmbience();
+      return;
+    }
     const PENTATONIC = [261.63, 293.66, 329.63, 392.0, 440.0, 523.25];
     let step = 0;
     const playZenNote = () => {
@@ -148,9 +167,77 @@ class TempleAudioEngine {
     this.synthBgTimer = setInterval(playZenNote, 3600);
   }
 
+  /**
+   * Nền nhạc không lời êm, chậm: hợp âm ngũ cung ngân dài (fade 6–8 giây) + thỉnh thoảng một nốt chuông xa.
+   * Tự tổng hợp nên không vướng bản quyền khi phát trên TikTok LIVE.
+   */
+  startPadAmbience() {
+    const CHORDS = [
+      [146.83, 220.0, 293.66], // D
+      [130.81, 196.0, 261.63], // C
+      [164.81, 246.94, 329.63], // E (ngũ cung)
+      [146.83, 196.0, 293.66]
+    ];
+    const BELL_NOTES = [587.33, 659.25, 783.99, 880.0];
+    let step = 0;
+    const playChord = () => {
+      if (!this.bgMusicEnabled || !this.ctx) return;
+      try {
+        const ctx = this.ctx;
+        const now = ctx.currentTime;
+        const level = (this.ttsPlaying ? this.getDuckedVolume() : this.bgBaseVolume) * 0.07;
+        if (level <= 0.001) return;
+        const chord = CHORDS[step % CHORDS.length];
+        chord.forEach((freq, i) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = i === 0 ? 'sine' : 'triangle';
+          osc.frequency.setValueAtTime(freq, now);
+          osc.detune.setValueAtTime((i - 1) * 4, now);
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.linearRampToValueAtTime(level / (i + 1), now + 3.5);
+          gain.gain.linearRampToValueAtTime(level / (i + 1), now + 8);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 13);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.onended = () => { osc.disconnect(); gain.disconnect(); };
+          osc.start(now);
+          osc.stop(now + 13.2);
+        });
+        if (step % 2 === 1) {
+          const t = now + 2 + Math.random() * 4;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(BELL_NOTES[Math.floor(Math.random() * BELL_NOTES.length)], t);
+          gain.gain.setValueAtTime(0.0001, t);
+          gain.gain.linearRampToValueAtTime(level * 0.55, t + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t + 5);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.onended = () => { osc.disconnect(); gain.disconnect(); };
+          osc.start(t);
+          osc.stop(t + 5.1);
+        }
+        step++;
+      } catch (_) {}
+    };
+    playChord();
+    this.synthBgTimer = setInterval(playChord, 9000);
+  }
+
+  setSfxVolume(vol) {
+    const n = Number(vol);
+    if (!Number.isFinite(n)) return;
+    this.sfxVolume = Math.max(0, Math.min(1, n));
+    try {
+      localStorage.setItem('temple_sfx_vol', String(this.sfxVolume));
+    } catch (_) {}
+  }
+
   stopZenAmbience() {
     try {
-      this.bgAudio.pause();
+      if (this.bgAudio) this.bgAudio.pause();
     } catch (_) {}
     if (this.synthBgTimer) {
       clearInterval(this.synthBgTimer);
@@ -175,11 +262,11 @@ class TempleAudioEngine {
   // --------------------------------------------------------------------------
   // 2. TIẾNG MÕ GỖ TỤNG KINH (WOODEN FISH PERCUSSION SYNTH)
   // --------------------------------------------------------------------------
-  playWoodenFish(pitchMultiplier = 1.0) {
-    if (!this.sfxEnabled) return;
+  playWoodenFish(pitchMultiplier = 1.0, when = 0) {
+    if (!this.sfxEnabled || this.sfxVolume <= 0) return;
     try {
       const ctx = this.ensureContext();
-      const now = ctx.currentTime;
+      const now = Math.max(ctx.currentTime, when || 0);
 
       const osc1 = ctx.createOscillator();
       const filter = ctx.createBiquadFilter();
@@ -196,7 +283,7 @@ class TempleAudioEngine {
       filter.Q.setValueAtTime(4.0, now);
 
       gain.gain.setValueAtTime(0.001, now);
-      gain.gain.linearRampToValueAtTime(0.28, now + 0.006);
+      gain.gain.linearRampToValueAtTime(0.28 * this.sfxVolume, now + 0.006);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
 
       osc1.connect(filter);
@@ -217,11 +304,11 @@ class TempleAudioEngine {
   // --------------------------------------------------------------------------
   // 3. TIẾNG ĐẠI HỒNG CHUNG (TEMPLE BRONZE BELL)
   // --------------------------------------------------------------------------
-  playTempleBell(intensity = 1.0) {
-    if (!this.sfxEnabled) return;
+  playTempleBell(intensity = 1.0, when = 0) {
+    if (!this.sfxEnabled || this.sfxVolume <= 0) return;
     try {
       const ctx = this.ensureContext();
-      const now = ctx.currentTime;
+      const now = Math.max(ctx.currentTime, when || 0);
 
       const base = 174;
       const partials = [
@@ -232,7 +319,7 @@ class TempleAudioEngine {
       ];
 
       const master = ctx.createGain();
-      master.gain.setValueAtTime(0.28 * Math.min(1.0, intensity), now);
+      master.gain.setValueAtTime(0.28 * Math.min(1.0, intensity) * this.sfxVolume, now);
       master.connect(ctx.destination);
 
       partials.forEach((p, idx) => {

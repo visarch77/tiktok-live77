@@ -312,7 +312,7 @@ function pickNumbers(obj, keys) {
 
 module.exports = {
   id: 'temple',
-  name: 'Đi Chùa',
+  name: 'Đi Chùa (bản cũ)',
   description: 'Chánh điện online: thắp hương, thả hoa đăng, rút thẻ thơ thiền, gõ mõ, thỉnh chuông, bảng tri ân',
   overlay: 'index.html',
   create

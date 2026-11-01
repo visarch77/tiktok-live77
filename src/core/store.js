@@ -35,8 +35,8 @@ function loadRoomConfigs() {
   return [
     {
       id: DEFAULT_ROOM_ID,
-      name: 'Thiền Viện Online',
-      mode: 'temple',
+      name: 'Phòng Tụng Kinh',
+      mode: 'chanting',
       tiktokUsername: DEFAULT_TIKTOK_USER,
       autoConnect: true
     }

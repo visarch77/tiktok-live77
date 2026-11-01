@@ -85,7 +85,8 @@ Một server chạy được nhiều phòng cùng lúc. Mỗi phòng = **1 tài 
 - Danh sách phòng lưu ở `data/rooms.json`, trạng thái từng phòng ở `data/rooms/<mã>.json`.
   Lần đầu chạy, dữ liệu cũ `data/merit-state.json` được tự chuyển sang phòng `main`.
 - Mỗi phòng live cần một nguồn phát riêng: mở thêm một OBS / TikTok Live Studio trỏ vào `/room/<mã>?obs=1`.
-- Chế độ hiện có: **Đi Chùa** (`temple`). Thêm chế độ mới (chạy bộ, battle quốc gia...) theo hướng dẫn
+- Chế độ hiện có: **Tụng Kinh Chung** (`chanting`, mặc định — xem [docs/phong-tung-kinh.md](docs/phong-tung-kinh.md))
+  và **Đi Chùa** (`temple`, bản cũ). Thêm chế độ mới (chạy bộ, battle quốc gia...) theo hướng dẫn
   [`src/modes/README.md`](src/modes/README.md).
 - Biến môi trường: `PORT`, `TIKTOK_USER` (tài khoản của phòng `main` khi tạo lần đầu), `DATA_DIR`, `CORS_ORIGINS`,
   `EULER_API_KEY` (khoá Euler Stream để ký kết nối TikTok; không có khoá chỉ được ~100 lượt/ngày, không đủ cho nhiều phòng).

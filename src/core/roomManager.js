@@ -35,7 +35,7 @@ class RoomManager {
     if (!id) throw new Error('Mã phòng không hợp lệ (chỉ dùng chữ thường, số, dấu - và _)');
     if (isNew && this.rooms.has(id)) throw new Error(`Đã có phòng mã "${id}"`);
 
-    const mode = input.mode ?? current?.modeId ?? 'temple';
+    const mode = input.mode ?? current?.modeId ?? Object.keys(MODES)[0];
     if (!MODES[mode]) throw new Error(`Không có chế độ "${mode}"`);
 
     const name = String(input.name ?? current?.name ?? id).trim().slice(0, 60) || id;

@@ -423,6 +423,26 @@
     // CẤU HÌNH THEO CHẾ ĐỘ (thêm chế độ mới: khai báo hành động nhanh tại đây)
     // ======================================================================
     const MODE_UI = {
+      chanting: {
+        listTitle: 'Đang trong đạo tràng',
+        pointsLabel: 'Không xếp hạng — theo người vừa tương tác',
+        actions: [
+          { icon: '🙏', name: 'Vào đạo tràng', desc: 'Thắp nhang, nhận chỗ ngồi', method: 'chanting.testJoin' },
+          { icon: '📿', name: 'Thả tim', desc: 'Cùng tụng kinh', method: 'chanting.testLike' },
+          { icon: '🪷', name: 'Thả đèn sen', desc: 'Như một món quà bất kỳ', method: 'chanting.testGift' },
+          { icon: '⏭', name: 'Sang bước tiếp', desc: 'Chuyển bước thời khoá', method: 'chanting.nextPhase' }
+        ],
+        commentHint: 'Ví dụ: kinh 2 · hoặc một lời nguyện',
+        stats: (st) => [
+          { label: 'Người cùng tụng hôm nay', value: fmt(st.counters?.participants), hint: `${fmt(st.counters?.sessions)} khoá đã viên mãn` },
+          { label: 'Lượt niệm chung', value: fmt(st.counters?.recitations), hint: 'Tổng lượt thả tim' },
+          { label: 'Lời nguyện · Đèn sen', value: `${fmt(st.counters?.wishes)} · ${fmt(st.counters?.lamps)}`, hint: `${fmt(st.counters?.invites)} bạn hữu được mời` }
+        ],
+        dangerActions: [
+          { label: '♻️ Đặt lại bộ đếm hôm nay', method: 'chanting.resetToday', confirm: 'Đặt lại các bộ đếm chung của hôm nay về 0?' }
+        ],
+        describe: describeChantingEvent
+      },
       temple: {
         pointsLabel: 'Điểm tri ân',
         actions: [
@@ -692,7 +712,7 @@
                   <div class="field">
                     <label for="simComment">Giả lập một bình luận TikTok</label>
                     <div class="input-group">
-                      <input class="input" id="simComment" placeholder="Ví dụ: xin rút một thẻ thơ" />
+                      <input class="input" id="simComment" placeholder="${esc(ui.commentHint || 'Ví dụ: xin rút một thẻ thơ')}" />
                       <button class="btn primary" data-act="send-comment">Gửi</button>
                     </div>
                     <span class="help">Được xử lý giống hệt bình luận thật (lọc spam, từ khoá, giới hạn 3,5 giây/người).</span>
@@ -715,7 +735,7 @@
           <div class="stack">
             <section class="card">
               <div class="card-head">
-                <div class="card-title">Bảng xếp hạng</div>
+                <div class="card-title">${esc(ui.listTitle || 'Bảng xếp hạng')}</div>
                 <div class="card-sub">${esc(ui.pointsLabel)}</div>
               </div>
               <ul class="lb" id="leaderboard"></ul>
@@ -809,7 +829,7 @@
 
       const stats = [
         { label: 'Người xem lúc này', value: t.connected ? fmt(t.viewerCount) : '—', hint: t.connected ? `@${t.username}` : 'Chưa live' },
-        { label: 'Người xem đã ghi nhận', value: fmt(room.viewers), hint: 'Tất cả phiên live' },
+        ...(room.mode === 'temple' ? [{ label: 'Người xem đã ghi nhận', value: fmt(room.viewers), hint: 'Tất cả phiên live' }] : []),
         ...ui.stats(roomState)
       ].slice(0, 4);
       $('#statsRow').innerHTML = stats.map((s) => `
@@ -824,10 +844,10 @@
       $('#leaderboard').innerHTML = lb.length
         ? lb.map((d, i) => `
           <li>
-            <span class="rank">${i + 1}</span>
+            ${ui.listTitle ? '' : `<span class="rank">${i + 1}</span>`}
             <span class="avatar">${d.avatar ? `<img src="${esc(d.avatar)}" alt="" loading="lazy" referrerpolicy="no-referrer" />` : esc(String(d.name || '?').charAt(0).toUpperCase())}</span>
             <span class="name" title="${esc(d.name)}">${esc(d.name)}</span>
-            <span class="pts">${fmt(d.merit ?? d.points)}</span>
+            <span class="pts">${d.label !== undefined ? esc(d.label) : fmt(d.merit ?? d.points)}</span>
           </li>`).join('')
         : '<li class="empty">Chưa có ai. Người xem tương tác sẽ hiện ở đây.</li>';
 
@@ -910,6 +930,20 @@
     // ======================================================================
     // MÔ TẢ SỰ KIỆN
     // ======================================================================
+    function describeChantingEvent(e) {
+      const u = `<b>${esc(e.user || 'Bạn')}</b>`;
+      switch (e.type) {
+        case 'wish':
+          return e.vote
+            ? { icon: '📜', text: `${u} đề nghị ${esc(e.vote.name)}${e.wish ? `: “${esc(e.wish)}”` : ''}` }
+            : { icon: '🏮', text: `${u}: “${esc(e.wish)}”` };
+        case 'lamp': return { icon: esc(e.symbol || '🪷'), text: `${u} thả một đèn sen` };
+        case 'invite': return { icon: '🌱', text: `${u} mời thêm bạn hữu vào đạo tràng` };
+        case 'sutraStart': return { icon: '📿', text: `Cả phòng bắt đầu tụng <b>${esc(e.sutra?.name)}</b>` };
+        default: return { icon: '✨', text: `${u} tham gia` };
+      }
+    }
+
     function describeTempleEvent(e) {
       const u = `<b>${esc(e.user || 'Thí chủ')}</b>`;
       const pts = e.merit ? ` <span class="muted">+${fmt(e.merit)}</span>` : '';
