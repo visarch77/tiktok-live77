@@ -1,6 +1,11 @@
 const { EventEmitter } = require('events');
 const { TikTokLiveConnection, WebcastEvent, ControlEvent } = require('tiktok-live-connector');
 const { extractUser, GiftComboTracker, LikeBatcher } = require('./normalize');
+const { EULER_API_KEY } = require('../config');
+
+if (!EULER_API_KEY) {
+  console.warn('[TikTok] Chưa đặt EULER_API_KEY: dùng Euler Stream ẩn danh (~100 lượt ký/ngày), dễ bị giới hạn khi chạy nhiều phòng.');
+}
 
 function isTikTokHost(hostname) {
   const h = String(hostname || '').toLowerCase();
@@ -122,7 +127,8 @@ class TikTokSource extends EventEmitter {
     const conn = new TikTokLiveConnection(cleanUser, {
       processInitialData: false,
       fetchRoomInfoOnConnect: false,
-      enableExtendedGiftInfo: false
+      enableExtendedGiftInfo: false,
+      ...(EULER_API_KEY ? { signApiKey: EULER_API_KEY } : {})
     });
     this.conn = conn;
 

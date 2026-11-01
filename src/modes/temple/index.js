@@ -23,7 +23,11 @@ const GIFT_LABELS = {
   dragon: 'Đại Lễ Kim Long Chầu Phật'
 };
 
-const FORTUNE_KEYWORDS_RE = keywordRegex(['xin xăm', 'xin xam', 'gieo quẻ', 'gieo que', 'rút quẻ', 'rut que', 'xin quẻ', 'xin que', 'quẻ', 'xăm']);
+// Người xem quen gõ "xin xăm / gieo quẻ"; kết quả trả về là Thẻ Thơ Thiền (không phải quẻ bói)
+const FORTUNE_KEYWORDS_RE = keywordRegex([
+  'thẻ thơ', 'the tho', 'rút thẻ', 'rut the',
+  'xin xăm', 'xin xam', 'gieo quẻ', 'gieo que', 'rút quẻ', 'rut que', 'xin quẻ', 'xin que', 'quẻ', 'xăm'
+]);
 const BELL_KEYWORDS_RE = keywordRegex(['chuông', 'chuong']);
 const WOODFISH_KEYWORDS_RE = keywordRegex(['gõ mõ', 'go mo', 'tụng kinh', 'tung kinh']);
 const INCENSE_KEYWORDS_RE = keywordRegex(['thắp hương', 'thap huong', 'dâng hương', 'dang huong', 'bái phật', 'bai phat', 'lạy phật', 'lay phat']);
@@ -38,7 +42,7 @@ const SIM_DEVOTEES = [
   { user: 'Diệu Thảo Tâm An', uniqueId: 'tam_an_99', wish: 'Nam Mô A Di Đà Phật, nguyện cầu thế giới hòa bình chúng sinh an lạc' },
   { user: 'Lê Hoàng Nam', uniqueId: 'hoangnam.dev', wish: 'Cầu thi cử đỗ đạt điểm cao, sự nghiệp rộng mở' },
   { user: 'Phạm Thanh Hà', uniqueId: 'thanhha.lotus', wish: 'Cầu gia đạo êm ấm, con cái ngoan ngoãn học giỏi' },
-  { user: 'Vũ Đức Thịnh', uniqueId: 'ducthinh88', wish: 'Con xin gieo một quẻ cầu tài lộc đầu năm' }
+  { user: 'Vũ Đức Thịnh', uniqueId: 'ducthinh88', wish: 'Xin rút một thẻ thơ để chiêm nghiệm đầu năm' }
 ];
 
 const COMMENT_COOLDOWN_MS = 3500;
@@ -55,7 +59,7 @@ function create(ctx, saved = {}) {
     return { user: params.user, uniqueId: params.uniqueId || '', avatar: params.avatar || '' };
   }
 
-  // Ghi công đức cho người xem + cộng vào tổng công đức của chùa
+  // Ghi điểm tri ân cho người xem + cộng vào tổng điểm của phòng (lưu trong trường totalMerit để tương thích dữ liệu cũ)
   function addMerit(params, merit, { incense = 0, gifts = 0, note = '' } = {}) {
     const dev = ctx.board.record(who(params), { points: merit, stats: { incense, gifts }, note });
     totals.totalMerit += merit;
@@ -139,11 +143,13 @@ function create(ctx, saved = {}) {
       totals.totalIncense += 3;
       totals.activeIncenseSticks = Math.min(36, totals.activeIncenseSticks + 3);
 
-      const wish = sanitizeWishText(params.wish) || `Dâng cúng ${giftName} lên Tam Bảo`;
+      const wish = sanitizeWishText(params.wish) || `Gửi tặng ${giftName}`;
       const dev = addMerit(params, merit, { incense: 3, gifts: 1, note: wish });
+      // Lời cảm ơn trung tính: quà tặng là tự nguyện, KHÔNG đổi lấy công đức / phù hộ / may mắn
+      // (tránh "gift baiting" theo chính sách TikTok và nội dung mê tín theo pháp luật Việt Nam)
       const ttsText = params.readTts === false
         ? ''
-        : `Công đức vô lượng! Cảm tạ thí chủ ${dev.name} đã phát tâm dâng cúng ${giftName}, tích thêm ${merit} điểm công đức. Nguyện cầu chư Phật gia hộ cho thí chủ vạn sự cát tường như ý.`;
+        : `Cảm ơn ${dev.name} đã gửi tặng ${giftName}. Chúc bạn một ngày bình an.`;
 
       return ctx.emitEvent({
         type: giftType === 'dragon' ? 'grandCeremony' : 'offerGift',
@@ -158,13 +164,13 @@ function create(ctx, saved = {}) {
     },
 
     drawFortune(params = {}) {
-      const topic = sanitizeWishText(params.topic) || 'Gia đạo, Tài lộc và Bình an';
+      const topic = sanitizeWishText(params.topic) || 'Chiêm nghiệm';
       const fortune = FORTUNE_DECK[Math.floor(Math.random() * FORTUNE_DECK.length)];
       const merit = 10;
 
       totals.fortuneCount += 1;
-      const dev = addMerit(params, merit, { note: `Xin xăm: Quẻ số ${fortune.number} (${fortune.rank})` });
-      const ttsText = params.readTts === false ? '' : `Thí chủ ${dev.name} vừa gieo được ${fortune.ttsSummary}`;
+      const dev = addMerit(params, merit, { note: `Thẻ thơ số ${fortune.number} (${fortune.rank})` });
+      const ttsText = params.readTts === false ? '' : `${dev.name} vừa rút được ${fortune.ttsSummary}`;
       return ctx.emitEvent({ type: 'drawFortune', ...devoteeFields(dev), topic, fortune, merit, ttsText });
     },
 
@@ -240,7 +246,7 @@ function create(ctx, saved = {}) {
             ...params,
             coins: evt.coins,
             giftName,
-            wish: `Thành tâm dâng ${giftName} kính lễ Đức Phật A Di Đà`
+            wish: `Gửi tặng ${giftName}`
           });
         }
         case 'follow':
@@ -307,7 +313,7 @@ function pickNumbers(obj, keys) {
 module.exports = {
   id: 'temple',
   name: 'Đi Chùa',
-  description: 'Chánh Điện Đức Phật A Di Đà: thắp hương, cầu phúc, xin xăm, gõ mõ, thỉnh chuông, bảng Công Đức',
+  description: 'Chánh điện online: thắp hương, thả hoa đăng, rút thẻ thơ thiền, gõ mõ, thỉnh chuông, bảng tri ân',
   overlay: 'index.html',
   create
 };

@@ -35,7 +35,7 @@ function loadRoomConfigs() {
   return [
     {
       id: DEFAULT_ROOM_ID,
-      name: 'Chùa Linh Ứng',
+      name: 'Thiền Viện Online',
       mode: 'temple',
       tiktokUsername: DEFAULT_TIKTOK_USER,
       autoConnect: true

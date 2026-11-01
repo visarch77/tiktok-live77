@@ -16,6 +16,9 @@ module.exports = {
   TTS_WORKER: path.join(ROOT, 'tts_worker.py'),
   DEFAULT_ROOM_ID: 'main',
   DEFAULT_TIKTOK_USER: process.env.TIKTOK_USER || 'zenfacts_vn',
+  // Khoá API Euler Stream (dịch vụ ký kết nối TikTok Live). Không có khoá: chỉ ~100 lượt ký/ngày,
+  // không đủ cho nhiều phòng. Mua tại https://www.eulerstream.com rồi đặt biến môi trường EULER_API_KEY.
+  EULER_API_KEY: process.env.EULER_API_KEY || '',
   // Thêm origin khác (ngoài localhost) được gọi RPC qua biến môi trường CORS_ORIGINS (cách nhau dấu phẩy)
   EXTRA_ORIGINS: String(process.env.CORS_ORIGINS || '')
     .split(',')

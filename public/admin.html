@@ -424,22 +424,22 @@
     // ======================================================================
     const MODE_UI = {
       temple: {
-        pointsLabel: 'Công đức',
+        pointsLabel: 'Điểm tri ân',
         actions: [
           { icon: '🔥', name: 'Thắp hương', desc: '3 nén • +15', method: 'temple.burnIncense', params: { count: 3 } },
           { icon: '🏮', name: 'Thả hoa đăng', desc: 'Cầu phúc • +10', method: 'temple.sendPrayer' },
-          { icon: '🎋', name: 'Xin xăm', desc: 'Gieo quẻ + đọc giải', method: 'temple.drawFortune' },
+          { icon: '🎋', name: 'Thẻ thơ thiền', desc: 'Rút thẻ + đọc lời nhắn', method: 'temple.drawFortune' },
           { icon: '🔔', name: 'Thỉnh chuông', desc: 'Đại Hồng Chung • +10', method: 'temple.ringBell', params: { count: 1, readTts: true } },
           { icon: '🪵', name: 'Gõ mõ', desc: '9 nhịp • +9', method: 'temple.strikeWoodenFish', params: { count: 9 } },
           { icon: '🍑', name: 'Mâm ngũ quả', desc: 'Quà 30 xu', method: 'temple.offerGift', params: { giftType: 'fruit', coins: 30, giftName: 'Mâm Ngũ Quả Cát Tường' } },
           { icon: '🐉', name: 'Đại lễ Kim Long', desc: 'Quà lớn 500 xu', method: 'temple.grandCeremony', params: { coins: 500, giftName: 'Đại Lễ Kim Long Chầu Phật' } }
         ],
         stats: (st) => [
-          { label: 'Tổng công đức', value: fmt(st.totalMerit) },
-          { label: 'Hương đã thắp', value: fmt(st.totalIncense), hint: `${fmt(st.lanternCount)} hoa đăng • ${fmt(st.fortuneCount)} quẻ` }
+          { label: 'Tổng điểm tri ân', value: fmt(st.totalMerit) },
+          { label: 'Hương đã thắp', value: fmt(st.totalIncense), hint: `${fmt(st.lanternCount)} hoa đăng • ${fmt(st.fortuneCount)} thẻ thơ` }
         ],
         dangerActions: [
-          { label: '♻️ Đặt lại bảng công đức', method: 'temple.resetMerit', confirm: 'Xoá toàn bộ công đức và bảng xếp hạng của phòng này? Không thể hoàn tác.' }
+          { label: '♻️ Đặt lại bảng tri ân', method: 'temple.resetMerit', confirm: 'Xoá toàn bộ điểm tri ân và bảng xếp hạng của phòng này? Không thể hoàn tác.' }
         ],
         describe: describeTempleEvent
       }
@@ -692,7 +692,7 @@
                   <div class="field">
                     <label for="simComment">Giả lập một bình luận TikTok</label>
                     <div class="input-group">
-                      <input class="input" id="simComment" placeholder="Ví dụ: con xin quẻ cầu tài lộc" />
+                      <input class="input" id="simComment" placeholder="Ví dụ: xin rút một thẻ thơ" />
                       <button class="btn primary" data-act="send-comment">Gửi</button>
                     </div>
                     <span class="help">Được xử lý giống hệt bình luận thật (lọc spam, từ khoá, giới hạn 3,5 giây/người).</span>
@@ -920,7 +920,7 @@
         case 'sendPrayer': return { icon: '🏮', text: `${u} cầu phúc: “${esc(e.wish)}”${pts}` };
         case 'offerGift': return { icon: '🎁', text: `${u} dâng ${esc(e.giftName)}${pts}` };
         case 'grandCeremony': return { icon: '🐉', text: `${u} dâng <b>${esc(e.giftName)}</b>${pts}` };
-        case 'drawFortune': return { icon: '🎋', text: `${u} gieo được quẻ số ${esc(e.fortune?.number)} — ${esc(e.fortune?.rank)}` };
+        case 'drawFortune': return { icon: '🎋', text: `${u} rút thẻ thơ số ${esc(e.fortune?.number)} — ${esc(e.fortune?.rank)}` };
         default: return { icon: '✨', text: `${u} tương tác` };
       }
     }

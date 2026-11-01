@@ -87,7 +87,12 @@ Một server chạy được nhiều phòng cùng lúc. Mỗi phòng = **1 tài 
 - Mỗi phòng live cần một nguồn phát riêng: mở thêm một OBS / TikTok Live Studio trỏ vào `/room/<mã>?obs=1`.
 - Chế độ hiện có: **Đi Chùa** (`temple`). Thêm chế độ mới (chạy bộ, battle quốc gia...) theo hướng dẫn
   [`src/modes/README.md`](src/modes/README.md).
-- Biến môi trường: `PORT`, `TIKTOK_USER` (tài khoản của phòng `main` khi tạo lần đầu), `DATA_DIR`, `CORS_ORIGINS`.
+- Biến môi trường: `PORT`, `TIKTOK_USER` (tài khoản của phòng `main` khi tạo lần đầu), `DATA_DIR`, `CORS_ORIGINS`,
+  `EULER_API_KEY` (khoá Euler Stream để ký kết nối TikTok; không có khoá chỉ được ~100 lượt/ngày, không đủ cho nhiều phòng).
+- Giả lập người xem chỉ dùng để chạy thử: tự tắt và không bật được khi phòng đang kết nối TikTok Live thật
+  (TikTok coi lượt dâng quà / bảng xếp hạng ảo là tương tác giả).
+- Chế độ Đi Chùa dùng **Thẻ Thơ Thiền** (thơ chiêm nghiệm, không xếp cát/hung, không hứa tài lộc) và lời cảm ơn
+  quà trung tính, để tránh nội dung mê tín dị đoan và "gift baiting".
 
 ---
 

@@ -1120,3 +1120,13 @@ body.obs-mode .stage-wrapper {
   border-left: 3px solid var(--gold-main);
   color: #f3e5cf;
 }
+
+/* Dòng miễn trừ trên Thẻ Thơ Thiền */
+.fortune-disclaimer {
+  margin-top: 18px;
+  font-size: 19px;
+  font-style: italic;
+  color: #3d120d;
+  opacity: 0.7;
+  text-align: center;
+}

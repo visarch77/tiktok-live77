@@ -1,6 +1,6 @@
 /**
  * Live 9:16 Client Controller — Chánh Điện Đức Phật A Di Đà & Đạo Tràng Phật Tử Quỳ Lễ
- * - Hiển thị 6 Đệm Quỳ VIP (Top 6 Bảng Vàng Công Đức)
+ * - Hiển thị 6 Đệm Quỳ VIP (Top 6 bảng tri ân)
  * - Hiển thị 40 Phật Tử mặc áo lam quỳ hai bên thảm đỏ + thẻ tên người xem
  * - Hiệu ứng người xem bước dọc thảm đỏ lên trước Lư Hương Đồng dâng hương
  * - Giọng đọc ZeroTTS (Mai Chi) + Pháp khí Web Audio
@@ -406,7 +406,7 @@
       updateCentralWorshipper(
         topDev.name,
         topDev.avatar,
-        `✨ Công đức: ${Number(topDev.merit).toLocaleString('vi-VN')} CĐ`,
+        `✨ Tri ân: ${Number(topDev.merit).toLocaleString('vi-VN')} điểm`,
         topDev.lastWish || 'Nam Mô A Di Đà Phật, cầu bình an cát tường',
         false
       );
@@ -442,9 +442,8 @@
       liveText.textContent = `Đang kết nối @${st.tiktok.username}...`;
     } else {
       liveDot.classList.remove('connected');
-      liveText.textContent = st.settings?.autoSim
-        ? 'CHÙA LINH ỨNG • TỰ ĐỘNG GIẢ LẬP ĐÔNG NGƯỜI'
-        : 'CHÙA LINH ỨNG • ĐỨC PHẬT A DI ĐÀ';
+      const roomTitle = String(st.room?.name || 'Thiền Viện Online').toUpperCase();
+      liveText.textContent = st.settings?.autoSim ? `${roomTitle} • CHẾ ĐỘ CHẠY THỬ` : roomTitle;
     }
 
     if (st.settings) autoSimState = Boolean(st.settings.autoSim);
@@ -489,18 +488,18 @@
   function formatEventSummary(ev) {
     switch (ev.type) {
       case 'burnIncense':
-        return `🔥 <strong>${escapeHtml(ev.user)}</strong> dâng ${ev.count} nén nhang (+${ev.merit} CĐ)`;
+        return `🔥 <strong>${escapeHtml(ev.user)}</strong> dâng ${ev.count} nén nhang (+${ev.merit} điểm)`;
       case 'strikeWoodenFish':
-        return `🪵 <strong>${escapeHtml(ev.user)}</strong> gõ mõ ${ev.count} nhịp (+${ev.merit} CĐ)`;
+        return `🪵 <strong>${escapeHtml(ev.user)}</strong> gõ mõ ${ev.count} nhịp (+${ev.merit} điểm)`;
       case 'ringBell':
-        return `🔔 <strong>${escapeHtml(ev.user)}</strong> thỉnh Đại Hồng Chung (+${ev.merit} CĐ)`;
+        return `🔔 <strong>${escapeHtml(ev.user)}</strong> thỉnh Đại Hồng Chung (+${ev.merit} điểm)`;
       case 'sendPrayer':
         return `🏮 <strong>${escapeHtml(ev.user)}</strong> cầu phúc: “${escapeHtml(ev.wish)}”`;
       case 'offerGift':
       case 'grandCeremony':
-        return `🪷 <strong>${escapeHtml(ev.user)}</strong> dâng <em>${escapeHtml(ev.giftName)}</em> (+${ev.merit} CĐ)`;
+        return `🪷 <strong>${escapeHtml(ev.user)}</strong> dâng <em>${escapeHtml(ev.giftName)}</em> (+${ev.merit} điểm)`;
       case 'drawFortune':
-        return `🎋 <strong>${escapeHtml(ev.user)}</strong> gieo được Quẻ số ${ev.fortune?.number} (${ev.fortune?.rank})`;
+        return `🎋 <strong>${escapeHtml(ev.user)}</strong> rút được Thẻ thơ số ${ev.fortune?.number} (${ev.fortune?.rank})`;
       default:
         return `✨ <strong>${escapeHtml(ev.user || 'Thí chủ')}</strong> tương tác`;
     }
@@ -521,15 +520,15 @@
       case 'burnIncense': {
         audio.playIncenseChime();
         particles.spawnIncenseBurst(540, 895);
-        particles.spawnFloatingMerit(`+${ev.merit} Công Đức`, 540, 860, '#ffe082');
-        animateWalkerOnCarpet(ev.user, ev.avatar, `🔥 Dâng ${ev.count} nén hương (+${ev.merit} CĐ)`, ev.wish);
+        particles.spawnFloatingMerit(`+${ev.merit} Tri Ân`, 540, 860, '#ffe082');
+        animateWalkerOnCarpet(ev.user, ev.avatar, `🔥 Dâng ${ev.count} nén hương (+${ev.merit} điểm)`, ev.wish);
         break;
       }
 
       case 'strikeWoodenFish': {
         audio.playWoodenFish();
         pulseHallBowing();
-        particles.spawnFloatingMerit(`+${ev.merit} Công Đức`, 890, 935, '#ffd54f');
+        particles.spawnFloatingMerit(`+${ev.merit} Tri Ân`, 890, 935, '#ffd54f');
         break;
       }
 
@@ -537,16 +536,16 @@
         audio.playTempleBell(1.0);
         pulseHallBowing();
         particles.spawnBellWave(540, 510, 4);
-        particles.spawnFloatingMerit(`+${ev.merit} Công Đức`, 190, 935, '#fff3b0');
-        updateCentralWorshipper(ev.user, ev.avatar, `🔔 Thỉnh Đại Hồng Chung (+${ev.merit} CĐ)`, ev.wish);
+        particles.spawnFloatingMerit(`+${ev.merit} Tri Ân`, 190, 935, '#fff3b0');
+        updateCentralWorshipper(ev.user, ev.avatar, `🔔 Thỉnh Đại Hồng Chung (+${ev.merit} điểm)`, ev.wish);
         break;
       }
 
       case 'sendPrayer': {
         audio.playIncenseChime();
         spawnSkyLantern(ev.user, ev.wish);
-        particles.spawnFloatingMerit(`+${ev.merit} Công Đức`, 540, 920, '#ffb74d');
-        animateWalkerOnCarpet(ev.user, ev.avatar, `🏮 Cầu phúc (+${ev.merit} CĐ)`, ev.wish);
+        particles.spawnFloatingMerit(`+${ev.merit} Tri Ân`, 540, 920, '#ffb74d');
+        animateWalkerOnCarpet(ev.user, ev.avatar, `🏮 Cầu phúc (+${ev.merit} điểm)`, ev.wish);
         break;
       }
 
@@ -554,8 +553,8 @@
         audio.playIncenseChime();
         audio.playTempleBell(0.85);
         particles.spawnIncenseBurst(540, 895);
-        particles.spawnFloatingMerit(`+${ev.merit} Công Đức`, 540, 840, '#fff3b0');
-        animateWalkerOnCarpet(ev.user, ev.avatar, `🪷 Dâng ${ev.giftName} (+${ev.merit} CĐ)`, ev.wish);
+        particles.spawnFloatingMerit(`+${ev.merit} Tri Ân`, 540, 840, '#fff3b0');
+        animateWalkerOnCarpet(ev.user, ev.avatar, `🪷 Dâng ${ev.giftName} (+${ev.merit} điểm)`, ev.wish);
         break;
       }
 
@@ -565,7 +564,7 @@
         particles.spawnGrandCeremonyRain();
         pulseHallBowing();
         showGrandCeremonyBanner(ev.user, ev.giftName, ev.merit);
-        animateWalkerOnCarpet(ev.user, ev.avatar, `🐉 ${ev.giftName} (+${ev.merit} CĐ)`, ev.wish);
+        animateWalkerOnCarpet(ev.user, ev.avatar, `🐉 ${ev.giftName} (+${ev.merit} điểm)`, ev.wish);
         break;
       }
 
@@ -574,11 +573,11 @@
         updateCentralWorshipper(
           ev.user,
           ev.avatar,
-          `🎋 Đang xin xăm...`,
-          `Thí chủ ${ev.user} đang thành tâm xin quẻ...`,
+          `🎋 Đang rút thẻ thơ...`,
+          `${ev.user} đang rút một thẻ thơ thiền...`,
           false
         );
-        // Chỉ hiển thị tờ Quẻ Xăm đúng thời điểm giọng đọc bắt đầu vang lên!
+        // Chỉ hiển thị Thẻ Thơ đúng thời điểm giọng đọc bắt đầu vang lên!
         audio.enqueueTts(ev.ttsText || '', {
           voice: ev.ttsVoice || 'maichi',
           onStart: () => {
@@ -587,7 +586,7 @@
             updateCentralWorshipper(
               ev.user,
               ev.avatar,
-              `🎋 Quẻ số ${ev.fortune?.number} (${ev.fortune?.rank})`,
+              `🎋 Thẻ thơ số ${ev.fortune?.number} (${ev.fortune?.rank})`,
               ev.fortune?.meaning || '',
               true
             );
@@ -624,11 +623,11 @@
   function showFortuneModal(user, fortune) {
     if (!fortune) return;
     const modal = document.getElementById('fortuneModal');
-    document.getElementById('fortuneRankBadge').textContent = fortune.rank.toUpperCase();
-    document.getElementById('fortuneTitle').textContent = `Quẻ Số ${fortune.number} — ${fortune.title}`;
-    document.getElementById('fortuneDevotee').textContent = `Thí chủ cầu quẻ: ${user}`;
+    document.getElementById('fortuneRankBadge').textContent = `CHỦ ĐỀ: ${fortune.rank.toUpperCase()}`;
+    document.getElementById('fortuneTitle').textContent = `Thẻ Thơ Số ${fortune.number} — ${fortune.title}`;
+    document.getElementById('fortuneDevotee').textContent = `Người rút thẻ: ${user}`;
     document.getElementById('fortunePoem').textContent = fortune.poem;
-    document.getElementById('fortuneMeaning').textContent = `Lời bàn: ${fortune.meaning}`;
+    document.getElementById('fortuneMeaning').textContent = `Lời nhắn: ${fortune.meaning}`;
 
     modal.classList.add('visible');
     clearTimeout(fortuneTimer);
@@ -644,7 +643,7 @@
   function showGrandCeremonyBanner(user, giftName, merit) {
     const banner = document.getElementById('grandCeremonyBanner');
     document.getElementById('grandTitle').textContent = `🐉 ${giftName.toUpperCase()} 🐉`;
-    document.getElementById('grandSub').textContent = `Đại Thí Chủ ${user} • Công Đức Vô Lượng (+${merit} CĐ)`;
+    document.getElementById('grandSub').textContent = `Cảm ơn ${user} đã gửi tặng • +${merit} điểm tri ân`;
     banner.classList.add('visible');
     clearTimeout(grandTimer);
     grandTimer = setTimeout(() => {

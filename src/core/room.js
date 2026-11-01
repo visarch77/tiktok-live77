@@ -78,7 +78,15 @@ class Room {
 
     this.source = new TikTokSource(this.id);
     this.source.on('event', (evt) => this.handleEvent(evt));
-    this.source.on('status', () => this.scheduleStateBroadcast(150));
+    this.source.on('status', (status) => {
+      // Giả lập người xem tạo tương tác giả: tự tắt ngay khi phòng kết nối live thật
+      if (status.connected && this.settings.autoSim) {
+        console.warn(`[Room ${this.id}] Tắt giả lập người xem vì phòng đang kết nối TikTok Live thật`);
+        this.configureAutoSim(false);
+        this.save();
+      }
+      this.scheduleStateBroadcast(150);
+    });
     this.source.on('viewerCount', (viewerCount) => this.broadcast('room.viewerCount', { viewerCount }));
 
     // Đổi chế độ chơi: giữ bảng xếp hạng người xem nhưng bỏ trạng thái riêng của chế độ cũ
@@ -148,6 +156,7 @@ class Room {
       ...evt
     };
     if (event.ttsText && !event.ttsVoice) event.ttsVoice = this.settings.ttsVoice;
+    if (this.simulating) event.simulated = true;
     this.recentEvents.unshift(event);
     if (this.recentEvents.length > MAX_RECENT_EVENTS) this.recentEvents.length = MAX_RECENT_EVENTS;
 
@@ -219,16 +228,24 @@ class Room {
     return this.source.disconnect();
   }
 
+  isLiveConnected() {
+    return Boolean(this.source.status.connected);
+  }
+
   configureAutoSim(enabled) {
-    this.settings.autoSim = Boolean(enabled) && typeof this.mode.simulate === 'function';
+    this.settings.autoSim =
+      Boolean(enabled) && typeof this.mode.simulate === 'function' && !this.isLiveConnected();
     clearInterval(this.autoSimTimer);
     this.autoSimTimer = null;
     if (this.settings.autoSim) {
       const step = () => {
         try {
+          this.simulating = true;
           this.mode.simulate();
         } catch (err) {
           console.error(`[Room ${this.id}] Lỗi giả lập:`, err);
+        } finally {
+          this.simulating = false;
         }
       };
       step();
@@ -239,6 +256,10 @@ class Room {
   updateSettings(params = {}) {
     const prevInterval = this.settings.autoSimIntervalMs;
     const clean = sanitizeSettings(params, this.settingsSchema);
+    // TikTok coi lượt dâng quà / bảng xếp hạng ảo trên phòng đang live là tương tác giả (fake engagement)
+    if (clean.autoSim === true && this.isLiveConnected()) {
+      throw new Error('Không bật được giả lập người xem khi phòng đang live thật (TikTok coi là tương tác giả). Ngắt kết nối TikTok trước khi chạy thử.');
+    }
     this.settings = { ...this.settings, ...clean };
     if (typeof clean.autoSim === 'boolean') {
       this.configureAutoSim(clean.autoSim);

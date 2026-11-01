@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chùa Linh Ứng Online — TikTok Live RPC (Đức Phật A Di Đà 9:16)</title>
+  <title>Thiền Viện Online — TikTok Live (9:16)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Noto+Serif:wght@700;900&display=swap" rel="stylesheet">
@@ -49,11 +49,11 @@
         <header class="minimal-top-bar">
           <div class="live-pill" id="liveStatusPill">
             <span class="live-dot" id="liveDot"></span>
-            <span id="liveStatusText">CHÙA LINH ỨNG • ĐỨC PHẬT A DI ĐÀ</span>
+            <span id="liveStatusText">THIỀN VIỆN ONLINE</span>
           </div>
           <div class="top-Right-badges">
             <div class="mini-stat-pill">
-              🔥 <strong id="statIncense">108</strong> hương • ✨ <strong id="statMerit">1,080</strong> CĐ
+              🔥 <strong id="statIncense">108</strong> hương • ✨ <strong id="statMerit">1,080</strong> điểm
             </div>
           </div>
         </header>
@@ -71,14 +71,14 @@
           <span class="hotspot-label">Thỉnh Chuông</span>
         </div>
 
-        <div class="ritual-hotspot woodfish-hotspot" id="woodenFishStation" title="Bấm để Gõ Mõ Tích Công Đức">
+        <div class="ritual-hotspot woodfish-hotspot" id="woodenFishStation" title="Bấm để Gõ Mõ">
           <span class="hotspot-icon">🪵</span>
           <span class="hotspot-label">Gõ Mõ (<span id="statWoodenFish">360</span>)</span>
         </div>
 
-        <div class="ritual-hotspot fortune-hotspot" id="fortuneCylinder" title="Bấm để Xin Xăm / Gieo Quẻ">
+        <div class="ritual-hotspot fortune-hotspot" id="fortuneCylinder" title="Bấm để Rút Thẻ Thơ Thiền">
           <span class="hotspot-icon">🎋</span>
-          <span class="hotspot-label">Xin Xăm</span>
+          <span class="hotspot-label">Thẻ Thơ</span>
         </div>
 
         <!-- 4. CHỦ LỄ ĐANG DÂNG HƯƠNG TRƯỚC LƯ HƯƠNG ĐỒNG (GIỮA CHÁNH ĐIỆN) -->
@@ -100,7 +100,7 @@
             <div class="tag-avatar" id="centralAvatar">🙏</div>
             <div class="tag-texts">
               <div class="tag-name" id="centralName">Thí Chủ Minh Tâm</div>
-              <div class="tag-sub" id="centralAction">✨ Dâng hương • +15 Công Đức</div>
+              <div class="tag-sub" id="centralAction">✨ Dâng hương • +15 điểm</div>
             </div>
           </div>
         </div>
@@ -159,7 +159,7 @@
             </div>
           </div>
 
-          <!-- Bên phải: Bảng TẤM LÒNG THÀNH (Top Công Đức) -->
+          <!-- Bên phải: Bảng TẤM LÒNG THÀNH (Top điểm tri ân) -->
           <div class="hud-right-leaderboard">
             <div class="hud-lb-header">TẤM LÒNG THÀNH</div>
             <div class="hud-lb-list" id="leaderboardList"></div>
@@ -176,10 +176,11 @@
         <div class="fortune-modal-overlay" id="fortuneModal">
           <div class="fortune-scroll-card">
             <div class="fortune-badge" id="fortuneRankBadge">THƯỢNG THƯỢNG CÁT</div>
-            <div class="fortune-heading" id="fortuneTitle">Quẻ Số 1 — Nhật Xuất Đông Phương</div>
-            <div class="fortune-devotee" id="fortuneDevotee">Thí chủ xin quẻ: Minh Tâm</div>
+            <div class="fortune-heading" id="fortuneTitle">Thẻ Thơ Số 1 — Mặt Trời Buổi Sớm</div>
+            <div class="fortune-devotee" id="fortuneDevotee">Người rút thẻ: Minh Tâm</div>
             <div class="fortune-poem" id="fortunePoem"></div>
             <div class="fortune-meaning" id="fortuneMeaning"></div>
+            <div class="fortune-disclaimer">Thơ chiêm nghiệm mang tính giải trí, không phải bói toán. Quà tặng là tự nguyện, không đổi lấy may mắn.</div>
           </div>
         </div>
       </div>
@@ -240,7 +241,7 @@
           <button class="dock-btn" id="btnRpcLantern">🏮 Thả Đèn Hoa Đăng</button>
           <button class="dock-btn" id="btnRpcWoodenFish">🪵 Gõ Mõ (+5)</button>
           <button class="dock-btn" id="btnRpcBell">🔔 Thỉnh Chuông Chùa</button>
-          <button class="dock-btn" id="btnRpcFortune">🎋 Xin Xăm / Gieo Quẻ</button>
+          <button class="dock-btn" id="btnRpcFortune">🎋 Rút Thẻ Thơ Thiền</button>
           <button class="dock-btn" id="btnRpcGiftLotus">🪷 Dâng Hoa Sen Vàng</button>
         </div>
         <button class="dock-btn gold" id="btnRpcGrandCeremony">
