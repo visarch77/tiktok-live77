@@ -452,7 +452,7 @@
           { icon: '🪷', name: 'Thả đèn sen', desc: 'Như một món quà bất kỳ', method: 'chanting.testGift' },
           { icon: '⏭', name: 'Sang bước tiếp', desc: 'Chuyển bước thời khoá', method: 'chanting.nextPhase' }
         ],
-        commentHint: 'Ví dụ: kinh 2 · hoặc một lời nguyện',
+        commentHint: 'Ví dụ: thắp nhang · kinh 2 · nam / nữ · hoặc một lời nguyện',
         stats: (st) => [
           { label: 'Người cùng tụng hôm nay', value: fmt(st.counters?.participants), hint: `${fmt(st.counters?.sessions)} khoá đã viên mãn` },
           { label: 'Lượt niệm chung', value: fmt(st.counters?.recitations), hint: 'Tổng lượt thả tim' },
@@ -1046,7 +1046,7 @@
           </div>
           <div class="ctl-group">
             <h4>Hôm nay</h4>
-            <p class="help">🙏 ${fmt(st.counters?.participants)} người · 📿 ${fmt(st.counters?.recitations)} tim (${fmt(st.counters?.heartsWithMo)} theo nhịp mõ) · 🔔 ${fmt(st.counters?.bellResponses)} lượt chắp tay theo chuông · ${fmt(st.counters?.sessions)} khoá viên mãn</p>
+            <p class="help">🙏 ${fmt(st.counters?.participants)} người · 📿 ${fmt(st.counters?.recitations)} tim (${fmt(st.counters?.heartsWithMo)} theo nhịp mõ) · 🔔 ${fmt(st.counters?.bellResponses)} lượt chắp tay theo chuông · 🔥 ${fmt(st.counters?.incenseOffers)} lượt thắp nhang · ${fmt(st.counters?.sessions)} khoá viên mãn</p>
           </div>
         </div>`;
     }
@@ -1107,6 +1107,12 @@
             ${vol('sfxVolume', 'Mõ & chuông', 0.8)}
             ${sw('natureSound', 'Tiếng suối nhẹ')}
             ${sw('showRhythmGuide', 'Hiện hướng dẫn thả tim theo nhịp')}
+            <div class="setting"><div><div class="setting-name">Bình luận hiện ở đâu</div><div class="setting-desc">Trên đầu phật tử, hoặc đèn hoa đăng bay lên</div></div>
+              <select class="input" data-setting="commentDisplay">
+                <option value="head" ${!s.commentDisplay || s.commentDisplay === 'head' ? 'selected' : ''}>Trên đầu</option>
+                <option value="lantern" ${s.commentDisplay === 'lantern' ? 'selected' : ''}>Đèn hoa đăng</option>
+                <option value="both" ${s.commentDisplay === 'both' ? 'selected' : ''}>Cả hai</option>
+              </select></div>
             <h4 style="margin-top:16px">Lịch xoay vòng bài kinh</h4>
             <p class="help">Dùng khi không ai đề nghị bài (bình luận “kinh 1–9”).</p>
             <div class="chips" id="rotationChips">${(s.rotation || []).map((n, i) => `<span class="chip">${esc(nameOf(n))}<button data-act="rot-remove" data-idx="${i}" aria-label="Bỏ">×</button></span>`).join('') || '<span class="muted">Trống — dùng lịch mặc định</span>'}</div>
@@ -1153,10 +1159,10 @@
           <button class="btn sm" data-act="people-refresh">↻ Làm mới</button>
         </div>
         ${rows.length ? `<div style="overflow-x:auto"><table class="people">
-          <thead><tr><th>Người tham gia</th><th>Phút cùng tụng</th><th>Tim</th><th>Theo nhịp mõ</th><th>Theo chuông</th><th>Lời nguyện</th><th>Đèn sen</th><th>Lần cuối</th></tr></thead>
+          <thead><tr><th>Người tham gia</th><th>Phút cùng tụng</th><th>Tim</th><th>Theo nhịp mõ</th><th>Theo chuông</th><th>Thắp nhang</th><th>Lời nguyện</th><th>Đèn sen</th><th>Lần cuối</th></tr></thead>
           <tbody>${rows.map((r) => `<tr>
             <td>${esc(r.name)}</td><td>${fmt(r.minutes)}</td><td>${fmt(r.hearts)}</td><td>${fmt(r.heartsWithMo)}</td><td>${fmt(r.heartsAtBell)}</td>
-            <td>${fmt(r.wishes)}</td><td>${fmt(r.lamps)}</td><td class="muted">${timeAgo(new Date(r.lastAt).toISOString())}</td></tr>`).join('')}</tbody>
+            <td>${fmt(r.incense)}</td><td>${fmt(r.wishes)}</td><td>${fmt(r.lamps)}</td><td class="muted">${timeAgo(new Date(r.lastAt).toISOString())}</td></tr>`).join('')}</tbody>
         </table></div>` : '<div class="empty">Hôm nay chưa có ai tham gia.</div>'}`;
     }
 
@@ -1214,6 +1220,7 @@
             : { icon: '🏮', text: `${u}: “${esc(e.wish)}”` };
         case 'lamp': return { icon: esc(e.symbol || '🪷'), text: `${u} thả một đèn sen` };
         case 'invite': return { icon: '🌱', text: `${u} mời thêm bạn hữu vào đạo tràng` };
+        case 'incenseOffer': return { icon: '🔥', text: `${u} lên thắp nhang dâng Phật` };
         case 'sutraStart': return { icon: '📿', text: `Cả phòng bắt đầu tụng <b>${esc(e.sutra?.name)}</b>` };
         default: return { icon: '✨', text: `${u} tham gia` };
       }

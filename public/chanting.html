@@ -14,18 +14,20 @@
     <!-- ================= KHUNG 9:16 (1080 x 1920) ================= -->
     <div class="stage-wrapper" id="stageWrapper">
       <div class="stage" id="stage">
-        <img src="/assets/amitabha_stage.png" alt="" class="bg-img" />
+        <img src="/assets/chanh_dien_rong.jpg" alt="" class="bg-img" />
         <div class="bg-vignette"></div>
 
         <!-- Đầu màn hình: tên phòng + bộ đếm chung của cả đạo tràng -->
-        <header class="top">
+        <!-- Hai góc trên (chừa khoảng giữa cho tượng Phật) -->
+        <header class="top-corner left">
           <div class="room-pill"><span class="live-dot" id="liveDot"></span><span id="roomName">PHÒNG TỤNG KINH CHUNG</span></div>
-          <div class="counters">
-            <div class="counter"><span class="c-icon">🙏</span><b id="cParticipants">0</b><span>người cùng tụng</span></div>
-            <div class="counter"><span class="c-icon">📿</span><b id="cRecitations">0</b><span>lượt niệm chung</span></div>
-            <div class="counter"><span class="c-icon">🏮</span><b id="cWishes">0</b><span>lời nguyện thiện</span></div>
-            <div class="counter"><span class="c-icon">🪷</span><b id="cLamps">0</b><span>đèn sen</span></div>
-          </div>
+          <div class="counter"><span class="c-icon">🙏</span><b id="cParticipants">0</b><span>người cùng tụng</span></div>
+          <div class="counter"><span class="c-icon">📿</span><b id="cRecitations">0</b><span>lượt niệm chung</span></div>
+        </header>
+        <header class="top-corner right">
+          <div class="counter"><span class="c-icon">🔥</span><b id="cIncense">0</b><span>lượt thắp nhang</span></div>
+          <div class="counter"><span class="c-icon">🏮</span><b id="cWishes">0</b><span>lời nguyện thiện</span></div>
+          <div class="counter"><span class="c-icon">🪷</span><b id="cLamps">0</b><span>đèn sen</span></div>
         </header>
 
         <!-- Lư hương: mỗi người vào đạo tràng thắp một nén -->
@@ -34,13 +36,18 @@
         <!-- Đạo tràng: chỗ ngồi mang tên người tham gia (xếp theo người vừa tương tác, không theo giá trị) -->
         <div class="hall" id="hall"></div>
 
+        <!-- Phật tử bước lên thảm đỏ thắp nhang (bình luận "thắp nhang") -->
+        <div class="walker-layer" id="walkerLayer"></div>
+
+        <!-- Bình luận hiện trên đầu phật tử -->
+        <div class="bubble-layer" id="bubbleLayer"></div>
+
         <!-- Đèn hoa đăng (bình luận) và đèn sen (quà) bay lên từ chỗ ngồi -->
         <div class="float-layer" id="floatLayer"></div>
 
         <canvas id="smokeCanvas"></canvas>
 
-        <!-- Dòng "đang cùng tụng" + thông báo nhẹ -->
-        <div class="chanting-line" id="chantingLine"></div>
+        <!-- Thông báo nhẹ -->
 
         <!-- Lời mời chắp tay khi chuông vang -->
         <div class="bell-prompt" id="bellPrompt"><div class="bp-icon">🔔</div><div class="bp-text">Cùng chắp tay — thả tim</div><div class="bp-sub" id="bellPromptSub">theo tiếng chuông</div></div>
@@ -63,10 +70,11 @@
           <div class="sp-body" id="spBody"></div>
           <div class="sp-foot">
             <span id="spNext">Khoá sau: —</span>
+            <span class="chanting-line" id="chantingLine"></span>
           </div>
         </section>
 
-        <div class="guide" id="guide">Thả tim để cùng tụng · Bình luận để thắp nhang &amp; gửi lời nguyện · “kinh 1–9” để đề nghị bài kinh · Mọi tương tác đều quý như nhau 🤍</div>
+        <div class="guide" id="guide">Thả tim để cùng tụng · “thắp nhang” để lên dâng hương · “kinh 1–9” đề nghị bài kinh · Mọi tương tác đều quý như nhau 🤍</div>
       </div>
     </div>
 
@@ -85,6 +93,7 @@
   <script src="/js/audio.js"></script>
   <script src="/js/ambient.js"></script>
   <script src="/js/particles.js"></script>
+  <script src="/js/seat-layout.js"></script>
   <script src="/js/chanting.js"></script>
 </body>
 </html>

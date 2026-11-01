@@ -11,7 +11,13 @@ const { isBlockedSpamOrToxic, sanitizeUserName, sanitizeWishText } = require('..
 //   → xướng danh hiệu + kinh chính (mõ) → niệm Phật (mõ) → hồi hướng (xướng, cuộn tên) → tĩnh lặng → kết chuông
 // ============================================================================
 
-const SEAT_COUNT = 38; // 6 bồ đoàn trước điện + 32 chỗ hai bên thảm
+// Số chỗ ngồi lấy từ bố cục dùng chung với màn hình (public/js/seat-layout.js) — gần to xa nhỏ, ~686 chỗ
+const SEAT_LAYOUT = require('../../../public/js/seat-layout').buildSeatLayout();
+const SEAT_COUNT = SEAT_LAYOUT.length;
+const { guessGender, parseSelfGender } = require('./gender');
+// Nam ngồi bên trái thảm, nữ bên phải
+const SIDE_FOR = { m: 'L', f: 'R' };
+const INCENSE_COOLDOWN_MS = 3 * 60 * 1000; // mỗi người lên thắp nhang tối đa 1 lần / 3 phút
 const PRESENCE_GAP_MS = 2 * 60 * 1000; // hai lần tương tác cách nhau ≤ 2 phút = vẫn đang ở trong đạo tràng
 const BELL_RESPONSE_MS = 6000; // thả tim trong 6 giây sau tiếng chuông = "chắp tay theo chuông"
 const MINUTE_MILESTONES = [10, 30, 60, 120];
@@ -23,6 +29,8 @@ const CHANT_FLUSH_MS = 1500;
 const THANKS_FLUSH_MS = 8000;
 const MAX_DEDICATION_NAMES = 300;
 const VOTE_RE = /(?:^|[^\p{L}])kinh\s*(?:số\s*)?([1-9])(?![0-9])/iu;
+// Cú pháp lên thắp nhang trước Phật
+const INCENSE_RE = /(?:^|[^\p{L}])(?:thắp|thap|dâng|dang)\s+(?:nhang|hương|huong)(?![\p{L}])/iu;
 
 // Mỗi loại quà là một biểu tượng tượng trưng — cùng kích thước, cùng ánh sáng, không theo giá trị
 const LAMP_SYMBOLS = ['🪷', '🏮', '🕯️', '🌸', '🌼', '💮', '🍃', '🌺'];
@@ -114,6 +122,9 @@ function create(ctx, saved = {}) {
   let votes = new Map(); // key -> { num, at }  (phiếu cho khoá kế tiếp)
   let nextOverride = null; // người trực chọn bài cho khoá sau
   const commentCooldown = new Map();
+  const incenseCooldown = new Map();
+  // Người xem tự chọn hình nam/nữ (bình luận "nam"/"nữ") — lưu theo mã băm, chỉ trong ngày
+  let genderChoices = new Map(saved.dayKey === todayKey() && Array.isArray(saved.genderChoices) ? saved.genderChoices : []);
 
   let currentSutra = null;
   let phase = null;
@@ -136,6 +147,7 @@ function create(ctx, saved = {}) {
       counters = emptyCounters();
       participantHashes = new Set();
       dayStats = new Map();
+      genderChoices = new Map();
     }
   }
 
@@ -238,6 +250,7 @@ function create(ctx, saved = {}) {
     let isNewSeat = false;
     if (!person) {
       person = { key, name, avatar: user.avatar || '', lastActive: now, lastLike: 0, slot: -1 };
+      person.gender = genderChoices.get(hashKey(key)) || guessGender(user.user || user.uniqueId);
       people.set(key, person);
     }
     person.name = name;
@@ -245,19 +258,7 @@ function create(ctx, saved = {}) {
     person.lastActive = now;
 
     if (person.slot < 0) {
-      let slot = slots.indexOf(null);
-      if (slot < 0) {
-        // Đạo tràng đã đầy chỗ hiện tên: nhường chỗ của người lâu nhất chưa tương tác
-        let oldest = null;
-        for (const k of slots) {
-          const p = people.get(k);
-          if (p && (!oldest || p.lastActive < oldest.lastActive)) oldest = p;
-        }
-        slot = oldest.slot;
-        oldest.slot = -1;
-      }
-      slots[slot] = key;
-      person.slot = slot;
+      assignSlot(person);
       isNewSeat = true;
     }
     if (people.size > 2000) {
@@ -276,8 +277,52 @@ function create(ctx, saved = {}) {
     return { person, isNewSeat };
   }
 
+  // Chọn chỗ trống phía của mình (nam: trái, nữ: phải), hàng gần trước; hết chỗ thì nhường chỗ của người
+  // lâu nhất chưa tương tác cùng phía
+  function assignSlot(person) {
+    const side = SIDE_FOR[person.gender] || 'R';
+    let slot = -1;
+    for (let i = 0; i < SEAT_COUNT; i++) {
+      if (slots[i] === null && SEAT_LAYOUT[i].side === side) {
+        slot = i;
+        break;
+      }
+    }
+    if (slot < 0) {
+      let oldest = null;
+      for (let i = 0; i < SEAT_COUNT; i++) {
+        if (SEAT_LAYOUT[i].side !== side) continue;
+        const p = people.get(slots[i]);
+        if (p && p !== person && (!oldest || p.lastActive < oldest.lastActive)) oldest = p;
+      }
+      if (oldest) {
+        slot = oldest.slot;
+        oldest.slot = -1;
+      } else {
+        slot = slots.indexOf(null);
+      }
+    }
+    if (slot < 0) return;
+    slots[slot] = person.key;
+    person.slot = slot;
+  }
+
+  // Người xem tự chọn hình: đổi hình và chuyển sang đúng phía (nam trái, nữ phải)
+  function setGender(person, gender) {
+    genderChoices.set(hashKey(person.key), gender);
+    if (genderChoices.size > 20000) genderChoices.delete(genderChoices.keys().next().value);
+    if (person.gender === gender) return false;
+    person.gender = gender;
+    if (person.slot >= 0) {
+      slots[person.slot] = null;
+      person.slot = -1;
+      assignSlot(person);
+    }
+    return true;
+  }
+
   function seatView(person) {
-    return { slot: person.slot, key: person.key, name: person.name, avatar: person.avatar };
+    return { slot: person.slot, key: person.key, name: person.name, avatar: person.avatar, gender: person.gender };
   }
 
   function announceSeat(person) {
@@ -628,6 +673,27 @@ function create(ctx, saved = {}) {
     const person = seatAndAnnounce(user);
     if (!raw || isBlockedSpamOrToxic(raw)) return null;
 
+    // "nam" / "nữ": người xem tự chọn hình của mình (sửa khi đoán theo tên bị sai)
+    const self = parseSelfGender(raw);
+    if (self) {
+      const changed = setGender(person, self);
+      ctx.save();
+      ctx.broadcast('chant.activity', { kind: 'gender', name: person.name, gender: self, changed });
+      if (changed) ctx.broadcastState();
+      return null;
+    }
+
+    // "thắp nhang" / "thắp hương" / "dâng hương": phật tử bước lên thảm đỏ, thắp nhang trước Phật rồi về chỗ
+    if (INCENSE_RE.test(raw)) {
+      const now = Date.now();
+      if (now - (incenseCooldown.get(person.key) || 0) < INCENSE_COOLDOWN_MS) return null;
+      incenseCooldown.set(person.key, now);
+      if (incenseCooldown.size > 2000) incenseCooldown.delete(incenseCooldown.keys().next().value);
+      counters.incenseOffers = (counters.incenseOffers || 0) + 1;
+      if (person.stat) person.stat.incense = (person.stat.incense || 0) + 1;
+      return ctx.emitEvent({ type: 'incenseOffer', key: person.key, user: person.name, avatar: person.avatar, slot: person.slot, gender: person.gender, counters });
+    }
+
     const voteMatch = raw.match(VOTE_RE);
     let voted = null;
     if (voteMatch && addVote(person.key, voteMatch[1])) {
@@ -762,6 +828,7 @@ function create(ctx, saved = {}) {
             heartsAtBell: st.heartsAtBell,
             wishes: st.wishes,
             lamps: st.lamps,
+            incense: st.incense || 0,
             firstAt: st.firstAt,
             lastAt: st.lastAt
           }))
@@ -842,7 +909,8 @@ function create(ctx, saved = {}) {
         counters,
         participantHashes: [...participantHashes].slice(-20000),
         rotationIndex,
-        dayStats: [...dayStats.entries()].slice(-MAX_TRACKED)
+        dayStats: [...dayStats.entries()].slice(-MAX_TRACKED),
+        genderChoices: [...genderChoices.entries()].slice(-20000)
       };
     },
 
@@ -885,6 +953,7 @@ module.exports = {
     sfxVolume: [0, 1],
     natureSound: 'boolean',
     showRhythmGuide: 'boolean',
+    commentDisplay: { type: 'enum', values: ['head', 'lantern', 'both'] },
     vietMoStyle: { type: 'enum', values: ['syllable', 'line'] },
     rotation: { type: 'intList', min: 1, maxValue: 9, max: 30 }
   },
@@ -909,6 +978,7 @@ module.exports = {
     sfxVolume: 0.8,
     natureSound: true,
     showRhythmGuide: true,
+    commentDisplay: 'head',
     rotation: [1, 2, 3, 5, 6, 4, 8, 1, 2, 9, 3, 7]
   },
   create

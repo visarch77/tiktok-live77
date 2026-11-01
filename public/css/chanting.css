@@ -28,22 +28,24 @@ body.obs-mode .stage-wrapper { height: 100vh; border: none; border-radius: 0; }
     linear-gradient(180deg, rgba(10, 4, 2, 0.55) 0%, rgba(10, 4, 2, 0) 12%),
     linear-gradient(0deg, rgba(10, 4, 2, 0.85) 0%, rgba(10, 4, 2, 0.35) 22%, rgba(10, 4, 2, 0) 40%); }
 
-/* ---------- Đầu màn hình ---------- */
-.top { position: absolute; top: 26px; left: 0; right: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; gap: 14px; }
-.room-pill { display: inline-flex; align-items: center; gap: 10px; padding: 8px 20px; border-radius: 999px; background: var(--ink); border: 1px solid var(--line); font-size: 20px; font-weight: 600; letter-spacing: 1.5px; color: var(--gold); }
+/* ---------- Hai góc trên (chừa khoảng giữa cho tượng Phật) ---------- */
+.top-corner { position: absolute; top: 22px; z-index: 20; display: flex; flex-direction: column; gap: 8px; }
+.top-corner.left { left: 20px; align-items: flex-start; }
+.top-corner.right { right: 20px; align-items: flex-end; }
+.room-pill { display: inline-flex; align-items: center; gap: 10px; max-width: 340px; padding: 7px 16px; border-radius: 999px; background: var(--ink); border: 1px solid var(--line); font-size: 17px; font-weight: 600; letter-spacing: 1.2px; color: var(--gold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .live-dot { width: 10px; height: 10px; border-radius: 50%; background: #8a7a62; }
 .live-dot.on { background: #ff5a4f; box-shadow: 0 0 0 4px rgba(255, 90, 79, 0.25); }
 .counters { display: flex; gap: 10px; }
-.counter { display: flex; align-items: baseline; gap: 7px; padding: 8px 14px; border-radius: 14px; background: var(--ink); border: 1px solid var(--line); font-size: 15px; color: rgba(255, 248, 236, 0.75); }
-.counter b { font-size: 22px; color: var(--ivory); font-variant-numeric: tabular-nums; font-weight: 700; }
+.counter { display: flex; align-items: baseline; gap: 7px; padding: 6px 13px; border-radius: 12px; background: var(--ink); border: 1px solid var(--line); font-size: 14px; color: rgba(255, 248, 236, 0.75); }
+.counter b { font-size: 19px; color: var(--ivory); font-variant-numeric: tabular-nums; font-weight: 700; }
 .c-icon { font-size: 17px; }
 
-.chanting-line { position: absolute; top: 164px; left: 50%; transform: translateX(-50%); z-index: 20; max-width: 940px; padding: 9px 22px; border-radius: 999px; background: var(--ink); border: 1px solid var(--line); font-size: 19px; color: var(--ivory); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0; transition: opacity 0.8s ease; }
+.chanting-line { max-width: 560px; font-size: 15px; color: var(--ivory); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0; transition: opacity 0.8s ease; }
 .chanting-line.show { opacity: 1; }
 .chanting-line b { color: var(--gold); font-weight: 600; }
 
-/* ---------- Lư hương ---------- */
-.incense-burner { position: absolute; top: 790px; left: 50%; transform: translateX(-50%); width: 190px; height: 130px; z-index: 9; pointer-events: none; }
+/* ---------- Lư hương (nền chánh điện rộng: miệng lư ở y≈515, thu nhỏ theo phối cảnh) ---------- */
+.incense-burner { position: absolute; top: 395px; left: 50%; transform: translateX(-50%) scale(0.55); transform-origin: 50% 120px; width: 190px; height: 130px; z-index: 9; pointer-events: none; }
 .incense-holder { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); width: 130px; height: 105px; }
 .incense-stick { position: absolute; bottom: 0; width: 3.5px; background: linear-gradient(180deg, #e0d6cc 0%, #d4a359 35%, #8c1d18 80%); border-radius: 2px; transform-origin: bottom center; }
 .incense-stick.new { animation: stickIn 1.6s ease-out; }
@@ -56,8 +58,8 @@ body.obs-mode .stage-wrapper { height: 100vh; border: none; border-radius: 0; }
 .seat .glow { position: absolute; left: 50%; top: 40%; width: 150px; height: 150px; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(circle, rgba(255, 226, 150, 0.55) 0%, rgba(255, 226, 150, 0) 68%); opacity: 0; transition: opacity 0.9s ease; }
 .seat.chanting .glow { opacity: 1; }
 .seat .sprite { position: relative; width: 86px; height: 112px; object-fit: contain; }
-.seat.empty .sprite { opacity: 0.0; }
-.seat .tag { position: relative; margin-top: -10px; max-width: 120px; padding: 2px 10px; border-radius: 999px; background: var(--ink-strong); border: 1px solid var(--line); font-size: 13px; font-weight: 600; color: var(--ivory); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.seat.empty .sprite, .seat.empty .tag, .seat.empty .glow, .seat.empty .doing { display: none; }
+.seat .tag { position: relative; margin-top: -10px; max-width: 120px; opacity: 0; transition: opacity 0.6s ease; padding: 2px 10px; border-radius: 999px; background: var(--ink-strong); border: 1px solid var(--line); font-size: 13px; font-weight: 600; color: var(--ivory); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .seat .doing { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); padding: 2px 10px; border-radius: 999px; background: rgba(246, 213, 138, 0.92); color: #3a1a08; font-size: 12px; font-weight: 700; white-space: nowrap; opacity: 0; transition: opacity 0.6s ease; }
 .seat.chanting .doing { opacity: 1; }
 .seat.arrive { animation: seatIn 1.4s ease-out; }
@@ -81,7 +83,7 @@ body.obs-mode .stage-wrapper { height: 100vh; border: none; border-radius: 0; }
 #smokeCanvas { position: absolute; inset: 0; width: 1080px; height: 1920px; z-index: 15; pointer-events: none; }
 
 /* ---------- Thông báo nhẹ ---------- */
-.ticker { position: absolute; left: 50%; top: 1566px; transform: translateX(-50%); z-index: 20; max-width: 980px; padding: 7px 18px; border-radius: 999px; background: var(--ink); border: 1px solid var(--line); font-size: 17px; color: var(--ivory); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0; transition: opacity 0.6s ease; }
+.ticker { position: absolute; left: 50%; top: 1562px; transform: translateX(-50%); z-index: 20; max-width: 640px; padding: 7px 18px; border-radius: 999px; background: var(--ink); border: 1px solid var(--line); font-size: 17px; color: var(--ivory); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0; transition: opacity 0.6s ease; }
 .ticker.show { opacity: 1; }
 
 /* ---------- Khung kinh ---------- */
@@ -127,7 +129,7 @@ body.obs-mode .stage-wrapper { height: 100vh; border: none; border-radius: 0; }
 .rhythm.show { opacity: 1; }
 .mo-dot { width: 16px; height: 16px; border-radius: 50%; background: rgba(246, 213, 138, 0.35); transition: transform 0.08s ease-out, background 0.08s; }
 .mo-dot.hit { transform: scale(1.5); background: var(--gold); }
-.bell-prompt { position: absolute; left: 50%; top: 1040px; z-index: 30; transform: translate(-50%, -50%) scale(0.92); padding: 22px 42px; border-radius: 26px; background: rgba(14, 6, 3, 0.86); border: 1.5px solid rgba(246, 213, 138, 0.7); text-align: center; opacity: 0; pointer-events: none; transition: opacity 0.5s ease, transform 0.5s ease; }
+.bell-prompt { position: absolute; left: 50%; top: 980px; z-index: 30; transform: translate(-50%, -50%) scale(0.92); padding: 22px 42px; border-radius: 26px; background: rgba(14, 6, 3, 0.86); border: 1.5px solid rgba(246, 213, 138, 0.7); text-align: center; opacity: 0; pointer-events: none; transition: opacity 0.5s ease, transform 0.5s ease; }
 .bell-prompt.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 .bp-icon { font-size: 54px; line-height: 1; }
 .bp-text { font-family: 'Noto Serif', serif; font-size: 36px; color: var(--gold); margin-top: 8px; }
@@ -135,3 +137,26 @@ body.obs-mode .stage-wrapper { height: 100vh; border: none; border-radius: 0; }
 .heart-burst { position: absolute; inset: 0; z-index: 29; pointer-events: none; overflow: hidden; }
 .heart-burst span { position: absolute; font-size: 30px; animation: heartUp 2.6s ease-out forwards; }
 @keyframes heartUp { 0% { transform: translateY(0) scale(0.6); opacity: 0; } 15% { opacity: 1; } 100% { transform: translateY(-360px) scale(1.1); opacity: 0; } }
+
+/* ---------- Phật tử bước lên thắp nhang ---------- */
+.walker-layer { position: absolute; inset: 0; z-index: 14; pointer-events: none; }
+.walker { position: absolute; left: 0; top: 0; width: 140px; height: 270px; transform-origin: 50% 100%; will-change: transform, opacity; }
+.walker img { position: absolute; left: 50%; bottom: 30px; transform: translateX(-50%); }
+.walker img.walk { height: 240px; width: auto; }
+.walker img.kneel { height: 190px; width: auto; }
+.walker .w-name { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); padding: 2px 12px; border-radius: 999px; background: var(--ink-strong); border: 1px solid var(--line); font-size: 18px; font-weight: 600; white-space: nowrap; color: var(--ivory); }
+.incense-glow { position: absolute; left: 540px; top: 480px; width: 140px; height: 140px; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(circle, rgba(255, 200, 110, 0.75), rgba(255, 200, 110, 0) 70%); z-index: 10; pointer-events: none; animation: glowOut 2.4s ease-out forwards; }
+@keyframes glowOut { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); } 20% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); } }
+
+/* Đạo tràng đông: tên chỉ hiện ở hàng gần, hoặc khi người đó vừa tương tác (vào, thả tim, bình luận…) */
+.seat.named .tag, .seat.active .tag, .seat.chanting .tag { opacity: 1; }
+.seat .doing { display: none; }
+.seat.chanting.named .doing { display: block; }
+
+/* ---------- Bình luận trên đầu ---------- */
+.bubble-layer { position: absolute; inset: 0; z-index: 17; pointer-events: none; }
+.bubble { position: absolute; transform: translate(-50%, -100%); max-width: 300px; padding: 8px 14px; border-radius: 16px; background: rgba(255, 249, 236, 0.95); color: #3a1a08; font-size: 17px; line-height: 1.32; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35); animation: bubbleLife 7.5s ease forwards; }
+.bubble::after { content: ''; position: absolute; left: 50%; bottom: -8px; transform: translateX(-50%); border: 8px solid transparent; border-top-color: rgba(255, 249, 236, 0.95); border-bottom: 0; }
+.bubble .b-name { display: block; font-size: 13px; font-weight: 700; color: #a0520d; margin-bottom: 1px; }
+.bubble .b-text { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+@keyframes bubbleLife { 0% { opacity: 0; margin-top: 10px; } 8% { opacity: 1; margin-top: 0; } 88% { opacity: 1; } 100% { opacity: 0; margin-top: -12px; } }

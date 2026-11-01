@@ -34,6 +34,7 @@
   audio.bgMusicEnabled = false;
   const particles = new window.TempleParticleEngine($('smokeCanvas'));
   particles.smokeDensity = 0.8;
+  particles.smokeMinY = 80; // khói bay lên trước tượng rồi tan
 
   let ambient = null;
   let musicOn = true;
@@ -149,23 +150,13 @@
   // ------------------------------------------------------------------------
   // Đạo tràng: 38 chỗ ngồi (6 bồ đoàn trước điện + 4 hàng x 4 chỗ mỗi bên thảm)
   // ------------------------------------------------------------------------
-  const SEAT_COORDS = [];
-  [144, 280, 413, 667, 800, 933].forEach((x) => SEAT_COORDS.push({ x, y: 1196, scale: 0.84 }));
-  for (let r = 0; r < 4; r++) {
-    const t = r / 3;
-    const y = Math.round(1338 + t * 214);
-    const scale = +(0.86 + t * 0.14).toFixed(2);
-    const leftInner = Math.round(300 - t * 26);
-    const rightInner = Math.round(780 + t * 26);
-    for (let c = 0; c < 4; c++) {
-      const k = c / 3;
-      SEAT_COORDS.push({ x: Math.round(56 + k * (leftInner - 56)), y, scale });
-    }
-    for (let c = 0; c < 4; c++) {
-      const k = c / 3;
-      SEAT_COORDS.push({ x: Math.round(rightInner + k * (1024 - rightInner)), y, scale });
-    }
-  }
+  // Bố cục chỗ ngồi dùng chung với server (public/js/seat-layout.js): gần to xa nhỏ, ~686 chỗ
+  const SEAT_COORDS = window.SeatLayout.buildSeatLayout();
+  // Hình theo giới: nữ áo tràng lam (assets/), nam áo lam nâu (assets/male/, tạo bằng Scenario theo cùng tư thế)
+  const spriteDir = (gender) => (gender === 'm' ? '/assets/male/' : '/assets/');
+  const NAMED_SCALE = 0.6; // khi đạo tràng còn thưa: các hàng gần (tỉ lệ ≥ 0.6) luôn hiện tên
+  const NAMED_MAX_PEOPLE = 150; // đông hơn mức này: chỉ hiện tên người vừa tương tác (tránh chữ chồng nhau)
+  const ACTIVE_MS = 25000; // người vừa tương tác: hiện tên trong 25 giây
 
   const seatEls = SEAT_COORDS.map((pos, slot) => {
     const el = document.createElement('div');
@@ -175,13 +166,37 @@
     el.style.zIndex = String(10 + Math.round(pos.y / 10));
     el.style.transform = `translate(-50%, -100%) scale(${pos.scale})`;
     el.innerHTML = `<div class="glow"></div><div class="doing">đang tụng kinh</div><img class="sprite" src="/assets/devotee.png" alt="" /><div class="tag"></div>`;
+    // Tên luôn đọc được ở hàng xa (bù lại tỉ lệ thu nhỏ), và không tràn sang chỗ bên cạnh
+    const tag = el.querySelector('.tag');
+    tag.style.fontSize = `${Math.round(13 / pos.scale)}px`;
+    tag.style.maxWidth = `${Math.round(Math.max(64, pos.spacing * 1.6) / pos.scale)}px`;
     el.dataset.slot = String(slot);
     $('hall').appendChild(el);
     return el;
   });
   const seatKeyBySlot = new Array(SEAT_COORDS.length).fill(null);
+  const seatGenderBySlot = new Array(SEAT_COORDS.length).fill('f');
   const slotByKey = new Map();
   const chantTimers = new Map();
+  const activeTimers = new Map();
+
+  // Người vừa tương tác: hiện tên tạm thời (đạo tràng đông nên hàng xa ẩn tên khi không hoạt động)
+  function markActive(key) {
+    const slot = slotByKey.get(key);
+    if (slot == null) return;
+    const el = seatEls[slot];
+    const pos = SEAT_COORDS[slot];
+    const tag = el.querySelector('.tag');
+    el.classList.add('active');
+    el.style.zIndex = '400'; // nổi lên trên các hàng khác để tên không bị che
+    tag.style.maxWidth = `${Math.round(170 / pos.scale)}px`;
+    clearTimeout(activeTimers.get(key));
+    activeTimers.set(key, setTimeout(() => {
+      el.classList.remove('active');
+      el.style.zIndex = String(10 + Math.round(pos.y / 10));
+      tag.style.maxWidth = `${Math.round(Math.max(64, pos.spacing * 1.6) / pos.scale)}px`;
+    }, ACTIVE_MS));
+  }
 
   function setSeat(seat, { arrive = false } = {}) {
     if (!seat || seat.slot == null || seat.slot < 0 || seat.slot >= seatEls.length) return;
@@ -190,12 +205,18 @@
     if (prevKey && prevKey !== seat.key) slotByKey.delete(prevKey);
     seatKeyBySlot[seat.slot] = seat.key;
     slotByKey.set(seat.key, seat.slot);
+    const g = seat.gender === 'm' ? 'm' : 'f';
+    if (seatGenderBySlot[seat.slot] !== g) {
+      seatGenderBySlot[seat.slot] = g;
+      el.querySelector('.sprite').src = `${spriteDir(g)}devotee.png`;
+    }
     el.querySelector('.tag').textContent = seat.name;
     el.classList.remove('empty');
     if (arrive) {
       el.classList.remove('arrive');
       void el.offsetWidth;
       el.classList.add('arrive');
+      markActive(seat.key);
     }
   }
 
@@ -203,9 +224,11 @@
     const used = new Set();
     for (const s of seats) {
       used.add(s.slot);
-      if (seatKeyBySlot[s.slot] !== s.key) setSeat(s);
+      if (seatKeyBySlot[s.slot] !== s.key || seatGenderBySlot[s.slot] !== (s.gender === 'm' ? 'm' : 'f')) setSeat(s);
     }
+    const sparse = seats.length <= NAMED_MAX_PEOPLE;
     seatEls.forEach((el, slot) => {
+      el.classList.toggle('named', sparse && SEAT_COORDS[slot].scale >= NAMED_SCALE);
       if (!used.has(slot)) {
         el.classList.add('empty');
         el.querySelector('.tag').textContent = '';
@@ -221,6 +244,7 @@
     if (slot == null) return;
     const el = seatEls[slot];
     el.classList.add('chanting');
+    markActive(key);
     clearTimeout(chantTimers.get(key));
     chantTimers.set(key, setTimeout(() => el.classList.remove('chanting'), 6000));
   }
@@ -229,6 +253,8 @@
   // Lư hương: số nén theo số người trong đạo tràng
   // ------------------------------------------------------------------------
   let stickCount = 0;
+  const BURNER_BASE_Y = 515;
+  const BURNER_SCALE = 0.55;
   function renderIncense(people) {
     const target = Math.max(1, Math.min(27, people || 1));
     if (target === stickCount) return;
@@ -250,7 +276,8 @@
       stick.innerHTML = '<div class="incense-ember"></div>';
       holder.appendChild(stick);
       const rad = (angle * Math.PI) / 180;
-      tips.push({ x: 540 + (left - 65) + Math.sin(rad) * height, y: 910 - Math.cos(rad) * height });
+      // Miệng lư hương ở (540, 515), cụm nhang thu nhỏ 0.55 theo phối cảnh
+      tips.push({ x: 540 + ((left - 65) + Math.sin(rad) * height) * BURNER_SCALE, y: BURNER_BASE_Y - Math.cos(rad) * height * BURNER_SCALE });
     }
     particles.setIncenseTips(tips);
   }
@@ -261,6 +288,7 @@
   function renderCounters(c) {
     if (!c) return;
     $('cParticipants').textContent = fmt(c.participants);
+    $('cIncense').textContent = fmt(c.incenseOffers);
     $('cRecitations').textContent = fmt(c.recitations);
     $('cWishes').textContent = fmt(c.wishes);
     $('cLamps').textContent = fmt(c.lamps);
@@ -309,9 +337,35 @@
   // Đèn hoa đăng (lời nguyện) & đèn sen (quà) bay lên từ chỗ ngồi
   // ------------------------------------------------------------------------
   function floaterOrigin(slot) {
-    const pos = SEAT_COORDS[slot] || { x: 540, y: 1520 };
-    return { x: Math.min(900, Math.max(180, pos.x)), y: pos.y - 120 };
+    const pos = SEAT_COORDS[slot] || { x: 540, y: 1480, scale: 1 };
+    return { x: Math.min(900, Math.max(180, pos.x)), y: pos.y - 120 * (pos.scale || 1) };
   }
+  // Bình luận hiện thành bong bóng ngay trên đầu phật tử (theo chỗ ngồi), tối đa 7 bong bóng cùng lúc
+  function showBubble(slot, name, text) {
+    const pos = SEAT_COORDS[slot];
+    if (!pos) return;
+    const layer = $('bubbleLayer');
+    if (layer.children.length >= 7) layer.firstElementChild.remove();
+    const headY = pos.y - 112 * pos.scale - 10;
+    // Né bong bóng khác ở gần (đẩy lên trên)
+    let y = headY;
+    for (const b of layer.children) {
+      const bx = Number(b.dataset.x);
+      const by = Number(b.dataset.y);
+      if (Math.abs(bx - pos.x) < 230 && Math.abs(by - y) < 70) y = by - 72;
+    }
+    const x = Math.min(1080 - 160, Math.max(160, pos.x));
+    const el = document.createElement('div');
+    el.className = 'bubble';
+    el.dataset.x = String(x);
+    el.dataset.y = String(y);
+    el.style.left = `${x}px`;
+    el.style.top = `${Math.max(140, y)}px`;
+    el.innerHTML = `<span class="b-name">${esc(name)}</span><span class="b-text">${esc(text)}</span>`;
+    layer.appendChild(el);
+    setTimeout(() => el.remove(), 7600);
+  }
+
   function addFloater(html, slot) {
     const layer = $('floatLayer');
     if (layer.children.length > 10) layer.firstElementChild.remove();
@@ -336,6 +390,7 @@
   let cueIdx = 0; // tiếng chuông / mõ kế tiếp cần hẹn giờ
   let voiceIdx = 0; // chữ kế tiếp cần đọc
   let showRhythm = true;
+  let commentDisplay = 'head';
   let lastBellPromptAt = 0;
 
   const TEXT_PHASES = new Set(['incense', 'opening', 'sutra', 'recitation', 'dedication']);
@@ -387,9 +442,9 @@
     }
     if (phase.id === 'gather') {
       const next = nextUpList[0];
-      body.innerHTML = `<div class="sp-message">Đạo tràng đang tụ hội — ai cũng có thể tham gia<br>${
+      body.innerHTML = `<div class="sp-message">Đạo tràng đang tụ hội — nam ngồi bên trái, nữ bên phải<br>${
         next ? `Khoá sắp tới sẽ cùng tụng <b>${esc(next.name)}</b>` : 'Bình luận <b>“kinh 1–9”</b> để đề nghị bài kinh cho cả phòng'
-      }</div>`;
+      }<br><span style="font-size:17px;opacity:.75">Hình chưa đúng? Bình luận <b>“nam”</b> hoặc <b>“nữ”</b></span></div>`;
       return;
     }
     if (phase.id === 'paused') {
@@ -630,6 +685,7 @@
       if (typeof st.settings.natureSound === 'boolean' && ambient) ambient.setNature(st.settings.natureSound);
       if (typeof st.settings.natureSound === 'boolean') natureOn = st.settings.natureSound;
       showRhythm = st.settings.showRhythmGuide !== false;
+      if (st.settings.commentDisplay) commentDisplay = st.settings.commentDisplay;
       renderRhythmGuide();
     }
     if (st.settings && typeof st.settings.musicVolume === 'number') {
@@ -644,12 +700,16 @@
     switch (a.kind) {
       case 'seat':
         setSeat(a.seat, { arrive: true });
+        if (slotByKey.size > NAMED_MAX_PEOPLE) seatEls.forEach((el) => el.classList.remove('named'));
         renderIncense(slotByKey.size);
-        ticker(`🙏 <b>${esc(a.seat.name)}</b> đã thắp nhang, vào đạo tràng`);
+        ticker(`🙏 <b>${esc(a.seat.name)}</b> đã vào đạo tràng`);
         break;
       case 'chant':
         (a.keys || []).forEach(markChanting);
         renderChantingLine(a.chantingNow || a.names || []);
+        break;
+      case 'gender':
+        ticker(`👤 <b>${esc(a.name)}</b> đã chọn hình ${a.gender === 'm' ? 'nam — ngồi bên trái' : 'nữ — ngồi bên phải'}`);
         break;
       case 'milestone':
         ticker(`🌼 <b>${esc(a.name)}</b> ${esc(a.text)} — tuỳ hỷ`);
@@ -673,8 +733,10 @@
     switch (ev.type) {
       case 'wish':
         if (ev.wish) {
-          addFloater(`<div class="lantern"><div class="who">🏮 ${esc(ev.user)}</div><div class="what">${esc(ev.wish)}</div></div>`, ev.slot);
+          if (commentDisplay !== 'lantern') showBubble(ev.slot, ev.user, ev.wish);
+          if (commentDisplay !== 'head') addFloater(`<div class="lantern"><div class="who">🏮 ${esc(ev.user)}</div><div class="what">${esc(ev.wish)}</div></div>`, ev.slot);
         }
+        if (ev.key) markActive(ev.key);
         if (ev.vote) ticker(`📜 <b>${esc(ev.user)}</b> đề nghị cả phòng tụng <b>${esc(ev.vote.name)}</b>`);
         if (ev.nextUp) {
           nextUpList = ev.nextUp;
@@ -682,6 +744,7 @@
         }
         break;
       case 'lamp':
+        if (ev.key) markActive(ev.key);
         addFloater(`<div class="lamp">${esc(ev.symbol || '🪷')}</div><div class="lamp-name">${esc(ev.user)}</div>`, ev.slot);
         ticker(`🪷 <b>${esc(ev.user)}</b> đã thả một đèn sen`);
         if (ev.nextUp) {
@@ -692,8 +755,104 @@
       case 'invite':
         ticker(`🌱 <b>${esc(ev.user)}</b> đã mời thêm bạn hữu vào đạo tràng`);
         break;
+      case 'incenseOffer':
+        queueWalker(ev);
+        break;
     }
     if (ev.counters) renderCounters(ev.counters);
+  }
+
+  // ------------------------------------------------------------------------
+  // Phật tử bước lên thảm đỏ, quỳ, xá ba lần, thắp nhang rồi lui về (bình luận "thắp nhang")
+  // ------------------------------------------------------------------------
+  const FRAME_FILES = {
+    walk1: 'devotee_walk.png',
+    walk2: 'devotee_walk_2.png',
+    kneelDown: 'devotee_kneel_down.png',
+    kneel: 'devotee.png',
+    bow: 'devotee_bow.png',
+    bowMid: 'devotee_bow_mid.png'
+  };
+  const framesFor = (gender) => Object.fromEntries(Object.entries(FRAME_FILES).map(([k, f]) => [k, spriteDir(gender) + f]));
+  // Nạp trước cả hai bộ hình để đổi khung không bị nháy
+  ['f', 'm'].forEach((g) => Object.values(framesFor(g)).forEach((u) => { const i = new Image(); i.src = u; }));
+  const walkerQueue = [];
+  let walkerBusy = false;
+  const WALK_START = { x: 540, y: 1585, scale: 0.95 };
+  const WALK_END = { x: 540, y: 662, scale: 0.42 };
+
+  function queueWalker(ev) {
+    if (walkerQueue.length >= 4) {
+      // Đông người: không xếp hàng quá dài, vẫn thắp nhang & báo tên
+      offerIncense(ev);
+      return;
+    }
+    walkerQueue.push(ev);
+    if (!walkerBusy) runWalker();
+  }
+
+  function offerIncense(ev) {
+    const glow = document.createElement('div');
+    glow.className = 'incense-glow';
+    $('stage').appendChild(glow);
+    setTimeout(() => glow.remove(), 2600);
+    particles.spawnIncenseBurst(540, BURNER_BASE_Y - 20);
+    ticker(`🔥 <b>${esc(ev.user)}</b> đã thắp nhang dâng Phật`);
+  }
+
+  function runWalker() {
+    const ev = walkerQueue.shift();
+    if (!ev) {
+      walkerBusy = false;
+      return;
+    }
+    walkerBusy = true;
+    const FRAMES = framesFor(ev.gender);
+    const el = document.createElement('div');
+    el.className = 'walker';
+    el.innerHTML = `<img class="walk" src="${FRAMES.walk1}" alt="" /><div class="w-name">${esc(ev.user)}</div>`;
+    $('walkerLayer').appendChild(el);
+    const img = el.querySelector('img');
+    const name = el.querySelector('.w-name');
+    const place = (p, extra = '') => `translate(${p.x - 70}px, ${p.y - 270}px) scale(${p.scale}) ${extra}`;
+    const setFrame = (key, cls) => {
+      img.src = FRAMES[key];
+      img.className = cls;
+    };
+
+    // 1. Bước đi dọc thảm (6,5 giây), xen kẽ hai khung chân
+    const WALK_MS = 6500;
+    let step = 0;
+    const stepTimer = setInterval(() => setFrame(++step % 2 ? 'walk2' : 'walk1', 'walk'), 320);
+    const walk = el.animate(
+      [
+        { transform: place(WALK_START), opacity: 0 },
+        { transform: place(WALK_START), opacity: 1, offset: 0.06 },
+        { transform: place(WALK_END), opacity: 1 }
+      ],
+      { duration: WALK_MS, easing: 'linear', fill: 'forwards' }
+    );
+    walk.onfinish = () => {
+      clearInterval(stepTimer);
+      name.style.opacity = '0';
+      // 2. Hạ gối, xá ba lần, thắp nhang
+      const seq = [
+        [0, 'kneelDown'], [250, 'kneel'],
+        [700, 'bow'], [1000, 'bowMid'], [1450, 'kneel'],
+        [1900, 'bow'], [2200, 'bowMid'], [2650, 'kneel'],
+        [3100, 'bow'], [3400, 'bowMid'], [3850, 'kneel']
+      ];
+      seq.forEach(([t, key]) => setTimeout(() => setFrame(key, 'kneel'), t));
+      setTimeout(() => offerIncense(ev), 1500);
+      // 3. Lui về chỗ ngồi (mờ dần)
+      setTimeout(() => {
+        const out = el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 1400, fill: 'forwards' });
+        out.onfinish = () => {
+          el.remove();
+          setTimeout(runWalker, 400);
+        };
+      }, 4600);
+    };
   }
 
   // ------------------------------------------------------------------------

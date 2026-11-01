@@ -234,7 +234,7 @@ class TempleParticleEngine {
     for (let i = this.smokeParticles.length - 1; i >= 0; i--) {
       const p = this.smokeParticles[i];
       p.age += 1;
-      if (p.age >= p.maxAge || p.y < 495) {
+      if (p.age >= p.maxAge || p.y < (this.smokeMinY ?? 495)) {
         this.smokeParticles.splice(i, 1);
         continue;
       }

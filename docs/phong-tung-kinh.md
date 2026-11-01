@@ -64,6 +64,28 @@ và tiếng suối rất nhỏ; vang chung, khoét dải 750 Hz cho mõ rõ, t�
 Bài kinh chính của mỗi khoá = bài **được nhiều người đề nghị nhất** trong khoá trước (mỗi người 1 phiếu,
 bình luận và quà ngang nhau); không ai đề nghị thì theo lịch mặc định.
 
+## 3a. Chánh điện & lên thắp nhang
+
+Nền `public/assets/chanh_dien_rong.jpg`: chánh điện rộng, không có hàng ghế VIP. **90 chỗ ngồi** xếp thành 10 hàng hai
+bên thảm đỏ (xa nhỏ – gần to), theo người vừa tương tác.
+
+Cập nhật: bố cục phối cảnh thật (`public/js/seat-layout.js`, dùng chung cho server và màn hình) — đường chân trời
+y≈255, kích thước, khoảng cách hàng và khoảng cách người tỉ lệ với khoảng cách tới chân trời; người ngồi sát nhau
+(hàng sau khuất một phần) ⇒ **596 chỗ** trong 26 hàng (bỏ 2 hàng sát bậc bàn thờ), chừa lối đi trên thảm. Người đến trước ngồi hàng gần, sát thảm.
+Tên: khi còn thưa (≤ 150 người) hàng gần luôn hiện tên; đông hơn thì chỉ hiện tên người vừa tương tác (25 giây).
+Bình luận hiện thành **bong bóng trên đầu** phật tử (tuỳ chọn: đèn hoa đăng, hoặc cả hai). Bình luận **“thắp nhang” / “thắp hương” / “dâng hương”**
+(có thể kèm lời khác) → phật tử mang tên người đó bước dọc thảm đỏ lên trước lư hương, quỳ, xá ba lần, thắp nhang
+(lư hương sáng lên, khói bay), rồi lui về. Mỗi người tối đa 1 lần / 3 phút; đông người thì chỉ xếp hàng 4 người,
+những người sau vẫn được thắp nhang và báo tên. Bộ đếm “lượt thắp nhang” ở góc phải.
+
+**Nam / nữ:** TikTok không cho biết giới tính. Hệ thống đoán theo tên hiển thị (`src/modes/chanting/gender.js`):
+tên có chữ lót “Văn”, tên thường dùng cho nam (Hùng, Tuấn, Đức…), từ xưng hô nam (chú, ông, anh trai…), tên tiếng Anh
+nam hoặc biểu tượng 👨 → **nam**; còn lại → **nữ** (“Thị”, “chị”, “cô”… luôn là nữ). Đoán sai thì người xem bình luận
+**“nam”** hoặc **“nữ”** để đổi (lựa chọn được nhớ trong ngày). **Nam ngồi bên trái thảm, nữ bên phải.**
+Hình nữ: áo tràng lam (`public/assets/`). Hình nam: áo lam nâu, tóc ngắn (`public/assets/male/`) — tạo bằng Scenario
+(GPT Image 2.5 Sunburst) từ chính 8 khung hình nữ ghép thành một sprite sheet, rồi cắt và căn chiều cao/chân đế trùng
+từng khung nữ để chuyển động đi, quỳ, xá, lạy khớp nhau.
+
 ## 3b. Thả tim cùng nghi thức
 
 Theo `research_notes/Nhịp mõ chuông và nhạc nền/nghi_thuc_tung_bai.md`:
