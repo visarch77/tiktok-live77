@@ -3,420 +3,1271 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quản Lý Phòng TikTok Live</title>
+  <title>Live Rooms — Quản Lý</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&family=Noto+Serif:wght@700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #120504;
-      --card: #210906;
-      --border: rgba(244, 193, 80, 0.38);
-      --gold: #f4c150;
-      --gold-light: #ffe694;
-      --text: #fff8eb;
-      --muted: #d6ba8a;
+      --bg: #f5f6f8;
+      --surface: #ffffff;
+      --surface-2: #f9fafb;
+      --border: #e4e7ec;
+      --border-strong: #d0d5dd;
+      --text: #101828;
+      --text-2: #475467;
+      --text-3: #98a2b3;
+      --primary: #e0533d;
+      --primary-hover: #c9432f;
+      --primary-soft: #fdeeeb;
+      --success: #12b76a;
+      --success-soft: #e7f8ef;
+      --warning: #f79009;
+      --warning-soft: #fef4e6;
+      --danger: #d92d20;
+      --danger-soft: #fdecea;
+      --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
+      --shadow-lg: 0 20px 40px -12px rgba(16, 24, 40, 0.25);
+      --radius: 10px;
+      --radius-lg: 14px;
     }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #0e1116;
+        --surface: #161b22;
+        --surface-2: #1c222b;
+        --border: #262d38;
+        --border-strong: #343c49;
+        --text: #e6e9ef;
+        --text-2: #a4adbb;
+        --text-3: #6b7482;
+        --primary: #f0644d;
+        --primary-hover: #ff7a63;
+        --primary-soft: rgba(240, 100, 77, 0.14);
+        --success-soft: rgba(18, 183, 106, 0.14);
+        --warning-soft: rgba(247, 144, 9, 0.14);
+        --danger-soft: rgba(217, 45, 32, 0.16);
+        --shadow-sm: none;
+        --shadow-lg: 0 20px 40px -12px rgba(0, 0, 0, 0.6);
+      }
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
     body {
-      background: radial-gradient(circle at 50% 0%, #330c08 0%, #100302 80%);
+      background: var(--bg);
       color: var(--text);
-      font-family: 'Be Vietnam Pro', sans-serif;
-      min-height: 100vh;
-      padding: 28px;
+      font-family: 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
     }
-    .container {
-      max-width: 1280px;
-      margin: 0 auto;
+    button, input, select { font: inherit; color: inherit; }
+    a { color: inherit; text-decoration: none; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; }
+
+    /* ---------- Layout ---------- */
+    .app { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      gap: 22px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
     }
-    .top-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: var(--card);
-      border: 1.5px solid var(--border);
-      border-radius: 18px;
-      padding: 18px 24px;
+    .brand { display: flex; align-items: center; gap: 10px; padding: 18px 18px 14px; }
+    .brand-logo {
+      width: 32px; height: 32px; border-radius: 9px;
+      background: linear-gradient(135deg, var(--primary), #f79009);
+      display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 15px;
     }
-    .top-title {
-      font-family: 'Noto Serif', serif;
-      font-size: 26px;
-      color: var(--gold-light);
+    .brand-name { font-weight: 700; font-size: 15px; }
+    .brand-sub { font-size: 12px; color: var(--text-3); }
+    .sidebar-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 18px 8px; color: var(--text-3); font-size: 12px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .05em;
     }
-    .top-sub {
-      font-size: 14px;
-      color: var(--muted);
-      margin-top: 4px;
+    .room-list { flex: 1; overflow-y: auto; padding: 0 10px 10px; }
+    .room-item {
+      display: flex; align-items: center; gap: 10px; width: 100%;
+      padding: 10px; border-radius: var(--radius); border: 1px solid transparent;
+      background: none; cursor: pointer; text-align: left;
     }
-    .top-links {
-      display: flex;
-      gap: 12px;
-    }
+    .room-item:hover { background: var(--surface-2); }
+    .room-item.active { background: var(--primary-soft); border-color: transparent; }
+    .room-item .ri-main { flex: 1; min-width: 0; }
+    .room-item .ri-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .room-item .ri-sub { font-size: 12px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .room-item .ri-viewers { font-size: 12px; color: var(--text-2); font-variant-numeric: tabular-nums; }
+    .sidebar-foot { padding: 12px 18px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-3); display: flex; align-items: center; gap: 8px; }
+
+    .main { min-width: 0; padding: 24px 28px 48px; }
+    .main-inner { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+
+    /* ---------- Status dot ---------- */
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-3); flex: none; }
+    .dot.live { background: var(--success); box-shadow: 0 0 0 3px var(--success-soft); }
+    .dot.wait { background: var(--warning); animation: pulse 1.2s infinite; }
+    .dot.err { background: var(--danger); }
+    @keyframes pulse { 50% { opacity: .35; } }
+
+    /* ---------- Buttons ---------- */
     .btn {
-      cursor: pointer;
-      border: 1px solid var(--border);
-      background: linear-gradient(180deg, #6b140e 0%, #3d0906 100%);
-      color: var(--gold-light);
-      padding: 10px 16px;
-      border-radius: 10px;
-      font-weight: 700;
-      font-size: 14px;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      height: 36px; padding: 0 14px; border-radius: 8px;
+      border: 1px solid var(--border-strong); background: var(--surface);
+      font-weight: 600; font-size: 13.5px; cursor: pointer; white-space: nowrap;
+      box-shadow: var(--shadow-sm); transition: background .12s, border-color .12s;
     }
-    .btn.gold {
-      background: linear-gradient(180deg, #f4c150 0%, #c48312 100%);
-      color: #1f0604;
-      border-color: #fff3b0;
+    .btn:hover { background: var(--surface-2); }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+    .btn.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .btn.primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+    .btn.danger { color: var(--danger); }
+    .btn.danger-solid { background: var(--danger); border-color: var(--danger); color: #fff; }
+    .btn.ghost { background: none; border-color: transparent; box-shadow: none; }
+    .btn.ghost:hover { background: var(--surface-2); }
+    .btn.sm { height: 30px; padding: 0 10px; font-size: 12.5px; }
+    .btn.icon { width: 36px; padding: 0; }
+    .btn.block { width: 100%; }
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+    /* ---------- Cards ---------- */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
+    .card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+    .card-title { font-weight: 600; font-size: 14.5px; }
+    .card-sub { font-size: 12.5px; color: var(--text-3); }
+    .card-body { padding: 16px 18px; }
+    .grid-2 { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+    .stack { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+
+    /* ---------- Room header ---------- */
+    .room-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .rh-title { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .rh-title h1 { font-size: 22px; font-weight: 700; letter-spacing: -.01em; }
+    .rh-meta { margin-top: 6px; display: flex; gap: 14px; flex-wrap: wrap; color: var(--text-2); font-size: 13px; align-items: center; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px;
+      border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--surface-2);
+      border: 1px solid var(--border); color: var(--text-2);
     }
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
+    .badge.live { background: var(--success-soft); color: var(--success); border-color: transparent; }
+    .badge.wait { background: var(--warning-soft); color: var(--warning); border-color: transparent; }
+    .badge.err { background: var(--danger-soft); color: var(--danger); border-color: transparent; }
+
+    .alert {
+      display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: var(--radius);
+      background: var(--warning-soft); color: var(--text); font-size: 13px;
     }
-    .card {
-      background: var(--card);
-      border: 1.5px solid var(--border);
-      border-radius: 18px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
+    .alert.danger { background: var(--danger-soft); }
+    .alert strong { font-weight: 600; }
+
+    /* ---------- Stats ---------- */
+    .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+    .stat { padding: 14px 16px; }
+    .stat-label { font-size: 12.5px; color: var(--text-3); font-weight: 500; }
+    .stat-value { margin-top: 4px; font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+    .stat-hint { font-size: 12px; color: var(--text-2); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* ---------- OBS link ---------- */
+    .copy-field { display: flex; align-items: center; gap: 8px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 4px 4px 4px 12px; }
+    .copy-field code { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-2); }
+
+    /* ---------- Actions ---------- */
+    .action-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+    .action {
+      display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+      padding: 10px 12px; border-radius: var(--radius); border: 1px solid var(--border);
+      background: var(--surface); cursor: pointer; text-align: left; transition: border-color .12s, background .12s;
     }
-    .card h2 {
-      font-size: 18px;
-      color: var(--gold-light);
-      border-bottom: 1px solid rgba(244, 193, 80, 0.2);
-      padding-bottom: 10px;
+    .action:hover { border-color: var(--primary); background: var(--primary-soft); }
+    .action .a-icon { font-size: 18px; }
+    .action .a-name { font-weight: 600; font-size: 13px; }
+    .action .a-desc { font-size: 11.5px; color: var(--text-3); }
+    details.test-identity { margin-top: 12px; }
+    details.test-identity summary { cursor: pointer; color: var(--text-2); font-size: 12.5px; user-select: none; }
+    details.test-identity .form-row { margin-top: 10px; }
+
+    /* ---------- Forms ---------- */
+    .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+    .field label { font-size: 12.5px; font-weight: 600; color: var(--text-2); }
+    .field .help { font-size: 12px; color: var(--text-3); }
+    .field .error-text { font-size: 12px; color: var(--danger); display: none; }
+    .field.invalid .error-text { display: block; }
+    .field.invalid .input { border-color: var(--danger); }
+    .input {
+      height: 38px; width: 100%; padding: 0 12px; border-radius: 8px;
+      border: 1px solid var(--border-strong); background: var(--surface); outline: none;
+      transition: border-color .12s, box-shadow .12s;
     }
-    .row {
-      display: flex;
-      gap: 10px;
+    .input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+    .input-group { display: flex; gap: 8px; }
+    .input-group .input { flex: 1; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .form-stack { display: flex; flex-direction: column; gap: 14px; }
+
+    .setting { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .setting:last-child { border-bottom: none; padding-bottom: 0; }
+    .setting:first-child { padding-top: 0; }
+    .setting-name { font-weight: 500; }
+    .setting-desc { font-size: 12px; color: var(--text-3); }
+    .range-wrap { display: flex; align-items: center; gap: 10px; min-width: 180px; }
+    .range-wrap input[type=range] { flex: 1; accent-color: var(--primary); }
+    .range-wrap output { width: 40px; text-align: right; font-variant-numeric: tabular-nums; color: var(--text-2); font-size: 12.5px; }
+    .setting select.input { width: 160px; height: 34px; }
+
+    /* Toggle switch */
+    .switch { position: relative; width: 38px; height: 22px; flex: none; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .switch span { position: absolute; inset: 0; background: var(--border-strong); border-radius: 999px; cursor: pointer; transition: background .15s; }
+    .switch span::after { content: ''; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px; border-radius: 50%; background: #fff; transition: transform .15s; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+    .switch input:checked + span { background: var(--primary); }
+    .switch input:checked + span::after { transform: translateX(16px); }
+    .switch input:focus-visible + span { box-shadow: 0 0 0 3px var(--primary-soft); }
+
+    /* Segmented tabs */
+    .tabs { display: inline-flex; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 3px; gap: 2px; }
+    .tabs button { white-space: nowrap; border: none; background: none; height: 28px; padding: 0 12px; border-radius: 6px; font-weight: 600; font-size: 12.5px; color: var(--text-2); cursor: pointer; }
+    .tabs button.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
+
+    /* ---------- Feed & Leaderboard ---------- */
+    .feed { list-style: none; max-height: 380px; overflow-y: auto; }
+    .feed li { display: flex; gap: 10px; padding: 10px 18px; border-bottom: 1px solid var(--border); }
+    .feed li:last-child { border-bottom: none; }
+    .feed li.fresh { animation: flash 1.6s ease-out; }
+    @keyframes flash { from { background: var(--primary-soft); } to { background: transparent; } }
+    .feed .f-icon { font-size: 16px; line-height: 20px; }
+    .feed .f-main { flex: 1; min-width: 0; }
+    .feed .f-text { overflow-wrap: anywhere; }
+    .feed .f-time { font-size: 11.5px; color: var(--text-3); white-space: nowrap; }
+    .lb { list-style: none; }
+    .lb li { display: flex; align-items: center; gap: 10px; padding: 9px 18px; border-bottom: 1px solid var(--border); }
+    .lb li:last-child { border-bottom: none; }
+    .lb .rank { width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; font-size: 11.5px; font-weight: 700; background: var(--surface-2); color: var(--text-2); flex: none; }
+    .lb li:nth-child(1) .rank { background: #fef0c7; color: #b54708; }
+    .lb li:nth-child(2) .rank { background: #eaecf0; color: #344054; }
+    .lb li:nth-child(3) .rank { background: #fbe4d5; color: #9c4221; }
+    .avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--surface-2); flex: none; overflow: hidden; display: grid; place-items: center; font-size: 12px; font-weight: 600; color: var(--text-2); }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .lb .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+    .lb .pts { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--text-2); }
+    .empty { padding: 28px 18px; text-align: center; color: var(--text-3); font-size: 13px; }
+    .empty-state { text-align: center; padding: 80px 20px; }
+    .empty-state .es-icon { font-size: 44px; }
+    .empty-state h2 { margin-top: 12px; font-size: 18px; }
+    .empty-state p { margin: 6px auto 18px; color: var(--text-2); max-width: 420px; }
+
+    /* ---------- Menu ---------- */
+    .menu-wrap { position: relative; }
+    .menu {
+      position: absolute; right: 0; top: calc(100% + 6px); min-width: 200px; z-index: 30;
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      box-shadow: var(--shadow-lg); padding: 6px; display: none;
     }
-    input, select, textarea {
-      width: 100%;
-      background: #120403;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 12px;
-      color: var(--text);
-      font-family: inherit;
-      font-size: 14px;
+    .menu.open { display: block; }
+    .menu button { display: flex; width: 100%; align-items: center; gap: 8px; padding: 8px 10px; border: none; background: none; border-radius: 6px; cursor: pointer; text-align: left; }
+    .menu button:hover { background: var(--surface-2); }
+    .menu button.danger { color: var(--danger); }
+    .menu hr { border: none; border-top: 1px solid var(--border); margin: 6px 0; }
+
+    /* ---------- Modal ---------- */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(16, 24, 40, 0.5); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 50; }
+    .modal-backdrop.open { display: flex; }
+    .modal { width: 100%; max-width: 480px; background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); max-height: calc(100vh - 32px); overflow-y: auto; }
+    .modal-head { padding: 18px 20px 4px; }
+    .modal-head h3 { font-size: 17px; }
+    .modal-head p { color: var(--text-2); font-size: 13px; margin-top: 4px; }
+    .modal-body { padding: 16px 20px; }
+    .modal-foot { padding: 12px 20px 18px; display: flex; justify-content: flex-end; gap: 8px; }
+    .mode-options { display: grid; gap: 8px; }
+    .mode-option { display: flex; gap: 10px; padding: 10px 12px; border: 1px solid var(--border-strong); border-radius: var(--radius); cursor: pointer; }
+    .mode-option:has(input:checked) { border-color: var(--primary); background: var(--primary-soft); }
+    .mode-option input { accent-color: var(--primary); margin-top: 3px; }
+    .mode-option .mo-name { font-weight: 600; }
+    .mode-option .mo-desc { font-size: 12px; color: var(--text-2); }
+    .check { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; color: var(--text-2); }
+    .check input { accent-color: var(--primary); width: 16px; height: 16px; }
+
+    /* ---------- Toasts ---------- */
+    .toasts { position: fixed; right: 16px; bottom: 16px; display: flex; flex-direction: column; gap: 8px; z-index: 60; max-width: calc(100vw - 32px); }
+    .toast {
+      display: flex; align-items: center; gap: 10px; min-width: 260px; max-width: 420px;
+      padding: 11px 14px; border-radius: var(--radius); background: #101828; color: #fff;
+      box-shadow: var(--shadow-lg); font-size: 13px; animation: slideIn .2s ease-out;
     }
-    .action-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
+    .toast.error { background: var(--danger); }
+    .toast.success .t-icon { color: #6ce9a6; }
+    @keyframes slideIn { from { transform: translateY(8px); opacity: 0; } }
+
+    /* ---------- Log ---------- */
+    details.log summary { cursor: pointer; padding: 14px 18px; font-weight: 600; font-size: 14px; list-style: none; display: flex; justify-content: space-between; }
+    details.log summary::after { content: '▾'; color: var(--text-3); }
+    details.log[open] summary::after { content: '▴'; }
+    details.log pre { margin: 0 18px 18px; padding: 12px; border-radius: 8px; background: var(--surface-2); border: 1px solid var(--border); font-size: 12px; max-height: 260px; overflow: auto; color: var(--text-2); }
+
+    .mobile-bar { display: none; }
+    .hidden { display: none !important; }
+    .muted { color: var(--text-3); }
+
+    @media (max-width: 1080px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
-    pre {
-      background: #0b0202;
-      border: 1px solid rgba(244, 193, 80, 0.25);
-      border-radius: 10px;
-      padding: 12px;
-      font-size: 12.5px;
-      color: #9ef0c0;
-      overflow-x: auto;
-      max-height: 280px;
+    @media (max-width: 760px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { position: fixed; inset: 0 auto 0 0; width: 86%; max-width: 320px; z-index: 40; transform: translateX(-100%); transition: transform .2s; }
+      .sidebar.open { transform: none; box-shadow: var(--shadow-lg); }
+      .card-head { flex-wrap: wrap; }
+      .action-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .mobile-bar { display: flex; align-items: center; gap: 10px; padding: 10px 16px; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 20; }
+      .mobile-bar .mb-title { font-weight: 600; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .main { padding: 16px 16px 40px; }
+      .form-row { grid-template-columns: 1fr; }
+      .rh-title h1 { font-size: 19px; }
+      .setting { flex-wrap: wrap; }
+      .range-wrap { min-width: 0; width: 100%; }
     }
-    .full { grid-column: 1 / -1; }
-    table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid rgba(244, 193, 80, 0.15); vertical-align: middle; }
-    th { color: var(--muted); font-weight: 600; font-size: 12.5px; text-transform: uppercase; letter-spacing: .04em; }
-    td .btn { padding: 6px 10px; font-size: 12.5px; }
-    .actions { display: flex; gap: 6px; flex-wrap: wrap; }
-    .pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); }
-    .dot { width: 9px; height: 9px; border-radius: 50%; background: #6b5a40; display: inline-block; }
-    .dot.on { background: #3ddc84; box-shadow: 0 0 8px #3ddc84; }
-    .dot.wait { background: #f4c150; }
-    .err { color: #ff9a8a; font-size: 12px; max-width: 280px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .row label { display: flex; align-items: center; gap: 6px; white-space: nowrap; color: var(--muted); font-size: 13px; }
-    .row label input { width: auto; }
-    select.room-select { width: auto; min-width: 220px; font-weight: 700; color: var(--gold-light); }
-    .hint { font-size: 13px; color: var(--muted); }
-    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } body { padding: 14px; } .top-bar { flex-direction: column; align-items: flex-start; gap: 12px; } }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header class="top-bar">
-      <div>
-        <div class="top-title">🎛️ QUẢN LÝ PHÒNG TIKTOK LIVE</div>
-        <div class="top-sub" id="statusBanner">Đang tải trạng thái hệ thống...</div>
+  <div class="mobile-bar">
+    <button class="btn icon ghost" id="btnOpenSidebar" aria-label="Danh sách phòng">☰</button>
+    <div class="mb-title" id="mobileTitle">Live Rooms</div>
+  </div>
+
+  <div class="app">
+    <!-- ================= SIDEBAR: DANH SÁCH PHÒNG ================= -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-logo">L</div>
+        <div>
+          <div class="brand-name">Live Rooms</div>
+          <div class="brand-sub">Quản lý phòng TikTok Live</div>
+        </div>
       </div>
-      <div class="top-links">
-        <label class="pill">Đang điều khiển phòng:
-          <select id="roomSelect" class="room-select"></select>
-        </label>
-        <a class="btn gold" id="linkOverlay" href="/" target="_blank">📺 Mở màn hình phòng</a>
+      <div style="padding: 4px 14px 8px;">
+        <button class="btn primary block" id="btnNewRoom">＋ Phòng mới</button>
       </div>
-    </header>
+      <div class="sidebar-head"><span>Phòng</span><span id="roomCount">0</span></div>
+      <nav class="room-list" id="roomList" aria-label="Danh sách phòng"></nav>
+      <div class="sidebar-foot" id="ttsFoot"><span class="dot"></span><span>ZeroTTS: đang kiểm tra…</span></div>
+    </aside>
 
-    <div class="grid">
-      <section class="card full">
-        <h2>🏠 1. Danh Sách Phòng Live</h2>
-        <table>
-          <thead>
-            <tr><th>Phòng</th><th>Chế độ</th><th>TikTok</th><th>Trạng thái</th><th>Người xem đã lưu</th><th>Thao tác</th></tr>
-          </thead>
-          <tbody id="roomsBody"></tbody>
-        </table>
-        <div class="row">
-          <input type="text" id="newRoomId" placeholder="Mã phòng (vd: chua-2)" />
-          <input type="text" id="newRoomName" placeholder="Tên hiển thị (vd: Chùa Hương Online)" />
-          <select id="newRoomMode"></select>
-          <input type="text" id="newRoomTikTok" placeholder="@username TikTok (để trống nếu chưa có)" />
-          <label><input type="checkbox" id="newRoomAuto" checked /> Tự kết nối</label>
-          <button class="btn gold" id="btnCreateRoom">＋ Tạo phòng</button>
-        </div>
-        <p class="hint">Mỗi phòng có màn hình riêng tại <code>/room/&lt;mã phòng&gt;</code> (thêm <code>?obs=1</code> cho OBS) và bảng xếp hạng riêng. Xoá phòng sẽ ngắt kết nối; dữ liệu được đổi tên thành <code>data/rooms/&lt;mã&gt;.deleted-*.json</code> để có thể khôi phục.</p>
-      </section>
+    <!-- ================= MAIN ================= -->
+    <main class="main">
+      <div class="main-inner" id="mainContent">
+        <div class="empty-state" id="loadingState"><div class="es-icon">⏳</div><h2>Đang tải…</h2></div>
+      </div>
+    </main>
+  </div>
 
-      <section class="card">
-        <h2>📡 2. Giọng Đọc ZeroTTS</h2>
-        <div class="row">
-          <input type="text" id="ttsDirectText" value="Nam mô A Di Đà Phật. Chùa Linh Ứng Online xin kính chào quý thí chủ thập phương." />
-          <button class="btn gold" id="btnSpeakMaiChi">🎙️ Đọc thử trên phòng</button>
+  <!-- ================= MODAL: TẠO / SỬA PHÒNG ================= -->
+  <div class="modal-backdrop" id="roomModal" role="dialog" aria-modal="true" aria-labelledby="roomModalTitle">
+    <form class="modal" id="roomForm" novalidate>
+      <div class="modal-head">
+        <h3 id="roomModalTitle">Tạo phòng mới</h3>
+        <p id="roomModalDesc">Mỗi phòng gắn với 1 tài khoản TikTok và có màn hình OBS riêng.</p>
+      </div>
+      <div class="modal-body form-stack">
+        <div class="field" id="fName">
+          <label for="inName">Tên phòng</label>
+          <input class="input" id="inName" placeholder="Ví dụ: Chùa Hương Online" maxlength="60" autocomplete="off" />
+          <span class="error-text">Nhập tên phòng</span>
         </div>
-        <audio id="adminAudioPreview" controls style="width: 100%; height: 38px;"></audio>
-      </section>
+        <div class="field" id="fId">
+          <label for="inId">Mã phòng</label>
+          <input class="input" id="inId" placeholder="chua-huong-online" maxlength="40" autocomplete="off" />
+          <span class="help" id="idHelp">Dùng trong địa chỉ màn hình: <code>/room/…</code></span>
+          <span class="error-text" id="idError">Mã phòng đã tồn tại</span>
+        </div>
+        <div class="field">
+          <label for="inTikTok">Tài khoản TikTok</label>
+          <input class="input" id="inTikTok" placeholder="@username hoặc link TikTok (có thể để trống)" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label>Chế độ</label>
+          <div class="mode-options" id="modeOptions"></div>
+          <span class="help hidden" id="modeWarn">⚠️ Đổi chế độ sẽ khởi động lại phòng. Bảng xếp hạng người xem được giữ, trạng thái riêng của chế độ cũ sẽ mất.</span>
+        </div>
+        <label class="check"><input type="checkbox" id="inAuto" checked /> Tự động kết nối khi khởi động server</label>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn" data-close>Huỷ</button>
+        <button type="submit" class="btn primary" id="btnRoomSubmit">Tạo phòng</button>
+      </div>
+    </form>
+  </div>
 
-      <section class="card" id="templeCard">
-        <h2>🙏 3. Lệnh Chế Độ Đi Chùa</h2>
-        <div class="row">
-          <input type="text" id="rpcUser" value="Đại Thí Chủ Minh Tâm" placeholder="Tên người xem..." />
-          <input type="text" id="rpcWish" value="Cầu gia đạo bình an, tài lộc vượng phát" placeholder="Lời cầu nguyện..." />
-        </div>
-        <div class="action-grid">
-          <button class="btn gold" onclick="sendRpc('temple.burnIncense', { count: 3 })">🔥 Thắp 3 Nén Hương</button>
-          <button class="btn" onclick="sendRpc('temple.sendPrayer', {})">🏮 Thả Đèn Hoa Đăng</button>
-          <button class="btn" onclick="sendRpc('temple.strikeWoodenFish', { count: 9 })">🪵 Gõ Mõ 9 Nhịp</button>
-          <button class="btn" onclick="sendRpc('temple.ringBell', { count: 1, readTts: true })">🔔 Thỉnh Đại Hồng Chung</button>
-          <button class="btn" onclick="sendRpc('temple.drawFortune', {})">🎋 Xin Xăm / Gieo Quẻ</button>
-          <button class="btn" onclick="sendRpc('temple.offerGift', { giftType: 'fruit', coins: 30, giftName: 'Mâm Ngũ Quả Cát Tường' })">🍑 Dâng Mâm Ngũ Quả</button>
-          <button class="btn gold" onclick="sendRpc('temple.grandCeremony', { coins: 500, giftName: 'Đại Lễ Kim Long Chầu Phật' })">🐉 Đại Lễ Kim Long</button>
-          <button class="btn" onclick="confirm('Xóa toàn bộ Bảng Công Đức của phòng này? Không thể hoàn tác.') && sendRpc('temple.resetMerit', {})">♻️ Đặt Lại Bảng Công Đức</button>
-        </div>
-      </section>
-
-      <section class="card">
-        <h2>💬 4. Giả Lập Bình Luận Người Xem</h2>
-        <div class="row">
-          <input type="text" id="simComment" value="Con xin gieo quẻ cầu tài lộc đầu tháng ạ" placeholder="Nhập nội dung bình luận TikTok..." />
-          <button class="btn gold" id="btnSendComment">Gửi Comment</button>
-        </div>
-        <div class="row">
-          <button class="btn" id="btnAutoSim">🤖 Tự động giả lập: …</button>
-        </div>
-        <p class="hint">Bình luận được gửi vào phòng đang chọn và xử lý theo chế độ của phòng đó.</p>
-      </section>
-
-      <section class="card">
-        <h2>🔌 5. Nhật Ký Phản Hồi JSON-RPC 2.0 (<code>/rpc</code>)</h2>
-        <pre id="rpcOutput">{ "status": "Sẵn sàng nhận lệnh JSON-RPC 2.0" }</pre>
-      </section>
+  <!-- ================= MODAL: XÁC NHẬN ================= -->
+  <div class="modal-backdrop" id="confirmModal" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="modal" style="max-width: 420px;">
+      <div class="modal-head">
+        <h3 id="confirmTitle">Xác nhận</h3>
+        <p id="confirmText"></p>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn" data-close>Huỷ</button>
+        <button type="button" class="btn danger-solid" id="confirmOk">Xác nhận</button>
+      </div>
     </div>
   </div>
 
-  <script>
-    const qs = new URLSearchParams(location.search);
-    let currentRoom = qs.get('room') || localStorageGet('admin_room') || 'main';
-    let roomsCache = [];
-    let modesCache = [];
+  <div class="toasts" id="toasts" aria-live="polite"></div>
 
-    function localStorageGet(k) { try { return localStorage.getItem(k); } catch (_) { return null; } }
-    function localStorageSet(k, v) { try { localStorage.setItem(k, v); } catch (_) {} }
+  <script>
+  (function () {
+    // ======================================================================
+    // CẤU HÌNH THEO CHẾ ĐỘ (thêm chế độ mới: khai báo hành động nhanh tại đây)
+    // ======================================================================
+    const MODE_UI = {
+      temple: {
+        pointsLabel: 'Công đức',
+        actions: [
+          { icon: '🔥', name: 'Thắp hương', desc: '3 nén • +15', method: 'temple.burnIncense', params: { count: 3 } },
+          { icon: '🏮', name: 'Thả hoa đăng', desc: 'Cầu phúc • +10', method: 'temple.sendPrayer' },
+          { icon: '🎋', name: 'Xin xăm', desc: 'Gieo quẻ + đọc giải', method: 'temple.drawFortune' },
+          { icon: '🔔', name: 'Thỉnh chuông', desc: 'Đại Hồng Chung • +10', method: 'temple.ringBell', params: { count: 1, readTts: true } },
+          { icon: '🪵', name: 'Gõ mõ', desc: '9 nhịp • +9', method: 'temple.strikeWoodenFish', params: { count: 9 } },
+          { icon: '🍑', name: 'Mâm ngũ quả', desc: 'Quà 30 xu', method: 'temple.offerGift', params: { giftType: 'fruit', coins: 30, giftName: 'Mâm Ngũ Quả Cát Tường' } },
+          { icon: '🐉', name: 'Đại lễ Kim Long', desc: 'Quà lớn 500 xu', method: 'temple.grandCeremony', params: { coins: 500, giftName: 'Đại Lễ Kim Long Chầu Phật' } }
+        ],
+        stats: (st) => [
+          { label: 'Tổng công đức', value: fmt(st.totalMerit) },
+          { label: 'Hương đã thắp', value: fmt(st.totalIncense), hint: `${fmt(st.lanternCount)} hoa đăng • ${fmt(st.fortuneCount)} quẻ` }
+        ],
+        dangerActions: [
+          { label: '♻️ Đặt lại bảng công đức', method: 'temple.resetMerit', confirm: 'Xoá toàn bộ công đức và bảng xếp hạng của phòng này? Không thể hoàn tác.' }
+        ],
+        describe: describeTempleEvent
+      }
+    };
+    const DEFAULT_MODE_UI = { pointsLabel: 'Điểm', actions: [], stats: () => [], dangerActions: [], describe: (e) => ({ icon: '✨', text: `<b>${esc(e.user || 'Người xem')}</b> tương tác` }) };
+
+    // ======================================================================
+    // TRẠNG THÁI
+    // ======================================================================
+    let rooms = [];
+    let modes = [];
+    let currentId = null;
+    let roomState = null;
+    let ws = null;
+    let wsRoom = null;
+    let editingId = null;
+    let lastLog = null;
+    const freshEventIds = new Set();
+
+    const $ = (sel, el = document) => el.querySelector(sel);
+
+    // ======================================================================
+    // TIỆN ÍCH
+    // ======================================================================
     function esc(str) {
       return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
+    function fmt(n) { return Number(n || 0).toLocaleString('vi-VN'); }
+    function lsGet(k) { try { return localStorage.getItem(k); } catch (_) { return null; } }
+    function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (_) {} }
+    function slugify(raw) {
+      return String(raw || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd')
+        .replace(/[^a-z0-9_-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').slice(0, 40);
+    }
+    function timeAgo(iso) {
+      const s = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 1000));
+      if (s < 10) return 'vừa xong';
+      if (s < 60) return `${s} giây trước`;
+      if (s < 3600) return `${Math.floor(s / 60)} phút trước`;
+      return new Date(iso).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    }
+    function modeUI(modeId) { return MODE_UI[modeId] || DEFAULT_MODE_UI; }
+    function currentRoom() { return rooms.find((r) => r.id === currentId) || null; }
+    function liveStatus(t = {}) {
+      if (t.connected) return { cls: 'live', text: 'Đang live', dot: 'live' };
+      if (t.connecting) return { cls: 'wait', text: 'Đang kết nối…', dot: 'wait' };
+      if (t.lastError) return { cls: 'err', text: 'Lỗi kết nối', dot: 'err' };
+      return { cls: '', text: 'Ngoại tuyến', dot: '' };
+    }
+    function overlayUrl(room, obs) {
+      return `${location.origin}/room/${encodeURIComponent(room.id)}${obs ? '?obs=1' : ''}`;
+    }
 
-    async function rpc(method, params = {}) {
+    function toast(message, type = 'success') {
+      const el = document.createElement('div');
+      el.className = `toast ${type}`;
+      el.innerHTML = `<span class="t-icon">${type === 'error' ? '⚠️' : '✓'}</span><span>${esc(message)}</span>`;
+      $('#toasts').appendChild(el);
+      setTimeout(() => el.remove(), type === 'error' ? 6000 : 3000);
+    }
+
+    async function rpc(method, params = {}, { silent = false } = {}) {
+      let data;
       try {
         const res = await fetch('/rpc', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ jsonrpc: '2.0', id: Date.now(), method, params })
         });
-        return await res.json();
+        data = await res.json();
       } catch (err) {
-        return { error: { message: `Không gọi được server: ${err.message}` } };
+        data = { error: { message: `Không gọi được server: ${err.message}` } };
       }
+      lastLog = { request: { method, params }, response: data };
+      const logEl = $('#rpcLog');
+      if (logEl) logEl.textContent = JSON.stringify(lastLog, null, 2);
+      if (data.error) {
+        if (!silent) toast(data.error.message, 'error');
+        throw new Error(data.error.message);
+      }
+      return data.result;
     }
 
-    function showOutput(data) {
-      document.getElementById('rpcOutput').textContent = JSON.stringify(data, null, 2);
+    // ======================================================================
+    // XÁC NHẬN & MODAL
+    // ======================================================================
+    function openModal(id) {
+      const m = document.getElementById(id);
+      m.classList.add('open');
+      setTimeout(() => (m.querySelector('input:not([type=checkbox]):not([type=radio])') || m.querySelector('.btn.primary, .btn.danger-solid'))?.focus(), 30);
     }
-
-    // Lệnh theo phòng đang chọn
-    async function sendRpc(method, extraParams = {}) {
-      const user = document.getElementById('rpcUser').value.trim() || 'Thí Chủ';
-      const wish = document.getElementById('rpcWish').value.trim();
-      const data = await rpc(method, { roomId: currentRoom, user, wish, ...extraParams });
-      showOutput(data);
-      refresh();
-      return data;
-    }
-
-    async function roomAction(method, params, confirmText) {
-      if (confirmText && !confirm(confirmText)) return;
-      const data = await rpc(method, params);
-      showOutput(data);
-      if (data.error) alert(data.error.message);
-      refresh();
-      return data;
-    }
-
-    function statusCell(r) {
-      const t = r.tiktok || {};
-      if (t.connected) return `<span class="pill"><span class="dot on"></span>LIVE • ${t.viewerCount || 0} mắt</span>`;
-      if (t.connecting) return `<span class="pill"><span class="dot wait"></span>Đang kết nối...</span>`;
-      return `<span class="pill"><span class="dot"></span>Chưa kết nối</span>${t.lastError ? `<span class="err" title="${esc(t.lastError)}">${esc(t.lastError)}</span>` : ''}`;
-    }
-
-    function renderRooms() {
-      const body = document.getElementById('roomsBody');
-      body.innerHTML = roomsCache.map((r) => `
-        <tr>
-          <td><strong>${esc(r.name)}</strong><br><span class="hint">${esc(r.id)}</span></td>
-          <td>${esc(r.modeName)}${r.autoSim ? ' <span class="hint">(giả lập)</span>' : ''}</td>
-          <td>${r.tiktokUsername ? '@' + esc(r.tiktokUsername) : '<span class="hint">—</span>'}${r.autoConnect ? '' : '<br><span class="hint">không tự kết nối</span>'}</td>
-          <td>${statusCell(r)}</td>
-          <td>${Number(r.viewers || 0).toLocaleString('vi-VN')}</td>
-          <td><div class="actions">
-            ${r.tiktok?.connected || r.tiktok?.connecting
-              ? `<button class="btn" data-act="disconnect" data-id="${esc(r.id)}">Ngắt</button>`
-              : `<button class="btn gold" data-act="connect" data-id="${esc(r.id)}">Kết nối</button>`}
-            <a class="btn" href="${esc(r.overlayUrl)}" target="_blank">Mở</a>
-            <a class="btn" href="${esc(r.overlayUrl)}?obs=1" target="_blank">OBS</a>
-            <button class="btn" data-act="edit" data-id="${esc(r.id)}">Sửa</button>
-            <button class="btn" data-act="delete" data-id="${esc(r.id)}">Xoá</button>
-          </div></td>
-        </tr>`).join('');
-
-      const sel = document.getElementById('roomSelect');
-      const prev = sel.value;
-      sel.innerHTML = roomsCache.map((r) => `<option value="${esc(r.id)}">${esc(r.name)} (${esc(r.id)})</option>`).join('');
-      if (!roomsCache.some((r) => r.id === currentRoom) && roomsCache[0]) currentRoom = roomsCache[0].id;
-      sel.value = currentRoom || prev;
-
-      const room = roomsCache.find((r) => r.id === currentRoom);
-      document.getElementById('linkOverlay').href = room ? room.overlayUrl : '/';
-      document.getElementById('templeCard').style.display = !room || room.mode === 'temple' ? '' : 'none';
-      document.getElementById('btnAutoSim').textContent = `🤖 Tự động giả lập: ${room?.autoSim ? 'ĐANG BẬT' : 'TẮT'}`;
-    }
-
-    document.getElementById('roomsBody').addEventListener('click', async (e) => {
-      const btn = e.target.closest('button[data-act]');
-      if (!btn) return;
-      const id = btn.dataset.id;
-      const room = roomsCache.find((r) => r.id === id);
-      switch (btn.dataset.act) {
-        case 'connect': {
-          let username = room.tiktokUsername;
-          if (!username) {
-            username = (prompt('Nhập @username TikTok cho phòng này:') || '').trim();
-            if (!username) return;
-            await rpc('rooms.update', { id, tiktokUsername: username });
-          }
-          roomAction('live.connect', { roomId: id, username });
-          break;
-        }
-        case 'disconnect':
-          roomAction('live.disconnect', { roomId: id });
-          break;
-        case 'edit': {
-          const name = prompt('Tên phòng:', room.name);
-          if (name === null) return;
-          const tiktokUsername = prompt('@username TikTok (để trống nếu chưa có):', room.tiktokUsername || '');
-          if (tiktokUsername === null) return;
-          const modeIds = modesCache.map((m) => m.id).join(', ');
-          const mode = prompt(`Chế độ (${modeIds}):`, room.mode);
-          if (mode === null) return;
-          if (mode !== room.mode && !confirm('Đổi chế độ sẽ khởi động lại phòng; trạng thái riêng của chế độ cũ sẽ mất (bảng xếp hạng người xem được giữ). Tiếp tục?')) return;
-          roomAction('rooms.update', { id, name, tiktokUsername, mode });
-          break;
-        }
-        case 'delete':
-          roomAction('rooms.delete', { id }, `Xoá phòng "${room.name}" (${id})? Phòng sẽ ngắt kết nối và biến mất khỏi danh sách.`);
-          break;
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+    document.querySelectorAll('.modal-backdrop').forEach((bd) => {
+      bd.addEventListener('mousedown', (e) => { if (e.target === bd) bd.classList.remove('open'); });
+      bd.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', () => bd.classList.remove('open')));
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-backdrop.open').forEach((m) => m.classList.remove('open'));
+        closeMenus();
       }
     });
 
-    document.getElementById('btnCreateRoom').onclick = async () => {
-      const data = await roomAction('rooms.create', {
-        id: document.getElementById('newRoomId').value.trim(),
-        name: document.getElementById('newRoomName').value.trim(),
-        mode: document.getElementById('newRoomMode').value,
-        tiktokUsername: document.getElementById('newRoomTikTok').value.trim(),
-        autoConnect: document.getElementById('newRoomAuto').checked
-      });
-      if (data?.result?.id) {
-        ['newRoomId', 'newRoomName', 'newRoomTikTok'].forEach((id) => (document.getElementById(id).value = ''));
-        currentRoom = data.result.id;
-        localStorageSet('admin_room', currentRoom);
-        refresh();
+    let confirmResolve = null;
+    function confirmDialog({ title, text, ok = 'Xác nhận', danger = true }) {
+      $('#confirmTitle').textContent = title;
+      $('#confirmText').textContent = text;
+      const btn = $('#confirmOk');
+      btn.textContent = ok;
+      btn.className = `btn ${danger ? 'danger-solid' : 'primary'}`;
+      openModal('confirmModal');
+      return new Promise((resolve) => { confirmResolve = resolve; });
+    }
+    $('#confirmOk').addEventListener('click', () => { closeModal('confirmModal'); confirmResolve?.(true); confirmResolve = null; });
+    $('#confirmModal').addEventListener('transitionend', () => {});
+    new MutationObserver(() => {
+      if (!$('#confirmModal').classList.contains('open') && confirmResolve) { confirmResolve(false); confirmResolve = null; }
+    }).observe($('#confirmModal'), { attributes: true, attributeFilter: ['class'] });
+
+    function closeMenus() { document.querySelectorAll('.menu.open').forEach((m) => m.classList.remove('open')); }
+    document.addEventListener('click', (e) => { if (!e.target.closest('.menu-wrap')) closeMenus(); });
+
+    // ======================================================================
+    // SIDEBAR
+    // ======================================================================
+    function renderSidebar() {
+      $('#roomCount').textContent = rooms.length;
+      $('#roomList').innerHTML = rooms.map((r) => {
+        const st = liveStatus(r.tiktok);
+        const viewers = r.tiktok?.connected ? `${fmt(r.tiktok.viewerCount)} 👁` : '';
+        return `<button class="room-item ${r.id === currentId ? 'active' : ''}" data-room="${esc(r.id)}">
+          <span class="dot ${st.dot}" title="${esc(st.text)}"></span>
+          <span class="ri-main">
+            <span class="ri-name">${esc(r.name)}</span>
+            <span class="ri-sub">${esc(r.modeName)} · ${r.tiktokUsername ? '@' + esc(r.tiktokUsername) : 'chưa gắn TikTok'}</span>
+          </span>
+          <span class="ri-viewers">${viewers}</span>
+        </button>`;
+      }).join('') || '<div class="empty">Chưa có phòng nào</div>';
+    }
+    $('#roomList').addEventListener('click', (e) => {
+      const item = e.target.closest('[data-room]');
+      if (!item) return;
+      selectRoom(item.dataset.room);
+      $('#sidebar').classList.remove('open');
+    });
+    $('#btnOpenSidebar').addEventListener('click', () => $('#sidebar').classList.toggle('open'));
+
+    function renderTtsFoot(tts) {
+      if (!tts) return;
+      const map = { ready: ['live', 'sẵn sàng'], loading: ['wait', 'đang tải model…'], starting: ['wait', 'đang khởi động…'] };
+      const [dot, text] = map[tts.status] || ['err', tts.status || 'không chạy'];
+      $('#ttsFoot').innerHTML = `<span class="dot ${dot}"></span><span>Giọng đọc ZeroTTS: ${esc(text)}</span>`;
+    }
+
+    // ======================================================================
+    // CHI TIẾT PHÒNG
+    // ======================================================================
+    function renderEmpty() {
+      $('#mainContent').innerHTML = `
+        <div class="empty-state">
+          <div class="es-icon">📺</div>
+          <h2>Chưa có phòng live nào</h2>
+          <p>Tạo phòng đầu tiên: chọn chế độ, gắn tài khoản TikTok và lấy địa chỉ màn hình để đưa vào OBS.</p>
+          <button class="btn primary" data-act="new-room">＋ Tạo phòng</button>
+        </div>`;
+    }
+
+    function renderRoomShell() {
+      const room = currentRoom();
+      if (!room) return renderEmpty();
+      const ui = modeUI(room.mode);
+      $('#mobileTitle').textContent = room.name;
+      document.title = `${room.name} — Live Rooms`;
+
+      $('#mainContent').innerHTML = `
+        <section class="room-header">
+          <div>
+            <div class="rh-title">
+              <h1 id="rhName"></h1>
+              <span class="badge" id="rhStatus"></span>
+            </div>
+            <div class="rh-meta" id="rhMeta"></div>
+          </div>
+          <div class="btn-row">
+            <span id="connectSlot"></span>
+            <a class="btn" id="btnOpenScreen" target="_blank" rel="noopener">Mở màn hình ↗</a>
+            <div class="menu-wrap">
+              <button class="btn icon" id="btnMore" aria-label="Thêm thao tác">⋯</button>
+              <div class="menu" id="moreMenu">
+                <button data-act="edit">✏️ Sửa phòng</button>
+                <button data-act="copy-obs">📋 Sao chép link OBS</button>
+                ${ui.dangerActions.map((a, i) => `<button data-act="mode-danger" data-idx="${i}">${esc(a.label)}</button>`).join('')}
+                <hr />
+                <button class="danger" data-act="delete">🗑 Xoá phòng</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div id="alertSlot"></div>
+
+        <section class="stats" id="statsRow"></section>
+
+        <section class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-title">Đưa vào OBS / TikTok Live Studio</div>
+              <div class="card-sub">Thêm nguồn <b>Browser</b>, kích thước <b>1080 × 1920</b>, dán địa chỉ bên dưới</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="copy-field">
+              <code id="obsUrl"></code>
+              <button class="btn sm primary" data-act="copy-obs">Sao chép</button>
+            </div>
+          </div>
+        </section>
+
+        <div class="grid-2">
+          <div class="stack">
+            <section class="card">
+              <div class="card-head">
+                <div>
+                  <div class="card-title">Thử tương tác</div>
+                  <div class="card-sub">Hiện ngay trên màn hình live của phòng</div>
+                </div>
+                <div class="tabs" role="tablist">
+                  <button class="active" data-tab="actions">Hành động</button>
+                  <button data-tab="comment">Bình luận</button>
+                </div>
+              </div>
+              <div class="card-body">
+                <div data-panel="actions">
+                  ${ui.actions.length ? `<div class="action-grid">${ui.actions.map((a, i) => `
+                    <button class="action" data-act="mode-action" data-idx="${i}">
+                      <span class="a-icon">${a.icon}</span>
+                      <span class="a-name">${esc(a.name)}</span>
+                      <span class="a-desc">${esc(a.desc)}</span>
+                    </button>`).join('')}</div>` : '<div class="muted">Chế độ này chưa có hành động nhanh.</div>'}
+                  <details class="test-identity">
+                    <summary>Người thử: <b id="idSummary"></b></summary>
+                    <div class="form-row">
+                      <div class="field"><label for="testUser">Tên người xem</label><input class="input" id="testUser" /></div>
+                      <div class="field"><label for="testWish">Lời nhắn / cầu nguyện</label><input class="input" id="testWish" /></div>
+                    </div>
+                  </details>
+                </div>
+                <div data-panel="comment" class="hidden">
+                  <div class="field">
+                    <label for="simComment">Giả lập một bình luận TikTok</label>
+                    <div class="input-group">
+                      <input class="input" id="simComment" placeholder="Ví dụ: con xin quẻ cầu tài lộc" />
+                      <button class="btn primary" data-act="send-comment">Gửi</button>
+                    </div>
+                    <span class="help">Được xử lý giống hệt bình luận thật (lọc spam, từ khoá, giới hạn 3,5 giây/người).</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="card">
+              <div class="card-head">
+                <div>
+                  <div class="card-title">Hoạt động trực tiếp</div>
+                  <div class="card-sub" id="feedSub">Cập nhật theo thời gian thực</div>
+                </div>
+              </div>
+              <ul class="feed" id="feed"></ul>
+            </section>
+          </div>
+
+          <div class="stack">
+            <section class="card">
+              <div class="card-head">
+                <div class="card-title">Bảng xếp hạng</div>
+                <div class="card-sub">${esc(ui.pointsLabel)}</div>
+              </div>
+              <ul class="lb" id="leaderboard"></ul>
+            </section>
+
+            <section class="card">
+              <div class="card-head"><div class="card-title">Cài đặt phòng</div></div>
+              <div class="card-body" id="settingsBody"></div>
+            </section>
+
+            <section class="card">
+              <div class="card-head"><div class="card-title">Giọng đọc thử</div></div>
+              <div class="card-body">
+                <div class="field">
+                  <div class="input-group">
+                    <input class="input" id="speakText" value="Nam mô A Di Đà Phật. Xin kính chào quý vị." />
+                    <button class="btn" data-act="speak">▶ Đọc</button>
+                  </div>
+                  <span class="help">Phát trên màn hình live của phòng và tại đây.</span>
+                </div>
+                <audio id="speakAudio" class="hidden"></audio>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <details class="card log">
+          <summary>Nhật ký kỹ thuật (JSON-RPC)</summary>
+          <pre id="rpcLog">${lastLog ? esc(JSON.stringify(lastLog, null, 2)) : 'Chưa có lệnh nào.'}</pre>
+        </details>`;
+
+      // Người thử: nhớ theo trình duyệt
+      const user = lsGet('admin_test_user') || 'Thí Chủ Minh Tâm';
+      const wish = lsGet('admin_test_wish') || 'Cầu gia đạo bình an, tài lộc vượng phát';
+      $('#testUser').value = user;
+      $('#testWish').value = wish;
+      const syncSummary = () => { $('#idSummary').textContent = $('#testUser').value.trim() || 'Thí Chủ'; };
+      syncSummary();
+      $('#testUser').addEventListener('input', () => { lsSet('admin_test_user', $('#testUser').value); syncSummary(); });
+      $('#testWish').addEventListener('input', () => lsSet('admin_test_wish', $('#testWish').value));
+      $('#simComment').addEventListener('keydown', (e) => { if (e.key === 'Enter') sendComment(); });
+      $('#speakText').addEventListener('keydown', (e) => { if (e.key === 'Enter') speak(); });
+
+      renderRoomHeader();
+      renderRoomState();
+    }
+
+    function renderRoomHeader() {
+      const room = currentRoom();
+      if (!room || !$('#rhName')) return;
+      const t = roomState?.tiktok || room.tiktok || {};
+      const st = liveStatus(t);
+      $('#rhName').textContent = room.name;
+      const badge = $('#rhStatus');
+      badge.className = `badge ${st.cls}`;
+      badge.innerHTML = `<span class="dot ${st.dot}"></span>${esc(st.text)}`;
+      $('#rhMeta').innerHTML = `
+        <span>🧩 ${esc(room.modeName)}</span>
+        <span>${room.tiktokUsername ? `🎵 @${esc(room.tiktokUsername)}` : '<span class="muted">🎵 Chưa gắn tài khoản TikTok</span>'}</span>
+        <span class="muted">Mã: ${esc(room.id)}</span>`;
+
+      const busy = t.connected || t.connecting;
+      $('#connectSlot').innerHTML = busy
+        ? `<button class="btn" data-act="disconnect">⏹ Ngắt kết nối</button>`
+        : `<button class="btn primary" data-act="connect">▶ Kết nối TikTok</button>`;
+      $('#btnOpenScreen').href = overlayUrl(room, false);
+      $('#obsUrl').textContent = overlayUrl(room, true);
+
+      // Cảnh báo thông minh: chỉ hiện khi có việc cần làm
+      const alerts = [];
+      if (!room.tiktokUsername) {
+        alerts.push(`<div class="alert"><span>💡</span><span><strong>Phòng chưa gắn tài khoản TikTok.</strong> Bấm “Kết nối TikTok” để nhập @username, hoặc dùng mục “Thử tương tác” để chạy thử.</span></div>`);
+      } else if (!busy && t.lastError) {
+        alerts.push(`<div class="alert danger"><span>⚠️</span><span><strong>Không kết nối được @${esc(t.username || room.tiktokUsername)}.</strong> ${esc(t.lastError)}<br><span class="muted">Thường do tài khoản chưa phát live. Hệ thống sẽ tự thử lại.</span></span></div>`);
       }
-    };
-
-    document.getElementById('roomSelect').onchange = (e) => {
-      currentRoom = e.target.value;
-      localStorageSet('admin_room', currentRoom);
-      renderRooms();
-      refreshState();
-    };
-
-    document.getElementById('btnSendComment').onclick = () => {
-      const comment = document.getElementById('simComment').value.trim();
-      sendRpc('room.comment', { comment });
-    };
-    document.getElementById('btnAutoSim').onclick = () => {
-      const room = roomsCache.find((r) => r.id === currentRoom);
-      sendRpc('live.setAutoSim', { enabled: !room?.autoSim });
-    };
-    document.getElementById('btnSpeakMaiChi').onclick = async () => {
-      const text = document.getElementById('ttsDirectText').value.trim();
-      const data = await sendRpc('room.speak', { text, broadcast: true });
-      if (data?.result?.url) {
-        const player = document.getElementById('adminAudioPreview');
-        player.src = data.result.url;
-        player.play().catch(() => {});
+      const tts = roomState?.tts;
+      if (tts && tts.status !== 'ready' && roomState?.settings?.ttsEnabled !== false) {
+        alerts.push(`<div class="alert"><span>🎙</span><span><strong>Giọng đọc chưa sẵn sàng</strong> (${esc(tts.status)}). Sự kiện vẫn hiển thị nhưng chưa có tiếng đọc.</span></div>`);
       }
-    };
+      $('#alertSlot').innerHTML = alerts.join('');
+      $('#alertSlot').style.display = alerts.length ? 'flex' : 'none';
+      $('#alertSlot').style.flexDirection = 'column';
+      $('#alertSlot').style.gap = '8px';
+    }
 
-    async function refreshState() {
+    function renderRoomState() {
+      const room = currentRoom();
+      if (!room || !roomState || !$('#statsRow')) return;
+      const ui = modeUI(room.mode);
+      const t = roomState.tiktok || {};
+
+      const stats = [
+        { label: 'Người xem lúc này', value: t.connected ? fmt(t.viewerCount) : '—', hint: t.connected ? `@${t.username}` : 'Chưa live' },
+        { label: 'Người xem đã ghi nhận', value: fmt(room.viewers), hint: 'Tất cả phiên live' },
+        ...ui.stats(roomState)
+      ].slice(0, 4);
+      $('#statsRow').innerHTML = stats.map((s) => `
+        <div class="card stat">
+          <div class="stat-label">${esc(s.label)}</div>
+          <div class="stat-value">${esc(s.value)}</div>
+          ${s.hint ? `<div class="stat-hint">${esc(s.hint)}</div>` : ''}
+        </div>`).join('');
+
+      // Bảng xếp hạng
+      const lb = (roomState.leaderboard || []).slice(0, 10);
+      $('#leaderboard').innerHTML = lb.length
+        ? lb.map((d, i) => `
+          <li>
+            <span class="rank">${i + 1}</span>
+            <span class="avatar">${d.avatar ? `<img src="${esc(d.avatar)}" alt="" loading="lazy" referrerpolicy="no-referrer" />` : esc(String(d.name || '?').charAt(0).toUpperCase())}</span>
+            <span class="name" title="${esc(d.name)}">${esc(d.name)}</span>
+            <span class="pts">${fmt(d.merit ?? d.points)}</span>
+          </li>`).join('')
+        : '<li class="empty">Chưa có ai. Người xem tương tác sẽ hiện ở đây.</li>';
+
+      renderFeed();
+      renderSettings();
+      renderTtsFoot(roomState.tts);
+    }
+
+    function renderFeed() {
+      const room = currentRoom();
+      if (!room || !$('#feed')) return;
+      const ui = modeUI(room.mode);
+      const events = roomState?.recentEvents || [];
+      $('#feed').innerHTML = events.length
+        ? events.map((e) => {
+            const d = ui.describe(e);
+            return `<li class="${freshEventIds.has(e.id) ? 'fresh' : ''}">
+              <span class="f-icon">${d.icon}</span>
+              <span class="f-main"><span class="f-text">${d.text}</span></span>
+              <span class="f-time" data-time="${esc(e.timestamp)}">${timeAgo(e.timestamp)}</span>
+            </li>`;
+          }).join('')
+        : '<li class="empty">Chưa có hoạt động nào trong phiên này.</li>';
+      freshEventIds.clear();
+    }
+
+    function renderSettings() {
+      const s = roomState?.settings;
+      const body = $('#settingsBody');
+      if (!s || !body) return;
+      // Không vẽ lại khi người dùng đang kéo thanh trượt / chọn giọng
+      if (body.contains(document.activeElement) && document.activeElement.matches('input[type=range], select')) return;
+      const voices = roomState.tts?.voices || [s.ttsVoice || 'maichi'];
+      const pct = (v, d) => Math.round((typeof v === 'number' ? v : d) * 100);
+      body.innerHTML = `
+        <div class="setting">
+          <div><div class="setting-name">Giọng đọc</div><div class="setting-desc">Đọc tên & lời nhắn của người xem</div></div>
+          <label class="switch"><input type="checkbox" data-setting="ttsEnabled" ${s.ttsEnabled !== false ? 'checked' : ''} /><span></span></label>
+        </div>
+        <div class="setting">
+          <div><div class="setting-name">Giọng</div></div>
+          <select class="input" data-setting="ttsVoice">${voices.map((v) => `<option value="${esc(v)}" ${v === s.ttsVoice ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select>
+        </div>
+        <div class="setting">
+          <div><div class="setting-name">Âm lượng giọng đọc</div></div>
+          <div class="range-wrap"><input type="range" min="0" max="100" value="${pct(s.ttsVolume, 0.95)}" data-setting="ttsVolume" /><output>${pct(s.ttsVolume, 0.95)}%</output></div>
+        </div>
+        <div class="setting">
+          <div><div class="setting-name">Âm lượng nhạc nền</div></div>
+          <div class="range-wrap"><input type="range" min="0" max="100" value="${pct(s.musicVolume, 0.65)}" data-setting="musicVolume" /><output>${pct(s.musicVolume, 0.65)}%</output></div>
+        </div>
+        <div class="setting">
+          <div><div class="setting-name">Giả lập người xem</div><div class="setting-desc">Tự tạo tương tác mẫu (chỉ dùng để thử)</div></div>
+          <label class="switch"><input type="checkbox" data-setting="autoSim" ${s.autoSim ? 'checked' : ''} /><span></span></label>
+        </div>`;
+    }
+
+    // Lưu cài đặt ngay khi thay đổi
+    document.addEventListener('input', (e) => {
+      const el = e.target.closest('input[type=range][data-setting]');
+      if (el) el.nextElementSibling.textContent = `${el.value}%`;
+    });
+    document.addEventListener('change', async (e) => {
+      const el = e.target.closest('[data-setting]');
+      if (!el || !currentId) return;
+      const key = el.dataset.setting;
+      let value;
+      if (el.type === 'checkbox') value = el.checked;
+      else if (el.type === 'range') value = +(Number(el.value) / 100).toFixed(2);
+      else value = el.value;
       try {
-        const res = await fetch(`/api/state?room=${encodeURIComponent(currentRoom)}`);
-        if (!res.ok) throw new Error('not found');
-        const st = await res.json();
-        const total = st.totalMerit != null ? ` | Tổng Công Đức: ${Number(st.totalMerit).toLocaleString('vi-VN')}` : '';
-        document.getElementById('statusBanner').textContent =
-          `${st.room?.name} [${st.room?.modeName}]${total} | ZeroTTS: ${st.tts?.status} (Giọng: ${st.tts?.voice}) | ${roomsCache.length} phòng`;
+        await rpc('room.updateSettings', { roomId: currentId, [key]: value });
+        toast(key === 'autoSim' ? (value ? 'Đã bật giả lập người xem' : 'Đã tắt giả lập người xem') : 'Đã lưu cài đặt');
+        if (key === 'autoSim') refreshRooms();
       } catch (_) {
-        document.getElementById('statusBanner').textContent = '⚠️ Mất kết nối tới server...';
+        if (el.type === 'checkbox') el.checked = !value;
+      }
+    });
+
+    // ======================================================================
+    // MÔ TẢ SỰ KIỆN
+    // ======================================================================
+    function describeTempleEvent(e) {
+      const u = `<b>${esc(e.user || 'Thí chủ')}</b>`;
+      const pts = e.merit ? ` <span class="muted">+${fmt(e.merit)}</span>` : '';
+      switch (e.type) {
+        case 'burnIncense': return { icon: '🔥', text: `${u} dâng ${e.count} nén hương${pts}` };
+        case 'strikeWoodenFish': return { icon: '🪵', text: `${u} gõ mõ ${e.count} nhịp${pts}` };
+        case 'ringBell': return { icon: '🔔', text: `${u} thỉnh Đại Hồng Chung${pts}` };
+        case 'sendPrayer': return { icon: '🏮', text: `${u} cầu phúc: “${esc(e.wish)}”${pts}` };
+        case 'offerGift': return { icon: '🎁', text: `${u} dâng ${esc(e.giftName)}${pts}` };
+        case 'grandCeremony': return { icon: '🐉', text: `${u} dâng <b>${esc(e.giftName)}</b>${pts}` };
+        case 'drawFortune': return { icon: '🎋', text: `${u} gieo được quẻ số ${esc(e.fortune?.number)} — ${esc(e.fortune?.rank)}` };
+        default: return { icon: '✨', text: `${u} tương tác` };
       }
     }
 
-    async function refresh() {
+    // ======================================================================
+    // THAO TÁC
+    // ======================================================================
+    function testIdentity() {
+      return {
+        user: ($('#testUser')?.value || '').trim() || 'Thí Chủ',
+        wish: ($('#testWish')?.value || '').trim()
+      };
+    }
+
+    async function connect() {
+      const room = currentRoom();
+      if (!room) return;
+      if (!room.tiktokUsername) {
+        openRoomModal(room, { focusTikTok: true });
+        return;
+      }
+      try {
+        toast(`Đang kết nối @${room.tiktokUsername}…`);
+        await rpc('live.connect', { roomId: room.id, username: room.tiktokUsername }, { silent: true });
+        toast(`Đã kết nối @${room.tiktokUsername}`);
+      } catch (err) {
+        toast(`Chưa kết nối được: ${err.message}`, 'error');
+      }
+      refreshRooms();
+    }
+
+    async function sendComment() {
+      const text = $('#simComment').value.trim();
+      if (!text) return $('#simComment').focus();
+      const { user } = testIdentity();
+      try {
+        const res = await rpc('room.comment', { roomId: currentId, comment: text, user, uniqueId: `admin_${slugify(user)}` });
+        if (res) {
+          toast('Đã gửi bình luận');
+          $('#simComment').value = '';
+        } else {
+          toast('Bình luận bị bỏ qua (lọc spam, quá ngắn hoặc gửi quá nhanh)', 'error');
+        }
+      } catch (_) {}
+    }
+
+    async function speak() {
+      const text = $('#speakText').value.trim();
+      if (!text) return;
+      try {
+        const res = await rpc('room.speak', { roomId: currentId, text, broadcast: true });
+        if (res?.url) {
+          const a = $('#speakAudio');
+          a.src = res.url;
+          a.play().catch(() => {});
+        } else {
+          toast(res?.error || 'Không đọc được', 'error');
+        }
+      } catch (_) {}
+    }
+
+    async function copyObs() {
+      const room = currentRoom();
+      if (!room) return;
+      const url = overlayUrl(room, true);
+      try {
+        await navigator.clipboard.writeText(url);
+        toast('Đã sao chép link OBS');
+      } catch (_) {
+        const range = document.createRange();
+        range.selectNodeContents($('#obsUrl'));
+        getSelection().removeAllRanges();
+        getSelection().addRange(range);
+        toast('Hãy nhấn Ctrl/Cmd + C để sao chép', 'error');
+      }
+    }
+
+    document.addEventListener('click', async (e) => {
+      const btn = e.target.closest('[data-act]');
+      const tab = e.target.closest('[data-tab]');
+      if (tab) {
+        tab.parentElement.querySelectorAll('button').forEach((b) => b.classList.toggle('active', b === tab));
+        document.querySelectorAll('[data-panel]').forEach((p) => p.classList.toggle('hidden', p.dataset.panel !== tab.dataset.tab));
+        if (tab.dataset.tab === 'comment') $('#simComment')?.focus();
+        return;
+      }
+      if (e.target.closest('#btnMore')) {
+        $('#moreMenu').classList.toggle('open');
+        return;
+      }
+      if (!btn) return;
+      const room = currentRoom();
+      const ui = room ? modeUI(room.mode) : DEFAULT_MODE_UI;
+      closeMenus();
+
+      switch (btn.dataset.act) {
+        case 'new-room':
+          openRoomModal(null);
+          break;
+        case 'edit':
+          openRoomModal(room);
+          break;
+        case 'connect':
+          connect();
+          break;
+        case 'disconnect':
+          await rpc('live.disconnect', { roomId: room.id }).catch(() => {});
+          toast('Đã ngắt kết nối');
+          refreshRooms();
+          break;
+        case 'copy-obs':
+          copyObs();
+          break;
+        case 'mode-action': {
+          const a = ui.actions[Number(btn.dataset.idx)];
+          const { user, wish } = testIdentity();
+          btn.disabled = true;
+          try {
+            await rpc(a.method, { roomId: room.id, user, wish, topic: wish, ...(a.params || {}) });
+          } catch (_) {}
+          setTimeout(() => (btn.disabled = false), 400);
+          break;
+        }
+        case 'mode-danger': {
+          const a = ui.dangerActions[Number(btn.dataset.idx)];
+          if (await confirmDialog({ title: a.label.replace(/^\S+\s/, ''), text: a.confirm, ok: 'Đặt lại' })) {
+            await rpc(a.method, { roomId: room.id }).then(() => toast('Đã đặt lại')).catch(() => {});
+            refreshRooms();
+          }
+          break;
+        }
+        case 'delete':
+          if (await confirmDialog({
+            title: `Xoá phòng “${room.name}”?`,
+            text: 'Phòng sẽ ngắt kết nối TikTok và biến mất khỏi danh sách. Dữ liệu được giữ lại trong data/rooms/ để khôi phục khi cần.',
+            ok: 'Xoá phòng'
+          })) {
+            try {
+              await rpc('rooms.delete', { id: room.id });
+              toast(`Đã xoá phòng ${room.name}`);
+              currentId = null;
+              await refreshRooms();
+            } catch (_) {}
+          }
+          break;
+        case 'send-comment':
+          sendComment();
+          break;
+        case 'speak':
+          speak();
+          break;
+      }
+    });
+    $('#btnNewRoom').addEventListener('click', () => openRoomModal(null));
+
+    // ======================================================================
+    // MODAL TẠO / SỬA PHÒNG
+    // ======================================================================
+    let idTouched = false;
+    function openRoomModal(room, { focusTikTok = false } = {}) {
+      editingId = room ? room.id : null;
+      idTouched = Boolean(room);
+      $('#roomModalTitle').textContent = room ? 'Sửa phòng' : 'Tạo phòng mới';
+      $('#roomModalDesc').textContent = room ? `Mã phòng: ${room.id} (không đổi được)` : 'Mỗi phòng gắn với 1 tài khoản TikTok và có màn hình OBS riêng.';
+      $('#btnRoomSubmit').textContent = room ? 'Lưu thay đổi' : 'Tạo phòng';
+      $('#inName').value = room?.name || '';
+      $('#inId').value = room?.id || '';
+      $('#inId').disabled = Boolean(room);
+      $('#fId').classList.toggle('hidden', Boolean(room));
+      $('#inTikTok').value = room?.tiktokUsername ? `@${room.tiktokUsername}` : '';
+      $('#inAuto').checked = room ? room.autoConnect : true;
+      const selected = room?.mode || modes[0]?.id;
+      $('#modeOptions').innerHTML = modes.map((m) => `
+        <label class="mode-option">
+          <input type="radio" name="mode" value="${esc(m.id)}" ${m.id === selected ? 'checked' : ''} />
+          <span><span class="mo-name">${esc(m.name)}</span><br><span class="mo-desc">${esc(m.description)}</span></span>
+        </label>`).join('');
+      $('#modeWarn').classList.add('hidden');
+      ['#fName', '#fId'].forEach((s) => $(s).classList.remove('invalid'));
+      updateIdHelp();
+      openModal('roomModal');
+      if (focusTikTok) setTimeout(() => $('#inTikTok').focus(), 40);
+    }
+
+    function updateIdHelp() {
+      const id = slugify($('#inId').value);
+      $('#idHelp').innerHTML = id
+        ? `Địa chỉ màn hình: <code>/room/${esc(id)}</code>`
+        : 'Dùng trong địa chỉ màn hình: <code>/room/…</code>';
+    }
+    $('#inName').addEventListener('input', () => {
+      $('#fName').classList.remove('invalid');
+      if (!editingId && !idTouched) {
+        $('#inId').value = slugify($('#inName').value);
+        $('#fId').classList.remove('invalid');
+        updateIdHelp();
+      }
+    });
+    $('#inId').addEventListener('input', () => {
+      idTouched = true;
+      $('#fId').classList.remove('invalid');
+      updateIdHelp();
+    });
+    $('#modeOptions').addEventListener('change', () => {
+      const room = editingId && rooms.find((r) => r.id === editingId);
+      const mode = $('#modeOptions input:checked')?.value;
+      $('#modeWarn').classList.toggle('hidden', !room || room.mode === mode);
+    });
+
+    $('#roomForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = $('#inName').value.trim();
+      const id = slugify($('#inId').value || name);
+      const mode = $('#modeOptions input:checked')?.value;
+      const tiktokUsername = $('#inTikTok').value.trim();
+      const autoConnect = $('#inAuto').checked;
+
+      let ok = true;
+      if (!name) { $('#fName').classList.add('invalid'); ok = false; }
+      if (!editingId) {
+        if (!id) { $('#idError').textContent = 'Nhập mã phòng (chữ, số, dấu -)'; $('#fId').classList.add('invalid'); ok = false; }
+        else if (rooms.some((r) => r.id === id)) { $('#idError').textContent = `Đã có phòng mã “${id}”`; $('#fId').classList.add('invalid'); ok = false; }
+      }
+      if (!ok) return;
+
+      const btn = $('#btnRoomSubmit');
+      btn.disabled = true;
+      try {
+        if (editingId) {
+          const room = rooms.find((r) => r.id === editingId);
+          if (mode !== room.mode && !(await confirmDialog({ title: 'Đổi chế độ phòng?', text: 'Phòng sẽ khởi động lại. Bảng xếp hạng người xem được giữ, trạng thái riêng của chế độ cũ sẽ mất.', ok: 'Đổi chế độ', danger: false }))) {
+            return;
+          }
+          await rpc('rooms.update', { id: editingId, name, mode, tiktokUsername, autoConnect });
+          toast('Đã lưu phòng');
+        } else {
+          const res = await rpc('rooms.create', { id, name, mode, tiktokUsername, autoConnect });
+          currentId = res.id;
+          lsSet('admin_room', currentId);
+          toast(`Đã tạo phòng ${name}`);
+        }
+        closeModal('roomModal');
+        await refreshRooms({ forceShell: true });
+      } catch (_) {
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // ======================================================================
+    // DỮ LIỆU: danh sách phòng (thăm dò) + state phòng đang chọn (WebSocket)
+    // ======================================================================
+    async function refreshRooms({ forceShell = false } = {}) {
+      let data;
       try {
         const res = await fetch('/api/rooms');
-        const data = await res.json();
-        roomsCache = data.rooms || [];
-        if (!modesCache.length) {
-          modesCache = data.modes || [];
-          document.getElementById('newRoomMode').innerHTML = modesCache
-            .map((m) => `<option value="${esc(m.id)}" title="${esc(m.description)}">${esc(m.name)}</option>`).join('');
-        }
-        renderRooms();
-      } catch (_) {}
-      refreshState();
+        data = await res.json();
+      } catch (_) {
+        return;
+      }
+      const prevMode = currentRoom()?.mode;
+      const prevName = currentRoom()?.name;
+      rooms = data.rooms || [];
+      modes = data.modes || [];
+      if (!rooms.some((r) => r.id === currentId)) {
+        currentId = rooms.find((r) => r.id === lsGet('admin_room'))?.id || rooms[0]?.id || null;
+      }
+      renderSidebar();
+      const room = currentRoom();
+      if (!room) {
+        connectWs(null);
+        roomState = null;
+        return renderEmpty();
+      }
+      if (forceShell || !$('#rhName') || room.mode !== prevMode || room.name !== prevName || wsRoom !== room.id) {
+        connectWs(room.id);
+        renderRoomShell();
+      } else {
+        renderRoomHeader();
+        renderRoomState();
+      }
     }
-    refresh();
-    setInterval(refresh, 4000);
+
+    function selectRoom(id) {
+      if (id === currentId) return;
+      currentId = id;
+      lsSet('admin_room', id);
+      roomState = null;
+      renderSidebar();
+      connectWs(id);
+      renderRoomShell();
+    }
+
+    let wsRetry = null;
+    function connectWs(roomId) {
+      clearTimeout(wsRetry);
+      if (ws) {
+        ws.onclose = null;
+        try { ws.close(); } catch (_) {}
+        ws = null;
+      }
+      wsRoom = roomId;
+      if (!roomId) return;
+      const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const sock = new WebSocket(`${proto}//${location.host}/ws?room=${encodeURIComponent(roomId)}`);
+      ws = sock;
+      sock.onmessage = (ev) => {
+        if (wsRoom !== roomId) return;
+        let msg;
+        try { msg = JSON.parse(ev.data); } catch (_) { return; }
+        switch (msg.method) {
+          case 'room.state':
+            roomState = msg.params;
+            renderRoomHeader();
+            renderRoomState();
+            break;
+          case 'room.event':
+            if (msg.params?.event?.id) freshEventIds.add(msg.params.event.id);
+            roomState = msg.params?.state || roomState;
+            renderRoomState();
+            break;
+          case 'room.viewerCount':
+            if (roomState?.tiktok) {
+              roomState.tiktok.viewerCount = msg.params.viewerCount;
+              renderRoomState();
+            }
+            break;
+          case 'tts.status':
+            if (roomState) roomState.tts = msg.params;
+            renderTtsFoot(msg.params);
+            renderRoomHeader();
+            break;
+        }
+      };
+      sock.onclose = () => {
+        if (ws === sock) wsRetry = setTimeout(() => connectWs(roomId), 2000);
+      };
+    }
+
+    // Cập nhật "x phút trước" mà không vẽ lại cả danh sách
+    setInterval(() => {
+      document.querySelectorAll('[data-time]').forEach((el) => (el.textContent = timeAgo(el.dataset.time)));
+    }, 15000);
+
+    refreshRooms();
+    setInterval(() => refreshRooms(), 5000);
+  })();
   </script>
 </body>
 </html>
