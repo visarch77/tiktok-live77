@@ -150,7 +150,13 @@ def main() -> None:
             text = (req.get("text") or "").strip()
             voice = (req.get("voice") or "maichi").strip().lower()
             if voice not in voices:
-                voice = "maichi"
+                voice = default_voice
+
+            # Node đã hết chờ (timeout 30s) -> bỏ qua, không tốn CPU tổng hợp câu không ai nghe nữa
+            deadline = req.get("deadline")
+            if isinstance(deadline, (int, float)) and time.time() * 1000 > deadline:
+                emit({"type": "result", "id": req_id, "ok": False, "error": "Expired before synthesis"})
+                continue
 
             norm_text = clean_and_normalize_text(text)
             if not norm_text:

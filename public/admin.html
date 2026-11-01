@@ -168,7 +168,7 @@
           <button class="btn" onclick="sendRpc('temple.drawFortune', {})">🎋 Xin Xăm / Gieo Quẻ</button>
           <button class="btn" onclick="sendRpc('temple.offerGift', { giftType: 'fruit', coins: 30, giftName: 'Mâm Ngũ Quả Cát Tường' })">🍑 Dâng Mâm Ngũ Quả</button>
           <button class="btn gold" onclick="sendRpc('temple.grandCeremony', { coins: 500, giftName: 'Đại Lễ Kim Long Chầu Phật' })">🐉 Đại Lễ Kim Long</button>
-          <button class="btn" onclick="sendRpc('temple.resetMerit', {})">♻️ Đặt Lại Bảng Công Đức</button>
+          <button class="btn" onclick="confirm('Xóa toàn bộ Bảng Công Đức? Không thể hoàn tác.') && sendRpc('temple.resetMerit', {})">♻️ Đặt Lại Bảng Công Đức</button>
         </div>
       </section>
 
@@ -200,12 +200,17 @@
         method,
         params: { user, wish, ...extraParams }
       };
-      const res = await fetch('/rpc', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
+      let data;
+      try {
+        const res = await fetch('/rpc', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        data = await res.json();
+      } catch (err) {
+        data = { error: { message: `Không gọi được server: ${err.message}` } };
+      }
       document.getElementById('rpcOutput').textContent = JSON.stringify(data, null, 2);
       refreshStatus();
       return data;
@@ -231,10 +236,19 @@
     };
 
     async function refreshStatus() {
-      const res = await fetch('/api/state');
-      const st = await res.json();
-      document.getElementById('statusBanner').textContent =
-        `Hương đã thắp: ${st.totalIncense} | Tổng Công Đức: ${st.totalMerit} | ZeroTTS: ${st.tts?.status} (Giọng: ${st.tts?.voice})`;
+      try {
+        const res = await fetch('/api/state');
+        const st = await res.json();
+        const live = st.tiktok?.connected
+          ? `LIVE @${st.tiktok.username} (${st.tiktok.viewerCount || 0} mắt)`
+          : st.tiktok?.connecting
+            ? `Đang kết nối @${st.tiktok.username}...`
+            : `Chưa kết nối${st.tiktok?.lastError ? ` — ${st.tiktok.lastError}` : ''}`;
+        document.getElementById('statusBanner').textContent =
+          `Hương đã thắp: ${st.totalIncense} | Tổng Công Đức: ${st.totalMerit} | ZeroTTS: ${st.tts?.status} (Giọng: ${st.tts?.voice}) | TikTok: ${live}`;
+      } catch (_) {
+        document.getElementById('statusBanner').textContent = '⚠️ Mất kết nối tới server...';
+      }
     }
     refreshStatus();
     setInterval(refreshStatus, 4000);

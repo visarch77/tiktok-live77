@@ -15,8 +15,12 @@ class TempleAudioEngine {
     this.ttsVoice = 'maichi';
 
     // Nhạc nền "Nam Mô A Di Đà Phật.m4a" — mặc định 65%, cho phép chỉnh trực tiếp 0% - 100%
-    const savedMusicVol = parseFloat(localStorage.getItem('temple_music_vol'));
-    const savedTtsVol = parseFloat(localStorage.getItem('temple_tts_vol'));
+    let savedMusicVol = NaN;
+    let savedTtsVol = NaN;
+    try {
+      savedMusicVol = parseFloat(localStorage.getItem('temple_music_vol'));
+      savedTtsVol = parseFloat(localStorage.getItem('temple_tts_vol'));
+    } catch (_) {}
     this.bgBaseVolume = Number.isFinite(savedMusicVol) ? Math.max(0, Math.min(1, savedMusicVol)) : 0.65;
     this.ttsVolume = Number.isFinite(savedTtsVol) ? Math.max(0, Math.min(1, savedTtsVol)) : 0.95;
 
@@ -41,7 +45,7 @@ class TempleAudioEngine {
       this.ctx = new AudioCtx();
     }
     if (this.ctx.state === 'suspended') {
-      this.ctx.resume();
+      this.ctx.resume().catch(() => {});
     }
     this.unlocked = true;
     if (this.bgMusicEnabled) {
@@ -58,8 +62,9 @@ class TempleAudioEngine {
   }
 
   setMusicVolume(vol) {
-    const v = Math.max(0, Math.min(1, Number(vol)));
-    if (!Number.isFinite(v)) return;
+    const n = Number(vol);
+    if (!Number.isFinite(n)) return;
+    const v = Math.max(0, Math.min(1, n));
     this.bgBaseVolume = v;
     try {
       localStorage.setItem('temple_music_vol', String(v));
@@ -70,8 +75,9 @@ class TempleAudioEngine {
   }
 
   setTtsVolume(vol) {
-    const v = Math.max(0, Math.min(1, Number(vol)));
-    if (!Number.isFinite(v)) return;
+    const n = Number(vol);
+    if (!Number.isFinite(n)) return;
+    const v = Math.max(0, Math.min(1, n));
     this.ttsVolume = v;
     try {
       localStorage.setItem('temple_tts_vol', String(v));
@@ -159,6 +165,11 @@ class TempleAudioEngine {
         this.bgAudio.volume = ducked ? this.getDuckedVolume() : this.bgBaseVolume;
       }
     } catch (_) {}
+  }
+
+  // Đặt thời gian tối đa cho một câu đọc: file lỗi/treo không làm kẹt cả hàng đợi
+  withTimeout(promise, ms) {
+    return Promise.race([promise, new Promise((resolve) => setTimeout(resolve, ms))]);
   }
 
   // --------------------------------------------------------------------------
@@ -358,7 +369,7 @@ class TempleAudioEngine {
     try {
       let audioUrl = item.url;
       if (!audioUrl && item.fetchPromise) {
-        const res = await item.fetchPromise;
+        const res = await this.withTimeout(item.fetchPromise, 35000);
         if (res && res.ok && res.url) {
           audioUrl = res.url;
         }
@@ -370,7 +381,11 @@ class TempleAudioEngine {
           this.onTtsStateChange({ speaking: true, synthesizing: false, text: item.text });
         }
         if (item.onStart) item.onStart();
-        await this.playWavUrl(audioUrl);
+        await this.withTimeout(this.playWavUrl(audioUrl), 45000);
+        if (this.currentAudio) {
+          try { this.currentAudio.pause(); } catch (_) {}
+          this.currentAudio = null;
+        }
         if (item.onEnd) item.onEnd();
       } else {
         if (item.onStart) item.onStart();
@@ -399,20 +414,17 @@ class TempleAudioEngine {
         const audio = new Audio(url);
         this.currentAudio = audio;
         audio.volume = this.ttsVolume;
-        audio.onended = () => {
-          this.currentAudio = null;
+        const done = () => {
+          if (this.currentAudio === audio) this.currentAudio = null;
+          audio.onended = null;
+          audio.onerror = null;
           resolve();
         };
-        audio.onerror = () => {
-          this.currentAudio = null;
-          resolve();
-        };
+        audio.onended = done;
+        audio.onerror = done;
         const playPromise = audio.play();
         if (playPromise && typeof playPromise.catch === 'function') {
-          playPromise.catch(() => {
-            this.currentAudio = null;
-            resolve();
-          });
+          playPromise.catch(done);
         }
       } catch (_) {
         resolve();

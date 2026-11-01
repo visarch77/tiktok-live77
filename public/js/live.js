@@ -39,6 +39,11 @@
     }
   }
   window.addEventListener('pointerdown', unlockAudioOnce, { once: true });
+  // OBS Browser Source cho phép tự phát âm thanh nhưng không có ai bấm chuột:
+  // khởi động nhạc nền ngay, không phải đợi sự kiện đầu tiên
+  if (document.body.classList.contains('obs-mode')) {
+    audio.ensureContext();
+  }
 
   // 3. Vẽ các nén nhang đang cháy trong Lư Hương Đỉnh Đồng (x=540, y=895)
   const incenseHolder = document.getElementById('incenseSticksHolder');
@@ -88,9 +93,14 @@
     { x: 940, y: 1188, rank: 6 }
   ];
 
+  let lastVipSig = '';
   function renderVipCushions(leaderboard = []) {
     const layer = document.getElementById('vipCushionsLayer');
     if (!layer) return;
+    // Chỉ dựng lại DOM khi Top 6 thực sự đổi (trước đây mỗi sự kiện đều xóa/dựng lại -> giật animation)
+    const sig = leaderboard.slice(0, 6).map((d) => d.name).join('|');
+    if (sig === lastVipSig && layer.children.length > 0) return;
+    lastVipSig = sig;
 
     layer.innerHTML = VIP_CUSHION_COORDS.map((slot, idx) => {
       const dev = leaderboard[idx];
@@ -216,7 +226,8 @@
       if (i % 4 !== 0) return;
       const img = el.querySelector('.devotee-sprite');
       if (!img) return;
-      const delay = (i % 4) * 80;
+      // (i % 4) luôn = 0 ở đây nên trước đây cả đạo tràng lạy cùng lúc; nay so le theo vị trí
+      const delay = (i / 4) * 60;
       setTimeout(() => { img.src = SPRITE_FRAMES.forehead; }, delay);
       setTimeout(() => { img.src = SPRITE_FRAMES.bowMid; }, delay + 140);
       setTimeout(() => { img.src = SPRITE_FRAMES.prostrateDeep; }, delay + 300);
@@ -297,6 +308,9 @@
     playThreeBowsSequence(2050);
   }
 
+  let beamTimer = null;
+  let haloTimer = null;
+
   function updateCentralWorshipper(user, avatar, actionLabel, wish, doThreeBows = true) {
     const nameEl = document.getElementById('centralName');
     const actEl = document.getElementById('centralAction');
@@ -322,21 +336,22 @@
       if (centralEl) centralEl.classList.remove('walking-up');
       playThreeBowsSequence(0);
     }
+    // Dùng 1 timer cho mỗi hiệu ứng: sự kiện dồn dập không còn tắt hào quang sớm giữa chừng
     if (beam) {
       beam.classList.add('intense');
-      setTimeout(() => beam.classList.remove('intense'), 4500);
+      clearTimeout(beamTimer);
+      beamTimer = setTimeout(() => beam.classList.remove('intense'), 4500);
     }
 
     const haloSys = document.getElementById('buddhaHaloSystem');
     const lotusHand = document.getElementById('lotusHandHalo');
-    if (haloSys) {
-      haloSys.classList.add('flare');
-      setTimeout(() => haloSys.classList.remove('flare'), 3600);
-    }
-    if (lotusHand) {
-      lotusHand.classList.add('flare');
-      setTimeout(() => lotusHand.classList.remove('flare'), 3600);
-    }
+    if (haloSys) haloSys.classList.add('flare');
+    if (lotusHand) lotusHand.classList.add('flare');
+    clearTimeout(haloTimer);
+    haloTimer = setTimeout(() => {
+      if (haloSys) haloSys.classList.remove('flare');
+      if (lotusHand) lotusHand.classList.remove('flare');
+    }, 3600);
     particles.spawnBellWave(540, 260, 2);
 
     // Cập nhật dòng thông báo dưới thanh HUD
@@ -348,9 +363,15 @@
 
   // 6. Cập nhật toàn bộ giao diện theo State từ Server
   let hasInitializedRealLeader = false;
+  let lastLbSig = '';
+  let lastFeedSig = '';
+  // Trạng thái giả lập lấy theo server (trước đây luôn bắt đầu = false nên nút bấm lần đầu không có tác dụng)
+  let autoSimState = false;
 
+  let lastState = null;
   function updateUIState(st) {
     if (!st) return;
+    lastState = st;
 
     document.getElementById('statIncense').textContent = Number(st.totalIncense || 0).toLocaleString('vi-VN');
     document.getElementById('statMerit').textContent = Number(st.totalMerit || 0).toLocaleString('vi-VN');
@@ -377,7 +398,9 @@
 
     // Cập nhật Bảng TẤM LÒNG THÀNH ở góc dưới phải (Top 4)
     const lbList = document.getElementById('leaderboardList');
-    if (lbList) {
+    const lbSig = lb.slice(0, 4).map((d) => `${d.name}:${d.merit}`).join('|');
+    if (lbList && lbSig !== lastLbSig) {
+      lastLbSig = lbSig;
       lbList.innerHTML = lb
         .slice(0, 4)
         .map(
@@ -408,6 +431,7 @@
         : 'CHÙA LINH ỨNG • ĐỨC PHẬT A DI ĐÀ';
     }
 
+    if (st.settings) autoSimState = Boolean(st.settings.autoSim);
     const btnAutoSim = document.getElementById('btnToggleAutoSim');
     if (btnAutoSim && st.settings) {
       btnAutoSim.textContent = st.settings.autoSim
@@ -436,7 +460,9 @@
 
 
     const feed = document.getElementById('eventFeed');
-    if (feed && Array.isArray(st.recentEvents)) {
+    const feedSig = Array.isArray(st.recentEvents) ? st.recentEvents.slice(0, 8).map((e) => e.id).join('|') : '';
+    if (feed && Array.isArray(st.recentEvents) && feedSig !== lastFeedSig) {
+      lastFeedSig = feedSig;
       feed.innerHTML = st.recentEvents
         .slice(0, 8)
         .map((ev) => `<div class="event-feed-item">${formatEventSummary(ev)}</div>`)
@@ -621,11 +647,23 @@
     ws.onmessage = (event) => {
       try {
         const msg = JSON.parse(event.data);
+        if (msg.id != null && msg.error) {
+          console.warn('[RPC]', msg.error.message);
+          return;
+        }
         if (msg.method === 'temple.state') {
           updateUIState(msg.params);
         } else if (msg.method === 'temple.event') {
           if (msg.params?.state) updateUIState(msg.params.state);
           if (msg.params?.event) triggerRitualVisuals(msg.params.event);
+        } else if (msg.method === 'temple.viewerCount') {
+          if (lastState?.tiktok?.connected) {
+            lastState.tiktok.viewerCount = msg.params?.viewerCount || 0;
+            const liveText = document.getElementById('liveStatusText');
+            if (liveText) {
+              liveText.textContent = `LIVE @${lastState.tiktok.username} • ${lastState.tiktok.viewerCount} mắt`;
+            }
+          }
         } else if (msg.method === 'tts.play') {
           if (msg.params?.url) {
             audio.enqueueTts(msg.params.text || 'Nam mô A Di Đà Phật', {
@@ -637,6 +675,9 @@
       } catch (_) {}
     };
 
+    ws.onerror = () => {
+      try { ws.close(); } catch (_) {}
+    };
     ws.onclose = () => {
       setTimeout(connectWebSocket, 2000);
     };
@@ -655,12 +696,19 @@
       ws.send(JSON.stringify(payload));
       return;
     }
-    const res = await fetch('/rpc', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
+    let data;
+    try {
+      const res = await fetch('/rpc', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      data = await res.json();
+    } catch (err) {
+      console.warn('[RPC] Lỗi gọi', method, err);
+      return null;
+    }
+    if (data?.error) console.warn('[RPC]', method, data.error.message);
     if (data?.result?.state) updateUIState(data.result.state);
     if (data?.result?.event) triggerRitualVisuals(data.result.event);
     return data;
@@ -769,7 +817,6 @@
     callRpc('live.connect', { username });
   });
 
-  let autoSimState = false;
   document.getElementById('btnToggleAutoSim')?.addEventListener('click', () => {
     autoSimState = !autoSimState;
     callRpc('live.setAutoSim', { enabled: autoSimState });
@@ -840,6 +887,7 @@
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 })();

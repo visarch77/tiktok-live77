@@ -140,6 +140,7 @@ class TempleParticleEngine {
   }
 
   spawnIncenseBurst(x = 540, y = 890) {
+    if (this.burstParticles.length > 160) return;
     for (let i = 0; i < 18; i++) {
       const angle = -Math.PI / 2 + (Math.random() - 0.5) * 1.1;
       const speed = 2.5 + Math.random() * 5.0;
@@ -157,6 +158,7 @@ class TempleParticleEngine {
   }
 
   spawnBellWave(x = 540, y = 510, count = 2) {
+    if (this.soundWaves.length > 8) return;
     for (let i = 0; i < Math.min(count, 2); i++) {
       this.soundWaves.push({
         x,
@@ -182,7 +184,9 @@ class TempleParticleEngine {
   }
 
   spawnGrandCeremonyRain() {
-    for (let i = 0; i < 16; i++) {
+    // Giới hạn số cánh hoa: quà lớn dồn dập trước đây đẩy hàng trăm cánh hoa vào khung hình
+    const petalRoom = Math.max(0, 60 - this.lotusPetals.length);
+    for (let i = 0; i < Math.min(16, petalRoom); i++) {
       this.lotusPetals.push(this.createLotusPetal(false));
     }
     for (let i = 0; i < 36; i++) {
@@ -262,9 +266,10 @@ class TempleParticleEngine {
         }
       }
 
-      ctx.save();
-      ctx.translate(petal.x, petal.y);
-      ctx.rotate(petal.rot);
+      // setTransform trực tiếp thay cho save()/translate()/rotate()/restore() mỗi cánh hoa
+      const cos = Math.cos(petal.rot);
+      const sin = Math.sin(petal.rot);
+      ctx.setTransform(cos, sin, -sin, cos, petal.x, petal.y);
       const sz = 28 * petal.scale;
       ctx.drawImage(
         petal.gold ? this.goldPetalSprite : this.pinkPetalSprite,
@@ -273,8 +278,8 @@ class TempleParticleEngine {
         sz,
         sz
       );
-      ctx.restore();
     }
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
 
     // 4. Sóng âm Đại Hồng Chung
     for (let i = this.soundWaves.length - 1; i >= 0; i--) {
