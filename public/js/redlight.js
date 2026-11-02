@@ -222,6 +222,10 @@
     });
   }
 
+  // Trò của người điều phối (giờ server): búp bê giả vờ quay / ngủ gật
+  const faking = (t = now()) => Boolean(ph.fake) && t >= ph.fake.at && t < ph.fake.at + ph.fake.ms;
+  const sleeping = (t = now()) => ph.light === 'green' && (ph.sleepUntil || 0) > t;
+
   // Nhạc theo pha hiện tại (gọi khi mở màn hình / bật tiếng giữa chừng)
   function syncMusic() {
     if (!unlocked) return;
@@ -233,7 +237,10 @@
       if (lobbyTracks.every((tr) => tr.el.error)) audio.lobbyLoop();
       else audio.stopLoops();
     } else if (ph.phase === 'play') {
-      if (ph.light === 'green' && ph.song) {
+      if (sleeping()) {
+        audio.stopSong();
+        audio.stopLoops();
+      } else if (ph.light === 'green' && ph.song) {
         audio.stopSong();
         audio.stopLoops();
       } else if (ph.light === 'green') audio.greenSong((ph.lightEndsAt + (ph.warnMs || 1500) - now()) / 1000);
@@ -265,7 +272,7 @@
   }
   function songTick() {
     const sg = ph.song;
-    const st = sg && unlocked && !previewMuted && !ph.paused && ph.phase === 'play' && ph.light !== 'red' ? songPos(sg, now()) : null;
+    const st = sg && unlocked && !previewMuted && !ph.paused && ph.phase === 'play' && ph.light !== 'red' && !faking() ? songPos(sg, now()) : null;
     if (!st) {
       if (!songEl.paused) songEl.pause();
       return;
@@ -405,6 +412,28 @@
           } else if (e.cause !== 'purge') fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.3, text: 'Loại!', color: '#ff6b6b', size: 30, t0: hitAt, life: 1100 });
         }
         if (e.name) pushTicker(`❌ Số ${e.num} ${e.name} bị loại`);
+        break;
+      case 'fakeTurn': {
+        // búp bê quay mặt (1 s) rồi "Đùa thôi!" — không ai bị bắn
+        const dy = FY - DOLL_H - 40;
+        fx.push({ type: 'text', x: W / 2, y: dy, text: 'HÙ!', color: '#ff4d6d', size: 56, t0: t0 + 900, life: 900 });
+        fx.push({ type: 'text', x: W / 2, y: dy, text: 'ĐÙA THÔI 😜', color: '#ffd43b', size: 46, t0: t0 + 1800, life: 1400 });
+        break;
+      }
+      case 'dollSleep':
+        banner = { text: '😴 NGỦ GẬT!', color: '#4dabf7', until: t0 + (e.ms || 6000) };
+        fx.push({ type: 'text', x: W / 2, y: FY - DOLL_H - 40, text: 'CHẠY MAU!', color: '#bfe3ff', size: 46, t0, life: 1800 });
+        syncMusic();
+        break;
+      case 'revive':
+        for (const id of e.ids || []) {
+          const r = sprites.get(id);
+          if (!r) continue;
+          const p = spritePos(r);
+          burst(p.x, p.y - PH * 0.45, '#69db7c', 18, t0);
+          fx.push({ type: 'ring', x: p.x, y: p.y, r: 40, color: '#69db7c', flat: true, t0, life: 700 });
+          fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.3, text: 'Hồi sinh!', color: '#69db7c', size: 30, t0, life: 1500 });
+        }
         break;
       case 'stomp': {
         // Khổng lồ dẫm: chạy theo đường server tính (qua các chỗ đông người); server xét ai bị dẫm theo thời gian thực
@@ -697,6 +726,12 @@
       dollPos = Math.min(4, dollPos + (dt * 4) / (TURN_MS / 1000));
       return;
     }
+    // giả vờ quay: quay mặt ra, nhìn một lúc rồi quay lưng lại hát tiếp (không bắn)
+    if (faking()) {
+      if (now() < ph.fake.at + ph.fake.ms - BACK_MS) dollPos = Math.min(4, dollPos + (dt * 4) / (TURN_MS / 1000));
+      else back();
+      return;
+    }
     if (ph.song) {
       const k = (now() - (ph.song.startAt + ph.song.durationMs - TURN_MS)) / TURN_MS;
       if (k > 0) dollPos = Math.max(dollPos, 4 * ease(Math.min(1, k)));
@@ -759,6 +794,15 @@
     const e0 = drawDollFrame(i0, cx, base, 1, shake);
     const e1 = i0 < 4 && mix > 0 ? drawDollFrame(i0 + 1, cx, base, mix, shake) : null;
     dollEyes = (mix > 0.5 ? e1 : e0) || [];
+    // ngủ gật: chữ Z bay lên từ đầu búp bê
+    if (ph.phase === 'play' && sleeping()) {
+      for (let k = 0; k < 3; k++) {
+        const ph2 = ((tn / 1400 + k / 3) % 1);
+        g.globalAlpha = Math.sin(ph2 * Math.PI);
+        text('Z', cx + 40 + ph2 * 50, base - DOLL_H - 10 - ph2 * 70, { size: 26 + ph2 * 22, weight: 900, color: '#bfe3ff', stroke: 4 });
+      }
+      g.globalAlpha = 1;
+    }
     // Mắt đỏ phát sáng khi đã thấy mặt
     if (dollEyes.length) {
       g.save();

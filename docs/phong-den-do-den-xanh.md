@@ -325,6 +325,15 @@ Cân lại khi có "đà chạy" (người có đà luôn chạy đúng `runSpee
 
 Trước khi cân lại: Heart Me (1 xu) giết 3 người — đã đổi thành chạy nhanh; "lính bắn" chỉ còn ở Hand Hearts (100 xu).
 
+## Trò của người điều phối (trang quản lý → 🕹 Điều khiển ván)
+
+| Nút | Lệnh | Khi nào bấm được | Tác dụng |
+|---|---|---|---|
+| 🦶 Thả khổng lồ | `redlight.releaseGiant` | đang chơi | cướp biển dẫm qua chỗ đông, tối đa `stompMax` người |
+| 👀 Búp bê giả vờ quay | `redlight.fakeTurn` | búp bê đang hát, còn ≥ 1,5 s | câu hát ngừng 2,6 s, búp bê quay mặt ("HÙ!") rồi quay lưng ("ĐÙA THÔI"), hát tiếp đúng chỗ cũ; đèn vẫn xanh nên không ai bị bắn — ai hoảng dừng tay thì tụt lại. Câu hát + đèn xanh lùi thêm 2,6 s |
+| 😴 Búp bê ngủ gật | `redlight.dollSleep` | đang chơi (cả lúc đèn đỏ) | 6 s đèn xanh không câu hát, không bắn, chữ Z bay trên đầu búp bê; hết giờ búp bê tỉnh dậy quay mặt (báo trước → đỏ) |
+| 🙏 Hồi sinh | `redlight.revive` | đang chơi, có người bị loại | tối đa 5 người bị loại gần nhất (ưu tiên người xem thật, không tính bản sao) sống lại ở chỗ cũ |
+
 ## Bình luận trên đầu người chơi
 
 Người chơi bình luận thì lời bình luận hiện thành bong bóng trên đầu nhân vật, ở mọi lúc: màn chờ (6 s), đang chạy

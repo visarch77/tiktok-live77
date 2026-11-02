@@ -18,6 +18,9 @@ const config = require('../../config');
 
 const TRACK = 120; // độ dài sân (đơn vị) — 6 hàng gạch trên nền, mỗi hàng 20 đơn vị
 const TICK_MS = 100;
+const FAKE_TURN_MS = 2600; // búp bê giả vờ quay: quay mặt 1 s + nhìn 0,9 s + quay lưng 0,7 s
+const DOLL_SLEEP_MS = 6000; // búp bê ngủ gật
+const REVIVE_MAX = 5; // hồi sinh tối đa mấy người mỗi lần bấm
 const BASE_SPEED = 5.8; // đơn vị/giây khi chạy (≈ 21 giây đèn xanh liên tục để về đích; bù cho đèn đỏ 8–11 s)
 // Số bước tim được dồn tối đa (≈ 6 giây chạy). Bước dồn KHÔNG mất khi đèn đỏ: hình TikTok tới người xem chậm 2–5 giây,
 // tim bấm lúc họ còn thấy xanh/vàng về server khi đã đỏ — giữ lại để chạy tiếp ở đèn xanh sau.
@@ -54,6 +57,9 @@ const MAX_CLONES_EACH = 10;
 const MAX_CLONES_TOTAL = 300;
 
 const LINES = {
+  // trò của người điều phối
+  fakeTurn: ['Hù! Đùa thôi, chạy tiếp đi!', 'Giật mình chưa? Đùa đấy!', 'Hù! Ai vừa đứng hình thế?'],
+  dollSleep: ['Búp bê ngủ gật rồi! Chạy mau lên!', 'Suỵt, búp bê đang ngáy, chạy nhanh lên nào!'],
   // đọc lúc chờ ván (luân phiên): luật chơi — nhấp tim liên tục, buông tay trước khi nhạc dừng
   lobby: [
     'Luật chơi: bình luận để vào chơi. Nhạc lên thì nhấp thả tim liên tục, nhấp càng nhiều chạy càng xa. Dừng tay trước khi nhạc dừng, nhạc dừng mà tim vẫn về là bị bắn!',
@@ -84,6 +90,9 @@ function create(ctx, saved = {}) {
   // ván mới bắt đầu thì những người giữ chỗ vào sân theo thứ tự.
   const queue = new Map(); // khoá người xem -> { user, name, likes, ok, okAt, hue }
   let song = null; // câu hát đang phát (đèn xanh): { mode, rates, startAt, durationMs }
+  // Trò của người điều phối: búp bê giả vờ quay (câu hát ngừng, quay mặt rồi quay lại, không bắn) / ngủ gật (không hát, không bắn)
+  let fake = null; // { at, ms }
+  let sleepUntil = 0;
   let nextSongMode = null; // người điều phối chọn kiểu cho lần hát sau
   // Quà tặng lúc nhạc dừng (đèn đỏ): kỹ năng chạy / tấn công để dành, búp bê hát câu sau mới có tác dụng.
   // Khiên, khiên đội, bản sao (bảo vệ) vẫn có tác dụng ngay.
@@ -923,6 +932,8 @@ function create(ctx, saved = {}) {
       lightStartedAt,
       graceMs: S().redGraceMs,
       purging: Boolean(purge),
+      fake,
+      sleepUntil,
       song: song && { mode: song.mode, rates: song.rates, startAt: song.startAt, durationMs: song.durationMs, cuts: CUTS },
       nextSong: nextSongMode || S().songMode || 'random',
       hall: hallOfFame(),
@@ -985,7 +996,7 @@ function create(ctx, saved = {}) {
     say(pick(LINES.start));
   }
 
-  function setLight(next, quiet = false) {
+  function setLight(next, quiet = false, greenMs = 0) {
     light = next;
     lightStartedAt = Date.now();
     if (next === 'green' && lightLog.length && lightLog[lightLog.length - 1].light === 'red') closeRedLatency();
@@ -994,7 +1005,13 @@ function create(ctx, saved = {}) {
     if (lightLog.length > 12) lightLog.shift();
     const st = S();
     if (next === 'green') for (const p of players.values()) if (!p.cloneOf) p.greenAt = lightStartedAt;
-    if (next === 'green' && st.songEnabled !== false) {
+    fake = null;
+    if (next !== 'green') sleepUntil = 0;
+    if (next === 'green' && greenMs) {
+      // búp bê ngủ gật: xanh không có câu hát, hết giờ thì tỉnh dậy quay mặt như thường
+      song = null;
+      lightEndsAt = lightStartedAt + greenMs;
+    } else if (next === 'green' && st.songEnabled !== false) {
       // Đèn xanh = búp bê hát; đoạn cuối câu hát (warnMs) búp bê bắt đầu quay đầu, hát xong là đỏ
       const plan = planSong(nextSongMode || st.songMode);
       nextSongMode = null;
@@ -1313,6 +1330,57 @@ function create(ctx, saved = {}) {
         setLight('green', true);
       } else broadcastPhase();
       return phaseInfo();
+    },
+    // Búp bê giả vờ quay: câu hát ngừng, búp bê quay mặt ra rồi quay lại hát tiếp — không bắn ai (ai hoảng dừng tay là tụt lại)
+    fakeTurn: () => {
+      const now = Date.now();
+      if (phase !== 'play' || purge || paused) throw new Error('Chỉ dùng được khi đang chơi ván');
+      if (light !== 'green' || sleepUntil > now || (fake && now < fake.at + fake.ms)) throw new Error('Chỉ dùng được lúc búp bê đang hát');
+      if (lightEndsAt - now < 1500) throw new Error('Câu hát sắp hết, đợi lần hát sau');
+      fake = { at: now, ms: FAKE_TURN_MS };
+      // câu hát và đèn xanh lùi lại đúng bằng lúc giả vờ (màn hình dừng nhạc trong lúc đó rồi hát tiếp chỗ cũ)
+      if (song) song.startAt += FAKE_TURN_MS;
+      lightEndsAt += FAKE_TURN_MS;
+      broadcastPhase();
+      ctx.broadcast('rl.fx', { kind: 'fakeTurn', ms: FAKE_TURN_MS });
+      setTimeout(() => say(pick(LINES.fakeTurn)), 1200); // nói lúc búp bê đã quay mặt (nhạc đang ngừng)
+      return phaseInfo();
+    },
+    // Búp bê ngủ gật: DOLL_SLEEP_MS không hát, không bắn — ai nhanh tay thì lao lên; tỉnh dậy là quay mặt luôn
+    dollSleep: () => {
+      if (phase !== 'play' || purge || paused) throw new Error('Chỉ dùng được khi đang chơi ván');
+      if (sleepUntil > Date.now()) throw new Error('Búp bê đang ngủ rồi');
+      setLight('green', true, DOLL_SLEEP_MS);
+      sleepUntil = lightEndsAt;
+      broadcastPhase();
+      ctx.broadcast('rl.fx', { kind: 'dollSleep', ms: DOLL_SLEEP_MS });
+      say(pick(LINES.dollSleep));
+      return phaseInfo();
+    },
+    // Hồi sinh: tối đa REVIVE_MAX người vừa bị loại gần nhất (ưu tiên người xem thật) đứng dậy chạy tiếp ở chỗ cũ
+    revive: () => {
+      if (phase !== 'play' || purge) throw new Error('Chỉ dùng được khi đang chơi ván');
+      const dead = [...players.values()]
+        .filter((p) => !p.alive && !p.finishRank && !p.cloneOf)
+        .sort((a, b) => (a.npc ? 1 : 0) - (b.npc ? 1 : 0) || b.deadAt - a.deadAt)
+        .slice(0, REVIVE_MAX);
+      if (!dead.length) throw new Error('Chưa có ai bị loại để hồi sinh');
+      const now = Date.now();
+      for (const p of dead) {
+        p.alive = true;
+        p.doomAt = 0;
+        p.doomCause = '';
+        p.deadAt = 0;
+        p.pending = 0;
+        p.dash = 0;
+        p.lastActiveAt = now;
+      }
+      rosterDirty = true;
+      broadcastPositions();
+      ctx.broadcast('rl.fx', { kind: 'revive', ids: dead.map((p) => p.id) });
+      const names = dead.filter((p) => !p.npc).map((p) => p.name);
+      announce(names.length ? `Hồi sinh! ${names.slice(0, 3).join(', ')}${names.length > 3 ? ' và mấy người nữa' : ''} sống lại rồi!` : 'Hồi sinh! Có người vừa sống lại!');
+      return { revived: dead.map((p) => p.name) };
     },
     // Người điều phối thả cướp biển khổng lồ (lâu lâu một lần cho hấp dẫn) — chỉ khi đang chạy ván
     releaseGiant: () => {
