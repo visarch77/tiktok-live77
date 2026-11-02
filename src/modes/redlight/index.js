@@ -1132,13 +1132,15 @@ function create(ctx, saved = {}) {
           return np;
         }
         const now = Date.now();
-        // Bình luận lúc đèn xanh cũng tiến 1,5 bước (tối đa 1 lần / 1,5 giây)
+        // Bình luận lúc búp bê hát = commentLikes tim (mặc định 2), tối đa 1 lần / 1,5 giây
         if (phase === 'play') {
           // Luật chỉ bắt người còn thả tim: bình luận lúc đèn đỏ không bị bắn (người xem hay chat)
           if (light === 'red') p.lastActiveAt = now;
           else if (now - p.lastChatStepAt > 1500) {
             p.lastChatStepAt = now;
-            move(p, 1.5);
+            const likes = S().commentLikes ?? 2;
+            if (likes > 0) move(p, Math.min(maxLikeStep(), likes * S().stepPerLike));
+            else p.lastActiveAt = now;
           }
         } else {
           p.lastActiveAt = now;
@@ -1372,6 +1374,7 @@ module.exports = {
     songEnabled: 'boolean',
     queueLikes: [1, 300],
     npcMin: [0, 30],
+    commentLikes: [0, 20],
     stompMax: [1, 15],
     graceMinMs: [2000, 9000],
     perPlayerGrace: 'boolean',
@@ -1403,6 +1406,7 @@ module.exports = {
     perPlayerGrace: false, // bật: ân hạn từng người = độ trễ đo được lớn nhất + graceMarginMs (không nhỏ hơn graceMinMs)
     graceMarginMs: GRACE_MARGIN, // ân hạn = độ trễ lớn nhất đo được + chừng này
     runSpeed: BASE_SPEED, // bước/giây khi chạy (sân dài 120 bước)
+    commentLikes: 2, // 1 bình luận lúc búp bê hát = chừng này tim (0 = bình luận không giúp chạy)
     npcMin: 6, // sân ít người thật hơn số này thì thêm người máy cho đủ (0 = tắt)
     stompMax: 5, // Kính râm: khổng lồ dẫm tối đa chừng này người (mỗi quà)
     queueLikes: 50, // thả đủ chừng này tim là tham gia (lúc chờ: vào luôn; đang chơi: giữ chỗ hàng chờ ván sau)
