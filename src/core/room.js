@@ -106,6 +106,15 @@ class Room {
         this.configureAutoSim(false);
         this.save();
       }
+      // Báo chế độ chơi lúc vừa lên live thật (vd. dọn người ảo còn đứng trên sân)
+      if (status.connected && !this.wasLive && typeof this.mode.onLiveConnected === 'function') {
+        try {
+          this.mode.onLiveConnected();
+        } catch (err) {
+          console.error(`[Room ${this.id}] Lỗi onLiveConnected:`, err);
+        }
+      }
+      this.wasLive = Boolean(status.connected);
       this.scheduleStateBroadcast(150);
     });
     this.source.on('viewerCount', (viewerCount) => this.broadcast('room.viewerCount', { viewerCount }));
@@ -132,6 +141,7 @@ class Room {
       broadcast: (method, params) => room.broadcast(method, params),
       updateSettings: (params) => room.updateSettings(params),
       viewerCount: () => (room.source && room.source.status ? Number(room.source.status.viewerCount) || 0 : 0),
+      isLive: () => room.isLiveConnected(),
       // Chạy fn như một tương tác giả lập (sự kiện được gắn simulated: true) — cho các hoạt động hẹn giờ
       simulated: (fn) => {
         const prev = room.simulating;

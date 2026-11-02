@@ -391,6 +391,23 @@ function create(ctx, saved = {}) {
     return list.map((r) => ({ n: r.name, ms: r.ms, h: r.hue }));
   }
 
+  // Dọn người ảo + người chơi thử (kèm bản sao của họ) khỏi sân và hàng chờ
+  function clearSimPlayers() {
+    let changed = false;
+    for (const p of [...players.values()]) {
+      const owner = p.cloneOf ? players.get(p.cloneOf) : p;
+      if (p.sim || (owner && owner.sim) || (p.cloneOf && !owner)) {
+        removePlayer(p);
+        changed = true;
+      }
+    }
+    for (const [k, q] of [...queue.entries()]) if (q.user && q.user.sim) queue.delete(k);
+    if (changed) {
+      broadcastRoster();
+      broadcastQueue();
+    }
+  }
+
   function testUser(name) {
     const n = String(name || 'Admin thử').trim().slice(0, 30) || 'Admin thử';
     return { user: n, uniqueId: `admintest_${n}`.slice(0, 40), avatar: '', sim: true };
@@ -933,7 +950,7 @@ function create(ctx, saved = {}) {
       case 'gift': {
         const p = join(u, { announce: true }) || players.get(byKey.get(viewerKey(u)));
         if (!p) return null;
-        const item = itemForGift(evt.giftName, evt.coins);
+        const item = itemForGift(evt.giftName, evt.coins, evt.giftId);
         const held = phase === 'play' && light === 'red' && !purge && DEFER_KINDS.has(item.kind);
         if (held) heldGifts.push({ id: p.id, item, count: Number(evt.count) || 1 });
         else applyItem(p, item, Number(evt.count) || 1);
@@ -1013,6 +1030,8 @@ function create(ctx, saved = {}) {
     },
     // Admin chơi thử như một người xem: vào chơi, thả tim, tặng quà. Đánh dấu người ảo nên không vào kỉ lục thật.
     testPlay: (params = {}) => {
+      // TikTok coi người chơi / quà giả trên phòng đang live là tương tác giả
+      if (ctx.isLive && ctx.isLive()) throw new Error('Phòng đang live thật: ngắt kết nối TikTok trước khi chơi thử');
       const u = testUser(params.name);
       testActiveUntil = Date.now() + 10 * 60 * 1000;
       const clampN = (v, max) => Math.max(1, Math.min(max, Math.round(Number(v) || 1)));
@@ -1029,8 +1048,14 @@ function create(ctx, saved = {}) {
       return testStatus(u);
     },
     testStatus: (params = {}) => testStatus(testUser(params.name)),
-    testCrowd: (params = {}) => ctx.simulated(() => sim.burst(Number(params.count) || 20)),
-    testGift: () => ctx.simulated(() => sim.randomGift()),
+    testCrowd: (params = {}) => {
+      if (ctx.isLive && ctx.isLive()) throw new Error('Phòng đang live thật: không thêm người ảo');
+      return ctx.simulated(() => sim.burst(Number(params.count) || 20));
+    },
+    testGift: () => {
+      if (ctx.isLive && ctx.isLive()) throw new Error('Phòng đang live thật: không tặng quà thử');
+      return ctx.simulated(() => sim.randomGift());
+    },
     clearPlayers: () => {
       queue.clear();
       broadcastQueue();
@@ -1047,6 +1072,14 @@ function create(ctx, saved = {}) {
     },
     onAutoSimChange(enabled) {
       sim.setRunning(enabled);
+      if (!enabled) clearSimPlayers();
+    },
+    // Vừa kết nối live thật: không để người ảo / người chơi thử nào còn trên sân hay hàng chờ
+    onLiveConnected() {
+      sim.setRunning(false);
+      testActiveUntil = 0; // thôi hiện kỉ lục của người ảo / người thử
+      clearSimPlayers();
+      broadcastPhase();
     },
     onSettingsChanged(changed) {
       if ('lobbySeconds' in changed && phase === 'lobby') phaseEndsAt = phaseStartedAt + S().lobbySeconds * 1000;

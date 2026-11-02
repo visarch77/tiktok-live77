@@ -252,6 +252,10 @@ Mô phỏng một người thả tim hết công suất, dừng khi THẤY đèn
 - Nhạc nền lúc nghỉ chờ ván mới: `lobby_1.m4a` (mingle) và `lobby_2.m4a` thay phiên theo số ván, bắt đầu 2,5 giây sau nhạc kết quả,
   lặp nếu nghỉ lâu hơn bản nhạc, nhỏ dần khi vào ván. Bật/tắt bằng "Nhạc nền lúc chờ ván"; thời gian nghỉ = "Thời gian xem kết quả"
   (5–60 s) + "Thời gian nghỉ chờ ván mới" (5–300 s) trong Cài đặt.
+- Quà nhận theo mã quà TikTok (`BY_GIFT_ID` trong items.js) vì tên quà TikTok trả về theo ngôn ngữ vùng kết nối
+  ("Rose" / "Hoa hồng"…); không khớp mã mới so tên tiếng Anh. Tên quà lấy từ `giftDetails.giftName` (tiktok-live-connector 2.x).
+- Vừa kết nối live thật: tắt giả lập, dọn hết người ảo / người chơi thử khỏi sân và hàng chờ, thôi hiện kỉ lục người ảo;
+  đang live thì chặn "Chơi thử", "Thêm người thử", "Tặng quà thử".
 - Bình luận lúc đèn đỏ không bị tính là cử động. Mỗi lần bắt lỗi đèn đỏ (người thật) ghi vào `DATA_DIR/redlight-fairness.log`.
 - Cân lại theo câu hát: tốc độ 3,8 bước/giây, tối đa 10 bước/gói tim, dồn tối đa 22 bước → người thả tim hết công suất,
   dừng khi búp bê quay đầu, trễ 1–4,5 giây về đích ~64–67 giây / ván 90 giây; thả tim bất chấp vẫn bị loại 100%.

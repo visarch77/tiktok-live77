@@ -18,6 +18,7 @@ function extractUser(data) {
   const user = u.nickname || uniqueId || data?.nickname || 'Thí Chủ';
   const avatar =
     u.profilePictureUrl ||
+    u.profilePicture?.url?.[0] ||
     u.avatarThumb?.urlList?.[0] ||
     u.avatarMedium?.urlList?.[0] ||
     u.avatarLarge?.urlList?.[0] ||
@@ -56,7 +57,8 @@ class GiftComboTracker {
     }
     const count = Math.max(1, repeatCount - prevCount);
     const diamondCount = Math.max(1, Number(giftObj?.diamondCount || data?.diamondCount || 1));
-    const giftName = giftObj?.name || data?.giftName || giftObj?.describe || 'Hoa Hồng Tâm Thành';
+    // tiktok-live-connector 2.x: tên quà nằm ở giftDetails.giftName (theo ngôn ngữ vùng kết nối); describe là câu "sent …"
+    const giftName = giftObj?.giftName || giftObj?.name || data?.giftName || data?.extendedGiftInfo?.name || giftObj?.describe || 'Hoa Hồng Tâm Thành';
 
     return {
       type: 'gift',

@@ -52,11 +52,33 @@ const LEGEND = [
   { gift: 'Kính râm', tiktok: 'Sunglasses', coins: 199, kind: 'stomp', emoji: '🦶', label: 'Khổng lồ dẫm', short: 'DẪM 5', desc: 'hoá khổng lồ chạy dẫm tối đa 5 người' }
 ];
 
-function itemForGift(giftName, coins) {
+// Nhận quà theo mã quà TikTok trước (tên quà TikTok trả về theo ngôn ngữ vùng kết nối: "Rose" / "Hoa hồng" / "バラ"…),
+// không khớp mã mới so theo tên tiếng Anh. Mã lấy từ danh sách quà công khai (github.com/kkkaoru/tiktok-gift-list-per-regison).
+const BY_GIFT_ID = {
+  5655: 'rose',
+  8913: 'rosa',
+  7934: 'heart me',
+  5487: 'finger heart',
+  5827: 'ice cream cone',
+  5879: 'doughnut',
+  5658: 'perfume',
+  6427: 'hat and mustache',
+  6064: 'gg',
+  5585: 'confetti',
+  6090: 'fireworks',
+  5660: 'hand hearts',
+  8343: 'hand hearts',
+  9947: 'friendship necklace',
+  5509: 'sunglasses'
+};
+
+function itemForGift(giftName, coins, giftId) {
+  const byId = BY_GIFT_ID[String(giftId || '')];
+  if (byId) return ITEMS[byId];
   const key = String(giftName || '').trim().toLowerCase();
   if (ITEMS[key]) return ITEMS[key];
   // Quà khác: chạy nhanh, số bước tăng theo giá xu nhưng có trần để quà to không thắng tuyệt đối
   return { kind: 'turbo', emoji: '⚡', label: 'Chạy nhanh', bonus: Math.min(12, 2 + Math.round(Math.log2(Math.max(1, coins)) * 1.5)) };
 }
 
-module.exports = { ITEMS, LEGEND, itemForGift };
+module.exports = { ITEMS, LEGEND, BY_GIFT_ID, itemForGift };

@@ -617,15 +617,15 @@
         { icon: '⏸', name: 'Tạm dừng / tiếp tục', desc: 'Dừng đồng hồ và đèn', method: 'redlight.pause' },
         { icon: '🏁', name: 'Kết thúc ván', desc: 'Hiện kết quả ngay', method: 'redlight.endRound' },
         { icon: '🔄', name: 'Ván mới', desc: 'Về màn chờ vào', method: 'redlight.newLobby' },
-        { icon: '👥', name: 'Thêm 20 người thử', desc: 'Người ảo vào game', method: 'redlight.testCrowd', params: { count: 20 } },
-        { icon: '🎁', name: 'Tặng quà thử', desc: 'Quà ngẫu nhiên → vật phẩm', method: 'redlight.testGift' },
+        { icon: '👥', name: 'Thêm 20 người thử', desc: 'Người ảo vào game (chỉ khi chưa live)', method: 'redlight.testCrowd', params: { count: 20 } },
+        { icon: '🎁', name: 'Tặng quà thử', desc: 'Quà ngẫu nhiên (chỉ khi chưa live)', method: 'redlight.testGift' },
         // Kiểu hát cho lần đèn xanh kế tiếp (chỉ một lần, sau đó quay về kiểu mặc định trong cài đặt)
         { icon: '🎵', name: 'Lần hát sau: đều đều', desc: 'Cả câu một tốc độ', method: 'redlight.setNextSong', params: { mode: 'steady' } },
         { icon: '🐢', name: 'Lần hát sau: chậm → nhanh', desc: 'Chậm đầu, nhanh dần', method: 'redlight.setNextSong', params: { mode: 'slowFast' } },
         { icon: '🐇', name: 'Lần hát sau: nhanh → chậm', desc: 'Nhanh đầu, chậm dần', method: 'redlight.setNextSong', params: { mode: 'fastSlow' } },
         { icon: '🎲', name: 'Lần hát sau: thất thường', desc: 'Mỗi chữ một tốc độ', method: 'redlight.setNextSong', params: { mode: 'jerky' } }
       ],
-      commentHint: 'Bình luận bất kỳ để vào chơi; đang chơi thì bình luận = động',
+      commentHint: 'Lúc chờ ván: bình luận để vào sân. Đang chơi: bình luận để vào hàng chờ ván sau (thả đủ tim mới giữ chỗ)',
       stats: (st) => [
         { label: 'Ván', value: fmt(st.rl?.round), hint: st.rl?.phase === 'play' ? 'Đang chơi' : st.rl?.phase === 'lobby' ? 'Đang chờ vào' : 'Kết quả' },
         { label: 'Đang chạy', value: fmt(st.rl?.counts?.alive), hint: `${fmt(st.rl?.counts?.players)} người chơi · ${fmt(st.rl?.counts?.clones)} bản sao` },
@@ -819,12 +819,19 @@
             { id: 'feed', label: '📡 Hoạt động' },
             { id: 'people', label: '👥 Người tham gia' }
           ]
-        : [
-            ...(room.mode === 'redlight' ? [{ id: 'play', label: '🎮 Chơi thử' }] : []),
-            { id: 'interact', label: '🧪 Thử tương tác' },
-            { id: 'feed', label: '📡 Hoạt động' },
-            { id: 'settings', label: '⚙️ Cài đặt' }
-          ];
+        : room.mode === 'redlight'
+          ? [
+              // lúc live: điều khiển ván trước, chơi thử (chỉ dùng khi chưa live) để cuối
+              { id: 'interact', label: '🕹 Điều khiển ván' },
+              { id: 'feed', label: '📡 Hoạt động' },
+              { id: 'settings', label: '⚙️ Cài đặt' },
+              { id: 'play', label: '🎮 Chơi thử' }
+            ]
+          : [
+              { id: 'interact', label: '🧪 Thử tương tác' },
+              { id: 'feed', label: '📡 Hoạt động' },
+              { id: 'settings', label: '⚙️ Cài đặt' }
+            ];
     }
     let studioTab = lsGet('admin_studio_tab') || 'control';
     let pvAudioOn = false;
@@ -1206,7 +1213,7 @@
         ${rlRange('greenMax', 'Đèn xanh dài nhất', 'Chỉ dùng khi tắt búp bê hát', 1, 30, 1, 's')}
         ${rlRange('redMin', 'Đèn đỏ ngắn nhất', 'Phải dài hơn thời gian ân hạn', 2, 20, 1, 's')}
         ${rlRange('redMax', 'Đèn đỏ dài nhất', '', 2, 30, 1, 's')}
-        ${rlRange('redGraceMs', 'Ân hạn đèn đỏ', 'Hình trên TikTok tới người xem chậm vài giây — chỉ bắt lỗi sau khoảng này', 0, 6000, 100, 'ms')}
+        ${rlRange('redGraceMs', 'Ân hạn đèn đỏ mặc định', 'Dùng cho người chưa đo được độ trễ; sau vài câu hát server tự tính riêng từng người (độ trễ + 1,5 s, trong 3–9 s)', 0, 6000, 100, 'ms')}
         ${rlRange('stepPerLike', 'Bước mỗi lượt tim', 'Sân dài 120 bước', 0.05, 5, 0.05, '')}
         ${rlRange('maxPlayers', 'Số người chơi tối đa', '', 5, 200, 5, ' người')}
         ${rlRange('queueLikes', 'Tim để tham gia', 'Lúc chờ: thả đủ tim là vào sân. Đang chơi: thả đủ tim được đứng hàng chờ, ván sau vào sân', 1, 300, 1, ' tim')}
