@@ -1001,8 +1001,44 @@
 
   // Chỉ còn nhãn "hết giờ": nhỏ, nằm thay dòng chữ chạy dưới vạch xuất phát để không che người chơi
   const bannerOn = () => ph.phase === 'play' && banner && performance.now() < banner.until;
+  // Lúc chờ ván: bảng luật chơi giữa sân (người chơi đứng ở vạch xuất phát nên giữa sân trống)
+  function drawRules(t) {
+    const cx = W / 2;
+    const top = FY + 70;
+    const w = 760;
+    const h = 430;
+    g.save();
+    g.fillStyle = 'rgba(14,16,32,0.82)';
+    roundRect(cx - w / 2, top, w, h, 28);
+    g.fill();
+    g.strokeStyle = 'rgba(255,79,154,0.75)';
+    g.lineWidth = 3;
+    roundRect(cx - w / 2, top, w, h, 28);
+    g.stroke();
+    text('LUẬT CHƠI', cx, top + 50, { size: 44, weight: 900, color: '#ffd43b', stroke: 6 });
+    const beat = 1 + 0.08 * Math.max(0, Math.sin(t / 120)); // tim đập nhanh: nhắc nhấp thật nhanh
+    const rows = [
+      { icon: '🎵', a: 'Nhạc lên:', b: 'NHẤP THẢ TIM THẬT NHANH để chạy', color: '#8ce99a', pulse: true },
+      { icon: '✋', a: 'DỪNG thả tim', b: 'TRƯỚC KHI nhạc dừng', color: '#ffd43b' },
+      { icon: '🎯', a: 'Nhạc dừng mà tim vẫn về:', b: 'búp bê thấy, lính BẮN', color: '#ff6b6b' },
+      { icon: '🏁', a: 'Về đích trước khi hết giờ', b: 'để sống sót', color: '#74c0fc' }
+    ];
+    rows.forEach((r, i) => {
+      const y = top + 118 + i * 72;
+      g.save();
+      g.translate(cx - w / 2 + 70, y);
+      if (r.pulse) g.scale(beat, beat);
+      text(r.icon, 0, 0, { size: 40 });
+      g.restore();
+      text(r.a, cx - w / 2 + 120, y - 15, { size: 26, weight: 700, color: '#fff', align: 'left', stroke: 3 });
+      text(r.b, cx - w / 2 + 120, y + 17, { size: 28, weight: 900, color: r.color, align: 'left', stroke: 4 });
+    });
+    text(`Thả ${queueNeed} tim hoặc bình luận để vào chơi`, cx, top + h - 28, { size: 24, weight: 700, color: '#ff8fbf', stroke: 3 });
+    g.restore();
+  }
+
   function drawBanner(t) {
-    if (ph.phase === 'lobby') return;
+    if (ph.phase === 'lobby') return drawRules(t);
     if (ph.phase === 'result') return drawResults();
     if (!bannerOn()) return;
     const on = Math.floor(t / 300) % 2 === 0;
@@ -1207,8 +1243,8 @@
   function marqueeParts() {
     const parts = [
       { text: `❤️ Thả ${queueNeed} tim hoặc bình luận để tham gia` },
-      { text: '🎵 Búp bê hát: thả tim để chạy' },
-      { text: '🛑 Hết nhạc: đứng im, cử động là bị bắn' },
+      { text: '🎵 Nhạc lên: nhấp thả tim thật nhanh để chạy' },
+      { text: '✋ Dừng thả tim TRƯỚC khi nhạc dừng, tim về lúc nhạc tắt là bị bắn' },
       { text: '⏱ Hết giờ chưa về đích cũng bị bắn' },
       { text: '🎁 Quà tặng lúc nhạc dừng: búp bê hát lại mới có tác dụng (khiên, bản sao có ngay)' }
     ];
