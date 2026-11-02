@@ -43,14 +43,17 @@
   const DOLL_H = 228; // chiều cao búp bê
   const GUARD_H = 90; // lính canh cao hơn người chơi một chút
   const PH = 78; // chiều cao người chơi đứng
-  const VARIANTS = 29; // 6 kiểu thường + 10 kiểu ngộ nghĩnh + 13 kiểu bựa (ông cụ chống gậy, anh bó bột, chú béo ụ, tóc HKT, lưng dài chân ngắn, chân dài, quần ống thấp ống cao, quần tụt, tóc tổ chim, đầu trọc 1 sợi, anh nằm sấp bò lết, anh tập tạ trồng chuối, anh tóc chôm chỉa lắc hông thả tim)
+  const VARIANTS = 29; // 6 kiểu thường + 10 kiểu ngộ nghĩnh + 13 kiểu bựa (ông cụ chống gậy, anh bó bột, chú béo ụ, tóc HKT, lưng dài chân ngắn, chân dài, quần ống thấp ống cao, quần tụt, [24 đã bỏ], đầu trọc 1 sợi, anh nằm sấp bò lết, anh tập tạ trồng chuối, anh tóc chôm chỉa lắc hông thả tim)
+  const DROPPED = new Set([24]); // tóc tổ chim: tóc to chiếm chỗ, che người khác
+  const VLIST = [...Array(VARIANTS).keys()].filter((v) => !DROPPED.has(v));
+  const variantOf = (h) => VLIST[(h || 0) % VLIST.length];
   const P_FRAMES = ['stand', 'run1', 'run2', 'run3', 'run4', 'freeze', 'freeze2', 'dead'];
   const RUN = ['run1', 'run2', 'run3', 'run4'];
 
   // Ảnh vẽ bằng Scenario (public/assets/redlight). manifest.json: tên → [rộng, cao, phụ]
   //   người chơi: phụ = [tâm x, tâm y, rộng] miếng vải số sau lưng; búp bê: phụ = [[x, y], ...] vị trí mắt (tỉ lệ)
   const ASSET = '/assets/redlight/';
-  const AV = 21; // đổi số này mỗi khi thay ảnh: /assets được cache 1 ngày
+  const AV = 22; // đổi số này mỗi khi thay ảnh: /assets được cache 1 ngày
   const IMG = {};
   // prettier-ignore
   const NAMES = ['bg', 'doll_0', 'doll_1', 'doll_2', 'doll_3', 'doll_4', 'guard_0', 'guard_1', 'guard_2',
@@ -61,7 +64,7 @@
     'gift_turbo', 'gift_shield', 'gift_buffalo', 'gift_clones', 'gift_wind', 'gift_giant', 'gift_chicken', 'gift_teamShield', 'gift_shove',
     'gift_crowd', 'gift_stomp',
     'giant_run1', 'giant_run2', 'giant_run3', 'giant_run4', 'giant_run5', 'giant_run6'];
-  for (let v = 0; v < VARIANTS; v++) for (const f of P_FRAMES) NAMES.push(`v${v}_${f}`);
+  for (const v of VLIST) for (const f of P_FRAMES) NAMES.push(`v${v}_${f}`);
   for (const n of NAMES) {
     const im = new Image();
     im.src = `${ASSET}${n}.webp?v=${AV}`;
@@ -919,7 +922,7 @@
     const dead = !s.a && !flashing;
     const deadAt = Math.max(s.deadSeenAt || 0, s.flashUntil || 0);
     const moving = isMoving(s, tn);
-    const v = (s.h || 0) % VARIANTS;
+    const v = variantOf(s.h);
     // mỗi kiểu nhân vật một chiều cao (bé gái nơ hồng thấp, anh tóc xù cao…)
     const hf = (MAN.heights && MAN.heights[v]) || 1;
     const size = PH * p.scale * (s.gi ? 2 : 1) * (s.k ? 1 : hf);
@@ -1283,7 +1286,7 @@
     const tn = performance.now();
     list.slice(0, REC_X.length).forEach((r, i) => {
       const x = REC_X[i];
-      const v = (r.h || 0) % VARIANTS;
+      const v = variantOf(r.h);
       const im = IMG[`v${v}_stand`];
       const hf = (MAN.heights && MAN.heights[v]) || 1;
       const hgt = 48 * hf;
@@ -1379,7 +1382,7 @@
     const x0 = W / 2 - (gap * slots) / 2 + gap / 2;
     shown.forEach((q, i) => {
       const x = x0 + i * gap;
-      const v = (q.h || 0) % VARIANTS;
+      const v = variantOf(q.h);
       const im = IMG[`v${v}_stand`];
       const hf = (MAN.heights && MAN.heights[v]) || 1;
       const hgt = 50 * hf;
@@ -1401,7 +1404,7 @@
     shown.forEach((q, i) => {
       const say = queueSays.get(q.n);
       if (!say || say.until < performance.now()) return;
-      const v = (q.h || 0) % VARIANTS;
+      const v = variantOf(q.h);
       const hgt = 50 * ((MAN.heights && MAN.heights[v]) || 1);
       // hẹp hơn khoảng cách hai người để bong bóng cạnh nhau không đè lên nhau
       drawBubble(x0 + i * gap, QFEET - hgt - 22, say.text, say.until, Math.max(90, gap - 26));
