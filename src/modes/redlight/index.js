@@ -57,7 +57,7 @@ const LINES = {
   // đọc lúc chờ ván (luân phiên): luật chơi — nhấp tim liên tục, buông tay trước khi nhạc dừng
   lobby: [
     'Luật chơi: bình luận để vào chơi. Nhạc lên thì nhấp thả tim liên tục, nhấp càng nhiều chạy càng xa. Dừng tay trước khi nhạc dừng, nhạc dừng mà tim vẫn về là bị bắn!',
-    'Ván mới sắp bắt đầu! Nhạc lên nhấp tim liên tục để chạy, nhạc sắp dừng thì buông tay. Về đích trước khi hết giờ là sống sót!'
+    'Ván mới sắp bắt đầu! Nhạc lên nhấp tim liên tục hoặc bình luận để chạy nhanh hơn, nhạc sắp dừng thì buông tay. Về đích trước khi hết giờ là sống sót!'
   ],
   start: ['Bắt đầu! Đèn xanh, chạy nào!', 'Xuất phát! Thả tim để chạy!'],
   green: ['Đèn xanh!', 'Chạy đi!', 'Đèn xanh, chạy nào!'],

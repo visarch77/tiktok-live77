@@ -1006,7 +1006,8 @@
     const cx = W / 2;
     const top = FY + 70;
     const w = 760;
-    const h = 430;
+    const h = 500;
+    const cmt = typeof settings.commentLikes === 'number' ? settings.commentLikes : 2;
     g.save();
     g.fillStyle = 'rgba(14,16,32,0.82)';
     roundRect(cx - w / 2, top, w, h, 28);
@@ -1019,6 +1020,7 @@
     const beat = 1 + 0.08 * Math.max(0, Math.sin(t / 120)); // tim đập nhanh: nhắc nhấp thật nhanh
     const rows = [
       { icon: '🎵', a: 'Nhạc lên:', b: 'NHẤP THẢ TIM THẬT NHANH để chạy', color: '#8ce99a', pulse: true },
+      ...(cmt > 0 ? [{ icon: '💬', a: 'Bình luận khi nhạc lên:', b: `chạy nhanh hơn (1 bình luận = ${cmt} tim)`, color: '#ff8fbf' }] : []),
       { icon: '✋', a: 'DỪNG thả tim', b: 'TRƯỚC KHI nhạc dừng', color: '#ffd43b' },
       { icon: '🎯', a: 'Nhạc dừng mà tim vẫn về:', b: 'búp bê thấy, lính BẮN', color: '#ff6b6b' },
       { icon: '🏁', a: 'Về đích trước khi hết giờ', b: 'để sống sót', color: '#74c0fc' }
@@ -1244,6 +1246,7 @@
     const parts = [
       { text: `❤️ Thả ${queueNeed} tim hoặc bình luận để tham gia` },
       { text: '🎵 Nhạc lên: nhấp thả tim thật nhanh để chạy' },
+      ...(settings.commentLikes === 0 ? [] : [{ text: `💬 Bình luận khi nhạc lên để chạy nhanh hơn (1 bình luận = ${settings.commentLikes ?? 2} tim)` }]),
       { text: '✋ Dừng thả tim TRƯỚC khi nhạc dừng, tim về lúc nhạc tắt là bị bắn' },
       { text: '⏱ Hết giờ chưa về đích cũng bị bắn' },
       { text: '🎁 Quà tặng lúc nhạc dừng: búp bê hát lại mới có tác dụng (khiên, bản sao có ngay)' }
