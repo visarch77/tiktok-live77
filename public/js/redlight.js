@@ -1412,7 +1412,7 @@
     const tn = performance.now();
     const fs = 15;
     g.save();
-    g.globalAlpha = Math.max(0, Math.min(1, (until - tn) / 400));
+    g.globalAlpha = Math.max(0, Math.min(1, (until - tn) / 250));
     g.font = `500 ${fs}px ${FONT}`;
     const lines = [];
     let cur = '';
@@ -1430,7 +1430,7 @@
     const bh = lines.length * (fs + 4) + 10;
     const bx = Math.max(SAFE_L, Math.min(SAFE_R - bw, x - bw / 2));
     const by = y - 7 - bh;
-    g.fillStyle = 'rgba(255,255,255,0.95)';
+    g.fillStyle = 'rgba(255,255,255,0.55)'; // nền trong suốt: không che sân / người phía sau
     roundRect(bx, by, bw, bh, 12);
     g.fill();
     g.beginPath();
