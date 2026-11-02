@@ -268,7 +268,7 @@
         this.osc(55, n, 0.18, { type: 'sine', vol: 0.32, slide: -15, attack: 0.004, bus: 'music' });
         this.osc(50, n + 0.22, 0.2, { type: 'sine', vol: 0.24, slide: -12, attack: 0.004, bus: 'music' });
         // quét: dải nhiễu trượt qua lại
-        this.noise(n + 0.1, 0.7, { vol: 0.04, type: 'bandpass', freq: 600, sweepTo: 2400, q: 6, bus: 'music' });
+        this.noise(n + 0.1, 0.7, { vol: 0.018, type: 'bandpass', freq: 600, sweepTo: 2400, q: 6, bus: 'music' });
       };
       beat();
       this.heartTimer = setInterval(beat, 900);
@@ -411,7 +411,7 @@
       this.osc(1000, t + 0.5, 0.3, { type: 'square', vol: 0.1, slide: -500, attack: 0.01 });
     }
 
-    // Tiếng servo búp bê quay đầu: file tạo sẵn (mẫu "A – servo điện"), khớp TURN_MS 480 / BACK_MS 380 của màn hình
+    // Tiếng servo búp bê quay đầu: file tạo sẵn (ù mô-tơ + rít bánh răng, cuối trượt xuống), khớp TURN_MS 1000 / BACK_MS 700
     loadSamples() {
       const list = [
         ['turn', 'doll_turn.m4a'],
@@ -440,7 +440,7 @@
 
     // Búp bê quay đầu: phát file servo; chưa tải xong thì tạo tiếng mô-tơ tạm bằng WebAudio
     dollTurn(dur = 0.5, back = false) {
-      if (this.playSample(back ? 'back' : 'turn', back ? 0.45 : 0.6)) return;
+      if (this.playSample(back ? 'back' : 'turn', back ? 0.28 : 0.4)) return;
       const c = this.ensure();
       if (!c) return;
       const t = this.t;
@@ -489,11 +489,11 @@
       this.lastEye = t;
       const f0 = 3750 + Math.random() * 450;
       const dir = Math.random() < 0.5 ? -1 : 1;
-      this.noise(t, 0.015, { vol: 0.05, type: 'highpass', freq: 5000 });
-      this.osc(f0, t, 0.16, { type: 'triangle', vol: 0.045, slide: lock ? 600 : dir * 260, attack: 0.012 });
-      this.osc(f0 / 2, t, 0.16, { vol: 0.018, slide: dir * 120, attack: 0.012 });
-      this.noise(t, 0.16, { vol: 0.03, type: 'bandpass', freq: f0, q: 9 });
-      if (lock) this.osc(2637, t + 0.16, 0.12, { type: 'square', vol: 0.04, attack: 0.003 });
+      this.noise(t, 0.015, { vol: 0.022, type: 'highpass', freq: 5000 });
+      this.osc(f0, t, 0.16, { type: 'triangle', vol: 0.02, slide: lock ? 600 : dir * 260, attack: 0.012 });
+      this.osc(f0 / 2, t, 0.16, { vol: 0.008, slide: dir * 120, attack: 0.012 });
+      this.noise(t, 0.16, { vol: 0.013, type: 'bandpass', freq: f0, q: 9 });
+      if (lock) this.osc(2637, t + 0.16, 0.12, { type: 'square', vol: 0.018, attack: 0.003 });
     }
 
     // Bước chân khổng lồ: "thịch" trầm + bụi

@@ -247,7 +247,7 @@ Mô phỏng một người thả tim hết công suất, dừng khi THẤY đèn
   (thanh cảm ơn ghi "dùng khi búp bê hát lại"). Khiên, Khiên đội, Bản sao có tác dụng ngay. Hoá gà luôn rơi vào đúng người dẫn đầu
   (trừ người tặng); người đó đang miễn thì hiện "Miễn gà!", không chuyển sang người khác.
 - Bình luận của người ở hàng chờ và người đứng chờ ván (vạch xuất phát) hiện thành bong bóng trên đầu 6 giây.
-- Búp bê quay đầu: tiếng servo điện thu sẵn `doll_turn.m4a` / `doll_back.m4a` (tổng hợp bằng numpy, không dùng âm có bản quyền) — mô-tơ rít lên, bánh răng lách tách, "cạch" kim loại khi dừng; mắt quét giật từng nhịp kèm tiếng servo; khoá vào người bị phát hiện có tiếng "bíp".
+- Búp bê quay đầu: tiếng servo điện thu sẵn `doll_turn.m4a` / `doll_back.m4a` (tổng hợp bằng numpy, không dùng âm có bản quyền) — ù mô-tơ ~100 Hz, rít bánh răng chuỗi 952 Hz, nghiến rung ~18 Hz, cuối trượt xuống rồi tắt (đặc trưng đo từ đoạn tham khảo); đầu quay chậm 1 giây, quay lưng 0,7 giây; mắt quét giật từng nhịp kèm tiếng servo; khoá vào người bị phát hiện có tiếng "bíp".
 - 2,8 giây đầu mỗi câu hát: chữ "TAP TAP ❤️👆" trong suốt rung ở góc phải khu hàng chờ, nhắc người xem chạm màn hình thả tim.
 - Nhạc nền lúc nghỉ chờ ván mới: `lobby_1.m4a` (mingle) và `lobby_2.m4a` thay phiên theo số ván, bắt đầu 2,5 giây sau nhạc kết quả,
   lặp nếu nghỉ lâu hơn bản nhạc, nhỏ dần khi vào ván. Bật/tắt bằng "Nhạc nền lúc chờ ván"; thời gian nghỉ = "Thời gian xem kết quả"
@@ -288,7 +288,7 @@ Thời gian về đích gần như không đổi với mọi quà (về đích t
 | Confetti (100) | khiên cho 10 người gần + người tặng | — | có lợi |
 | Hand Hearts (100) | lính bắn 2 người đang chạy | — | 2 người bị loại |
 | Vòng cổ / Friendship Necklace (10) | 10 bản sao | không nhanh hơn; người thả tim bất chấp vẫn 0% về đích | — |
-| Kính râm / Sunglasses (199) | hoá khổng lồ đi ngang làn ngay trước mặt, dẫm tối đa 5 người (khiên đỡ, khổng lồ miễn) | hạng 20,8 → 16,4 | 5 người bị loại |
+| Kính râm / Sunglasses (199) | cướp biển chân gỗ khổng lồ (Scenario, 6 khung chạy khập khiễn) lết chậm 230 px/s theo đường ngẫu nhiên qua 3 chỗ đông người; ai đứng sát chân lúc nó đi qua bị dẫm (xét theo thời gian thực — kịp chạy khỏi đường là thoát), tối đa `stompMax` người (mặc định 5; khiên đỡ, khổng lồ miễn) | hạng 21 → 18–20 | 5 người bị loại |
 
 Trước khi cân lại: Heart Me (1 xu) giết 3 người — đã đổi thành chạy nhanh; "lính bắn" chỉ còn ở Hand Hearts (100 xu).
 

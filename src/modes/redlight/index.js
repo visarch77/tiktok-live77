@@ -30,11 +30,14 @@ const GRACE_MAX = 9000;
 const GRACE_MARGIN = 1500;
 // Bị búp bê phát hiện: nháy đỏ trên màn hình chừng này rồi mới bị bắn (mỗi lần nháy đỏ là một phát bắn)
 const SPOT_MS = 1200;
-// Khổng lồ dẫm: đi ngang sân trái → phải; người ở vị trí x (0..1) bị dẫm lúc STOMP_LEAD + x * STOMP_CROSS
-const STOMP_LEAD = 250;
-const STOMP_CROSS = 1500;
-const STOMP_BAND = 6; // nửa bề dày làn dẫm (đơn vị sân, sân dài 120)
-const STOMP_MAX = 5;
+// Khổng lồ dẫm: cướp biển chân gỗ chạy khập khiễn một đường ngẫu nhiên xuyên sân, vòng qua 3 chỗ đông người.
+// Xét va chạm theo thời gian thực (mỗi nhịp game): ai đang đứng sát bàn chân lúc nó đi qua thì bị dẫm — kịp chạy
+// ra khỏi đường thì thoát. Đo theo điểm ảnh trên màn hình (sân rộng 740 px, cao 702 px cho 120 đơn vị) để khớp hình.
+const STOMP_FIELD_W = 740;
+const STOMP_PX_PER_UNIT = 702 / 120;
+const STOMP_SPEED = 230; // px/giây: chậm để người chơi thấy và kịp né
+const STOMP_RADIUS = 48; // px: bán kính bàn chân + thân người chơi
+const STOMP_WAYPOINTS = 3;
 // Hết giờ: lính canh tiến vào sân (PURGE_MARCH_MS) rồi bắn lần lượt mọi người chưa về đích
 const PURGE_MARCH_MS = 1300;
 const PURGE_SHOOT_MS = 3200; // tổng thời gian bắn (chia đều cho số người), mỗi phát cách nhau tối đa 220ms
@@ -74,6 +77,7 @@ function create(ctx, saved = {}) {
   // Khiên, khiên đội, bản sao (bảo vệ) vẫn có tác dụng ngay.
   const DEFER_KINDS = new Set(['turbo', 'buffalo', 'wind', 'giant', 'chicken', 'stomp']);
   let heldGifts = []; // [{ id, item, count }]
+  let stompers = []; // khổng lồ đang chạy: { giverKey, path, startAt, cap, hit, count }
   const redActs = new Set(); // người vẫn thả tim sau khi nhạc dừng (màn hình vẽ đang chạy tại chỗ)
   let finishCount = 0;
   let results = [];
@@ -438,6 +442,75 @@ function create(ctx, saved = {}) {
       .slice(0, n);
   }
 
+  // Đường chạy của khổng lồ: vào từ một mép (ngẫu nhiên trái/phải), lần lượt qua 3 chỗ đông người, ra mép kia.
+  // Trả về [{ x (0..1), y (đơn vị sân), t (ms từ lúc bắt đầu) }]
+  function stompPath(others) {
+    const px = (v) => ({ X: v.x * STOMP_FIELD_W, Y: v.y * STOMP_PX_PER_UNIT });
+    const pts = others.map(px);
+    // chỗ đông: mỗi người được chấm điểm theo số người đứng quanh (chọn ngẫu nhiên theo trọng số, không trùng chỗ)
+    const weight = pts.map((a) => (pts.filter((b) => Math.hypot(a.X - b.X, a.Y - b.Y) < 90).length + 1) ** 2);
+    const picked = [];
+    for (let k = 0; k < STOMP_WAYPOINTS && picked.length < others.length; k++) {
+      const total = weight.reduce((s, w, i) => s + (picked.some((j) => Math.hypot(pts[j].X - pts[i].X, pts[j].Y - pts[i].Y) < 120) ? 0 : w), 0);
+      if (!total) break;
+      let r = Math.random() * total;
+      for (let i = 0; i < pts.length; i++) {
+        const w = picked.some((j) => Math.hypot(pts[j].X - pts[i].X, pts[j].Y - pts[i].Y) < 120) ? 0 : weight[i];
+        if ((r -= w) <= 0 && w > 0) {
+          picked.push(i);
+          break;
+        }
+      }
+    }
+    const dir = Math.random() < 0.5 ? 1 : -1;
+    const way = picked.map((i) => ({ x: others[i].x, y: others[i].y })).sort((a, b) => dir * (a.x - b.x));
+    const edgeIn = dir > 0 ? -0.08 : 1.08;
+    const first = way[0] || { y: TRACK / 2 };
+    const last = way[way.length - 1] || first;
+    const nodes = [{ x: edgeIn, y: first.y }, ...way, { x: 1 - edgeIn, y: last.y }];
+    let t = 0;
+    return nodes.map((nd, i) => {
+      if (i) {
+        const a = nodes[i - 1];
+        t += (Math.hypot((nd.x - a.x) * STOMP_FIELD_W, (nd.y - a.y) * STOMP_PX_PER_UNIT) / STOMP_SPEED) * 1000;
+      }
+      return { x: Math.round(nd.x * 1000) / 1000, y: Math.round(nd.y * 10) / 10, t: Math.round(t) };
+    });
+  }
+
+  // Mỗi nhịp game: khổng lồ ở đâu trên đường chạy, ai đang đứng sát bàn chân thì bị dẫm (mỗi người chỉ xét một lần)
+  function stepStompers(now) {
+    for (let i = stompers.length - 1; i >= 0; i--) {
+      const st = stompers[i];
+      const path = st.path;
+      const age = now - st.startAt;
+      if (age > path[path.length - 1].t) {
+        stompers.splice(i, 1);
+        continue;
+      }
+      let j = 1;
+      while (j < path.length - 1 && path[j].t < age) j++;
+      const a = path[j - 1];
+      const b = path[j];
+      const k = Math.max(0, Math.min(1, (age - a.t) / Math.max(1, b.t - a.t)));
+      const gx = (a.x + (b.x - a.x) * k) * STOMP_FIELD_W;
+      const gy = (a.y + (b.y - a.y) * k) * STOMP_PX_PER_UNIT;
+      for (const v of runners()) {
+        if (v.key === st.giverKey || v.doomAt || st.hit.has(v.id)) continue;
+        if (Math.hypot(v.x * STOMP_FIELD_W - gx, v.y * STOMP_PX_PER_UNIT - gy) > STOMP_RADIUS) continue;
+        st.hit.add(v.id);
+        if (st.count >= st.cap || v.giantUntil > now) continue; // khổng lồ không bị dẫm
+        if (v.shield > 0) {
+          v.shield--;
+          ctx.broadcast('rl.fx', { kind: 'shieldSave', id: v.id });
+          continue;
+        }
+        st.count++;
+        eliminate(v, 'stomp');
+      }
+    }
+  }
+
   function applyItem(p, item, count) {
     const now = Date.now();
     const n = Math.max(1, Math.min(count, 10));
@@ -496,33 +569,11 @@ function create(ctx, saved = {}) {
         break;
       }
       case 'stomp': {
-        // Làn dẫm: ngay trước mặt người tặng (người gần nhất phía trước; mình dẫn đầu thì người gần nhất phía sau)
         const others = runners().filter((v) => v.key !== p.key && !v.doomAt);
         if (!others.length) break;
-        const ahead = others.filter((v) => v.y > p.y).sort((a, b) => a.y - b.y)[0];
-        const near = ahead || others.sort((a, b) => b.y - a.y)[0];
-        const bandY = Math.min(TRACK - STOMP_BAND, Math.max(STOMP_BAND, near.y));
-        const inBand = others
-          .filter((v) => !v.cloneOf && Math.abs(v.y - bandY) <= STOMP_BAND)
-          .sort((a, b) => Math.abs(a.y - bandY) - Math.abs(b.y - bandY))
-          .slice(0, STOMP_MAX * Math.min(n, 2));
-        const ids = [];
-        const saved = [];
-        for (const v of inBand) {
-          if (v.giantUntil > now) continue; // khổng lồ không bị dẫm
-          if (v.shield > 0) {
-            v.shield--;
-            saved.push(v.id);
-            continue;
-          }
-          // có bản sao thì bản sao chết thay (bản sao đứng sát chủ)
-          const victim = clonesOf(v).find((c) => c.alive && !c.doomAt) || v;
-          victim.doomAt = now + STOMP_LEAD + victim.x * STOMP_CROSS;
-          victim.doomCause = 'stomp';
-          victim.pending = 0;
-          ids.push(victim.id);
-        }
-        ctx.broadcast('rl.fx', { kind: 'stomp', from: p.id, y: bandY, ids, saved, lead: STOMP_LEAD, cross: STOMP_CROSS });
+        const path = stompPath(others);
+        stompers.push({ giverKey: p.key, path, startAt: now, cap: S().stompMax * Math.min(n, 2), hit: new Set(), count: 0 });
+        ctx.broadcast('rl.fx', { kind: 'stomp', from: p.id, path });
         break;
       }
       case 'teamShield': {
@@ -593,6 +644,7 @@ function create(ctx, saved = {}) {
   function enterLobby() {
     purge = null;
     heldGifts = [];
+    stompers = [];
     song = null;
     phase = 'lobby';
     phaseStartedAt = Date.now();
@@ -746,6 +798,7 @@ function create(ctx, saved = {}) {
       if (now >= purge.endAt) endRound('time');
     } else if (phase === 'play') {
       if (now >= lightEndsAt) setLight(light === 'green' ? 'warn' : light === 'warn' ? 'red' : 'green');
+      if (stompers.length) stepStompers(now);
       const dt = TICK_MS / 1000;
       let moved = false;
       for (const p of [...players.values()]) {
@@ -1007,7 +1060,7 @@ function create(ctx, saved = {}) {
           roster: rosterView(),
           results,
           lastWinners,
-          legend: LEGEND,
+          legend: LEGEND.map((it) => (it.kind === 'stomp' ? { ...it, short: `DẪM ${S().stompMax}`, desc: `hoá khổng lồ chạy dẫm tối đa ${S().stompMax} người` } : it)),
           queue: queueView(),
           queueNeed: S().queueLikes,
           counts: {
@@ -1053,6 +1106,7 @@ module.exports = {
     simCrowd: [5, 200],
     songEnabled: 'boolean',
     queueLikes: [1, 300],
+    stompMax: [1, 15],
     songMode: { type: 'enum', values: ['random', ...MODES] }
   },
   defaultSettings: {
@@ -1073,6 +1127,7 @@ module.exports = {
     autoLoop: true,
     simCrowd: 60,
     songEnabled: true, // đèn xanh theo câu hát của búp bê; tắt thì dùng greenMin/greenMax
+    stompMax: 5, // Kính râm: khổng lồ dẫm tối đa chừng này người (mỗi quà)
     queueLikes: 50, // thả đủ chừng này tim là tham gia (lúc chờ: vào luôn; đang chơi: giữ chỗ hàng chờ ván sau)
     songMode: 'random',
     bgMusicEnabled: true,

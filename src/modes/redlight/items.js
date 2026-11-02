@@ -49,7 +49,7 @@ const LEGEND = [
   { gift: 'Mũ & ria', tiktok: 'Hat and Mustache', coins: 99, kind: 'giant', emoji: '💪', label: 'Khổng lồ', short: 'KHỔNG LỒ', desc: '15 giây mỗi tim đi gấp đôi' },
   { gift: 'Hand Hearts', tiktok: 'Hand Hearts', coins: 100, kind: 'buffalo', emoji: '🎯', label: 'Lính bắn', short: 'BẮN 2', desc: 'lính bắn 2 người đang chạy' },
   { gift: 'Confetti', tiktok: 'Confetti', coins: 100, kind: 'teamShield', emoji: '🫧', label: 'Khiên đội', short: 'KHIÊN ĐỘI', desc: 'khiên cho 10 người quanh mình' },
-  { gift: 'Kính râm', tiktok: 'Sunglasses', coins: 199, kind: 'stomp', emoji: '🦶', label: 'Khổng lồ dẫm', short: 'DẪM 5', desc: 'hoá khổng lồ dẫm 5 người trước mặt' }
+  { gift: 'Kính râm', tiktok: 'Sunglasses', coins: 199, kind: 'stomp', emoji: '🦶', label: 'Khổng lồ dẫm', short: 'DẪM 5', desc: 'hoá khổng lồ chạy dẫm tối đa 5 người' }
 ];
 
 function itemForGift(giftName, coins) {

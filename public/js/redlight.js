@@ -42,7 +42,7 @@
   // Ảnh vẽ bằng Scenario (public/assets/redlight). manifest.json: tên → [rộng, cao, phụ]
   //   người chơi: phụ = [tâm x, tâm y, rộng] miếng vải số sau lưng; búp bê: phụ = [[x, y], ...] vị trí mắt (tỉ lệ)
   const ASSET = '/assets/redlight/';
-  const AV = 11; // đổi số này mỗi khi thay ảnh: /assets được cache 1 ngày
+  const AV = 14; // đổi số này mỗi khi thay ảnh: /assets được cache 1 ngày
   const IMG = {};
   // prettier-ignore
   const NAMES = ['bg', 'doll_0', 'doll_1', 'doll_2', 'doll_3', 'doll_4', 'guard_0', 'guard_1', 'guard_2',
@@ -51,7 +51,8 @@
     'fx_shield', 'fx_flash', 'fx_spark', 'fx_trail', 'fx_aura', 'fx_wave', 'fx_smoke', 'fx_feather',
     'ui_panel', 'ui_rank1', 'ui_rank2', 'ui_rank3', 'ui_rank4', 'ui_rank5',
     'gift_turbo', 'gift_shield', 'gift_buffalo', 'gift_clones', 'gift_wind', 'gift_giant', 'gift_chicken', 'gift_teamShield',
-    'gift_crowd', 'gift_stomp'];
+    'gift_crowd', 'gift_stomp',
+    'giant_run1', 'giant_run2', 'giant_run3', 'giant_run4', 'giant_run5', 'giant_run6'];
   for (let v = 0; v < VARIANTS; v++) for (const f of P_FRAMES) NAMES.push(`v${v}_${f}`);
   for (const n of NAMES) {
     const im = new Image();
@@ -392,13 +393,9 @@
         if (e.name) pushTicker(`❌ Số ${e.num} ${e.name} bị loại`);
         break;
       case 'stomp': {
-        // Khổng lồ dẫm: nhân vật của người tặng phóng to đi ngang làn sân (trái → phải), dẫm người theo thời điểm server tính
-        const giver = e.from && sprites.get(e.from);
-        stompers.push({ t0, y: project(0.5, e.y).y, v: giver ? (giver.h || 0) % VARIANTS : 0, num: giver ? giver.num : '', lead: e.lead || 250, cross: e.cross || 1500, steps: 0 });
-        for (const id of e.saved || []) {
-          const v = sprites.get(id);
-          if (v) fx.push({ type: 'text', x: spritePos(v).x, y: spritePos(v).y - PH * 1.4, text: 'Khiên đỡ!', color: '#74c0fc', size: 24, t0: t0 + 600, life: 1100 });
-        }
+        // Khổng lồ dẫm: chạy theo đường server tính (qua các chỗ đông người); server xét ai bị dẫm theo thời gian thực
+        const path = (e.path || []).map((n) => ({ ...project(n.x, n.y), t: n.t }));
+        if (path.length > 1) stompers.push({ t0, path, frame: -1 });
         break;
       }
       case 'say':
@@ -649,8 +646,9 @@
   let dollShout = 0;
   let dollEyes = []; // toạ độ mắt trên màn hình (khung có mặt)
   const laserLocks = []; // tia mắt khoá vào người bị loại
-  const TURN_MS = 480; // quay đầu nhìn ra sân: xong đúng lúc câu hát dứt
-  const BACK_MS = 380; // quay lưng lại khi bắt đầu hát
+  // Quay đầu chậm kiểu máy (khớp tiếng servo doll_turn / doll_back): bắt đầu 1 giây trước khi câu hát dứt, xong đúng lúc dứt
+  const TURN_MS = 1000;
+  const BACK_MS = 700; // quay lưng lại khi bắt đầu hát
   const ease = (k) => k * k * (3 - 2 * k);
   // Bắt đầu quay mặt ra / quay lưng lại: tiếng máy (gọi qua updateDoll)
   let dollPrev = 0;
@@ -1303,42 +1301,50 @@
     }
   }
 
-  // Khổng lồ dẫm: chân chạm đất mỗi bước → bụi + rung + tiếng "thịch"
+  // Khổng lồ dẫm (Scenario: cướp biển chân gỗ gầy ốm, 6 khung chạy khập khiễn nhìn ngang, mặt quay sang phải):
+  // chạy chậm theo đường server gửi, quay mặt theo hướng chạy; khung 1 (giày chạm đất) và 3 (chân gỗ nện xuống) → bụi + "thịch"
   const stompers = [];
+  const GIANT_FRAME_MS = 150;
+  const GIANT_H = PH * 3.3; // cướp biển gầy cao lêu nghêu
   function drawStompers(t) {
     const tn = performance.now();
     for (let i = stompers.length - 1; i >= 0; i--) {
       const st = stompers[i];
       const age = tn - st.t0;
-      const end = st.lead + st.cross + 400;
-      if (age > end) {
+      const end = st.path[st.path.length - 1].t;
+      if (age > end + 200) {
         stompers.splice(i, 1);
         continue;
       }
-      // x khớp server: người ở vị trí x bị dẫm lúc lead + x * cross
-      const k = (age - st.lead) / st.cross;
-      const x = FX0 + k * (FX1 - FX0);
-      const step = Math.floor(age / 250);
-      if (step > st.steps) {
-        st.steps = step;
-        addSprite('fx_smoke', x, st.y - 6, 50, 170, 600, tn);
-        if (unlocked) audio.stompStep();
+      // vị trí theo thời gian trên đường gấp khúc (khớp thời điểm server loại người)
+      let j = 1;
+      while (j < st.path.length - 1 && st.path[j].t < age) j++;
+      const a = st.path[j - 1];
+      const b = st.path[j];
+      const k = Math.max(0, Math.min(1, (age - a.t) / Math.max(1, b.t - a.t)));
+      const x = a.x + (b.x - a.x) * k;
+      const y = a.y + (b.y - a.y) * k;
+      const face = b.x >= a.x ? 1 : -1;
+      const frame = Math.floor(age / GIANT_FRAME_MS) % 6;
+      if (frame !== st.frame) {
+        st.frame = frame;
+        if (frame === 0 || frame === 2) {
+          addSprite('fx_smoke', x + face * 30, y - 4, 40, 150, 550, tn);
+          if (unlocked) audio.stompStep();
+        }
       }
-      const im = IMG[`v${st.v}_run${(step % 4) + 1}`];
+      const im = IMG[`giant_run${frame + 1}`];
       if (!ready(im)) continue;
-      const h = PH * 3.4;
+      const h = GIANT_H;
       const w = (im.naturalWidth / im.naturalHeight) * h;
-      const bob = -Math.abs(Math.sin((age / 250) * Math.PI)) * 14;
-      const fade = Math.min(1, age / 200, (end - age) / 300);
       g.save();
-      g.globalAlpha = fade;
-      g.fillStyle = 'rgba(0,0,0,0.35)';
+      g.globalAlpha = Math.min(1, (age + 150) / 150, (end + 200 - age) / 200);
+      g.fillStyle = 'rgba(0,0,0,0.32)';
       g.beginPath();
-      g.ellipse(x, st.y, w * 0.35, 18, 0, 0, Math.PI * 2);
+      g.ellipse(x, y, w * 0.42, 16, 0, 0, Math.PI * 2);
       g.fill();
-      // quay mặt sang phải (đi ngang): lật ảnh không cần — ảnh nhìn từ sau lưng, chỉ nghiêng người về hướng đi
-      g.translate(x, st.y + bob);
-      g.rotate(0.12);
+      g.translate(x, y);
+      g.scale(face, 1);
       g.drawImage(im, -w / 2, -h, w, h);
       g.restore();
     }
