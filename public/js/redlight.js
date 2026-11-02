@@ -42,7 +42,7 @@
   // Ảnh vẽ bằng Scenario (public/assets/redlight). manifest.json: tên → [rộng, cao, phụ]
   //   người chơi: phụ = [tâm x, tâm y, rộng] miếng vải số sau lưng; búp bê: phụ = [[x, y], ...] vị trí mắt (tỉ lệ)
   const ASSET = '/assets/redlight/';
-  const AV = 14; // đổi số này mỗi khi thay ảnh: /assets được cache 1 ngày
+  const AV = 15; // đổi số này mỗi khi thay ảnh: /assets được cache 1 ngày
   const IMG = {};
   // prettier-ignore
   const NAMES = ['bg', 'doll_0', 'doll_1', 'doll_2', 'doll_3', 'doll_4', 'guard_0', 'guard_1', 'guard_2',
@@ -50,7 +50,7 @@
     'ic_turbo', 'ic_shield', 'ic_shot', 'ic_clones', 'ic_push', 'ic_giant', 'ic_chicken', 'ic_team',
     'fx_shield', 'fx_flash', 'fx_spark', 'fx_trail', 'fx_aura', 'fx_wave', 'fx_smoke', 'fx_feather',
     'ui_panel', 'ui_rank1', 'ui_rank2', 'ui_rank3', 'ui_rank4', 'ui_rank5',
-    'gift_turbo', 'gift_shield', 'gift_buffalo', 'gift_clones', 'gift_wind', 'gift_giant', 'gift_chicken', 'gift_teamShield',
+    'gift_turbo', 'gift_shield', 'gift_buffalo', 'gift_clones', 'gift_wind', 'gift_giant', 'gift_chicken', 'gift_teamShield', 'gift_shove',
     'gift_crowd', 'gift_stomp',
     'giant_run1', 'giant_run2', 'giant_run3', 'giant_run4', 'giant_run5', 'giant_run6'];
   for (let v = 0; v < VARIANTS; v++) for (const f of P_FRAMES) NAMES.push(`v${v}_${f}`);
@@ -381,7 +381,7 @@
           const p = spritePos(s);
           // Đèn đỏ: tia mắt búp bê khoá vào người bị loại
           // đèn đỏ: đã nháy đỏ từ sự kiện "spotted" → giờ lính bắn
-          if (e.cause === 'purge' || e.cause === 'red') shootAt(s, t0);
+          if (e.cause === 'purge' || e.cause === 'red' || e.cause === 'shove') shootAt(s, t0);
           const hitAt = t0 + (e.cause === 'red' || e.cause === 'purge' ? 120 : 0);
           burst(p.x, p.y - PH * 0.45, '#ff3b6b', 16, hitAt);
           addSprite('fx_spark', p.x, p.y - PH * 0.45, 40, 130, 380, hitAt);
@@ -473,6 +473,21 @@
           fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.4, text: 'Cục tác!', color: '#ffe066', size: 28, t0, life: 1400 });
         }
         break;
+      case 'shove': {
+        // bị đẩy ngã: chữ "Bị đẩy!", bụi, nháy đỏ tới lúc lính bắn (sự kiện "out" cause shove)
+        if (s) {
+          const p = spritePos(s);
+          s.spotUntil = t0 + (e.ms || 1200) + 300;
+          addSprite('fx_smoke', p.x, p.y - 10, 30, 120, 600, t0);
+          fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.4, text: 'Bị đẩy!', color: '#ffa94d', size: 28, t0, life: 1300 });
+        }
+        const g = e.from && sprites.get(e.from);
+        if (g) {
+          const gp = spritePos(g);
+          fx.push({ type: 'text', x: gp.x, y: gp.y - PH * 1.4, text: 'Trượt tay!', color: '#ffe066', size: 22, t0, life: 1100 });
+        }
+        break;
+      }
       case 'chickenBlocked':
         // người dẫn đầu vừa bị hoá gà, đang được miễn
         for (const id of e.ids || []) {

@@ -274,6 +274,8 @@ Mô phỏng một người thả tim hết công suất, dừng khi THẤY đèn
   momentumSec giây thì tự chạy hết tốc lực suốt lúc búp bê hát, nhạc dừng tự đứng; luật bắn giữ nguyên. Mô phỏng gửi thưa
   15–60 s, ván 90 s: đà 20 s → về đích 15–29%; đà 45 s → 56–82%; **đà 60 s + tốc độ 5 → 89–100%** (TB 79 s).
   Người thả tim bất chấp chỉ bị bắt 16–32% vì đợt tim của họ hiếm khi rơi đúng khoảng bắt (giới hạn của TikTok).
+- GG (1 xu) đổi từ "hoá gà" thành **đẩy ngã**: người tặng "trượt tay" đẩy người đứng gần mình nhất (combo tối đa 3 người) → nháy đỏ
+  1,2 s rồi lính bắn; khiên đỡ được, khổng lồ không ngã; có tác dụng ngay kể cả lúc đèn đỏ. Giọng đọc: "A bị B trượt tay đẩy ngã!".
 - Bình luận lúc đèn đỏ không bị tính là cử động. Mỗi lần bắt lỗi đèn đỏ (người thật) ghi vào `DATA_DIR/redlight-fairness.log`.
 - Cân lại theo câu hát: tốc độ 3,8 bước/giây, tối đa 10 bước/gói tim, dồn tối đa 22 bước → người thả tim hết công suất,
   dừng khi búp bê quay đầu, trễ 1–4,5 giây về đích ~64–67 giây / ván 90 giây; thả tim bất chấp vẫn bị loại 100%.

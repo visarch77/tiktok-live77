@@ -87,7 +87,7 @@ function create(ctx, saved = {}) {
   let nextSongMode = null; // người điều phối chọn kiểu cho lần hát sau
   // Quà tặng lúc nhạc dừng (đèn đỏ): kỹ năng chạy / tấn công để dành, búp bê hát câu sau mới có tác dụng.
   // Khiên, khiên đội, bản sao (bảo vệ) vẫn có tác dụng ngay.
-  const DEFER_KINDS = new Set(['turbo', 'buffalo', 'wind', 'giant', 'chicken', 'stomp']);
+  const DEFER_KINDS = new Set(['turbo', 'buffalo', 'wind', 'giant', 'chicken', 'stomp']); // đẩy ngã: có tác dụng ngay, kể cả lúc búp bê nhìn
   let heldGifts = []; // [{ id, item, count }]
   let stompers = []; // khổng lồ đang chạy: { giverKey, path, startAt, cap, hit, count }
   const redActs = new Set(); // người vẫn thả tim sau khi nhạc dừng (màn hình vẽ đang chạy tại chỗ)
@@ -740,6 +740,36 @@ function create(ctx, saved = {}) {
         p.giantUntil = Math.max(p.giantUntil, now) + (item.ms || 10000) * n;
         rosterDirty = true;
         break;
+      case 'shove': {
+        // "Trượt tay" đẩy người đứng gần mình nhất (mỗi quà 1 người, combo tối đa 3) → ngã, nháy đỏ rồi lính bắn
+        const px = (v) => ({ X: v.x * STOMP_FIELD_W, Y: v.y * STOMP_PX_PER_UNIT });
+        const me = px(p);
+        const near = runners()
+          .filter((v) => v.key !== p.key && !v.cloneOf && !v.doomAt)
+          .map((v) => ({ v, d: Math.hypot(px(v).X - me.X, px(v).Y - me.Y) }))
+          .sort((a, b) => a.d - b.d)
+          .slice(0, Math.min(n, 3));
+        for (const { v } of near) {
+          const giver = speakName(p.name) || `Số ${p.num}`;
+          const victim = speakName(v.name) || `Số ${v.num}`;
+          if (v.giantUntil > now) {
+            announce(`${giver} đẩy ${victim} nhưng khổng lồ không ngã!`);
+            continue;
+          }
+          if (v.shield > 0) {
+            v.shield--;
+            ctx.broadcast('rl.fx', { kind: 'shieldSave', id: v.id });
+            announce(`${giver} đẩy ${victim} nhưng khiên đỡ được!`);
+            continue;
+          }
+          v.doomAt = now + SPOT_MS;
+          v.doomCause = 'shove';
+          v.pending = 0;
+          ctx.broadcast('rl.fx', { kind: 'shove', from: p.id, id: v.id, ms: SPOT_MS });
+          announce(`${victim} bị ${giver} trượt tay đẩy ngã!`);
+        }
+        break;
+      }
       case 'chicken': {
         // Luôn nhắm đúng người dẫn đầu (trừ người tặng). Người dẫn đầu vừa bị hoá gà (còn miễn 20 giây kể từ lúc hoá)
         // thì quà không có tác dụng — không chuyển sang người hạng sau, để ai xem cũng thấy gà chỉ rơi vào người đứng đầu.
@@ -811,6 +841,13 @@ function create(ctx, saved = {}) {
   const speakName = (n) => String(n || '').replace(/[^\p{L}\p{M}\s]/gu, ' ').replace(/\s+/g, ' ').trim().slice(0, 24);
   const itemSaid = new Map(); // "khoá người|vật phẩm" → lúc đọc
   let itemSayQueue = [];
+  // Câu đọc theo sự kiện (vd. đẩy ngã): lúc búp bê đang hát thì giữ lại, đọc khi nhạc dừng
+  function announce(text) {
+    if (phase === 'play' && light !== 'red') {
+      itemSayQueue.push(text);
+      if (itemSayQueue.length > 3) itemSayQueue.shift();
+    } else say(text);
+  }
   function sayItem(p, kind) {
     const line = ITEM_SAY[kind];
     if (!line || p.npc) return;
