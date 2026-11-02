@@ -34,6 +34,8 @@ const GRACE_MARGIN = 2500;
 const LAG_SAMPLE_MIN = 1500;
 // Bị búp bê phát hiện: nháy đỏ trên màn hình chừng này rồi mới bị bắn (mỗi lần nháy đỏ là một phát bắn)
 const SPOT_MS = 1200;
+// Hết ván: chỉ giữ người chơi có tương tác trong chừng này trước lúc vào màn chờ (ai rời live thì tự bị gỡ)
+const KEEP_ACTIVE_MS = 45000;
 // Khổng lồ dẫm: cướp biển chân gỗ chạy khập khiễn một đường ngẫu nhiên xuyên sân, vòng qua 3 chỗ đông người.
 // Xét va chạm theo thời gian thực (mỗi nhịp game): ai đang đứng sát bàn chân lúc nó đi qua thì bị dẫm — kịp chạy
 // ra khỏi đường thì thoát. Đo theo điểm ảnh trên màn hình (sân rộng 740 px, cao 702 px cho 120 đơn vị) để khớp hình.
@@ -50,7 +52,11 @@ const MAX_CLONES_EACH = 10;
 const MAX_CLONES_TOTAL = 300;
 
 const LINES = {
-  lobby: ['Bình luận bất kỳ để vào chơi. Ván mới sắp bắt đầu!', 'Ai muốn chơi thì bình luận nhé, sắp bắt đầu rồi!'],
+  // đọc lúc chờ ván: luật chơi ngắn gọn
+  lobby: [
+    'Luật chơi: nhạc lên thì nhấp thả tim thật nhanh để chạy. Dừng thả tim trước khi nhạc dừng, nhạc dừng mà tim vẫn về là bị bắn. Bình luận hoặc thả tim để vào chơi!',
+    'Ván mới sắp bắt đầu! Nhạc lên thả tim thật nhanh, dừng tay trước khi nhạc dừng nhé. Bình luận để vào chơi!'
+  ],
   start: ['Bắt đầu! Đèn xanh, chạy nào!', 'Xuất phát! Thả tim để chạy!'],
   green: ['Đèn xanh!', 'Chạy đi!', 'Đèn xanh, chạy nào!'],
   red: ['Đèn đỏ!', 'Đứng im!', 'Búp bê quay lại rồi, đứng im!', 'Đèn đỏ! Lính canh đang nhìn!'],
@@ -804,8 +810,9 @@ function create(ctx, saved = {}) {
     phase = 'lobby';
     phaseStartedAt = Date.now();
     phaseEndsAt = Date.now() + S().lobbySeconds * 1000;
-    // Giữ lại người còn tương tác trong ván vừa rồi, bỏ bản sao & người đã rời
-    const keepSince = Date.now() - 180000;
+    // Giữ lại người còn tương tác gần cuối ván (thả tim / bình luận / tặng quà trong KEEP_ACTIVE_MS), bỏ bản sao
+    // & người đã rời. Trước đây giữ 3 phút nên người thả tim đầu ván rồi rời live vẫn đứng kẹt ở ván sau tới lúc bị bắn.
+    const keepSince = Date.now() - KEEP_ACTIVE_MS;
     for (const p of [...players.values()]) {
       if (p.cloneOf || p.lastActiveAt < keepSince) {
         removePlayer(p);
