@@ -318,6 +318,10 @@ Thời gian về đích gần như không đổi với mọi quà (về đích t
 | Vòng cổ / Friendship Necklace (10) | 10 bản sao | không nhanh hơn; người thả tim bất chấp vẫn 0% về đích | — |
 | Kính râm / Sunglasses (199) | cướp biển chân gỗ khổng lồ (Scenario, 6 khung chạy khập khiễn) lết chậm 230 px/s theo đường ngẫu nhiên qua 3 chỗ đông người; ai đứng sát chân lúc nó đi qua bị dẫm (xét theo thời gian thực — kịp chạy khỏi đường là thoát), tối đa `stompMax` người (mặc định 10; khiên đỡ, khổng lồ miễn) | hạng 21 → 18–20 | tối đa 10 người bị loại |
 
+Cân lại khi có "đà chạy" (người có đà luôn chạy đúng `runSpeed`, bước dồn từ tim không còn tác dụng):
+- Hoa hồng: bước cộng thêm đi vào `dash` riêng, chạy chồng lên tốc độ thường (đo: 3 giây chạy 32,5 bước so với 14,5 của người thường).
+- Khổng lồ: chạy ×2 (trước ×1,6); đồng hồ khổng lồ đứng yên lúc đèn đỏ, nên 15 s là 15 s búp bê hát (vẫn miễn bắn / dẫm / đẩy suốt thời gian đó). Một lần Mũ & ria ≈ +75 bước (~60% sân).
+
 Trước khi cân lại: Heart Me (1 xu) giết 3 người — đã đổi thành chạy nhanh; "lính bắn" chỉ còn ở Hand Hearts (100 xu).
 
 ## Bảng kỉ lục

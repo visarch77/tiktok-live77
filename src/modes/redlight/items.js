@@ -3,12 +3,12 @@
  * Quà chỉ là phụ trợ: người không tặng quà vẫn về đích được bằng thả tim và dừng đúng lúc.
  *
  * Loại vật phẩm (kind):
- *   turbo     chạy nhanh: cộng bước + tăng tốc vài giây
+ *   turbo     chạy nhanh: lao lên thêm vài bước (cả khi đang có đà) + chạy ×2 trong 2,5 giây
  *   shield    khiên: chịu một phát bắn lúc đèn đỏ, đổi lại được nhấp tim suốt lần búp bê quay lại đó (tim vẫn cộng)
  *   buffalo   lính bắn: lính canh bắn 5 người đang chạy ngẫu nhiên (không bắn người có khiên / khổng lồ); chỉ quà đắt
  *   clones    bản sao: chạy cùng chủ, chết thay chủ (số bản sao theo giá quà)
  *   wind      búp bê hét: sóng âm đẩy lùi 5 người dẫn đầu (mỗi người được miễn 10 giây sau khi bị đẩy)
- *   giant     khổng lồ: mỗi lượt tim đi gấp đôi, chạy nhanh hơn, không bị lính bắn
+ *   giant     khổng lồ: chạy gấp đôi (giờ chỉ trôi lúc búp bê hát), mỗi lượt tim đi gấp đôi, không bị bắn / dẫm / đẩy
  *   chicken   hoá gà: người dẫn đầu (trừ người tặng) chạy chậm 5 giây (không còn quà nào dùng)
  *   shove     đẩy ngã: người tặng "trượt tay" đẩy người đứng gần nhất ngã → lính bắn (khiên đỡ được, khổng lồ không ngã)
  *   teamShield khiên cho 10 người đứng gần và người tặng
@@ -47,7 +47,7 @@ const LEGEND = [
   { gift: 'Finger Heart', tiktok: 'Finger Heart', coins: 5, kind: 'shield', emoji: '🛡️', label: 'Khiên', short: 'KHIÊN', desc: 'chịu 1 phát bắn, được nhấp tim cả lúc búp bê quay lại' },
   { gift: 'Vòng cổ', tiktok: 'Friendship Necklace', coins: 10, kind: 'crowd', emoji: '👥', label: '5 bản sao', short: '5 BẢN SAO', desc: '5 bản sao chạy quanh mình, chết thay mình' },
   { gift: 'Donut', tiktok: 'Doughnut', coins: 30, kind: 'wind', emoji: '📢', label: 'Búp bê hét', short: 'ĐẨY LÙI 5', desc: 'đẩy lùi 5 người dẫn đầu' },
-  { gift: 'Mũ & ria', tiktok: 'Hat and Mustache', coins: 99, kind: 'giant', emoji: '💪', label: 'Khổng lồ', short: 'KHỔNG LỒ', desc: '15 giây mỗi tim đi gấp đôi' },
+  { gift: 'Mũ & ria', tiktok: 'Hat and Mustache', coins: 99, kind: 'giant', emoji: '💪', label: 'Khổng lồ', short: 'KHỔNG LỒ', desc: 'chạy gấp đôi 15 giây hát, miễn bắn / dẫm / đẩy' },
   { gift: 'Hand Hearts', tiktok: 'Hand Hearts', coins: 100, kind: 'buffalo', emoji: '🎯', label: 'Lính bắn', short: 'BẮN 5', desc: 'lính bắn 5 người đang chạy' },
   { gift: 'Confetti', tiktok: 'Confetti', coins: 100, kind: 'teamShield', emoji: '🫧', label: 'Khiên đội', short: 'KHIÊN ĐỘI', desc: 'khiên cho 10 người quanh mình' },
   { gift: 'Kính râm', tiktok: 'Sunglasses', coins: 199, kind: 'stomp', emoji: '🦶', label: 'Khổng lồ dẫm', short: 'DẪM 10', desc: 'hoá khổng lồ chạy dẫm tối đa 10 người' }

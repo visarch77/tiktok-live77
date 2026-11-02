@@ -625,7 +625,7 @@ function create(ctx, saved = {}) {
   function speedOf(p, now) {
     let v = S().runSpeed ?? BASE_SPEED;
     if (p.turboUntil > now) v *= 2;
-    if (p.giantUntil > now) v *= 1.6;
+    if (p.giantUntil > now) v *= 2;
     if (p.chickenUntil > now) v *= 0.4;
     return v;
   }
@@ -720,7 +720,8 @@ function create(ctx, saved = {}) {
       case 'turbo':
         p.turboUntil = Math.max(p.turboUntil, now) + 2500;
         if (phase === 'play' && p.alive && !p.finishRank && light !== 'red') {
-          p.pending = Math.min(p.pending + (item.bonus || 3) * n, maxPending() + 8);
+          // lao lên: cộng bước riêng chạy chồng lên tốc độ thường (cả khi đang có đà — bước dồn từ tim thì đà đã thay)
+          p.dash = Math.min((p.dash || 0) + (item.bonus || 3) * n, 60);
         }
         break;
       case 'shield':
@@ -1092,13 +1093,17 @@ function create(ctx, saved = {}) {
       let moved = false;
       for (const p of [...players.values()]) {
         if (p.doomAt && now >= p.doomAt) eliminate(p, p.doomCause || 'red');
+        // khổng lồ chỉ tính giờ lúc búp bê hát: đèn đỏ thì đồng hồ khổng lồ đứng yên (vẫn miễn bắn / dẫm / đẩy)
+        if (light === 'red' && p.giantUntil > now) p.giantUntil += TICK_MS;
         if (!p.alive || p.finishRank || p.doomAt || light === 'red') continue;
         const momentum = (p.momentumUntil || 0) > now;
-        if (!momentum && p.pending <= 0) continue;
+        if (!momentum && p.pending <= 0 && !(p.dash > 0)) continue;
         // có đà: chạy hết tốc lực (vẫn tiêu bước dồn); không đà: chạy bằng bước dồn từ tim như cũ
         const step = momentum ? speedOf(p, now) * dt : Math.min(p.pending, speedOf(p, now) * dt);
         p.pending = Math.max(0, p.pending - step);
-        p.y += step;
+        const dash = p.dash > 0 ? Math.min(p.dash, speedOf(p, now) * dt) : 0; // hoa hồng: lao thêm cùng tốc độ
+        if (dash) p.dash -= dash;
+        p.y += step + dash;
         moved = true;
         if (p.y >= TRACK) finish(p);
       }
