@@ -372,6 +372,7 @@ function create(ctx, saved = {}) {
       }
     }
     if (light === 'red') redActs.add(p.id);
+    if (units > 0) keepMomentum(p); // có tim về (lúc hát hoặc còn trong ân hạn): giữ đà chạy
     // Khổng lồ: mỗi lượt tim đi gấp đôi (chạy bị giới hạn bởi số tim, không phải tốc độ)
     if (p.giantUntil > Date.now()) units *= 2;
     // Đèn xanh/vàng: chạy ngay. Đỏ trong thời gian ân hạn: dồn lại, chạy khi xanh trở lại
@@ -467,6 +468,17 @@ function create(ctx, saved = {}) {
       result: p.shield > 0 ? 'shield' : clonesOf(p).length ? 'clone' : 'out'
     };
     fs.appendFile(fairLog, JSON.stringify(line) + '\n', () => {});
+  }
+
+  // Đà chạy: TikTok gửi tim rất thưa ở phòng đông (mỗi người 1 đợt / 20–60 s) nên chạy theo từng đợt tim thì nhân vật
+  // đứng im phần lớn thời gian. Ai có tim / bình luận về trong momentumSec giây gần nhất thì tự chạy hết tốc lực suốt lúc
+  // búp bê hát, nhạc dừng thì tự đứng. Luật bắn giữ nguyên (tim về sau ân hạn lúc đèn đỏ vẫn bị bắn).
+  function keepMomentum(p) {
+    const sec = S().momentumSec ?? 20;
+    if (sec <= 0) return;
+    const until = Date.now() + sec * 1000;
+    p.momentumUntil = until;
+    for (const c of clonesOf(p)) c.momentumUntil = until;
   }
 
   function violate(p) {
@@ -1026,9 +1038,12 @@ function create(ctx, saved = {}) {
       let moved = false;
       for (const p of [...players.values()]) {
         if (p.doomAt && now >= p.doomAt) eliminate(p, p.doomCause || 'red');
-        if (!p.alive || p.finishRank || p.doomAt || p.pending <= 0 || light === 'red') continue;
-        const step = Math.min(p.pending, speedOf(p, now) * dt);
-        p.pending -= step;
+        if (!p.alive || p.finishRank || p.doomAt || light === 'red') continue;
+        const momentum = (p.momentumUntil || 0) > now;
+        if (!momentum && p.pending <= 0) continue;
+        // có đà: chạy hết tốc lực (vẫn tiêu bước dồn); không đà: chạy bằng bước dồn từ tim như cũ
+        const step = momentum ? speedOf(p, now) * dt : Math.min(p.pending, speedOf(p, now) * dt);
+        p.pending = Math.max(0, p.pending - step);
         p.y += step;
         moved = true;
         if (p.y >= TRACK) finish(p);
@@ -1138,6 +1153,7 @@ function create(ctx, saved = {}) {
           if (light === 'red') p.lastActiveAt = now;
           else if (now - p.lastChatStepAt > 1500) {
             p.lastChatStepAt = now;
+            keepMomentum(p); // bình luận lúc búp bê hát cũng giữ đà chạy
             const likes = S().commentLikes ?? 2;
             if (likes > 0) move(p, Math.min(maxLikeStep(), likes * S().stepPerLike));
             else p.lastActiveAt = now;
@@ -1375,6 +1391,7 @@ module.exports = {
     queueLikes: [1, 300],
     npcMin: [0, 30],
     commentLikes: [0, 20],
+    momentumSec: [0, 60],
     stompMax: [1, 15],
     graceMinMs: [2000, 9000],
     perPlayerGrace: 'boolean',
@@ -1406,6 +1423,7 @@ module.exports = {
     perPlayerGrace: false, // bật: ân hạn từng người = độ trễ đo được lớn nhất + graceMarginMs (không nhỏ hơn graceMinMs)
     graceMarginMs: GRACE_MARGIN, // ân hạn = độ trễ lớn nhất đo được + chừng này
     runSpeed: BASE_SPEED, // bước/giây khi chạy (sân dài 120 bước)
+    momentumSec: 20, // đà chạy: có tim / bình luận trong chừng này giây thì tự chạy suốt lúc búp bê hát (0 = tắt)
     commentLikes: 2, // 1 bình luận lúc búp bê hát = chừng này tim (0 = bình luận không giúp chạy)
     npcMin: 6, // sân ít người thật hơn số này thì thêm người máy cho đủ (0 = tắt)
     stompMax: 5, // Kính râm: khổng lồ dẫm tối đa chừng này người (mỗi quà)

@@ -1237,6 +1237,7 @@
         </div>
         ${rlRange('graceMarginMs', 'Ân hạn cộng thêm', 'Chỉ dùng khi bật “Ân hạn riêng từng người”: ân hạn = độ trễ lớn nhất đo được + chừng này (tối đa 9 s)', 0, 5000, 250, 'ms')}
         ${rlRange('runSpeed', 'Tốc độ chạy', 'Bước/giây khi chạy; sân dài 120 bước. Đèn đỏ dài thì tăng tốc để ván vẫn kịp về đích', 2, 12, 0.1, ' bước/s')}
+        ${rlRange('momentumSec', 'Đà chạy', 'TikTok gửi tim rất thưa khi phòng đông. Ai có tim / bình luận về trong chừng này giây thì tự chạy hết tốc lực suốt lúc búp bê hát, nhạc dừng tự đứng (luật bắn giữ nguyên). Độ khó khi đó chủ yếu do “Tốc độ chạy”. 0 = tắt (chạy theo từng đợt tim như cũ)', 0, 60, 1, 's')}
         ${rlRange('commentLikes', '1 bình luận = bao nhiêu tim', 'Bình luận lúc búp bê hát giúp chạy như chừng này tim (tối đa 1 bình luận / 1,5 giây). Bình luận lúc đèn đỏ không chạy, không bị bắn. 0 = bình luận không giúp chạy', 0, 20, 1, ' tim')}
         ${rlRange('stepPerLike', 'Bước mỗi lượt tim', 'Độ dễ: sân dài 120 bước, tăng số này thì cần ít tim hơn (0,8 → 150 tim; 1,6 → 75 tim). Nhớ tăng “Tốc độ chạy” theo', 0.05, 5, 0.05, '')}
         ${rlRange('maxPlayers', 'Số người chơi tối đa', '', 5, 200, 5, ' người')}
