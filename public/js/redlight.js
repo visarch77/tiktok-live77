@@ -130,7 +130,7 @@
           addSprite('fx_smoke', p.x, p.y - PH * 0.45, 30, 120, 650, performance.now());
         }
       }
-      Object.assign(s, { n: r.n, num: r.num, av: r.av, c: r.c, x: r.x, a: r.a, f: r.f, s: r.s, gi: r.g, k: r.k, h: r.h });
+      Object.assign(s, { n: r.n, num: r.num, av: r.av, c: r.c, x: r.x, a: r.a, f: r.f, s: r.s, gi: r.g, k: r.k, h: r.h, b: r.b });
       if (Math.abs(r.y - s.ty) > 0.01) s.ty = r.y;
       if (!r.a && !s.deadSeenAt) s.deadSeenAt = performance.now();
       if (r.a) s.deadSeenAt = 0;
@@ -954,7 +954,8 @@
       const fs = Math.round(18 * (s.gi ? 1.4 : 1));
       s.headX = x;
       s.headY = top - fs * 1.1;
-      text(s.n, x, top - fs * 0.55, { size: fs, weight: 400, color: flashing || spotted ? '#ff6b6b' : dead ? '#bbb' : '#fff', stroke: 3 });
+      // người máy lấp chỗ (không phải người xem): ghi 🤖, chữ xám xanh
+      text(s.b ? `🤖${s.n}` : s.n, x, top - fs * 0.55, { size: fs, weight: 400, color: flashing || spotted ? '#ff6b6b' : dead ? '#bbb' : s.b ? '#a9c1d6' : '#fff', stroke: 3 });
     }
     g.restore();
   }

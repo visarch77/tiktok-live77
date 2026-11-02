@@ -1220,6 +1220,7 @@
         ${rlRange('redGraceMs', 'Ân hạn đèn đỏ mặc định', 'Dùng cho người chưa đo được độ trễ; sau vài câu hát server tự tính riêng từng người (độ trễ + 1,5 s, trong 3–9 s)', 0, 6000, 100, 'ms')}
         ${rlRange('stepPerLike', 'Bước mỗi lượt tim', 'Sân dài 120 bước', 0.05, 5, 0.05, '')}
         ${rlRange('maxPlayers', 'Số người chơi tối đa', '', 5, 200, 5, ' người')}
+        ${rlRange('npcMin', 'Người máy khi vắng người chơi', 'Sân ít người thật hơn số này thì thêm người máy (tên “Máy n”, có 🤖) cho đủ, để ván vẫn chạy; có người thật vào thì người máy rút bớt. Người máy chỉ chạy, không bình luận / tặng quà, không vào kỉ lục. 0 = tắt', 0, 30, 1, ' người')}
         ${rlRange('queueLikes', 'Tim để tham gia', 'Lúc chờ: thả đủ tim là vào sân. Đang chơi: thả đủ tim được đứng hàng chờ, ván sau vào sân', 1, 300, 1, ' tim')}
         ${rlRange('stompMax', 'Kính râm: số người bị dẫm tối đa', 'Khổng lồ chạy đường ngẫu nhiên qua chỗ đông người; khiên đỡ được', 1, 15, 1, ' người')}
         ${rlRange('simCrowd', 'Số người ảo khi giả lập', '', 5, 200, 5, ' người')}`;

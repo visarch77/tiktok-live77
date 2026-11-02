@@ -133,7 +133,8 @@ function create(ctx, saved = {}) {
       lastActiveAt: Date.now(),
       lastChatStepAt: 0,
       hue: Math.floor(Math.random() * 360),
-      sim: Boolean(u.sim)
+      sim: Boolean(u.sim),
+      npc: Boolean(u.npc)
     };
     players.set(p.id, p);
     byKey.set(p.key, p.id);
@@ -152,7 +153,51 @@ function create(ctx, saved = {}) {
     // vào giữa câu hát (tặng quà): đo trễ từ đầu câu → ân hạn rộng hơn thực tế, không bắn oan lần đầu
     if (phase === 'play' && light !== 'red') p.greenAt = lightStartedAt;
     if (announce) ctx.broadcast('rl.fx', { kind: 'join', id: p.id, name: p.name, num: p.num });
+    if (phase === 'lobby' && !p.npc) fillNpcs(); // có người thật vào thì bớt người máy
     return p;
+  }
+
+  // --------------------------------------------------------------------------
+  // Người máy lấp chỗ: sân ít người thật hơn npcMin thì thêm người máy (tên "Máy n", màn hình ghi 🤖) cho đủ,
+  // để vừa vào live đã có ván chạy. Người máy chỉ thả tim trong game — không bình luận, không tặng quà,
+  // không vào kỉ lục / bảng xếp hạng thật. Có người thật vào lúc chờ ván thì người máy rút bớt tương ứng.
+  // --------------------------------------------------------------------------
+  let npcSeq = 0;
+  let npcNextAt = 0;
+  const lightLog = []; // lịch sử đổi đèn để người máy "thấy" đèn trễ như người xem thật
+  function lightAt(t) {
+    for (let i = lightLog.length - 1; i >= 0; i--) if (lightLog[i].t <= t) return lightLog[i].light;
+    return 'red';
+  }
+  function npcList() {
+    return [...players.values()].filter((p) => p.npc && !p.cloneOf);
+  }
+  function fillNpcs() {
+    const humans = [...players.values()].filter((p) => !p.cloneOf && !p.npc).length;
+    const want = S().autoSim ? 0 : Math.max(0, S().npcMin - humans);
+    const list = npcList();
+    for (const p of list.slice(want)) {
+      for (const c of clonesOf(p)) removePlayer(c);
+      removePlayer(p);
+    }
+    for (let i = list.length; i < want; i++) {
+      npcSeq = (npcSeq % 99) + 1;
+      const p = makePlayer({ user: `Máy ${npcSeq}`, uniqueId: `npc_${npcSeq}_${Date.now() % 100000}`, avatar: '', sim: true, npc: true });
+      p.npcLag = rand(1000, 3200); // trễ hình như người xem thật
+      p.npcEager = rand(0.45, 0.85);
+      p.npcReckless = rand(0.002, 0.02); // thỉnh thoảng lỡ tay lúc nhạc dừng → bị bắn cho vui
+    }
+  }
+  function driveNpcs(now) {
+    if (now < npcNextAt) return;
+    npcNextAt = now + 400;
+    for (const p of npcList()) {
+      if (!p.alive || p.finishRank || p.doomAt) continue;
+      const seen = lightAt(now - p.npcLag);
+      if (seen === 'green' || seen === 'warn') {
+        if (Math.random() < p.npcEager) move(p, Math.min(MAX_LIKE_STEP, (2 + Math.floor(Math.random() * 4)) * S().stepPerLike));
+      } else if (Math.random() < p.npcReckless) move(p, S().stepPerLike);
+    }
   }
 
   // Lúc chờ ván: người đứng ở vạch xuất phát bình luận thì hiện trên đầu
@@ -396,7 +441,7 @@ function create(ctx, saved = {}) {
     let changed = false;
     for (const p of [...players.values()]) {
       const owner = p.cloneOf ? players.get(p.cloneOf) : p;
-      if (p.sim || (owner && owner.sim) || (p.cloneOf && !owner)) {
+      if ((p.sim && !p.npc) || (owner && owner.sim && !owner.npc) || (p.cloneOf && !owner)) {
         removePlayer(p);
         changed = true;
       }
@@ -687,6 +732,7 @@ function create(ctx, saved = {}) {
       });
     }
     promoteQueue();
+    fillNpcs();
     rosterDirty = true;
     broadcastPhase();
     say(pick(LINES.lobby));
@@ -707,6 +753,8 @@ function create(ctx, saved = {}) {
   function setLight(next, quiet = false) {
     light = next;
     lightStartedAt = Date.now();
+    lightLog.push({ t: lightStartedAt, light: next });
+    if (lightLog.length > 12) lightLog.shift();
     const st = S();
     if (next === 'green') for (const p of players.values()) if (!p.cloneOf) p.greenAt = lightStartedAt;
     if (next === 'green' && st.songEnabled !== false) {
@@ -816,6 +864,7 @@ function create(ctx, saved = {}) {
     } else if (phase === 'play') {
       if (now >= lightEndsAt) setLight(light === 'green' ? 'warn' : light === 'warn' ? 'red' : 'green');
       if (stompers.length) stepStompers(now);
+      driveNpcs(now);
       const dt = TICK_MS / 1000;
       let moved = false;
       for (const p of [...players.values()]) {
@@ -856,7 +905,8 @@ function create(ctx, saved = {}) {
       s: p.shield,
       g: p.giantUntil > now ? 1 : 0,
       k: p.chickenUntil > now ? 1 : 0,
-      h: p.hue
+      h: p.hue,
+      b: p.npc ? 1 : 0
     }));
   }
 
@@ -987,6 +1037,7 @@ function create(ctx, saved = {}) {
   });
   // Phòng khởi động lại khi giả lập đang bật: room.js không báo onAutoSimChange
   if (S().autoSim) sim.setRunning(true);
+  fillNpcs();
 
   const rpc = {
     startRound: () => {
@@ -1073,16 +1124,25 @@ function create(ctx, saved = {}) {
     onAutoSimChange(enabled) {
       sim.setRunning(enabled);
       if (!enabled) clearSimPlayers();
+      if (phase === 'lobby') fillNpcs();
     },
     // Vừa kết nối live thật: không để người ảo / người chơi thử nào còn trên sân hay hàng chờ
     onLiveConnected() {
       sim.setRunning(false);
       testActiveUntil = 0; // thôi hiện kỉ lục của người ảo / người thử
       clearSimPlayers();
+      if (phase === 'lobby') {
+        fillNpcs(); // sân trống thì người máy vào lấp chỗ ngay
+        broadcastRoster();
+      }
       broadcastPhase();
     },
     onSettingsChanged(changed) {
       if ('lobbySeconds' in changed && phase === 'lobby') phaseEndsAt = phaseStartedAt + S().lobbySeconds * 1000;
+      if (('npcMin' in changed || 'autoSim' in changed) && phase === 'lobby') {
+        fillNpcs();
+        broadcastRoster();
+      }
       if ('autoLoop' in changed) broadcastPhase();
     },
     getPublicState() {
@@ -1139,6 +1199,7 @@ module.exports = {
     simCrowd: [5, 200],
     songEnabled: 'boolean',
     queueLikes: [1, 300],
+    npcMin: [0, 30],
     stompMax: [1, 15],
     dollTurnVolume: [0, 1],
     songMode: { type: 'enum', values: ['random', ...MODES] }
@@ -1162,6 +1223,7 @@ module.exports = {
     simCrowd: 60,
     songEnabled: true, // đèn xanh theo câu hát của búp bê; tắt thì dùng greenMin/greenMax
     dollTurnVolume: 0.1, // âm lượng tiếng servo búp bê xoay đầu (0 = tắt, 1 = to nhất)
+    npcMin: 6, // sân ít người thật hơn số này thì thêm người máy cho đủ (0 = tắt)
     stompMax: 5, // Kính râm: khổng lồ dẫm tối đa chừng này người (mỗi quà)
     queueLikes: 50, // thả đủ chừng này tim là tham gia (lúc chờ: vào luôn; đang chơi: giữ chỗ hàng chờ ván sau)
     songMode: 'random',

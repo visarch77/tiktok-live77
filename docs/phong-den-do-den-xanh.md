@@ -256,6 +256,9 @@ Mô phỏng một người thả tim hết công suất, dừng khi THẤY đèn
   ("Rose" / "Hoa hồng"…); không khớp mã mới so tên tiếng Anh. Tên quà lấy từ `giftDetails.giftName` (tiktok-live-connector 2.x).
 - Vừa kết nối live thật: tắt giả lập, dọn hết người ảo / người chơi thử khỏi sân và hàng chờ, thôi hiện kỉ lục người ảo;
   đang live thì chặn "Chơi thử", "Thêm người thử", "Tặng quà thử".
+- Người máy lấp chỗ (`npcMin`, mặc định 6, 0 = tắt): sân ít người thật hơn số này thì thêm người máy "Máy n" (màn hình ghi 🤖, chữ xám)
+  cho ván vẫn chạy kể cả khi đang live; người máy thấy đèn trễ 1–3,2 s như người xem, thả tim lúc búp bê hát, thỉnh thoảng lỡ tay bị bắn.
+  Không bình luận, không tặng quà, không vào kỉ lục thật. Có người thật vào lúc chờ ván thì người máy rút bớt tương ứng.
 - Bình luận lúc đèn đỏ không bị tính là cử động. Mỗi lần bắt lỗi đèn đỏ (người thật) ghi vào `DATA_DIR/redlight-fairness.log`.
 - Cân lại theo câu hát: tốc độ 3,8 bước/giây, tối đa 10 bước/gói tim, dồn tối đa 22 bước → người thả tim hết công suất,
   dừng khi búp bê quay đầu, trễ 1–4,5 giây về đích ~64–67 giây / ván 90 giây; thả tim bất chấp vẫn bị loại 100%.
