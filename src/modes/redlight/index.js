@@ -311,8 +311,10 @@ function create(ctx, saved = {}) {
   // Ân hạn = trung vị 5 lần gần nhất + 1,5 s (3–9 s). Người thả tim liên tục thì đo ra rất nhỏ → vẫn bị bắt.
   function graceFor(p) {
     const s = p.lagSamples;
-    if (!s || !s.length) return S().redGraceMs;
-    return Math.max(GRACE_MIN, Math.min(GRACE_MAX, Math.max(...s) + GRACE_MARGIN));
+    if (!s || !s.length) return Math.max(S().redGraceMs, S().graceMinMs ?? GRACE_MIN);
+    // chỉnh được trong cài đặt: graceMinMs (ân hạn tối thiểu), graceMarginMs (cộng thêm vào độ trễ đo được)
+    const min = S().graceMinMs ?? GRACE_MIN;
+    return Math.max(min, Math.min(Math.max(min, GRACE_MAX), Math.max(...s) + (S().graceMarginMs ?? GRACE_MARGIN)));
   }
   function redArmedFor(p, now = Date.now()) {
     return phase === 'play' && light === 'red' && now >= lightStartedAt + graceFor(p);
@@ -492,7 +494,7 @@ function create(ctx, saved = {}) {
   }
 
   function speedOf(p, now) {
-    let v = BASE_SPEED;
+    let v = S().runSpeed ?? BASE_SPEED;
     if (p.turboUntil > now) v *= 2;
     if (p.giantUntil > now) v *= 1.6;
     if (p.chickenUntil > now) v *= 0.4;
@@ -1210,6 +1212,9 @@ module.exports = {
     queueLikes: [1, 300],
     npcMin: [0, 30],
     stompMax: [1, 15],
+    graceMinMs: [2000, 9000],
+    graceMarginMs: [0, 5000],
+    runSpeed: [2, 12],
     dollTurnVolume: [0, 1],
     songMode: { type: 'enum', values: ['random', ...MODES] }
   },
@@ -1232,6 +1237,9 @@ module.exports = {
     simCrowd: 60,
     songEnabled: true, // đèn xanh theo câu hát của búp bê; tắt thì dùng greenMin/greenMax
     dollTurnVolume: 0.1, // âm lượng tiếng servo búp bê xoay đầu (0 = tắt, 1 = to nhất)
+    graceMinMs: GRACE_MIN, // ân hạn đèn đỏ tối thiểu cho mọi người
+    graceMarginMs: GRACE_MARGIN, // ân hạn = độ trễ lớn nhất đo được + chừng này
+    runSpeed: BASE_SPEED, // bước/giây khi chạy (sân dài 120 bước)
     npcMin: 6, // sân ít người thật hơn số này thì thêm người máy cho đủ (0 = tắt)
     stompMax: 5, // Kính râm: khổng lồ dẫm tối đa chừng này người (mỗi quà)
     queueLikes: 50, // thả đủ chừng này tim là tham gia (lúc chờ: vào luôn; đang chơi: giữ chỗ hàng chờ ván sau)
