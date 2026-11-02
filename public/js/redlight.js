@@ -204,7 +204,8 @@
     audio.configure({
       musicOn: settings.bgMusicEnabled !== false,
       sfxOn: settings.sfxEnabled !== false,
-      musicVolume: typeof settings.musicVolume === 'number' ? settings.musicVolume : 0.55
+      musicVolume: typeof settings.musicVolume === 'number' ? settings.musicVolume : 0.55,
+      dollTurnVolume: typeof settings.dollTurnVolume === 'number' ? settings.dollTurnVolume : 0.1
     });
   }
 

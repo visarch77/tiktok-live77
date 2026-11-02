@@ -1140,6 +1140,7 @@ module.exports = {
     songEnabled: 'boolean',
     queueLikes: [1, 300],
     stompMax: [1, 15],
+    dollTurnVolume: [0, 1],
     songMode: { type: 'enum', values: ['random', ...MODES] }
   },
   defaultSettings: {
@@ -1160,6 +1161,7 @@ module.exports = {
     autoLoop: true,
     simCrowd: 60,
     songEnabled: true, // đèn xanh theo câu hát của búp bê; tắt thì dùng greenMin/greenMax
+    dollTurnVolume: 0.1, // âm lượng tiếng servo búp bê xoay đầu (0 = tắt, 1 = to nhất)
     stompMax: 5, // Kính râm: khổng lồ dẫm tối đa chừng này người (mỗi quà)
     queueLikes: 50, // thả đủ chừng này tim là tham gia (lúc chờ: vào luôn; đang chơi: giữ chỗ hàng chờ ván sau)
     songMode: 'random',

@@ -247,7 +247,7 @@ Mô phỏng một người thả tim hết công suất, dừng khi THẤY đèn
   (thanh cảm ơn ghi "dùng khi búp bê hát lại"). Khiên, Khiên đội, Bản sao có tác dụng ngay. Hoá gà luôn rơi vào đúng người dẫn đầu
   (trừ người tặng); người đó đang miễn thì hiện "Miễn gà!", không chuyển sang người khác.
 - Bình luận của người ở hàng chờ và người đứng chờ ván (vạch xuất phát) hiện thành bong bóng trên đầu 6 giây.
-- Búp bê quay đầu: tiếng servo điện thu sẵn `doll_turn.m4a` / `doll_back.m4a` (tổng hợp bằng numpy, không dùng âm có bản quyền) — ù mô-tơ ~100 Hz, rít bánh răng chuỗi 952 Hz, nghiến rung ~18 Hz, cuối trượt xuống rồi tắt (đặc trưng đo từ đoạn tham khảo); đầu quay chậm 1 giây, quay lưng 0,7 giây; mắt quét giật từng nhịp kèm tiếng servo; khoá vào người bị phát hiện có tiếng "bíp".
+- Búp bê quay đầu: tiếng servo điện thu sẵn `doll_turn.m4a` / `doll_back.m4a` (tổng hợp bằng numpy, không dùng âm có bản quyền) — ù mô-tơ ~100 Hz, rít bánh răng chuỗi 952 Hz, nghiến rung ~18 Hz, cuối trượt xuống rồi tắt (đặc trưng đo từ đoạn tham khảo); đầu quay chậm 1 giây, quay lưng 0,7 giây; âm lượng chỉnh trong Cài đặt "Tiếng búp bê xoay đầu" (`dollTurnVolume`, mặc định 10%, 0% = tắt); mắt quét giật từng nhịp kèm tiếng servo; khoá vào người bị phát hiện có tiếng "bíp".
 - 2,8 giây đầu mỗi câu hát: chữ "TAP TAP ❤️👆" trong suốt rung ở góc phải khu hàng chờ, nhắc người xem chạm màn hình thả tim.
 - Nhạc nền lúc nghỉ chờ ván mới: `lobby_1.m4a` (mingle) và `lobby_2.m4a` thay phiên theo số ván, bắt đầu 2,5 giây sau nhạc kết quả,
   lặp nếu nghỉ lâu hơn bản nhạc, nhỏ dần khi vào ván. Bật/tắt bằng "Nhạc nền lúc chờ ván"; thời gian nghỉ = "Thời gian xem kết quả"

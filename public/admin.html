@@ -1205,6 +1205,10 @@
         ${rlRange('resultSeconds', 'Thời gian xem kết quả', 'Bảng kết quả ván vừa rồi; nhạc nền chờ bắt đầu từ đây', 5, 60, 1, 's')}
         ${rlRange('lobbySeconds', 'Thời gian nghỉ chờ ván mới', 'Người xem bình luận / thả tim để vào sân; chưa ai vào thì chờ thêm', 5, 300, 5, 's')}
         <div class="setting">
+          <div><div class="setting-name">Tiếng búp bê xoay đầu</div><div class="setting-desc">Tiếng servo máy lúc búp bê quay ra / quay lưng. 0% = tắt</div></div>
+          <div class="range-wrap"><input type="range" min="0" max="100" value="${Math.round((typeof s.dollTurnVolume === 'number' ? s.dollTurnVolume : 0.1) * 100)}" data-setting="dollTurnVolume" /><output>${Math.round((typeof s.dollTurnVolume === 'number' ? s.dollTurnVolume : 0.1) * 100)}%</output></div>
+        </div>
+        <div class="setting">
           <div><div class="setting-name">Nhạc nền lúc chờ ván</div><div class="setting-desc">Hai bản nhạc thay phiên nhau mỗi lần nghỉ; âm lượng theo “Âm lượng nhạc nền”</div></div>
           <label class="switch"><input type="checkbox" data-setting="bgMusicEnabled" ${s.bgMusicEnabled !== false ? 'checked' : ''} /><span></span></label>
         </div>

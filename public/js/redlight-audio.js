@@ -32,6 +32,7 @@
       this.musicOn = true;
       this.sfxOn = true;
       this.musicVolume = 0.55;
+      this.dollTurnVolume = 0.1; // tiếng servo búp bê xoay đầu (cài đặt dollTurnVolume)
       this.sfxVolume = 0.9;
       this.songNodes = [];
       this.loopTimer = null;
@@ -106,7 +107,8 @@
       else this.ctx.resume().catch(() => {});
     }
 
-    configure({ musicOn, sfxOn, musicVolume }) {
+    configure({ musicOn, sfxOn, musicVolume, dollTurnVolume }) {
+      if (typeof dollTurnVolume === 'number') this.dollTurnVolume = dollTurnVolume;
       if (typeof musicOn === 'boolean') this.musicOn = musicOn;
       if (typeof sfxOn === 'boolean') this.sfxOn = sfxOn;
       if (typeof musicVolume === 'number') this.musicVolume = musicVolume;
@@ -440,7 +442,9 @@
 
     // Búp bê quay đầu: phát file servo; chưa tải xong thì tạo tiếng mô-tơ tạm bằng WebAudio
     dollTurn(dur = 0.5, back = false) {
-      if (this.playSample(back ? 'back' : 'turn', back ? 0.28 : 0.4)) return;
+      const v = this.dollTurnVolume * (back ? 0.7 : 1);
+      if (v <= 0.001) return;
+      if (this.playSample(back ? 'back' : 'turn', v)) return;
       const c = this.ensure();
       if (!c) return;
       const t = this.t;
@@ -463,7 +467,7 @@
       depth.gain.value = 0.35;
       lfo.connect(depth).connect(gear.gain);
       const env = c.createGain();
-      const vol = back ? 0.12 : 0.18;
+      const vol = Math.max(0.0002, (back ? 0.12 : 0.18) * Math.min(1, v / 0.4));
       env.gain.setValueAtTime(0.0001, t);
       env.gain.exponentialRampToValueAtTime(vol, t + 0.04);
       env.gain.setValueAtTime(vol, t + d - 0.06);
@@ -473,12 +477,10 @@
       lfo.start(t);
       o.stop(t + d + 0.05);
       lfo.stop(t + d + 0.05);
-      this.osc(1906, t + 0.03, d, { vol: back ? 0.018 : 0.028, slide: back ? -60 : 90, attack: 0.06 });
-      this.osc(2859, t + 0.03, d, { vol: back ? 0.012 : 0.018, slide: back ? -90 : 130, attack: 0.06 });
-      this.noise(t, d, { vol: 0.05, type: 'bandpass', freq: 1700, q: 1.3 });
-      // khớp đầu dừng lại
-      this.noise(t + d - 0.03, 0.08, { vol: back ? 0.18 : 0.32, type: 'bandpass', freq: 650, q: 2.5 });
-      this.osc(72, t + d - 0.03, 0.16, { vol: back ? 0.2 : 0.32, slide: -25, attack: 0.003 });
+      const k = Math.min(1, v / 0.4);
+      this.osc(1906, t + 0.03, d, { vol: Math.max(0.0002, (back ? 0.018 : 0.028) * k), slide: back ? -60 : 90, attack: 0.06 });
+      this.osc(2859, t + 0.03, d, { vol: Math.max(0.0002, (back ? 0.012 : 0.018) * k), slide: back ? -90 : 130, attack: 0.06 });
+      this.noise(t, d, { vol: Math.max(0.0002, 0.05 * k), type: 'bandpass', freq: 1700, q: 1.3 });
     }
 
     // Lòng mắt người máy lia sang chỗ khác: "zzt" servo ~4 kHz ngắn; lock = khoá vào người vừa bị phát hiện
