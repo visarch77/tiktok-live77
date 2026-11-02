@@ -43,14 +43,14 @@
   const DOLL_H = 228; // chiều cao búp bê
   const GUARD_H = 90; // lính canh cao hơn người chơi một chút
   const PH = 78; // chiều cao người chơi đứng
-  const VARIANTS = 28; // 6 kiểu thường + 10 kiểu ngộ nghĩnh + 12 kiểu bựa (ông cụ chống gậy, anh bó bột, chú béo ụ, tóc HKT, lưng dài chân ngắn, chân dài, quần ống thấp ống cao, quần tụt, tóc tổ chim, đầu trọc 1 sợi, anh nằm sấp bò lết, anh tập tạ trồng chuối)
+  const VARIANTS = 29; // 6 kiểu thường + 10 kiểu ngộ nghĩnh + 13 kiểu bựa (ông cụ chống gậy, anh bó bột, chú béo ụ, tóc HKT, lưng dài chân ngắn, chân dài, quần ống thấp ống cao, quần tụt, tóc tổ chim, đầu trọc 1 sợi, anh nằm sấp bò lết, anh tập tạ trồng chuối, anh tóc chôm chỉa lắc hông thả tim)
   const P_FRAMES = ['stand', 'run1', 'run2', 'run3', 'run4', 'freeze', 'freeze2', 'dead'];
   const RUN = ['run1', 'run2', 'run3', 'run4'];
 
   // Ảnh vẽ bằng Scenario (public/assets/redlight). manifest.json: tên → [rộng, cao, phụ]
   //   người chơi: phụ = [tâm x, tâm y, rộng] miếng vải số sau lưng; búp bê: phụ = [[x, y], ...] vị trí mắt (tỉ lệ)
   const ASSET = '/assets/redlight/';
-  const AV = 20; // đổi số này mỗi khi thay ảnh: /assets được cache 1 ngày
+  const AV = 21; // đổi số này mỗi khi thay ảnh: /assets được cache 1 ngày
   const IMG = {};
   // prettier-ignore
   const NAMES = ['bg', 'doll_0', 'doll_1', 'doll_2', 'doll_3', 'doll_4', 'guard_0', 'guard_1', 'guard_2',
