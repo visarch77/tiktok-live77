@@ -18,16 +18,20 @@ const config = require('../../config');
 
 const TRACK = 120; // độ dài sân (đơn vị) — 6 hàng gạch trên nền, mỗi hàng 20 đơn vị
 const TICK_MS = 100;
-const BASE_SPEED = 4.4; // đơn vị/giây tối đa khi chạy bình thường (≈ 23 giây đèn xanh liên tục để về đích)
+const BASE_SPEED = 5.8; // đơn vị/giây khi chạy (≈ 21 giây đèn xanh liên tục để về đích; bù cho đèn đỏ 8–11 s)
 // Số bước tim được dồn tối đa (≈ 6 giây chạy). Bước dồn KHÔNG mất khi đèn đỏ: hình TikTok tới người xem chậm 2–5 giây,
 // tim bấm lúc họ còn thấy xanh/vàng về server khi đã đỏ — giữ lại để chạy tiếp ở đèn xanh sau.
 // Mô phỏng với đèn xanh theo câu hát (2,6–9 giây tuỳ tốc độ), người thả tim hết công suất, dừng khi búp bê bắt đầu
 // quay đầu, trễ 1–4,5 giây: về đích ~64–67 giây / ván 90 giây; người thả tim liên tục bất chấp đèn vẫn bị loại 100%.
-const MAX_PENDING = 22;
+const MAX_PENDING = 28;
 const MAX_LIKE_STEP = 10; // bước tối đa cho một gói tim (TikTok gộp tim ~1,2 giây/gói)
-const GRACE_MIN = 3000;
+// Live thật (11/2026): tim của người dừng đúng lúc vẫn về server 4–6 s sau khi nhạc dừng (hình trễ + phản xạ + TikTok gộp tim
+// + LikeBatcher), trong khi đo từ đầu câu hát có thể chỉ ra 0,3–1,8 s vì người chơi bấm trước nhịp. Nên: ân hạn tối thiểu 5 s,
+// bỏ mẫu < 1,5 s, lấy mẫu LỚN NHẤT gần đây; đèn đỏ 8–11 s để người thả tim bất chấp vẫn bị bắt sau ân hạn.
+const GRACE_MIN = 5000;
 const GRACE_MAX = 9000;
-const GRACE_MARGIN = 1500;
+const GRACE_MARGIN = 2500;
+const LAG_SAMPLE_MIN = 1500;
 // Bị búp bê phát hiện: nháy đỏ trên màn hình chừng này rồi mới bị bắn (mỗi lần nháy đỏ là một phát bắn)
 const SPOT_MS = 1200;
 // Khổng lồ dẫm: cướp biển chân gỗ chạy khập khiễn một đường ngẫu nhiên xuyên sân, vòng qua 3 chỗ đông người.
@@ -158,10 +162,14 @@ function create(ctx, saved = {}) {
   }
 
   // --------------------------------------------------------------------------
-  // Người máy lấp chỗ: sân ít người thật hơn npcMin thì thêm người máy (tên "Máy n", màn hình ghi 🤖) cho đủ,
+  // Người máy lấp chỗ: sân ít người thật hơn npcMin thì thêm người máy (biệt danh vui, màn hình gắn 🤖) cho đủ,
   // để vừa vào live đã có ván chạy. Người máy chỉ thả tim trong game — không bình luận, không tặng quà,
   // không vào kỉ lục / bảng xếp hạng thật. Có người thật vào lúc chờ ván thì người máy rút bớt tương ứng.
   // --------------------------------------------------------------------------
+  // biệt danh kiểu nhân vật game (màn hình vẫn gắn 🤖 để người xem biết đây không phải người thật)
+  const NPC_NAMES = ['Bé Su', 'Tí Đẹp Trai', 'Hai Lúa', 'Mây Lang Thang', 'Sóc Nâu', 'Gió Đồng', 'Bin Bon', 'Nắng Mai', 'Đá Cuội', 'Cún Con',
+    'Mèo Mập', 'Gấu Trúc', 'Tèo Em', 'Bông Gòn', 'Ốc Sên', 'Cá Mập Con', 'Bánh Bao', 'Kẹo Dẻo', 'Su Hào', 'Bắp Rang',
+    'Chuột Lắt', 'Heo Hồng', 'Vịt Bầu', 'Cà Rốt', 'Mít Ướt', 'Trà Sữa', 'Xoài Non', 'Bí Đỏ', 'Ếch Xanh', 'Thỏ Ngọc'];
   let npcSeq = 0;
   let npcNextAt = 0;
   const lightLog = []; // lịch sử đổi đèn để người máy "thấy" đèn trễ như người xem thật
@@ -181,8 +189,11 @@ function create(ctx, saved = {}) {
       removePlayer(p);
     }
     for (let i = list.length; i < want; i++) {
-      npcSeq = (npcSeq % 99) + 1;
-      const p = makePlayer({ user: `Máy ${npcSeq}`, uniqueId: `npc_${npcSeq}_${Date.now() % 100000}`, avatar: '', sim: true, npc: true });
+      npcSeq = (npcSeq % 999) + 1;
+      const used = new Set(npcList().map((x) => x.name));
+      const free = NPC_NAMES.filter((n) => !used.has(n));
+      const name = free.length ? free[Math.floor(Math.random() * free.length)] : `Máy ${npcSeq}`;
+      const p = makePlayer({ user: name, uniqueId: `npc_${npcSeq}_${Date.now() % 100000}`, avatar: '', sim: true, npc: true });
       p.npcLag = rand(1000, 3200); // trễ hình như người xem thật
       p.npcEager = rand(0.45, 0.85);
       p.npcReckless = rand(0.002, 0.02); // thỉnh thoảng lỡ tay lúc nhạc dừng → bị bắn cho vui
@@ -301,9 +312,7 @@ function create(ctx, saved = {}) {
   function graceFor(p) {
     const s = p.lagSamples;
     if (!s || !s.length) return S().redGraceMs;
-    const sorted = [...s].sort((a, b) => a - b);
-    const med = sorted[Math.floor(sorted.length / 2)];
-    return Math.max(GRACE_MIN, Math.min(GRACE_MAX, med + GRACE_MARGIN));
+    return Math.max(GRACE_MIN, Math.min(GRACE_MAX, Math.max(...s) + GRACE_MARGIN));
   }
   function redArmedFor(p, now = Date.now()) {
     return phase === 'play' && light === 'red' && now >= lightStartedAt + graceFor(p);
@@ -313,7 +322,7 @@ function create(ctx, saved = {}) {
     if (!p.greenAt) return;
     const m = now - p.greenAt;
     p.greenAt = 0;
-    if (m > 9000) return;
+    if (m > 9000 || m < LAG_SAMPLE_MIN) return; // < 1,5 s: bấm trước nhịp, không phải độ trễ thật
     p.lagSamples = [...(p.lagSamples || []).slice(-4), m];
   }
 
@@ -1191,7 +1200,7 @@ module.exports = {
     redMin: [2, 20],
     redMax: [2, 30],
     warnMs: [500, 4000],
-    redGraceMs: [0, 6000],
+    redGraceMs: [0, 9000],
     stepPerLike: [0.05, 5],
     maxPlayers: [5, 200],
     lateJoin: 'boolean',
@@ -1210,12 +1219,12 @@ module.exports = {
     resultSeconds: 10,
     greenMin: 3,
     greenMax: 7,
-    redMin: 6,
-    redMax: 9,
+    redMin: 8,
+    redMax: 11,
     warnMs: 2000,
     // Hình trên TikTok tới người xem chậm 2–4 giây + tim gộp 1,2 giây + sự kiện về server chậm ~1 giây: chỉ bắt lỗi sau khoảng này.
     // Đèn đỏ đủ dài (5–8 giây) để người thả tim bất chấp vẫn bị bắt sau ân hạn.
-    redGraceMs: 4000,
+    redGraceMs: 5500,
     stepPerLike: 0.8,
     maxPlayers: 120,
     lateJoin: true,
