@@ -4,7 +4,7 @@ const path = require('path');
 const { TTS_CACHE_DIR } = require('../../config');
 const { LITURGY, SUTRAS, RECITATION_LINE, DEFAULT_INVOCATION, DEFAULT_ROTATION, toLines, lineSyllables } = require('./texts');
 const timeline = require('./timeline');
-const { isBlockedSpamOrToxic, sanitizeUserName, sanitizeWishText } = require('../../util/sanitize');
+const { isBlockedSpamOrToxic, sanitizeUserName, sanitizeWishText, isCleanForDisplay } = require('../../util/sanitize');
 
 // ============================================================================
 // CHẾ ĐỘ "PHÒNG TỤNG KINH CHUNG" (xem docs/phong-tung-kinh.md)
@@ -1297,6 +1297,8 @@ function create(ctx, saved = {}) {
     return null;
   }
 
+  const prayCooldown = new Map(); // mỗi người lên lạy vì lời nguyện tối đa 1 lần / 90 giây
+  const PRAY_COOLDOWN_MS = 90000;
   function handleComment(user, text) {
     const raw = String(text || '').trim();
     const person = seatAndAnnounce(user);
@@ -1335,13 +1337,22 @@ function create(ctx, saved = {}) {
     commentCooldown.set(person.key, now);
     if (commentCooldown.size > 1000) commentCooldown.delete(commentCooldown.keys().next().value);
 
-    // Phiếu chọn kinh hiện riêng; lời nguyện chỉ giữ phần còn lại của bình luận
-    const wish = sanitizeWishText(voted ? raw.replace(VOTE_RE, ' ') : raw);
+    // Phiếu chọn kinh hiện riêng; lời nguyện chỉ giữ phần còn lại của bình luận.
+    // Chữ được hiện / đọc phải qua bộ lọc chặt (tục tĩu, chửi bới, quảng cáo, link, số điện thoại...)
+    let wish = sanitizeWishText(voted ? raw.replace(VOTE_RE, ' ') : raw);
+    if (wish && !isCleanForDisplay(wish)) wish = '';
     if (!wish && !voted) return null;
     counters.wishes += 1;
     if (person.stat) person.stat.wishes += 1;
     const sincere = Boolean(wish) && isSincere(wish);
     if (sincere) enqueueSpeech(`${speakName(person.name)}: ${wish}`);
+    // Lời nguyện / lời chúc thật tâm: người đó bước lên chánh điện lạy rồi hiện lời (lúc dâng hương / nghe pháp)
+    let pray = false;
+    if (sincere && phase && (phase.id === 'gather' || phase.id === 'dharma') && now - (prayCooldown.get(person.key) || 0) > PRAY_COOLDOWN_MS) {
+      pray = true;
+      prayCooldown.set(person.key, now);
+      if (prayCooldown.size > 2000) prayCooldown.delete(prayCooldown.keys().next().value);
+    }
     return ctx.emitEvent({
       type: 'wish',
       sincere,
@@ -1349,7 +1360,9 @@ function create(ctx, saved = {}) {
       user: person.name,
       avatar: person.avatar,
       slot: person.slot,
+      gender: person.gender,
       wish,
+      pray,
       vote: voted ? { num: voted.num, name: voted.name } : null,
       counters,
       nextUp: nextUp()
