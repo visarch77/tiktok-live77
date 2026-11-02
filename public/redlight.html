@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Đèn Xanh – Đèn Đỏ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    html, body { margin: 0; height: 100%; background: #0b1020; overflow: hidden; }
+    body { display: flex; align-items: center; justify-content: center; font-family: 'Be Vietnam Pro', system-ui, sans-serif; }
+    canvas { display: block; }
+    #unlock {
+      position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
+      background: rgba(0,0,0,.65); color: #fff; padding: 8px 14px; border-radius: 999px; font-size: 13px; cursor: pointer;
+    }
+    body.obs #unlock { display: none; }
+  </style>
+</head>
+<body>
+  <canvas id="stage" width="1080" height="1920"></canvas>
+  <div id="unlock">🔊 Bấm để bật âm thanh</div>
+  <script src="/js/redlight-audio.js"></script>
+  <script src="/js/redlight.js"></script>
+</body>
+</html>

@@ -2,11 +2,13 @@
 // trong src/modes/README.md rồi đăng ký vào đây.
 const chanting = require('./chanting');
 const temple = require('./temple');
+const redlight = require('./redlight');
 
 // Chế độ đầu tiên là mặc định khi tạo phòng mới
 const MODES = {
   [chanting.id]: chanting,
-  [temple.id]: temple
+  [temple.id]: temple,
+  [redlight.id]: redlight
 };
 
 function listModes() {
