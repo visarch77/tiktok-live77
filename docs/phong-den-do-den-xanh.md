@@ -227,7 +227,11 @@ Mô phỏng một người thả tim hết công suất, dừng khi THẤY đèn
 ## Nhân vật
 
 16 kiểu (6 thường + 10 ngộ nghĩnh: bé mập kính tròn, anh tóc xù, bà cụ búi tóc, anh cơ bắp mohawk, bé nơ hồng,
-ông râu bạc, cô tóc tết, cô lô cuốn tóc, cậu tóc xanh tai nghe, bé mũ len). Mỗi kiểu có 2 tư thế đứng im khác nhau
+ông râu bạc, cô tóc tết, cô lô cuốn tóc, cậu tóc xanh tai nghe, bé mũ len) — thêm 10 kiểu bựa (v16–v25, 11/2026):
+ông cụ lụ khụ chống gậy 3 sợi tóc, anh bó bột chống nạng, chú béo ụ hở lưng, anh tóc HKT vàng đỏ, anh lưng dài chân
+ngắn, anh chân dài lêu nghêu, cô quần ống thấp ống cao một chiếc dép tổ ong, anh quần tụt lộ quần đùi hoa, chị tóc tổ
+chim có chim vàng, chú đầu trọc một sợi tóc ăng-ten. Tổng 26 kiểu; mỗi kiểu bựa có 2 tư thế đứng hình riêng (vd. kéo
+quần, che sợi tóc, chim mổ đầu). Vẽ bằng Scenario (nano-banana-2, ảnh mẫu cũ), xoá nền birefnet, cắt theo khối liền. Mỗi kiểu có 2 tư thế đứng im khác nhau
 (người chơi số chẵn/lẻ dùng tư thế khác nhau), số được vẽ lên miếng vải sau lưng; vừa vào chơi hiện huy hiệu số to 2,4 giây.
 
 
