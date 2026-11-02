@@ -25,6 +25,8 @@ const BASE_SPEED = 5.8; // đơn vị/giây khi chạy (≈ 21 giây đèn xanh 
 // quay đầu, trễ 1–4,5 giây: về đích ~64–67 giây / ván 90 giây; người thả tim liên tục bất chấp đèn vẫn bị loại 100%.
 const MAX_PENDING = 28;
 const MAX_LIKE_STEP = 10; // bước tối đa cho một gói tim (TikTok gộp tim ~1,2 giây/gói)
+// Hai giới hạn trên tính cho "Bước mỗi lượt tim" 0,8; tăng bước mỗi tim (dễ hơn, đỡ mỏi tay) thì nới giới hạn tương ứng
+const BASE_STEP_PER_LIKE = 0.8;
 // Live thật (11/2026): tim của người dừng đúng lúc vẫn về server 4–6 s sau khi nhạc dừng (hình trễ + phản xạ + TikTok gộp tim
 // + LikeBatcher), trong khi đo từ đầu câu hát có thể chỉ ra 0,3–1,8 s vì người chơi bấm trước nhịp. Nên: ân hạn tối thiểu 5 s,
 // bỏ mẫu < 1,5 s, lấy mẫu LỚN NHẤT gần đây; đèn đỏ 8–11 s để người thả tim bất chấp vẫn bị bắt sau ân hạn.
@@ -215,7 +217,7 @@ function create(ctx, saved = {}) {
       if (!p.alive || p.finishRank || p.doomAt) continue;
       const seen = lightAt(now - p.npcLag);
       if (seen === 'green' || seen === 'warn') {
-        if (Math.random() < p.npcEager) move(p, Math.min(MAX_LIKE_STEP, (2 + Math.floor(Math.random() * 4)) * S().stepPerLike));
+        if (Math.random() < p.npcEager) move(p, Math.min(maxLikeStep(), (2 + Math.floor(Math.random() * 4)) * S().stepPerLike));
       } else if (Math.random() < p.npcReckless) move(p, S().stepPerLike);
     }
   }
@@ -318,6 +320,10 @@ function create(ctx, saved = {}) {
   // Ân hạn riêng từng người theo độ trễ đo được: mỗi lần đèn xanh, đo từ lúc xanh tới lúc gói tim đầu tiên của họ về
   // (= trễ hình + gộp tim + mạng). Tim cuối họ bấm khi còn thấy xanh sẽ về muộn đúng chừng đó sau lúc đỏ.
   // Ân hạn = trung vị 5 lần gần nhất + 1,5 s (3–9 s). Người thả tim liên tục thì đo ra rất nhỏ → vẫn bị bắt.
+  const capScale = () => Math.max(1, (S().stepPerLike || BASE_STEP_PER_LIKE) / BASE_STEP_PER_LIKE);
+  const maxLikeStep = () => MAX_LIKE_STEP * capScale();
+  const maxPending = () => MAX_PENDING * capScale();
+
   function graceFor(p) {
     // Mặc định: một mức ân hạn chung cho mọi người (graceMinMs). Live thật 11/2026: độ trễ đo lúc bắt đầu câu hát
     // không liên quan tới độ trễ lúc dừng (người bắt đầu thả tim muộn bị đo 7–9 s rồi được nới ân hạn tối đa, bấm lố vẫn sống).
@@ -364,8 +370,8 @@ function create(ctx, saved = {}) {
     // Khổng lồ: mỗi lượt tim đi gấp đôi (chạy bị giới hạn bởi số tim, không phải tốc độ)
     if (p.giantUntil > Date.now()) units *= 2;
     // Đèn xanh/vàng: chạy ngay. Đỏ trong thời gian ân hạn: dồn lại, chạy khi xanh trở lại
-    p.pending = Math.min(p.pending + units, MAX_PENDING);
-    for (const c of clonesOf(p)) c.pending = Math.min(c.pending + units, MAX_PENDING);
+    p.pending = Math.min(p.pending + units, maxPending());
+    for (const c of clonesOf(p)) c.pending = Math.min(c.pending + units, maxPending());
     return light !== 'red';
   }
 
@@ -682,7 +688,7 @@ function create(ctx, saved = {}) {
       case 'turbo':
         p.turboUntil = Math.max(p.turboUntil, now) + 2500;
         if (phase === 'play' && p.alive && !p.finishRank && light !== 'red') {
-          p.pending = Math.min(p.pending + (item.bonus || 3) * n, MAX_PENDING + 8);
+          p.pending = Math.min(p.pending + (item.bonus || 3) * n, maxPending() + 8);
         }
         break;
       case 'shield':
@@ -1099,7 +1105,7 @@ function create(ctx, saved = {}) {
           queueLike(u, Number(evt.count) || 1);
           return null;
         }
-        move(p, Math.min(MAX_LIKE_STEP, (Number(evt.count) || 1) * S().stepPerLike));
+        move(p, Math.min(maxLikeStep(), (Number(evt.count) || 1) * S().stepPerLike));
         return p;
       }
       case 'gift': {

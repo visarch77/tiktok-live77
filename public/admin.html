@@ -1237,7 +1237,7 @@
         </div>
         ${rlRange('graceMarginMs', 'Ân hạn cộng thêm', 'Chỉ dùng khi bật “Ân hạn riêng từng người”: ân hạn = độ trễ lớn nhất đo được + chừng này (tối đa 9 s)', 0, 5000, 250, 'ms')}
         ${rlRange('runSpeed', 'Tốc độ chạy', 'Bước/giây khi chạy; sân dài 120 bước. Đèn đỏ dài thì tăng tốc để ván vẫn kịp về đích', 2, 12, 0.1, ' bước/s')}
-        ${rlRange('stepPerLike', 'Bước mỗi lượt tim', 'Sân dài 120 bước', 0.05, 5, 0.05, '')}
+        ${rlRange('stepPerLike', 'Bước mỗi lượt tim', 'Độ dễ: sân dài 120 bước, tăng số này thì cần ít tim hơn (0,8 → 150 tim; 1,6 → 75 tim). Nhớ tăng “Tốc độ chạy” theo', 0.05, 5, 0.05, '')}
         ${rlRange('maxPlayers', 'Số người chơi tối đa', '', 5, 200, 5, ' người')}
         ${rlRange('npcMin', 'Người máy khi vắng người chơi', 'Sân ít người thật hơn số này thì thêm người máy (biệt danh vui) cho đủ, để ván vẫn chạy; có người thật vào thì người máy rút bớt. Người máy chỉ chạy, không bình luận / tặng quà, không vào kỉ lục. 0 = tắt', 0, 30, 1, ' người')}
         ${rlRange('queueLikes', 'Tim để tham gia', 'Lúc chờ: thả đủ tim là vào sân. Đang chơi: thả đủ tim được đứng hàng chờ, ván sau vào sân', 1, 300, 1, ' tim')}
