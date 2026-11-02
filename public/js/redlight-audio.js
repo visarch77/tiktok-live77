@@ -21,7 +21,9 @@
   const LOBBY = [65, 69, 72, 74, 72, 69, 67, 69, 65, 67, 69, 72, 69, 67, 65, 62];
 
   class RLAudio {
-    constructor() {
+    constructor({ assetVer = '' } = {}) {
+      this.assetVer = assetVer;
+      this.samples = {}; // tiếng thu sẵn (AudioBuffer): turn / back = búp bê quay đầu ra / quay lưng lại
       this.ctx = null;
       this.master = null;
       this.musicBus = null;
@@ -67,6 +69,7 @@
         this.musicBus.connect(comp);
         this.sfxBus.connect(comp);
         this.applyVolumes();
+        this.loadSamples();
       }
       if (this.ctx.state === 'suspended' && !this.muted) this.ctx.resume().catch(() => {});
       return this.ctx;
@@ -78,6 +81,18 @@
       try {
         const src = this.ctx.createMediaElementSource(el);
         src.connect(this.sfxBus);
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    // Nhạc nền chờ ván (thẻ <audio>) đi qua kênh nhạc: theo nút bật nhạc nền + âm lượng nhạc nền
+    connectMusic(el) {
+      if (!this.ensure()) return false;
+      try {
+        const src = this.ctx.createMediaElementSource(el);
+        src.connect(this.musicBus);
         return true;
       } catch (_) {
         return false;
@@ -396,8 +411,36 @@
       this.osc(1000, t + 0.5, 0.3, { type: 'square', vol: 0.1, slide: -500, attack: 0.01 });
     }
 
-    // Búp bê quay đầu: mô-tơ trầm ~100 Hz rè theo nhịp bánh răng, tiếng rít hộp số ~1,9 / 2,9 kHz, dừng thì "cạch"
+    // Tiếng servo búp bê quay đầu: file tạo sẵn (mẫu "A – servo điện"), khớp TURN_MS 480 / BACK_MS 380 của màn hình
+    loadSamples() {
+      const list = [
+        ['turn', 'doll_turn.m4a'],
+        ['back', 'doll_back.m4a']
+      ];
+      for (const [name, file] of list) {
+        fetch(`/assets/redlight/${file}?v=${this.assetVer}`)
+          .then((r) => r.arrayBuffer())
+          .then((b) => this.ctx.decodeAudioData(b))
+          .then((buf) => (this.samples[name] = buf))
+          .catch(() => {});
+      }
+    }
+
+    playSample(name, vol) {
+      const buf = this.samples[name];
+      if (!buf || !this.ensure()) return false;
+      const src = this.ctx.createBufferSource();
+      src.buffer = buf;
+      const g = this.ctx.createGain();
+      g.gain.value = vol;
+      src.connect(g).connect(this.sfxBus);
+      src.start();
+      return true;
+    }
+
+    // Búp bê quay đầu: phát file servo; chưa tải xong thì tạo tiếng mô-tơ tạm bằng WebAudio
     dollTurn(dur = 0.5, back = false) {
+      if (this.playSample(back ? 'back' : 'turn', back ? 0.45 : 0.6)) return;
       const c = this.ensure();
       if (!c) return;
       const t = this.t;

@@ -1037,7 +1037,7 @@ module.exports = {
   description: 'Game sinh tồn: bình luận để vào, thả tim để chạy, đèn đỏ phải đứng im. Quà là vật phẩm.',
   overlay: 'redlight.html',
   settingsSchema: {
-    lobbySeconds: [5, 120],
+    lobbySeconds: [5, 300],
     roundSeconds: [30, 600],
     resultSeconds: [5, 60],
     greenMin: [1, 20],

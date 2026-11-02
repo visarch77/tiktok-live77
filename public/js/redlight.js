@@ -42,7 +42,7 @@
   // Ảnh vẽ bằng Scenario (public/assets/redlight). manifest.json: tên → [rộng, cao, phụ]
   //   người chơi: phụ = [tâm x, tâm y, rộng] miếng vải số sau lưng; búp bê: phụ = [[x, y], ...] vị trí mắt (tỉ lệ)
   const ASSET = '/assets/redlight/';
-  const AV = 10; // đổi số này mỗi khi thay ảnh: /assets được cache 1 ngày
+  const AV = 11; // đổi số này mỗi khi thay ảnh: /assets được cache 1 ngày
   const IMG = {};
   // prettier-ignore
   const NAMES = ['bg', 'doll_0', 'doll_1', 'doll_2', 'doll_3', 'doll_4', 'guard_0', 'guard_1', 'guard_2',
@@ -172,7 +172,7 @@
   // --------------------------------------------------------------------------
   // Âm thanh: bộ âm tự tạo (public/js/redlight-audio.js) + giọng đọc ZeroTTS
   // --------------------------------------------------------------------------
-  const audio = new window.RLAudio();
+  const audio = new window.RLAudio({ assetVer: AV });
   // Xem trước trong trang quản lý: im lặng cho tới khi bấm "🔇 Nghe thử"
   let previewMuted = PREVIEW;
   let unlocked = false;
@@ -213,8 +213,11 @@
     if (ph.paused) {
       audio.stopSong();
       audio.stopLoops();
-    } else if (ph.phase === 'lobby') audio.lobbyLoop();
-    else if (ph.phase === 'play') {
+    } else if (ph.phase === 'lobby') {
+      // nhạc chờ là file mp3 (lobbyMusicTick); chỉ dùng nhạc tự tạo khi không tải được file
+      if (lobbyTracks.every((tr) => tr.el.error)) audio.lobbyLoop();
+      else audio.stopLoops();
+    } else if (ph.phase === 'play') {
       if (ph.light === 'green' && ph.song) {
         audio.stopSong();
         audio.stopLoops();
@@ -258,6 +261,46 @@
     if (songEl.paused) songEl.play().catch(() => {});
   }
 
+  // Nhạc nền lúc nghỉ chờ ván mới (sau nhạc kết quả 2,5 giây → hết lúc chờ): hai bản thay phiên theo số ván,
+  // lặp lại nếu thời gian chờ dài hơn bản nhạc; vào ván thì nhỏ dần rồi dừng.
+  // gain: cân độ to hai bản (đo RMS: bản 1 to hơn bản 2 khoảng 3 dB)
+  const lobbyTracks = [
+    { file: 'lobby_1.m4a', gain: 0.72 },
+    { file: 'lobby_2.m4a', gain: 1 }
+  ].map((tr) => {
+    const el = new Audio(`${ASSET}${tr.file}?v=${AV}`);
+    el.preload = 'auto';
+    el.loop = true;
+    el.volume = 0;
+    return { ...tr, el, wired: false, vol: 0 };
+  });
+  let resultAt = 0;
+  let lobbyMusicAt = performance.now();
+  function lobbyMusicTick() {
+    const tn = performance.now();
+    const dt = Math.min(0.1, (tn - lobbyMusicAt) / 1000);
+    lobbyMusicAt = tn;
+    const resting = ph.phase === 'lobby' || (ph.phase === 'result' && tn - resultAt > 2500);
+    const want = unlocked && !previewMuted && !ph.paused && settings.bgMusicEnabled !== false && resting;
+    const cur = (ph.round || 0) % lobbyTracks.length;
+    lobbyTracks.forEach((tr, i) => {
+      const target = want && i === cur ? tr.gain : 0;
+      // lên nhanh vừa (≈1 s), xuống nhanh hơn (≈0,6 s) khi vào ván
+      tr.vol += (target - tr.vol) * Math.min(1, dt * (target > tr.vol ? 2.5 : 4.5));
+      if (target === 0 && tr.vol < 0.01) {
+        tr.vol = 0;
+        if (!tr.el.paused) {
+          tr.el.pause();
+          tr.el.currentTime = 0; // lần nghỉ sau phát lại từ đầu bài
+        }
+        return;
+      }
+      if (!tr.wired) tr.wired = audio.connectMusic(tr.el);
+      tr.el.volume = Math.max(0, Math.min(1, tr.vol));
+      if (tr.el.paused) tr.el.play().catch(() => {});
+    });
+  }
+
   // Giọng đọc: phát lần lượt, bỏ bớt khi hàng chờ quá dài
   const ttsQueue = [];
   let ttsPlaying = false;
@@ -292,6 +335,7 @@
   }
 
   function onPhaseChange(phase) {
+    if (phase === 'result') resultAt = performance.now();
     if (phase !== 'play') banner = null;
     if (phase === 'lobby' || phase === 'play') purgeAt = 0;
     if (phase === 'result') {
@@ -1467,6 +1511,7 @@
     }
     updateDoll(dt);
     songTick();
+    lobbyMusicTick();
     finalCountdown();
 
     g.clearRect(0, 0, W, H);

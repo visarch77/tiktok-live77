@@ -1195,14 +1195,19 @@
           <div><div class="setting-name">Kiểu hát mặc định</div><div class="setting-desc">Nút “Lần hát sau” ở mục điều khiển chỉ đổi một lần</div></div>
           <select class="input" data-setting="songMode">${[['random', 'Ngẫu nhiên'], ['steady', 'Đều đều'], ['slowFast', 'Chậm → nhanh'], ['fastSlow', 'Nhanh → chậm'], ['jerky', 'Thất thường']].map(([v, n]) => `<option value="${v}" ${v === (s.songMode || 'random') ? 'selected' : ''}>${n}</option>`).join('')}</select>
         </div>
-        ${rlRange('lobbySeconds', 'Thời gian chờ vào', '', 5, 120, 1, 's')}
+        ${rlRange('resultSeconds', 'Thời gian xem kết quả', 'Bảng kết quả ván vừa rồi; nhạc nền chờ bắt đầu từ đây', 5, 60, 1, 's')}
+        ${rlRange('lobbySeconds', 'Thời gian nghỉ chờ ván mới', 'Người xem bình luận / thả tim để vào sân; chưa ai vào thì chờ thêm', 5, 300, 5, 's')}
+        <div class="setting">
+          <div><div class="setting-name">Nhạc nền lúc chờ ván</div><div class="setting-desc">Hai bản nhạc thay phiên nhau mỗi lần nghỉ; âm lượng theo “Âm lượng nhạc nền”</div></div>
+          <label class="switch"><input type="checkbox" data-setting="bgMusicEnabled" ${s.bgMusicEnabled !== false ? 'checked' : ''} /><span></span></label>
+        </div>
         ${rlRange('roundSeconds', 'Thời gian một ván', '', 30, 600, 5, 's')}
         ${rlRange('greenMin', 'Đèn xanh ngắn nhất', 'Chỉ dùng khi tắt búp bê hát', 1, 20, 1, 's')}
         ${rlRange('greenMax', 'Đèn xanh dài nhất', 'Chỉ dùng khi tắt búp bê hát', 1, 30, 1, 's')}
         ${rlRange('redMin', 'Đèn đỏ ngắn nhất', 'Phải dài hơn thời gian ân hạn', 2, 20, 1, 's')}
         ${rlRange('redMax', 'Đèn đỏ dài nhất', '', 2, 30, 1, 's')}
         ${rlRange('redGraceMs', 'Ân hạn đèn đỏ', 'Hình trên TikTok tới người xem chậm vài giây — chỉ bắt lỗi sau khoảng này', 0, 6000, 100, 'ms')}
-        ${rlRange('stepPerLike', 'Bước mỗi lượt tim', 'Sân dài 100 bước', 0.05, 5, 0.05, '')}
+        ${rlRange('stepPerLike', 'Bước mỗi lượt tim', 'Sân dài 120 bước', 0.05, 5, 0.05, '')}
         ${rlRange('maxPlayers', 'Số người chơi tối đa', '', 5, 200, 5, ' người')}
         ${rlRange('queueLikes', 'Tim để tham gia', 'Lúc chờ: thả đủ tim là vào sân. Đang chơi: thả đủ tim được đứng hàng chờ, ván sau vào sân', 1, 300, 1, ' tim')}
         ${rlRange('simCrowd', 'Số người ảo khi giả lập', '', 5, 200, 5, ' người')}`;

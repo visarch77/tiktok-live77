@@ -247,8 +247,11 @@ Mô phỏng một người thả tim hết công suất, dừng khi THẤY đèn
   (thanh cảm ơn ghi "dùng khi búp bê hát lại"). Khiên, Khiên đội, Bản sao có tác dụng ngay. Hoá gà luôn rơi vào đúng người dẫn đầu
   (trừ người tặng); người đó đang miễn thì hiện "Miễn gà!", không chuyển sang người khác.
 - Bình luận của người ở hàng chờ và người đứng chờ ván (vạch xuất phát) hiện thành bong bóng trên đầu 6 giây.
-- Búp bê quay đầu có tiếng mô-tơ + "cạch"; mắt quét giật từng nhịp kèm tiếng servo; khoá vào người bị phát hiện có tiếng "bíp".
+- Búp bê quay đầu: tiếng servo điện thu sẵn `doll_turn.m4a` / `doll_back.m4a` (tổng hợp bằng numpy, không dùng âm có bản quyền) — mô-tơ rít lên, bánh răng lách tách, "cạch" kim loại khi dừng; mắt quét giật từng nhịp kèm tiếng servo; khoá vào người bị phát hiện có tiếng "bíp".
 - 2,8 giây đầu mỗi câu hát: chữ "TAP TAP ❤️👆" trong suốt rung ở góc phải khu hàng chờ, nhắc người xem chạm màn hình thả tim.
+- Nhạc nền lúc nghỉ chờ ván mới: `lobby_1.m4a` (mingle) và `lobby_2.m4a` thay phiên theo số ván, bắt đầu 2,5 giây sau nhạc kết quả,
+  lặp nếu nghỉ lâu hơn bản nhạc, nhỏ dần khi vào ván. Bật/tắt bằng "Nhạc nền lúc chờ ván"; thời gian nghỉ = "Thời gian xem kết quả"
+  (5–60 s) + "Thời gian nghỉ chờ ván mới" (5–300 s) trong Cài đặt.
 - Bình luận lúc đèn đỏ không bị tính là cử động. Mỗi lần bắt lỗi đèn đỏ (người thật) ghi vào `DATA_DIR/redlight-fairness.log`.
 - Cân lại theo câu hát: tốc độ 3,8 bước/giây, tối đa 10 bước/gói tim, dồn tối đa 22 bước → người thả tim hết công suất,
   dừng khi búp bê quay đầu, trễ 1–4,5 giây về đích ~64–67 giây / ván 90 giây; thả tim bất chấp vẫn bị loại 100%.

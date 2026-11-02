@@ -7,6 +7,8 @@ embedded-assets.js
 *.log
 *.m4a
 public/assets/bg_chant.m4a
+# âm thanh của phòng Đèn Xanh – Đèn Đỏ là một phần của game (câu hát búp bê, nhạc chờ ván)
+!public/assets/redlight/*.m4a
 # nhạc nền nhập từ YouTube / file riêng (chỉ giữ README)
 public/music/*
 !public/music/README.md
