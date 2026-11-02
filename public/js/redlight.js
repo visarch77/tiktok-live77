@@ -325,19 +325,22 @@
         if (s) {
           const p = spritePos(s);
           // Đèn đỏ: tia mắt búp bê khoá vào người bị loại
-          if (e.cause === 'purge') shootAt(s, t0);
-          if (e.cause === 'red') {
-            // búp bê quét thấy → nháy đỏ ~0,65 s rồi lính bắn
-            s.flashUntil = t0 + 650;
-            shootAt(s, t0 + 600);
-          }
-          if (e.cause === 'red') laserLocks.push({ id: s.id, x: p.x, y: p.y - PH * 0.45, t0, until: t0 + 700 });
-          const hitAt = t0 + (e.cause === 'red' ? 710 : e.cause === 'purge' ? 120 : 0);
+          // đèn đỏ: đã nháy đỏ từ sự kiện "spotted" → giờ lính bắn
+          if (e.cause === 'purge' || e.cause === 'red') shootAt(s, t0);
+          const hitAt = t0 + (e.cause === 'red' || e.cause === 'purge' ? 120 : 0);
           burst(p.x, p.y - PH * 0.45, '#ff3b6b', 16, hitAt);
           addSprite('fx_spark', p.x, p.y - PH * 0.45, 40, 130, 380, hitAt);
           if (e.cause !== 'purge') fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.3, text: 'Loại!', color: '#ff6b6b', size: 30, t0: hitAt, life: 1100 });
         }
         if (e.name) pushTicker(`❌ Số ${e.num} ${e.name} bị loại`);
+        break;
+      case 'spotted':
+        // Búp bê thấy người còn động sau ân hạn: tia mắt khoá vào, nháy đỏ, hết e.ms thì server loại (sự kiện "out")
+        if (s) {
+          const p = spritePos(s);
+          s.spotUntil = t0 + (e.ms || 1200) + 300;
+          laserLocks.push({ id: s.id, x: p.x, y: p.y - PH * 0.45, t0, until: t0 + (e.ms || 1200) });
+        }
         break;
       case 'finish':
         if (unlocked) audio.finish(e.rank);
@@ -728,8 +731,8 @@
     const tn = performance.now();
     // bị phát hiện: còn đứng nháy đỏ một lúc rồi mới ngã
     const flashing = !s.a && tn < (s.flashUntil || 0);
-    // đèn đỏ mà tim vẫn về (đang chạy tại chỗ): búp bê đã thấy → nháy đỏ cảnh báo, tiếp tục là bị bắn
-    const spotted = s.a && !s.f && ph.phase === 'play' && ph.light === 'red' && tn < (s.actUntil || 0);
+    // búp bê đã thấy (server báo "spotted"): nháy đỏ cho tới khi bị bắn
+    const spotted = s.a && !s.f && tn < (s.spotUntil || 0);
     const dead = !s.a && !flashing;
     const deadAt = Math.max(s.deadSeenAt || 0, s.flashUntil || 0);
     const moving = isMoving(s, tn);
@@ -783,7 +786,7 @@
       fit = 0.85;
     } else {
       let f = 'stand';
-      if (flashing) f = RUN[Math.floor(tn / 90) % 4];
+      if (flashing || spotted) f = RUN[Math.floor(tn / 90) % 4];
       else if (dead) f = tn - deadAt < 220 ? 'freeze' : 'dead';
       else if (moving) f = RUN[Math.floor(s.anim) % 4];
       else if (ph.phase === 'play' && ph.light === 'red' && !s.f) f = s.id % 2 && ready(IMG[`v${v}_freeze2`]) ? 'freeze2' : 'freeze';

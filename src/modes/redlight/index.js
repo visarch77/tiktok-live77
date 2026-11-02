@@ -28,6 +28,8 @@ const MAX_LIKE_STEP = 10; // bước tối đa cho một gói tim (TikTok gộp 
 const GRACE_MIN = 3000;
 const GRACE_MAX = 9000;
 const GRACE_MARGIN = 1500;
+// Bị búp bê phát hiện: nháy đỏ trên màn hình chừng này rồi mới bị bắn (mỗi lần nháy đỏ là một phát bắn)
+const SPOT_MS = 1200;
 // Hết giờ: lính canh tiến vào sân (PURGE_MARCH_MS) rồi bắn lần lượt mọi người chưa về đích
 const PURGE_MARCH_MS = 1300;
 const PURGE_SHOOT_MS = 3200; // tổng thời gian bắn (chia đều cho số người), mỗi phát cách nhau tối đa 220ms
@@ -109,6 +111,7 @@ function create(ctx, saved = {}) {
       y: 0,
       pending: 0,
       alive: true,
+      doomAt: 0,
       finishRank: 0,
       shield: 0,
       giantUntil: 0,
@@ -240,7 +243,7 @@ function create(ctx, saved = {}) {
   // Người chơi vừa "động" (thả tim / bình luận). Trả về true nếu được tiến lên.
   function move(p, units) {
     p.lastActiveAt = Date.now();
-    if (phase !== 'play' || paused || !p.alive || p.finishRank) return false;
+    if (phase !== 'play' || paused || !p.alive || p.finishRank || p.doomAt) return false;
     if (units > 0) measureLag(p, Date.now());
     if (light === 'red' && redArmedFor(p)) {
       logViolation(p, units);
@@ -283,17 +286,21 @@ function create(ctx, saved = {}) {
       ctx.broadcast('rl.fx', { kind: 'shieldSave', id: p.id });
       return;
     }
-    const clones = clonesOf(p);
-    if (clones.length) {
-      eliminate(clones[0], 'red');
-      return;
-    }
-    eliminate(p, 'red');
+    // có bản sao thì bản sao chết thay; người (hoặc bản sao) bị phát hiện đứng nháy đỏ SPOT_MS rồi bị bắn
+    const clone = clonesOf(p).find((c) => c.alive && !c.doomAt);
+    spot(clone || p);
+  }
+
+  function spot(p) {
+    p.doomAt = Date.now() + SPOT_MS;
+    p.pending = 0;
+    ctx.broadcast('rl.fx', { kind: 'spotted', id: p.id, ms: SPOT_MS });
   }
 
   function eliminate(p, cause) {
     if (!p.alive || p.finishRank) return;
     p.alive = false;
+    p.doomAt = 0;
     p.pending = 0;
     p.deadAt = Date.now();
     rosterDirty = true;
@@ -534,6 +541,7 @@ function create(ctx, saved = {}) {
         y: 0,
         pending: 0,
         alive: true,
+        doomAt: 0,
         finishRank: 0,
         shield: 0,
         giantUntil: 0,
@@ -662,7 +670,8 @@ function create(ctx, saved = {}) {
       const dt = TICK_MS / 1000;
       let moved = false;
       for (const p of [...players.values()]) {
-        if (!p.alive || p.finishRank || p.pending <= 0 || light === 'red') continue;
+        if (p.doomAt && now >= p.doomAt) eliminate(p, 'red');
+        if (!p.alive || p.finishRank || p.doomAt || p.pending <= 0 || light === 'red') continue;
         const step = Math.min(p.pending, speedOf(p, now) * dt);
         p.pending -= step;
         p.y += step;

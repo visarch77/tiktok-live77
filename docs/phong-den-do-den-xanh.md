@@ -240,8 +240,10 @@ Mô phỏng một người thả tim hết công suất, dừng khi THẤY đèn
 - Màn hình phát lại theo mốc + tốc độ server gửi, khớp đồng hồ server (vào giữa chừng tự nhảy đúng chỗ), giữ cao độ giọng.
 - Trang quản lý: bật/tắt "Búp bê hát làm đèn xanh", kiểu hát mặc định, và 4 nút "Lần hát sau: …" (đổi một lần).
 - Búp bê chỉ quay đầu: thân nhìn từ sau giữ nguyên, đầu ghép từ 5 góc xoay.
-- Nhạc dừng mà vẫn thả tim: trong 4 giây ân hạn người đó hiện đang chạy tại chỗ (bước dồn lại cho đèn xanh sau);
-  quá ân hạn thì búp bê quét tia khoá lại và lính bắn.
+- Nhạc dừng mà vẫn thả tim: trong ân hạn riêng của người đó (3–9 giây theo độ trễ đo được) chỉ hiện chạy tại chỗ,
+  bước dồn lại cho đèn xanh sau; quá ân hạn thì búp bê khoá tia vào, người đó nháy đỏ 1,2 giây rồi lính bắn.
+  Mỗi lần nháy đỏ chắc chắn là một phát bắn (server gửi `rl.fx spotted`, hết 1,2 giây mới loại).
+- Bình luận lúc đèn đỏ không bị tính là cử động. Mỗi lần bắt lỗi đèn đỏ (người thật) ghi vào `DATA_DIR/redlight-fairness.log`.
 - Cân lại theo câu hát: tốc độ 3,8 bước/giây, tối đa 10 bước/gói tim, dồn tối đa 22 bước → người thả tim hết công suất,
   dừng khi búp bê quay đầu, trễ 1–4,5 giây về đích ~64–67 giây / ván 90 giây; thả tim bất chấp vẫn bị loại 100%.
 
