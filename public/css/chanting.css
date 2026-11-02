@@ -453,3 +453,34 @@ body.show-safe .tt-safe { display: block; }
 .bubble::after { border-top-color: rgb(28 12 4 / calc(0.25 + 0.35 * var(--ui-a))); }
 .bubble .b-name { color: #ffd98a; }
 .floater .lantern { background: rgb(60 22 10 / calc(0.25 + 0.35 * var(--ui-a))); border-color: rgb(246 213 138 / 0.4); text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7); }
+
+/* ---------- Hẹn giờ tắt live ---------- */
+.end-card { position: absolute; left: 50%; top: 830px; z-index: 23; width: 760px; padding: 14px 26px; border-radius: 20px; text-align: center;
+  background: rgb(20 8 3 / calc(0.35 + 0.4 * var(--ui-a))); border: 1px solid rgb(246 213 138 / 0.45); color: var(--ivory);
+  transform: translate(-50%, -8px); opacity: 0; transition: opacity 1s ease, transform 1s ease, top 1.2s ease, padding 1.2s ease; pointer-events: none; }
+.end-card.show { opacity: 1; transform: translate(-50%, 0); }
+.end-card .ec-lotus { display: none; font-size: 64px; line-height: 1.1; }
+.end-card .ec-title { font-size: 28px; font-weight: 600; color: #ffe2a3; }
+.end-card .ec-sub { font-size: 22px; opacity: .85; margin-top: 4px; }
+.end-card.final { z-index: 60; top: 850px; padding: 34px 40px 38px; background: rgb(20 8 3 / 0.62); box-shadow: 0 0 80px rgb(255 200 110 / 0.25); }
+.end-card.final .ec-lotus { display: block; animation: ecGlow 4s ease-in-out infinite; }
+.end-card.final .ec-title { font-size: 44px; font-family: 'Dancing Script', cursive; }
+.end-card.final .ec-sub { font-size: 26px; line-height: 1.5; margin-top: 10px; }
+@keyframes ecGlow { 0%, 100% { filter: drop-shadow(0 0 6px #ffd27a); } 50% { filter: drop-shadow(0 0 22px #ffd27a); } }
+
+/* ---------- Vùng an toàn hai bên: điện thoại màn dài (19,5:9, 20:9) phóng khung 9:16 cho đầy màn hình,
+   TikTok cắt mất ~95–110px mỗi bên — đưa bảng, dòng chữ chạy, khung kinh vào trong 112px ---------- */
+.side-panel { width: 272px; }
+.side-panel.left { left: 112px; }
+.side-panel.right { right: 112px; }
+.marquee { left: 112px; right: 112px; }
+.sutra-panel { left: 108px; right: 108px; padding-left: 20px; padding-right: 20px; }
+.announce { width: 840px; }
+
+/* ---------- Khung kinh trên điện thoại: đáy khung bị khung bình luận & thanh nhập của TikTok che kín —
+   đưa lên vùng trống giữa dòng chữ chạy (≈620) và thông báo quà của TikTok (≈1060) ---------- */
+.sutra-panel { top: 672px; }
+.stage:not(.offering) .announce { top: 960px; }
+
+/* Phật tử nền (ngồi sẵn khi phòng vắng): không bảng tên */
+.seat.ambient .tag { display: none !important; }

@@ -9,7 +9,7 @@ const { isBlockedSpamOrToxic, sanitizeUserName, sanitizeWishText } = require('..
 // ============================================================================
 // CHẾ ĐỘ "PHÒNG TỤNG KINH CHUNG" (xem docs/phong-tung-kinh.md)
 // - Mọi tương tác bình đẳng: không bảng xếp hạng, không số xu, không phân biệt quà lớn – nhỏ
-// - Tương tác đầu tiên bất kỳ = thắp nhang + nhận chỗ ngồi; ai cũng thấy mình trên màn hình
+// - Tương tác đầu tiên bất kỳ = dâng hương + nhận chỗ ngồi; ai cũng thấy mình trên màn hình
 // - Thời khoá lặp lại: tụ hội → khai chuông → niệm hương (xướng, không mõ) → khai chuông mõ → khai kinh
 //   → xướng danh hiệu + kinh chính (mõ) → niệm Phật (mõ) → hồi hướng (xướng, cuộn tên) → tĩnh lặng → kết chuông
 // ============================================================================
@@ -21,7 +21,8 @@ const { guessGender, parseSelfGender } = require('./gender');
 const { createSimulator, SIM_LEVELS, SIM_PREFIX } = require('./sim');
 const { giftOffering, isSmallGift, OFFERINGS } = require('./gifts');
 const { createWishBag } = require('./wishes');
-const { ANNOUNCE, nextSessionLine, splitForSpeech, createAnnouncer } = require('./announcements');
+const { ANNOUNCE, FAREWELL, GOODBYE, nextSessionLine, splitForSpeech, createAnnouncer } = require('./announcements');
+const obs = require('../../core/obsControl');
 // Nam ngồi bên trái thảm, nữ bên phải
 const SIDE_FOR = { m: 'L', f: 'R' };
 
@@ -63,7 +64,7 @@ const SPREAD_ORDER = (() => {
   }
   return out;
 })();
-const INCENSE_COOLDOWN_MS = 3 * 60 * 1000; // mỗi người lên thắp nhang tối đa 1 lần / 3 phút
+const INCENSE_COOLDOWN_MS = 3 * 60 * 1000; // mỗi người lên dâng hương tối đa 1 lần / 3 phút
 const PRESENCE_GAP_MS = 2 * 60 * 1000; // hai lần tương tác cách nhau ≤ 2 phút = vẫn đang ở trong đạo tràng
 const BELL_RESPONSE_MS = 6000; // thả tim trong 6 giây sau tiếng chuông = "chắp tay theo chuông"
 const MINUTE_MILESTONES = [10, 30, 60, 120];
@@ -75,7 +76,7 @@ const CHANT_FLUSH_MS = 1500;
 const THANKS_FLUSH_MS = 2500; // gom quà trong 2,5 giây rồi đọc tên + lời chúc
 const MAX_DEDICATION_NAMES = 300;
 const VOTE_RE = /(?:^|[^\p{L}])kinh\s*(?:số\s*)?([1-9])(?![0-9])/iu;
-// Cú pháp lên thắp nhang trước Phật
+// Cú pháp lên dâng hương trước Phật (vẫn nhận "thắp nhang" / "thắp hương")
 const INCENSE_RE = /(?:^|[^\p{L}])(?:thắp|thap|dâng|dang)\s+(?:nhang|hương|huong)(?![\p{L}])/iu;
 
 // Mỗi loại quà là một biểu tượng tượng trưng — cùng kích thước, cùng ánh sáng, không theo giá trị
@@ -86,7 +87,7 @@ const GIFT_FOCUS_MS = 20000; // mỗi người được camera đưa cận cản
 // Lời chúc "thật tâm" để đọc thành tiếng (đã qua lọc khiếm nhã / spam): có ý chúc, nguyện, cảm ơn
 const SINCERE_RE = /(nguy[eệ]n|c[aầ]u|ch[uú]c|mong|b[iì]nh an|an l[aà]nh|an l[aạ]c|an vui|s[uứ]c kh[oỏ]e|kh[oỏ]e m[aạ]nh|h[aạ]nh ph[uú]c|may m[aắ]n|c[aả]m [oơ]n|tu[yỳ] h[yỷ]|di [dđ][aà]|nam m[oô]|si[eê]u|h[oồ]i h[uướ][oớ]ng|b[iì]nh y[eê]n|t[aâ]m an|th[aà]nh t[aâ]m|t[uừ] bi)/iu;
 const SPEECH_QUEUE_MAX = 6;
-const WELCOME_SPEAK_MS = 25000; // lời chào người mới (dâng lễ) gom lại, tối đa 1 lần / 25 giây
+const WELCOME_SPEAK_MS = 25000; // lời chào người mới (dâng hương) gom lại, tối đa 1 lần / 25 giây
 
 // Công đức tụng kinh trong ngày: chủ yếu theo thời gian cùng tụng và số tim; quà đóng góp rất ít
 const MERIT_PER_MINUTE = 2;
@@ -98,7 +99,7 @@ const AURA_MINUTES = [10, 30, 60];
 const AURA_HEARTS = [150, 500, 1500];
 
 const PHASE_TITLES = {
-  gather: 'Dâng lễ',
+  gather: 'Dâng hương',
   bell_open: 'Khai chuông',
   incense: LITURGY.incense.title,
   khai_chuong_mo: 'Khai chuông mõ',
@@ -343,7 +344,7 @@ function create(ctx, saved = {}) {
         const lastTouch = Math.max(p.lastActive || 0, p.lastLike || 0);
         const protectedNow = now - lastTouch < REPLACE_PROTECT_MS;
         // Hạng nhường chỗ: [đang được bảo vệ?, đã từng thả tim?, lần thả tim gần nhất, lần tương tác gần nhất]
-        const rank = [protectedNow ? 1 : 0, p.lastLike ? 1 : 0, p.lastLike || 0, p.lastActive || 0];
+        const rank = p.ambient ? [-1, 0, 0, 0] : [protectedNow ? 1 : 0, p.lastLike ? 1 : 0, p.lastLike || 0, p.lastActive || 0];
         if (!victimRank || rankLess(rank, victimRank)) {
           victim = p;
           victimRank = rank;
@@ -377,7 +378,9 @@ function create(ctx, saved = {}) {
   }
 
   function seatView(person) {
-    return { slot: person.slot, key: person.key, name: person.name, avatar: person.avatar, gender: person.gender, tier: auraTier(person) };
+    const v = { slot: person.slot, key: person.key, name: person.name, avatar: person.avatar, gender: person.gender, tier: auraTier(person) };
+    if (person.ambient) v.ambient = true;
+    return v;
   }
 
   // ------------------------------------------------------------------------
@@ -428,7 +431,7 @@ function create(ctx, saved = {}) {
   }
 
   // ------------------------------------------------------------------------
-  // Hai chế độ: DÂNG LỄ (lúc tụ hội) — nhạc nền + đọc lời chúc thật tâm, cảm ơn người ủng hộ;
+  // Hai chế độ: DÂNG HƯƠNG (lúc tụ hội) — nhạc nền + đọc lời chúc thật tâm, cảm ơn người ủng hộ;
   // TỤNG KINH (mọi bước còn lại) — chỉ tiếng pháp, lời chúc/cảm ơn hiện trên bảng bên trái
   // ------------------------------------------------------------------------
   function offeringTime() {
@@ -487,10 +490,52 @@ function create(ctx, saved = {}) {
     }
   }
 
+  // Lời chúc kèm lời chào người mới (phòng còn ít người xem: chào từng người cho đạo tràng ấm áp, không im lặng)
+  const WELCOME_WISHES = [
+    'Chúc {b} một ngày bình an.',
+    'Chúc {b} thân tâm an lạc.',
+    'Mời {b} ngồi xuống, cùng thả tim theo tiếng mõ nhé.',
+    'Chúc {b} và gia đình mạnh khoẻ, an vui.',
+    'Mong {b} tìm được chút bình yên nơi đây.',
+    'Chúc {b} mọi việc hanh thông, lòng nhẹ nhàng.',
+    'Muốn lên chánh điện, {b} cứ bình luận chữ dâng hương nhé.',
+    'Cảm ơn {b} đã ghé, chúc {b} luôn an lành.'
+  ];
+  let welcomeWishIdx = 0;
+  let welcomeFlushTimer = null;
+  const WELCOME_EACH_GAP_MS = 7000;
+
+  // Tên đọc được: bỏ số, ký hiệu, emoji; tên tài khoản mặc định (user123…) thì không đọc tên
+  function welcomeName(name) {
+    const n = speakName(String(name || '').replace(/[^\p{L}\p{M}\s]/gu, ' ')).trim();
+    return !n || /^user$/i.test(n) ? '' : n;
+  }
+
+  function flushWelcome() {
+    welcomeFlushTimer = null;
+    const names = [...new Set(welcomeBuffer.map(welcomeName))];
+    const unnamed = names.includes('');
+    const named = names.filter(Boolean).slice(0, 3);
+    welcomeBuffer = [];
+    if (!named.length && !unnamed) return;
+    lastWelcomeSpeak = Date.now();
+    const many = named.length + (unnamed ? 1 : 0) > 1;
+    const who = named.length ? named.join(', ') + (unnamed ? ' và các bạn mới' : '') : 'bạn mới';
+    const wish = WELCOME_WISHES[welcomeWishIdx++ % WELCOME_WISHES.length].replace(/\{b\}/g, many ? 'các bạn' : 'bạn');
+    enqueueSpeech(`Chào mừng ${who} đã vào đạo tràng. ${wish}`);
+  }
+
   function noteWelcome(person) {
     welcomeBuffer.push(person.name);
     if (welcomeBuffer.length > 4) welcomeBuffer.shift();
     const now = Date.now();
+    const limit = Number(ctx.settings.welcomeEachBelow ?? 50);
+    const viewers = ctx.viewerCount ? ctx.viewerCount() : 0;
+    if (limit > 0 && viewers < limit) {
+      // Ít người xem: chào từng người (vào dồn dập thì gom 2–3 tên trong một câu)
+      if (!welcomeFlushTimer) welcomeFlushTimer = setTimeout(flushWelcome, Math.max(2500, lastWelcomeSpeak + WELCOME_EACH_GAP_MS - now));
+      return;
+    }
     if (now - lastWelcomeSpeak < WELCOME_SPEAK_MS) return;
     lastWelcomeSpeak = now;
     const names = welcomeBuffer.map(speakName).filter(Boolean);
@@ -644,7 +689,7 @@ function create(ctx, saved = {}) {
     switch (id) {
       case 'gather':
         // Chế độ DÂNG LỄ: nhạc nền, đọc lời chúc, cảm ơn người dâng lễ; camera cận cảnh người dâng
-        return { ...base, subtitle: 'Mời mọi người vào đạo tràng — dâng lễ, gửi lời chúc, thả tim', cues: [], durationMs: offeringMs() };
+        return { ...base, subtitle: 'Mời mọi người vào đạo tràng — dâng hương, gửi lời chúc, thả tim', cues: [], durationMs: offeringMs() };
       case 'bell_open': {
         const tl = timeline.openingBells();
         return { ...base, subtitle: 'Mời đại chúng cùng an tọa', cues: tl.cues, durationMs: tl.endAt };
@@ -770,7 +815,7 @@ function create(ctx, saved = {}) {
   };
 
   // ------------------------------------------------------------------------
-  // Lịch tự động: DÂNG LỄ (offeringMinutes) ⇄ TỤNG KINH (chantMinutes).
+  // Lịch tự động: DÂNG HƯƠNG (offeringMinutes) ⇄ TỤNG KINH (chantMinutes).
   // Tụng kinh = một khoá đầy đủ; sau mỗi bài kinh, nếu còn đủ thời gian thì tụng tiếp bài kế trong lịch
   // (trước phần niệm Phật – hồi hướng – kết chuông), để cả khoá dài gần đúng số phút đã đặt.
   // ------------------------------------------------------------------------
@@ -784,6 +829,12 @@ function create(ctx, saved = {}) {
     if (m > 0) return Math.round(m * 60000);
     return (Number(ctx.settings.gatherSeconds) || 90) * 1000;
   }
+  // Chế độ phòng: 'auto' luân phiên Dâng hương ⇄ Tụng kinh | 'offering' chỉ Dâng hương | 'chant' tụng kinh liên tục
+  function roomMode() {
+    const m = ctx.settings.roomMode;
+    if (m === 'offering' || m === 'chant' || m === 'auto') return m;
+    return ctx.settings.autoRun === false ? 'offering' : 'auto';
+  }
   function chantBudgetMs() {
     return Math.round((Number(ctx.settings.chantMinutes) || 20) * 60000);
   }
@@ -792,7 +843,8 @@ function create(ctx, saved = {}) {
     if (id === 'sutra' && chantBlockStart) {
       const elapsed = Date.now() - chantBlockStart;
       const lastSutraMs = (phase && phase.durationMs) || 4 * 60000;
-      if (sutrasThisBlock < 12 && elapsed + lastSutraMs + TAIL_ESTIMATE_MS <= chantBudgetMs()) {
+      const endCut = endActive() && Date.now() + lastSutraMs + TAIL_ESTIMATE_MS >= endAt() - farewellMs();
+      if (!endCut && sutrasThisBlock < 12 && elapsed + lastSutraMs + TAIL_ESTIMATE_MS <= chantBudgetMs()) {
         repeatSutra = true;
         return 'sutra';
       }
@@ -814,6 +866,7 @@ function create(ctx, saved = {}) {
     clearTimeout(phaseTimer);
     const prevId = phase && phase.id;
     paused = false;
+    if (endStage === 'ended') endStage = null; // người trực cho chạy lại sau khi đã kết thúc
     clearAnnounceTimers();
     if (id !== 'bell_open' && id !== 'gather' && !currentSutra) currentSutra = pickNextSutra();
     if (id === 'sutra' && repeatSutra) {
@@ -832,7 +885,7 @@ function create(ctx, saved = {}) {
       // Ai đang ngồi trong đạo tràng đều có tên trong lời hồi hướng của khoá này
       for (const key of slots) {
         const p = key && people.get(key);
-        if (p) sessionNames.set(p.key, p.name);
+        if (p && !p.ambient) sessionNames.set(p.key, p.name);
       }
     }
     if (id === 'sutra') {
@@ -848,12 +901,112 @@ function create(ctx, saved = {}) {
     ctx.scheduleStateBroadcast();
     if (id === 'gather') scheduleTransitionSpeech(prevId);
     // Chế độ "điều phối tay": tụ hội đến khi người trực bấm "Bắt đầu khoá tụng"
-    if (id === 'gather' && ctx.settings.autoRun === false) return;
-    phaseTimer = setTimeout(() => enterPhase(nextPhaseId(id)), phase.durationMs);
+    if (id === 'gather' && roomMode() === 'offering') return;
+    phaseTimer = setTimeout(() => advanceFrom(id), phase.durationMs);
+  }
+
+  function advanceFrom(id) {
+    // Chế độ chỉ tụng kinh: kết khoá xong vào khoá mới luôn (trừ khi sắp tắt live)
+    if (roomMode() === 'chant' && (id === 'bell_close' || id === 'gather') && !chantWouldBeCut(Date.now())) {
+      currentSutra = null;
+      return enterPhase('bell_open');
+    }
+    // Sắp tới giờ tắt live, không đủ thời gian cho trọn một khoá tụng: ở lại Dâng hương tới lúc chào
+    if (id === 'gather' && chantWouldBeCut(Date.now())) {
+      phaseTimer = setTimeout(() => advanceFrom('gather'), 30000);
+      return;
+    }
+    enterPhase(nextPhaseId(id));
   }
 
   // ------------------------------------------------------------------------
-  // Lời dẫn chuyển chế độ: sau kết chuông (sang dâng lễ), báo trước 1 phút, và ngay trước khi vào khoá tụng
+  // Hẹn giờ tắt live: trước giờ hẹn vài phút đọc lời báo & cảm ơn; tới giờ đọc lời chào cuối,
+  // màn hình chuyển sang "Viên mãn", (tuỳ chọn) tự dừng phát trong OBS.
+  // Đang tụng kinh dở thì không tụng thêm bài, đợi kết khoá rồi mới chào.
+  // ------------------------------------------------------------------------
+  let endStage = null; // null | 'scheduled' | 'farewell' | 'ended'
+  let farewellStartedAt = 0;
+  let obsStopTimer = null;
+  let obsResult = null;
+  // Giờ hẹn đã qua lúc khởi động (máy tắt / chạy lại) thì bỏ qua
+  let endedFor = Number(ctx.settings.liveEndAt) > 0 && Number(ctx.settings.liveEndAt) <= Date.now() ? Number(ctx.settings.liveEndAt) : 0;
+  const pickFarewell = (() => { let i = 0; return () => FAREWELL[i++ % FAREWELL.length]; })();
+  const pickGoodbye = (() => { let i = 0; return () => GOODBYE[i++ % GOODBYE.length]; })();
+
+  function endAt() {
+    return Number(ctx.settings.liveEndAt) || 0;
+  }
+  function endActive() {
+    const at = endAt();
+    return at > 0 && at !== endedFor;
+  }
+  function farewellMs() {
+    return Math.round((Number(ctx.settings.farewellMinutes) || 3) * 60000);
+  }
+  // Nếu bắt đầu khoá tụng lúc t thì có kịp tụng trọn & còn thời gian chào không?
+  function chantWouldBeCut(t) {
+    return endActive() && endAt() - t < chantBudgetMs() + farewellMs() + 60000;
+  }
+
+  function checkEnd() {
+    if (disposed) return;
+    if (!endActive()) {
+      if (endStage === 'scheduled' || endStage === 'farewell') {
+        endStage = null;
+        ctx.scheduleStateBroadcast();
+      }
+      return;
+    }
+    const at = endAt();
+    const now = Date.now();
+    if (endStage !== 'farewell') {
+      if (endStage !== 'scheduled') {
+        endStage = 'scheduled';
+        ctx.scheduleStateBroadcast();
+      }
+      if (now < at - farewellMs() || !offeringTime()) return;
+      endStage = 'farewell';
+      farewellStartedAt = now;
+      clearAnnounceTimers(); // không báo "sắp tụng kinh" nữa
+      announce(pickFarewell()(Math.max(1, Math.round((at - now) / 60000))));
+      ctx.emitEvent({ type: 'liveEnding', at });
+      ctx.scheduleStateBroadcast();
+      return;
+    }
+    const due = now >= Math.max(at, farewellStartedAt + 60000);
+    if (due) speechQueue.length = 0; // tới giờ: không nhận đọc lời chúc mới, đọc xong câu đang dở là chào
+    if (due && ((!speaking && !announceQueue.length) || now >= at + 90000)) finishLive(at);
+  }
+
+  function finishLive(at) {
+    endedFor = at;
+    endStage = 'ended';
+    clearTimeout(phaseTimer);
+    clearAnnounceTimers();
+    speechQueue.length = 0;
+    phase = { id: 'ended', title: 'Viên mãn', subtitle: 'Buổi tụng kinh hôm nay đã viên mãn — hẹn gặp lại', startedAt: Date.now(), cues: [], durationMs: 0, sessionSutra: null };
+    ctx.broadcast('chant.phase', { phase, serverNow: Date.now(), nextUp: nextUp() });
+    announce(pickGoodbye());
+    ctx.emitEvent({ type: 'liveEnded', at });
+    ctx.save();
+    ctx.scheduleStateBroadcast();
+    obsResult = null;
+    if (ctx.settings.obsAutoStop) {
+      // Đợi lời chào đọc xong & khán giả kịp xem màn hình viên mãn rồi mới dừng phát
+      clearTimeout(obsStopTimer);
+      obsStopTimer = setTimeout(() => {
+        obs.stopStream()
+          .then((r) => { obsResult = { ok: true, note: r.note || 'Đã dừng phát trong OBS' }; })
+          .catch((err) => { obsResult = { ok: false, note: err.message }; console.warn(`[chanting ${ctx.roomId}] Không dừng được OBS:`, err.message); })
+          .finally(() => ctx.scheduleStateBroadcast());
+      }, 45000);
+    }
+  }
+
+  const endTimer = setInterval(checkEnd, 3000);
+
+  // ------------------------------------------------------------------------
+  // Lời dẫn chuyển chế độ: sau kết chuông (sang dâng hương), báo trước 1 phút, và ngay trước khi vào khoá tụng
   // ------------------------------------------------------------------------
   const pickAnnouncement = createAnnouncer();
   let announceTimers = [];
@@ -868,17 +1021,18 @@ function create(ctx, saved = {}) {
     if (fromChant) {
       announceTimers.push(setTimeout(() => {
         announce(pickAnnouncement('toOffering'));
-        if (ctx.settings.autoRun !== false) announce(nextSessionLine(dur / 60000));
+        if (roomMode() === 'auto' && !chantWouldBeCut(phase.startedAt + dur)) announce(nextSessionLine(dur / 60000));
       }, 1500));
     }
-    if (ctx.settings.autoRun === false) return; // điều phối tay: không biết lúc nào vào khoá tụng
+    if (roomMode() !== 'auto') return; // điều phối tay: không biết lúc nào vào khoá tụng
+    if (chantWouldBeCut(phase.startedAt + dur) || endStage === 'farewell') return; // sắp tắt live: không vào khoá tụng nữa
     if (dur >= 150000) announceTimers.push(setTimeout(() => announce(pickAnnouncement('soon')), dur - 75000));
     if (dur >= 50000) announceTimers.push(setTimeout(() => announce(pickAnnouncement('toChant')), dur - 38000));
   }
 
   function pauseRoom() {
     clearTimeout(phaseTimer);
-    resumeTo = phase && phase.id !== 'paused' ? phase.id : resumeTo;
+    resumeTo = phase && phase.id !== 'paused' && phase.id !== 'ended' ? phase.id : resumeTo;
     paused = true;
     phase = { id: 'paused', title: 'Tạm dừng', subtitle: 'Người trực đã tạm dừng thời khoá', startedAt: Date.now(), cues: [], durationMs: 0, sessionSutra: null };
     ctx.broadcast('chant.phase', { phase, serverNow: Date.now(), nextUp: nextUp() });
@@ -1026,7 +1180,7 @@ function create(ctx, saved = {}) {
     ctx.save();
   }
 
-  // Lời chúc khi dâng lễ: rút ngẫu nhiên từ bộ 100 câu chúc chung (sức khoẻ, bình an, công việc, may mắn…)
+  // Lời chúc khi dâng hương: rút ngẫu nhiên từ bộ 100 câu chúc chung (sức khoẻ, bình an, công việc, may mắn…)
   const nextWish = createWishBag();
 
   function flushThanks() {
@@ -1092,7 +1246,7 @@ function create(ctx, saved = {}) {
       return null;
     }
 
-    // "thắp nhang" / "thắp hương" / "dâng hương": phật tử bước lên thảm đỏ, thắp nhang trước Phật rồi về chỗ
+    // "thắp nhang" / "thắp hương" / "dâng hương": phật tử bước lên thảm đỏ, dâng hương trước Phật rồi về chỗ
     if (INCENSE_RE.test(raw) || /🔥/u.test(raw)) {
       const now = Date.now();
       if (now - (incenseCooldown.get(person.key) || 0) < INCENSE_COOLDOWN_MS) return null;
@@ -1156,7 +1310,7 @@ function create(ctx, saved = {}) {
       addVote(person.key, 1 + hashIndex(giftKey, SUTRAS.length), { replace: false });
     }
     // Quà nhỏ: lễ vật bay lên cùng tên (mỗi người tối đa 1 lần / 4 giây). Quà lớn: camera cận cảnh +
-    // màn dâng lễ riêng của món đó (mỗi người tối đa 1 lần / 20 giây để không bị lặp khi tặng liên tục)
+    // màn dâng hương riêng của món đó (mỗi người tối đa 1 lần / 20 giây để không bị lặp khi tặng liên tục)
     const small = isSmallGift(evt);
     const now = Date.now();
     const gap = small ? 4000 : GIFT_FOCUS_MS;
@@ -1231,6 +1385,61 @@ function create(ctx, saved = {}) {
     }
     return removed;
   }
+
+  // ------------------------------------------------------------------------
+  // Phật tử nền: khi phòng còn vắng (mới mở live), vài phật tử không tên ngồi sẵn trong chánh điện
+  // và thỉnh thoảng lên dâng hương cho cảnh không trống. Không phải người xem: không tên, không bình luận,
+  // không thả tim, không tính vào số người / lượt dâng hương / bảng tinh tấn. Người xem thật vào tới đâu
+  // thì phật tử nền lui ra tới đó.
+  // ------------------------------------------------------------------------
+  const AMBIENT_PREFIX = 'amb_';
+  const isAmbient = (key) => typeof key === 'string' && key.startsWith(AMBIENT_PREFIX);
+  let ambientWalkTimer = null;
+
+  function ambientTarget() {
+    const want = Math.max(0, Math.min(12, Number(ctx.settings.ambientCount ?? 6) || 0));
+    const real = slots.filter((k) => k && !isAmbient(k)).length;
+    return Math.max(0, want - real);
+  }
+
+  function syncAmbient() {
+    if (disposed) return;
+    for (const [k, p] of people) if (isAmbient(k) && p.slot < 0) people.delete(k); // bị người xem thật nhường chỗ
+    const seated = slots.filter(isAmbient);
+    const target = endStage === 'ended' ? 0 : ambientTarget();
+    let changed = false;
+    // Thêm dần từng người (không hiện cả nhóm cùng lúc)
+    if (seated.length < target) {
+      let i = 0;
+      while (people.has(`${AMBIENT_PREFIX}${i}`)) i++;
+      const person = { key: `${AMBIENT_PREFIX}${i}`, name: '', avatar: '', ambient: true, lastActive: Date.now(), lastLike: 0, slot: -1, gender: i % 2 ? 'm' : 'f' };
+      people.set(person.key, person);
+      assignSlot(person);
+      changed = true;
+    } else if (seated.length > target) {
+      const key = seated[seated.length - 1];
+      const p = people.get(key);
+      if (p && p.slot >= 0 && slots[p.slot] === key) slots[p.slot] = null;
+      people.delete(key);
+      changed = true;
+    }
+    if (changed) ctx.scheduleStateBroadcast();
+  }
+
+  function ambientWalk() {
+    clearTimeout(ambientWalkTimer);
+    if (disposed) return;
+    const keys = slots.filter(isAmbient);
+    if (keys.length && endStage !== 'ended') {
+      const p = people.get(keys[Math.floor(Math.random() * keys.length)]);
+      if (p) ctx.broadcast('chant.activity', { kind: 'ambientIncense', slot: p.slot, key: p.key, gender: p.gender });
+    }
+    // Phòng càng vắng càng hay có người lên (40–100 giây một lượt)
+    ambientWalkTimer = setTimeout(ambientWalk, 40000 + Math.random() * 60000);
+  }
+
+  const ambientTimer = setInterval(syncAmbient, 6000);
+  ambientWalkTimer = setTimeout(ambientWalk, 15000);
 
   function testUser(params = {}) {
     const name = params.user || 'Người thử';
@@ -1357,6 +1566,15 @@ function create(ctx, saved = {}) {
         if (kind === 'toOffering') announce(nextSessionLine(offeringMs() / 60000));
         return { ok: true };
       },
+      // Chào & tắt ngay: đọc lời báo, sau đúng số phút "báo trước" thì kết thúc
+      endSoon() {
+        const at = Date.now() + farewellMs();
+        ctx.updateSettings({ liveEndAt: at });
+        return { ok: true, at };
+      },
+      obsTest() {
+        return obs.test();
+      },
       // Hiện đường chạy ngang ngay một lượt (người trực bấm trong lúc live)
       showMarquee() {
         ctx.broadcast('chant.activity', { kind: 'marquee' });
@@ -1366,7 +1584,7 @@ function create(ctx, saved = {}) {
         const u = testUser(params);
         const person = seatAndAnnounce(u);
         incenseCooldown.delete(person.key);
-        return handleComment(u, 'thắp nhang') || { ok: true };
+        return handleComment(u, 'dâng hương') || { ok: true };
       },
       testLike(params) {
         handleLike(testUser(params), 5);
@@ -1412,6 +1630,7 @@ function create(ctx, saved = {}) {
         chantingNow: chantingNow(),
         nextUp: nextUp(),
         merit: topMerit(),
+        ending: endStage ? { stage: endStage, at: endAt() || endedFor, farewellMinutes: farewellMs() / 60000, obs: obsResult } : null,
         schedule: {
           mode: !phase || phase.id === 'gather' || phase.id === 'paused' ? 'offering' : 'chanting',
           offeringMinutes: offeringMs() / 60000,
@@ -1421,6 +1640,7 @@ function create(ctx, saved = {}) {
         catalog: SUTRAS.map(sutraSummary),
         // Cho trang admin: danh sách người đang ngồi trong đạo tràng (không xếp hạng)
         leaderboard: seats
+          .filter((s) => !s.ambient)
           .map((s) => people.get(s.key))
           .sort((a, b) => b.lastActive - a.lastActive)
           .slice(0, 12)
@@ -1441,7 +1661,12 @@ function create(ctx, saved = {}) {
 
     dispose() {
       disposed = true;
+      clearInterval(ambientTimer);
+      clearTimeout(welcomeFlushTimer);
+      clearTimeout(ambientWalkTimer);
       clearAnnounceTimers();
+      clearInterval(endTimer);
+      clearTimeout(obsStopTimer);
       clearTimeout(meritTimer);
       simulator.stop();
       clearTimeout(phaseTimer);
@@ -1454,6 +1679,25 @@ function create(ctx, saved = {}) {
       if ('readerVoice' in changed || 'readerEnabled' in changed || 'readerStyle' in changed) prepareReader();
       // Bật lại chạy tự động khi đang tụ hội: bắt đầu đếm giờ tụ hội
       if (changed.autoRun === true && phase && phase.id === 'gather') enterPhase('gather');
+      // Đổi chế độ phòng: chuyển ngay
+      if ('roomMode' in changed && phase && phase.id !== 'ended') {
+        const chanting = phase.id !== 'gather' && phase.id !== 'paused';
+        if (changed.roomMode === 'offering' && phase.id !== 'gather') enterPhase('gather');
+        else if (changed.roomMode === 'chant' && !chanting) { currentSutra = null; enterPhase('bell_open'); }
+        else if (phase.id === 'gather') enterPhase('gather'); // tính lại giờ Dâng hương
+      }
+      // Đổi / huỷ giờ hẹn tắt live: tính lại ngay
+      if ('liveEndAt' in changed) {
+        if (endStage === 'farewell' || endStage === 'scheduled') endStage = null;
+        if (!changed.liveEndAt) clearTimeout(obsStopTimer);
+        // Đang ở lại Dâng hương chờ tắt mà huỷ hẹn: chạy lịch như thường
+        if (phase && phase.id === 'gather' && !chantWouldBeCut(Date.now())) {
+          clearTimeout(phaseTimer);
+          const left = Math.max(5000, phase.startedAt + phase.durationMs - Date.now());
+          phaseTimer = setTimeout(() => advanceFrom('gather'), left);
+        }
+        checkEnd();
+      }
     }
   };
 }
@@ -1482,6 +1726,9 @@ module.exports = {
     readerVolume: [0, 1],
     sfxVolume: [0, 1],
     natureSound: 'boolean',
+    presetMusicOn: 'boolean', // nhạc thiền tự tạo
+    fileMusicOn: 'boolean', // nhạc YouTube / file
+    fileMusicVolume: [0, 1],
     showRhythmGuide: 'boolean',
     commentDisplay: { type: 'enum', values: ['head', 'lantern', 'both'] },
     readerStyle: { type: 'enum', values: ['natural', 'syllable'] },
@@ -1498,8 +1745,18 @@ module.exports = {
     marqueeEveryMin: [1, 30],
     uiOpacity: [20, 100],
     fxLevel: { type: 'enum', values: ['off', 'light', 'normal', 'rich'] },
-    musicTrack: 'track', // nhạc nền lúc DÂNG LỄ
+    musicTrack: 'track', // nhạc nền lúc DÂNG HƯƠNG
     musicTrackChant: 'track', // nhạc nền lúc TỤNG KINH ("preset:none" = chỉ tiếng pháp)
+    roomMode: { type: 'enum', values: ['auto', 'offering', 'chant'] },
+    welcomeEachBelow: [0, 100000], // dưới số người xem này: chào từng người vào (0 = tắt)
+    ambientCount: [0, 12], // phật tử nền khi phòng vắng (0 = tắt)
+    musicPlayMode: { type: 'enum', values: ['single', 'list', 'shuffle'] }, // lặp 1 bài | lần lượt theo danh sách | ngẫu nhiên
+    musicList: 'trackList', // danh sách phát lúc DÂNG HƯƠNG
+    musicListChant: 'trackList', // danh sách phát lúc TỤNG KINH
+    musicPresetMinutes: [3, 60], // nhạc thiền tự tạo trong danh sách: phát bao nhiêu phút rồi sang bài
+    liveEndAt: [0, 4102444800000], // giờ hẹn tắt live (mốc thời gian ms, 0 = không hẹn)
+    farewellMinutes: [1, 15], // báo trước bao nhiêu phút
+    obsAutoStop: 'boolean', // tới giờ: tự dừng phát trong OBS (obs-websocket)
     cameraZoom: [120, 400],
     lineGapMs: [200, 3000],
     vietMoStyle: { type: 'enum', values: ['syllable', 'line'] },
@@ -1527,6 +1784,9 @@ module.exports = {
     readerVolume: 0.35,
     sfxVolume: 0.8,
     natureSound: true,
+    presetMusicOn: true,
+    fileMusicOn: true,
+    fileMusicVolume: 0.45,
     showRhythmGuide: true,
     commentDisplay: 'head',
     readerStyle: 'natural',
@@ -1545,6 +1805,15 @@ module.exports = {
     fxLevel: 'normal',
     musicTrack: 'preset:still',
     musicTrackChant: 'preset:breath',
+    musicPlayMode: 'single',
+    ambientCount: 6,
+    welcomeEachBelow: 50,
+    musicList: [],
+    musicListChant: [],
+    musicPresetMinutes: 10,
+    liveEndAt: 0,
+    farewellMinutes: 3,
+    obsAutoStop: false,
     cameraZoom: 300,
     lineGapMs: 700,
     rotation: [1, 2, 3, 5, 6, 4, 8, 1, 2, 9, 3, 7]

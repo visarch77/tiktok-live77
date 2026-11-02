@@ -5,6 +5,7 @@ const express = require('express');
 const cors = require('cors');
 const config = require('./config');
 const music = require('./core/musicLibrary');
+const obs = require('./core/obsControl');
 const { ZeroTTSManager } = require('./core/tts');
 const { RoomManager } = require('./core/roomManager');
 const { Hub } = require('./core/hub');
@@ -82,6 +83,12 @@ async function handleRpc(method, params = {}, defaultRoomId = config.DEFAULT_ROO
       return { jobs: music.jobList(), files: music.list() };
     case 'music.delete':
       return music.remove(params.file);
+    case 'obs.getConfig':
+      return obs.getConfig();
+    case 'obs.setConfig':
+      return obs.setConfig(params);
+    case 'obs.test':
+      return obs.test();
     default: {
       const room = rooms.require(params.roomId || defaultRoomId);
       return room.rpc(method, params);
@@ -112,6 +119,23 @@ app.get('/', (req, res, next) => {
 app.get('/room/:id', (req, res) => {
   const room = rooms.get(req.params.id);
   if (!room) return res.status(404).send(`Không tìm thấy phòng "${req.params.id}". Tạo phòng tại /admin`);
+  sendOverlay(res, room);
+});
+
+// Địa chỉ cho TikTok LIVE Studio (nguồn "Liên kết"): ô nhập của LIVE Studio chỉ nhận URL có dạng tên miền
+// (…\.html qua được, "localhost:3000/?obs=1" thì không) và tự kiểm tra bằng một yêu cầu GET từ app —
+// nên trả kèm Access-Control-Allow-Origin để bước kiểm tra đó không bị chặn. Trang hiển thị giống ?obs=1.
+app.get('/live.html', (req, res, next) => {
+  const room = rooms.get(req.query.room || config.DEFAULT_ROOM_ID) || rooms.rooms.values().next().value;
+  if (!room) return next();
+  res.set('Access-Control-Allow-Origin', '*');
+  sendOverlay(res, room);
+});
+
+app.get('/room/:id/live.html', (req, res) => {
+  const room = rooms.get(req.params.id);
+  if (!room) return res.status(404).send(`Không tìm thấy phòng "${req.params.id}"`);
+  res.set('Access-Control-Allow-Origin', '*');
   sendOverlay(res, room);
 });
 

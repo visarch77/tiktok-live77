@@ -28,7 +28,7 @@
         <!-- Vùng sáng camera chiếu vào người đang được cận cảnh -->
         <div class="cam-spot" id="camSpot"></div>
 
-        <!-- Phật tử bước lên thảm đỏ thắp nhang (bình luận "thắp nhang") -->
+        <!-- Phật tử bước lên thảm đỏ dâng hương (bình luận "dâng hương") -->
         <div class="walker-layer" id="walkerLayer"></div>
 
         <!-- Bình luận hiện trên đầu phật tử -->
@@ -59,6 +59,8 @@
           <div style="left:16px;top:1060px;width:720px;height:200px;border-radius:24px">Thông báo quà · người mới vào</div>
           <div style="left:16px;top:1280px;width:740px;height:450px;border-radius:24px">Khung bình luận</div>
           <div style="left:0;right:0;top:1745px;height:175px">Ô bình luận · nút quà · chia sẻ</div>
+          <div style="left:0;top:0;bottom:0;width:110px;background:rgba(255,160,40,.22);border-color:rgba(255,190,90,.9)">Điện thoại dài: bị cắt</div>
+          <div style="right:0;top:0;bottom:0;width:110px;background:rgba(255,160,40,.22);border-color:rgba(255,190,90,.9)">Điện thoại dài: bị cắt</div>
         </div>
         <!-- Tên người dâng: nằm trên mọi hiệu ứng để luôn đọc rõ -->
         <div class="hv-name" id="hvName"><div class="hv-who" id="hvWho"></div><div class="hv-what" id="hvWhat"></div></div>
@@ -76,7 +78,7 @@
           <div class="pn-stats">
             <span title="người cùng tụng">🙏 <b id="cParticipants">0</b> người</span>
             <span title="lượt niệm chung">📿 <b id="cRecitations">0</b> niệm</span>
-            <span title="lượt thắp nhang">🔥 <b id="cIncense">0</b> nhang</span>
+            <span title="lượt dâng hương">🔥 <b id="cIncense">0</b> dâng hương</span>
             <span title="lời nguyện">🏮 <b id="cWishes">0</b> nguyện</span>
             <span title="đèn sen">🪷 <b id="cLamps">0</b> đèn sen</span>
           </div>
@@ -97,6 +99,12 @@
         <div class="ticker" id="ticker"></div>
         <!-- Lời dẫn chuyển chế độ: hiện chữ theo giọng đọc -->
         <div class="announce" id="announce"><span class="an-icon">🎙</span><span id="announceText"></span></div>
+        <!-- Hẹn giờ tắt live: báo sắp kết thúc / màn hình viên mãn -->
+        <div class="end-card" id="endCard">
+          <div class="ec-lotus">🪷</div>
+          <div class="ec-title" id="ecTitle"></div>
+          <div class="ec-sub" id="ecSub"></div>
+        </div>
 
         <!-- Khung kinh: chữ sáng dần theo nhịp mõ -->
         <section class="sutra-panel" id="sutraPanel">
@@ -122,7 +130,7 @@
         <aside class="guide" id="guide">
           <div class="gd-title">Cùng tham gia</div>
           <div>🤍 <b>Thả tim</b> — cùng tụng kinh</div>
-          <div>🔥 <b>“thắp nhang”</b> — lên dâng hương</div>
+          <div>🔥 <b>“dâng hương”</b> — lên chánh điện</div>
           <div>📜 <b>“kinh 1–9”</b> — đề nghị bài kinh</div>
           <div>👤 <b>“nam” / “nữ”</b> — đổi hình</div>
         </aside>

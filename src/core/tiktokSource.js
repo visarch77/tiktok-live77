@@ -82,7 +82,10 @@ class TikTokSource extends EventEmitter {
 
   scheduleReconnect(username) {
     if (this.manualDisconnect || this.reconnectTimer || !username) return;
-    const delay = Math.min(120000, 10000 * 2 ** Math.min(this.reconnectAttempts, 4));
+    // Mỗi lần kết nối tốn một lượt ký của Euler Stream (không có khoá: ~100 lượt/ngày) — giãn dần tới 5 phút.
+    // Bị giới hạn lượt thì đợi hẳn 10 phút; phòng đã tắt live (vừa nối đã ngắt) cũng không thử dồn dập.
+    const limited = /rate.?limit|too many/i.test(String(this.status.lastError || ''));
+    const delay = limited ? 600000 : Math.min(300000, 10000 * 2 ** Math.min(this.reconnectAttempts, 5));
     this.reconnectAttempts += 1;
     this.log(`Thử kết nối lại @${username} sau ${Math.round(delay / 1000)}s...`);
     this.reconnectTimer = setTimeout(() => {
@@ -90,6 +93,55 @@ class TikTokSource extends EventEmitter {
       if (this.manualDisconnect || this.status.connected || this.status.connecting) return;
       this.connect(username, { auto: true }).catch(() => {});
     }, delay);
+  }
+
+  // Canh phiên live: TikTok vẫn cho nối vào phòng đã kết thúc (báo "đã kết nối" nhưng không có sự kiện nào),
+  // và mỗi lần lên live là một phòng mới. Cứ 45 giây hỏi TikTok tài khoản có đang live không và ở phòng nào:
+  // có phòng live mới thì chuyển sang ngay; phòng đang nối đã kết thúc thì ngắt và chờ lần live sau.
+  startWatch(username) {
+    clearInterval(this.watchTimer);
+    this.watchTimer = setInterval(() => this.checkLive(username).catch(() => {}), 45000);
+    clearTimeout(this.firstCheckTimer);
+    this.firstCheckTimer = setTimeout(() => this.checkLive(username).catch(() => {}), 8000);
+  }
+
+  stopWatch() {
+    clearInterval(this.watchTimer);
+    clearTimeout(this.firstCheckTimer);
+    this.watchTimer = null;
+  }
+
+  async checkLive(username) {
+    if (this.manualDisconnect || this.status.connecting || this.checking) return;
+    this.checking = true;
+    try {
+      const probe = new TikTokLiveConnection(username, EULER_API_KEY ? { signApiKey: EULER_API_KEY } : {});
+      const live = await probe.fetchIsLive();
+      if (this.manualDisconnect || this.status.connecting) return;
+      if (!live) {
+        if (this.status.connected || this.reconnectTimer) {
+          this.log(`@${username} không còn phát live (phòng ${this.status.roomId || '?'}) — chờ lần live sau`);
+          clearTimeout(this.reconnectTimer);
+          this.reconnectTimer = null;
+          if (this.conn) {
+            const old = this.conn;
+            this.conn = null;
+            Promise.resolve().then(() => old.disconnect()).catch(() => {});
+          }
+          this.likes.flush();
+          this.setStatus({ connected: false, connecting: false, viewerCount: 0, lastError: 'Tài khoản chưa phát live — sẽ tự kết nối khi lên live' });
+        }
+        return;
+      }
+      const roomId = String((await probe.fetchRoomId()) || '');
+      if (!this.status.connected || (roomId && roomId !== String(this.status.roomId))) {
+        this.log(`Phát hiện phiên live${roomId ? ` (phòng ${roomId})` : ''} — kết nối ngay`);
+        this.reconnectAttempts = 0;
+        await this.connect(username, { auto: true });
+      }
+    } finally {
+      this.checking = false;
+    }
   }
 
   async connect(usernameOrUrl, { auto = false } = {}) {
@@ -113,6 +165,7 @@ class TikTokSource extends EventEmitter {
       } catch (_) {}
     }
 
+    this.startWatch(cleanUser);
     this.status = {
       connected: false,
       connecting: true,
@@ -146,7 +199,7 @@ class TikTokSource extends EventEmitter {
     const emitEvent = (evt) => this.emit('event', evt);
 
     on(ControlEvent.CONNECTED, (roomState) => {
-      this.reconnectAttempts = 0;
+      this.connectedAt = Date.now();
       this.log(`Đã kết nối phòng @${cleanUser} (roomId: ${roomState?.roomId || conn.roomId || '?'})`);
       this.setStatus({
         connected: true,
@@ -158,6 +211,9 @@ class TikTokSource extends EventEmitter {
 
     on(ControlEvent.DISCONNECTED, () => {
       this.log(`Đã ngắt kết nối @${cleanUser}`);
+      // Giữ được kết nối ≥ 1 phút mới coi là ổn định; vừa nối đã ngắt (thường do live đã kết thúc) thì tiếp tục giãn
+      if (this.connectedAt && Date.now() - this.connectedAt >= 60000) this.reconnectAttempts = 0;
+      this.connectedAt = 0;
       this.likes.flush();
       this.setStatus({ connected: false, connecting: false, viewerCount: 0 });
       this.scheduleReconnect(cleanUser);
@@ -206,7 +262,7 @@ class TikTokSource extends EventEmitter {
     try {
       const roomState = await conn.connect();
       if (this.conn !== conn) return this.status;
-      this.reconnectAttempts = 0;
+      if (!this.connectedAt) this.connectedAt = Date.now();
       this.setStatus({
         connected: true,
         connecting: false,
@@ -226,6 +282,7 @@ class TikTokSource extends EventEmitter {
 
   disconnect() {
     this.manualDisconnect = true;
+    this.stopWatch();
     clearTimeout(this.reconnectTimer);
     this.reconnectTimer = null;
     this.likes.flush();

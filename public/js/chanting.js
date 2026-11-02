@@ -10,7 +10,9 @@
   // ?preview=1: nhúng trong trang quản lý — giống OBS nhưng im lặng cho tới khi người trực bật nghe
   const PREVIEW = params.get('preview') === '1';
   if (params.get('safe') === '1') document.body.classList.add('show-safe');
-  if (params.get('obs') === '1' || PREVIEW) document.body.classList.add('obs-mode');
+  // /live.html: địa chỉ cho TikTok LIVE Studio (ô "Liên kết" không nhận được ?obs=1 trên localhost) — giống ?obs=1
+  const STUDIO_LINK = /\/live\.html$/.test(location.pathname);
+  if (params.get('obs') === '1' || PREVIEW || STUDIO_LINK) document.body.classList.add('obs-mode');
   const roomMatch = location.pathname.match(/^\/room\/([^/?#]+)/);
   const ROOM_ID = decodeURIComponent((roomMatch && roomMatch[1]) || params.get('room') || 'main');
 
@@ -44,13 +46,113 @@
 
   let ambient = null;
   let musicOn = true;
+  let ending = null; // hẹn giờ tắt live (từ server)
   let natureOn = true;
   let musicTrack = 'preset:still'; // đang phát
   let trackOffering = 'preset:still';
   let trackChant = 'preset:breath';
-  // Nhạc theo chế độ: Dâng lễ một bài, Tụng kinh một bài ("preset:none" = tắt nhạc, chỉ tiếng pháp)
+  // Danh sách phát: "single" lặp 1 bài · "list" lần lượt · "shuffle" ngẫu nhiên. Mỗi chế độ một danh sách,
+  // nhớ vị trí riêng; nhạc file hết bài thì sang bài, nhạc thiền tự tạo (không có hồi kết) phát đủ N phút rồi sang.
+  let playMode = 'single';
+  const lists = { offering: [], chant: [] };
+  const listPos = { offering: -1, chant: -1 };
+  let presetMinutes = 10;
+  let listSig = '';
+  let presetTimer = null;
+  function musicKey() {
+    return isOfferingPhase(phase) ? 'offering' : 'chant';
+  }
+  function useList(key) {
+    return playMode !== 'single' && lists[key].length > 0;
+  }
+  // Bật / tắt riêng từng loại nhạc: tắt loại nào thì bài loại đó im (danh sách thì bỏ qua bài đó)
+  let presetMusicOn = true;
+  let fileMusicOn = true;
+  let fileMusicVolume = 0.45;
+  const isFileTrack = (t) => String(t || '').startsWith('file:');
+  function sourceOn(t) {
+    if (!t || t === 'preset:none') return true;
+    return isFileTrack(t) ? fileMusicOn : presetMusicOn;
+  }
+  function nextFromList(key) {
+    const all = lists[key];
+    const list = all.filter(sourceOn);
+    if (!list.length) {
+      listPos[key] = -1;
+      return 'preset:none';
+    }
+    // listPos là vị trí trong cả danh sách; bỏ qua bài thuộc loại nhạc đang tắt
+    let i = listPos[key];
+    if (playMode === 'shuffle' && list.length > 1) {
+      do i = Math.floor(Math.random() * all.length); while (i === listPos[key] || !sourceOn(all[i]));
+    } else {
+      do i = (i + 1) % all.length; while (!sourceOn(all[i]));
+    }
+    listPos[key] = i;
+    return all[i];
+  }
+  function armListTimer(track) {
+    clearTimeout(presetTimer);
+    presetTimer = null;
+    if (!ambient) return;
+    const key = musicKey();
+    const multi = useList(key) && lists[key].length > 1;
+    ambient.loopFile = !multi;
+    ambient.onFileEnded = multi ? () => advanceList() : null;
+    if (multi && track.startsWith('preset:')) presetTimer = setTimeout(advanceList, presetMinutes * 60000);
+  }
+  function advanceList() {
+    const key = musicKey();
+    if (!ambient || !useList(key)) return;
+    const next = nextFromList(key);
+    const same = next === musicTrack;
+    musicTrack = next;
+    armListTimer(next);
+    if (next === 'preset:none') return ambient.running && ambient.stop();
+    if (!ambient.running) {
+      if (musicOn) { ambient.setTrack(next); ambient.start(); }
+    } else if (same) ambient.restart();
+    else ambient.setTrack(next);
+  }
+  // Nhạc theo chế độ: Dâng hương một bài/danh sách, Tụng kinh một bài/danh sách ("preset:none" = tắt nhạc, chỉ tiếng pháp)
   function applyModeMusic() {
-    const want = isOfferingPhase(phase) ? trackOffering : trackChant;
+    if (phase && phase.id === 'ended') {
+      // Buổi live đã viên mãn: nhạc nhỏ dần rồi tắt
+      clearTimeout(presetTimer);
+      if (ambient && ambient.running) ambient.stop();
+      musicTrack = 'preset:none';
+      listSig = '';
+      return;
+    }
+    const key = musicKey();
+    if (useList(key)) {
+      const sig = `${key}|${playMode}|${lists[key].join(',')}|${presetMinutes}|${presetMusicOn}|${fileMusicOn}`;
+      if (sig === listSig && ambient && (musicTrack === 'preset:none') !== ambient.running) return;
+      const listChanged = !listSig.startsWith(`${key}|`) || sig !== listSig;
+      listSig = sig;
+      if (!ambient) return;
+      // Sửa danh sách khi bài đang phát vẫn còn trong đó: phát tiếp bài này, không nhảy bài
+      const keep = sourceOn(musicTrack) ? lists[key].indexOf(musicTrack) : -1;
+      if (listChanged && keep >= 0 && (musicTrack === 'preset:none') !== ambient.running) {
+        listPos[key] = keep;
+        armListTimer(musicTrack);
+        return;
+      }
+      if (listChanged || keep < 0) {
+        if (listPos[key] >= lists[key].length) listPos[key] = -1;
+        musicTrack = '';
+        return advanceList();
+      }
+      return;
+    }
+    listSig = '';
+    clearTimeout(presetTimer);
+    if (ambient) {
+      ambient.loopFile = true;
+      ambient.onFileEnded = null;
+    }
+    const picked = key === 'offering' ? trackOffering : trackChant;
+    const want = sourceOn(picked) ? picked : 'preset:none';
     if (want === musicTrack && ambient && (want === 'preset:none') !== ambient.running) return;
     musicTrack = want;
     if (!ambient) return;
@@ -74,8 +176,14 @@
 
   function startMusic() {
     const ctx = audio.ensureContext();
-    if (!ambient) ambient = new window.AmbientMusic(ctx, { volume: musicVolume, nature: natureOn });
+    if (!ambient) ambient = new window.AmbientMusic(ctx, { volume: musicVolume, fileVolume: fileMusicVolume, nature: natureOn });
+    if (useList(musicKey()) || (phase && phase.id === 'ended')) {
+      listSig = '';
+      musicTrack = '';
+      return applyModeMusic();
+    }
     musicTrack = isOfferingPhase(phase) ? trackOffering : trackChant;
+    if (!sourceOn(musicTrack)) musicTrack = 'preset:none';
     if (musicTrack === 'preset:none') return;
     ambient.setTrack(musicTrack);
     if (musicOn) ambient.start();
@@ -163,7 +271,7 @@
     $('btnAudio').textContent = '✅ Âm thanh đã bật';
   }
   if (!PREVIEW) addEventListener('pointerdown', unlockAudio, { once: true });
-  // OBS tự phát nhạc — đợi trang khởi tạo xong (cần biết đang Dâng lễ hay Tụng kinh để chọn bài)
+  // OBS tự phát nhạc — đợi trang khởi tạo xong (cần biết đang Dâng hương hay Tụng kinh để chọn bài)
   if (document.body.classList.contains('obs-mode') && !PREVIEW) setTimeout(startMusic, 0);
 
   // Trạng thái âm thanh để trang quản lý hiển thị / chẩn đoán
@@ -288,6 +396,7 @@
       el.querySelector('.sprite').src = charSrc(g, 'seat');
     }
     el.querySelector('.tag').textContent = seat.name;
+    el.classList.toggle('ambient', Boolean(seat.ambient));
     seatNameBySlot[seat.slot] = seat.name;
     setTier(seat.slot, seat.tier || 0);
     el.classList.remove('empty');
@@ -313,6 +422,7 @@
         if (seatTierBySlot[slot]) setTier(slot, 0);
         seatNameBySlot[slot] = '';
         el.classList.add('empty');
+        el.classList.remove('ambient');
         el.querySelector('.tag').textContent = '';
         if (seatKeyBySlot[slot]) slotByKey.delete(seatKeyBySlot[slot]);
         seatKeyBySlot[slot] = null;
@@ -598,10 +708,11 @@
     renderRhythmGuide();
     renderModeTitle();
     const wasOffering = $('stage').classList.contains('offering');
-    $('stage').classList.toggle('offering', isOfferingPhase(p));
+    $('stage').classList.toggle('offering', isOfferingPhase(p) || p.id === 'ended');
     applyModeMusic();
+    renderEnding();
     if (lastCatalog) renderMarquee(lastCatalog);
-    // Đổi chế độ (dâng lễ ⇄ tụng kinh): nhắc hướng dẫn một lượt
+    // Đổi chế độ (dâng hương ⇄ tụng kinh): nhắc hướng dẫn một lượt
     if (wasOffering !== isOfferingPhase(p) && mqMode === 'interval') marqueeShowOnce();
     if (p.id === 'bell_close') fx.shower(6, 1.6); // khoá tụng viên mãn: mưa hoa
 
@@ -629,6 +740,10 @@
       body.innerHTML = `<div class="sp-message">Đạo tràng đang tụ hội — nam ngồi bên trái, nữ bên phải<br>${
         next ? `Khoá sắp tới sẽ cùng tụng <b>${esc(next.name)}</b>` : 'Bình luận <b>“kinh 1–9”</b> để đề nghị bài kinh cho cả phòng'
       }<br><span style="font-size:17px;opacity:.75">Hình chưa đúng? Bình luận <b>“nam”</b> hoặc <b>“nữ”</b></span></div>`;
+      return;
+    }
+    if (phase.id === 'ended') {
+      body.innerHTML = '<div class="sp-message">Buổi tụng kinh hôm nay đã viên mãn — hẹn gặp lại quý vị 🙏</div>';
       return;
     }
     if (phase.id === 'paused') {
@@ -858,6 +973,10 @@
   function applyState(st) {
     if (st && st.merit) renderMerit(st.merit);
     if (st && st.catalog) renderMarquee(st.catalog);
+    if (st && 'ending' in st) {
+      ending = st.ending;
+      renderEnding();
+    }
     if (st && st.schedule) {
       schedule = st.schedule;
       renderModeTitle();
@@ -885,10 +1004,21 @@
         readerVolume = st.settings.readerVolume;
         if (readerBus) readerBus.gain.setTargetAtTime(readerVolume, audio.ctx.currentTime, 0.2);
       }
+      roomMode = st.settings.roomMode || (st.settings.autoRun === false ? 'offering' : 'auto');
       if (typeof st.settings.natureSound === 'boolean' && ambient) ambient.setNature(st.settings.natureSound);
       if (typeof st.settings.natureSound === 'boolean') natureOn = st.settings.natureSound;
       if (st.settings.musicTrack) trackOffering = st.settings.musicTrack;
       if (st.settings.musicTrackChant) trackChant = st.settings.musicTrackChant;
+      if (st.settings.musicPlayMode) playMode = st.settings.musicPlayMode;
+      presetMusicOn = st.settings.presetMusicOn !== false;
+      fileMusicOn = st.settings.fileMusicOn !== false;
+      if (typeof st.settings.fileMusicVolume === 'number') {
+        fileMusicVolume = st.settings.fileMusicVolume;
+        if (ambient) ambient.setFileVolume(fileMusicVolume);
+      }
+      if (Array.isArray(st.settings.musicList)) lists.offering = st.settings.musicList;
+      if (Array.isArray(st.settings.musicListChant)) lists.chant = st.settings.musicListChant;
+      if (Number(st.settings.musicPresetMinutes) > 0) presetMinutes = Number(st.settings.musicPresetMinutes);
       applyModeMusic();
       showRhythm = st.settings.showRhythmGuide !== false;
       camOn = st.settings.cameraFollow !== false;
@@ -962,13 +1092,13 @@
     const chanting = !isOfferingPhase(phase);
     const sutras = catalog.map((c) => `<b>${c.num}</b>. ${esc(c.name)}`).join(' · ');
     const items = [
-      ...(chanting ? ['🙏 <b>Đang tụng kinh</b> — xin tạm ngưng bình luận, cùng <b>thả tim theo nhịp mõ</b> để tâm lắng lại'] : ['🌸 <b>Đang dâng lễ</b> — gửi lời chúc, thả tim; mỗi tấm lòng đều được đạo tràng ghi nhận và chúc phúc']),
+      ...(chanting ? ['🙏 <b>Đang tụng kinh</b> — xin tạm ngưng bình luận, cùng <b>thả tim theo nhịp mõ</b> để tâm lắng lại'] : ['🌸 <b>Đang dâng hương</b> — gửi lời chúc, thả tim; mỗi tấm lòng đều được đạo tràng ghi nhận và chúc phúc']),
       '🤍 <b>Thả tim theo nhịp mõ</b> khi tụng kinh — mỗi tiếng mõ một lần thả tim, là đang cùng tụng với đạo tràng',
-      '🔥 Bình luận <b>“thắp nhang”</b> hoặc <b>🔥</b> để lên chánh điện dâng hương',
+      '🔥 Bình luận <b>“dâng hương”</b> hoặc <b>🔥</b> để lên chánh điện dâng hương',
       `📜 Bình luận <b>“kinh + số”</b> để đề nghị bài kinh cho khoá sau: ${sutras}`,
       '👤 Hình chưa đúng giới tính? Bình luận <b>“nam”</b> hoặc <b>“nữ”</b> để đổi',
       '🔔 Khi chuông vang, cùng <b>thả tim chắp tay</b> theo tiếng chuông',
-      '🏮 Gửi <b>lời chúc thật tâm</b> — lúc dâng lễ sẽ được đọc lên',
+      '🏮 Gửi <b>lời chúc thật tâm</b> — lúc dâng hương sẽ được đọc lên',
       '🎁 Mỗi món quà là một <b>lễ vật tượng trưng</b> dâng lên Tam Bảo, quý như nhau',
       '🪷 Tụng kinh đều đặn, <b>tinh tấn</b> mỗi ngày — tâm an là phước lành lớn nhất'
     ];
@@ -1017,17 +1147,42 @@
     }
   }
 
+  // Hẹn giờ tắt live: thẻ "sắp kết thúc" trong mấy phút cuối, màn hình viên mãn khi đã kết thúc
+  const hhmm = (t) => new Date(t).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+  function renderEnding() {
+    const card = $('endCard');
+    const final = (phase && phase.id === 'ended') || (ending && ending.stage === 'ended');
+    const soon = !final && ending && ending.stage === 'farewell';
+    card.classList.toggle('final', Boolean(final));
+    card.classList.toggle('show', Boolean(final || soon));
+    if (final) {
+      $('ecTitle').textContent = 'Buổi tụng kinh đã viên mãn';
+      $('ecSub').innerHTML = 'Nguyện công đức này hồi hướng đến tất cả<br>Kính chúc quý vị thân tâm an lạc · Hẹn gặp lại 🙏';
+    } else if (soon) {
+      $('ecTitle').textContent = `🌙 Buổi live sẽ kết thúc lúc ${hhmm(ending.at)}`;
+      $('ecSub').textContent = 'Cảm ơn quý vị đã cùng tụng kinh · Gửi lời chúc cuối nhé 🙏';
+    }
+  }
+
   let schedule = null;
+  let roomMode = 'auto';
   function renderModeTitle() {
     let left = '';
-    if (phase && phase.id === 'gather' && phase.durationMs) left = Math.max(0, phase.startedAt + phase.durationMs - serverNow());
+    if (phase && phase.id === 'gather' && phase.durationMs && roomMode === 'auto') left = Math.max(0, phase.startedAt + phase.durationMs - serverNow());
     else if (schedule && schedule.chantBlockStart && !isOfferingPhase(phase)) left = Math.max(0, schedule.chantBlockStart + schedule.chantMinutes * 60000 - serverNow());
     const mins = left !== '' ? ` · còn ${Math.max(1, Math.ceil(left / 60000))}′` : '';
-    $('feedTitle').textContent = isOfferingPhase(phase) ? `🌸 Dâng lễ${mins}` : `📿 Đang tụng kinh${mins}`;
+    if (phase && phase.id === 'ended') return void ($('feedTitle').textContent = '🪷 Viên mãn');
+    if (ending && ending.stage === 'farewell') {
+      const l = Math.max(0, ending.at - serverNow());
+      return void ($('feedTitle').textContent = `🌙 Sắp kết thúc · còn ${Math.max(1, Math.ceil(l / 60000))}′`);
+    }
+    // Đang ở lại Dâng hương chờ tới giờ tắt live (không vào khoá tụng nữa)
+    if (ending && ending.stage === 'scheduled' && phase && phase.id === 'gather' && left === 0) return void ($('feedTitle').textContent = `🌸 Dâng hương · đến ${hhmm(ending.at)}`);
+    $('feedTitle').textContent = isOfferingPhase(phase) ? `🌸 Dâng hương${mins}` : `📿 Đang tụng kinh${mins}`;
   }
   setInterval(renderModeTitle, 15000);
 
-  // Giọng đọc lời chúc / lời cảm ơn (chỉ lúc dâng lễ — server không gửi trong lúc tụng kinh)
+  // Giọng đọc lời chúc / lời cảm ơn (chỉ lúc dâng hương — server không gửi trong lúc tụng kinh)
   let announceHide = null;
   function showAnnounce(text, durMs) {
     $('announceText').textContent = text;
@@ -1052,6 +1207,10 @@
   function onActivity(a) {
     if (a.counters) renderCounters(a.counters);
     switch (a.kind) {
+      case 'ambientIncense':
+        // Phật tử nền lên dâng hương: chỉ có cảnh đi lên, không tên, không báo trên bảng
+        queueWalker({ ambient: true, key: a.key, slot: a.slot, gender: a.gender, user: '' });
+        break;
       case 'seat':
         setSeat(a.seat, { arrive: true });
         if (slotByKey.size > NAMED_MAX_PEOPLE) seatEls.forEach((el) => el.classList.remove('named'));
@@ -1131,15 +1290,15 @@
         break;
       case 'incenseOffer':
         queueWalker(ev);
-        feed(`🔥 <b>${esc(ev.user)}</b> lên thắp nhang dâng Phật`);
+        feed(`🔥 <b>${esc(ev.user)}</b> lên dâng hương lễ Phật`);
         break;
     }
     if (ev.counters) renderCounters(ev.counters);
   }
 
   // ------------------------------------------------------------------------
-  // Phật tử lên dâng hương (bình luận "thắp nhang"): rời hàng ghế của mình, bước dọc thảm đỏ tới trước Phật,
-  // đứng chắp tay thắp nhang, quỳ xá, rồi lui về chỗ. Tối đa 3 người cùng lên (3 lối trên thảm).
+  // Phật tử lên dâng hương (bình luận "dâng hương"): rời hàng ghế của mình, bước dọc thảm đỏ tới trước Phật,
+  // đứng chắp tay dâng hương, quỳ xá, rồi lui về chỗ. Tối đa 3 người cùng lên (3 lối trên thảm).
   // Chuyển động theo phối cảnh: đi đều theo chiều sâu thật (xa thì chậm và nhỏ dần), nhịp bước khớp tốc độ.
   // ------------------------------------------------------------------------
   const CHAR_FRAMES = ['walk1', 'walk2', 'walk3', 'walk4', 'stand', 'kneel', 'bow', 'bowDeep'];
@@ -1387,7 +1546,7 @@
 
   function queueWalker(ev) {
     if (walkerQueue.length >= MAX_QUEUE) {
-      // Quá đông: vẫn thắp nhang / hiện lễ vật và báo tên, không xếp hàng quá dài
+      // Quá đông: vẫn dâng hương / hiện lễ vật và báo tên, không xếp hàng quá dài
       if (ev.gift) queueFocus(ev);
       else offerIncense(ev);
       return;
@@ -1401,7 +1560,7 @@
     while (walkerQueue.length) {
       const lane = laneBusy.findIndex((b) => !b);
       if (lane < 0) return;
-      // Mỗi lúc chỉ một người dâng quà đi lên (màn lễ vật không chồng lên nhau); người thắp nhang vẫn đi song song
+      // Mỗi lúc chỉ một người dâng quà đi lên (màn lễ vật không chồng lên nhau); người dâng hương vẫn đi song song
       const qi = walkerQueue.findIndex((e) => !e.gift || !giftWalking);
       if (qi < 0) return;
       laneBusy[lane] = true;
@@ -1422,7 +1581,7 @@
     particles.spawnIncenseBurst(540, BURNER_BASE_Y - 20);
     // Tia sáng bay lên từ lư hương (đổi sang toạ độ màn hình theo camera hiện tại)
     fx.burst(540 * cam.z + cam.x, (BURNER_BASE_Y - 30) * cam.z + cam.y, { petals: 4, leaves: 2, sparkles: 18 });
-    ticker(`🔥 <b>${esc(ev.user)}</b> đã thắp nhang dâng Phật`);
+    if (!ev.ambient) ticker(`🔥 <b>${esc(ev.user)}</b> đã dâng hương lễ Phật`);
   }
 
   function makeWalker(ev) {
@@ -1432,7 +1591,7 @@
     el.style.width = `${CHAR_W}px`;
     el.style.height = `${CHAR_H}px`;
     el.style.transformOrigin = `50% ${CHAR_FLOOR * 100}%`;
-    el.innerHTML = `<div class="w-glow"></div><img class="w-a" alt="" /><img class="w-b" alt="" /><div class="w-name">${ev.gift ? '🎁' : '🔥'} ${esc(ev.user)}</div>`;
+    el.innerHTML = `<div class="w-glow"></div><img class="w-a" alt="" /><img class="w-b" alt="" />${ev.ambient ? '' : `<div class="w-name">${ev.gift ? '🎁' : '🔥'} ${esc(ev.user)}</div>`}`;
     $('hall').appendChild(el);
     const imgs = [el.querySelector('.w-a'), el.querySelector('.w-b')];
     const name = el.querySelector('.w-name');
@@ -1461,10 +1620,10 @@
         el.style.transform = `translate(${(x - CHAR_W / 2).toFixed(1)}px, ${(y - CHAR_H * CHAR_FLOOR + extraY).toFixed(1)}px) scale(${s.toFixed(4)})`;
         el.style.zIndex = String(10 + Math.round(y / 10));
         // Người đi lên: tên to (~28px trên màn hình dù đứng xa hay gần), màu riêng theo việc đang làm
-        name.style.fontSize = `${Math.round(28 / Math.max(0.25, s * cam.z))}px`;
+        if (name) name.style.fontSize = `${Math.round(28 / Math.max(0.25, s * cam.z))}px`;
       },
       hideName() {
-        name.style.opacity = '0';
+        if (name) name.style.opacity = '0';
       }
     };
   }
@@ -1473,7 +1632,7 @@
     const slot = slotByKey.has(ev.key) ? slotByKey.get(ev.key) : ev.slot;
     const seatEl = slot != null && slot >= 0 ? seatEls[slot] : null;
     const seatPos = seatEl ? SEAT_COORDS[slot] : null;
-    if (!ev.gift) ticker(`🔥 <b>${esc(ev.user)}</b> đang lên dâng hương`);
+    if (!ev.gift && !ev.ambient) ticker(`🔥 <b>${esc(ev.user)}</b> đang lên dâng hương`);
 
     // Bước ra từ đầu hàng ghế của mình (sát thảm đỏ); không có chỗ ngồi thì từ cuối thảm
     const y0 = seatPos ? Math.min(CARPET_BOTTOM_Y, seatPos.y) : CARPET_BOTTOM_Y;
@@ -1542,7 +1701,7 @@
       const bows = busy ? 1 : 3;
       const seq = [];
       let t = 500;
-      seq.push([t, () => offerIncense(ev)]); // đứng chắp tay, thắp nhang
+      seq.push([t, () => offerIncense(ev)]); // đứng chắp tay, dâng hương
       t += 900;
       seq.push([t, () => w.frame('kneel', 320)]);
       t += 600;

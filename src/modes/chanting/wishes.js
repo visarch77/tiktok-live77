@@ -1,5 +1,5 @@
 /**
- * 100 lời chúc đọc khi có người dâng lễ (chế độ DÂNG LỄ).
+ * 100 lời chúc đọc khi có người dâng hương (chế độ DÂNG HƯƠNG).
  * Chỉ chúc chung chung: sức khoẻ, bình an, công việc, may mắn, tâm an, trí tuệ — KHÔNG nhắc tới
  * gia đình, vợ chồng, con cái, tuổi tác, giới tính hay bất cứ điều gì chưa biết về người xem.
  */

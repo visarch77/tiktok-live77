@@ -11,9 +11,10 @@
  * Các thông số là mặc định kỹ thuật, nên chỉnh theo tai nghe thực tế.
  */
 class AmbientMusic {
-  constructor(ctx, { volume = 0.45, nature = true, style = 'still' } = {}) {
+  constructor(ctx, { volume = 0.45, fileVolume = volume, nature = true, style = 'still' } = {}) {
     this.ctx = ctx;
-    this.volume = volume;
+    this.volume = volume; // nhạc thiền tự tạo
+    this.fileVolume = fileVolume; // nhạc YouTube / file
     this.natureEnabled = nature;
     this.styleId = AmbientMusic.STYLES[style] ? style : 'still';
     this.style = AmbientMusic.STYLES[this.styleId];
@@ -69,7 +70,7 @@ class AmbientMusic {
     // Bus nhạc (dùng để chỉnh âm lượng & né tiếng chuông)
     this.duckGain = ctx.createGain();
     this.volumeGain = ctx.createGain();
-    this.volumeGain.gain.value = this.volume * AmbientMusic.BOOST;
+    this.volumeGain.gain.value = this.currentVolume() * AmbientMusic.BOOST;
     // Đồng hồ đo mức âm (để trang quản lý biết nhạc có đang phát không)
     this.meter = ctx.createAnalyser();
     this.meter.fftSize = 1024;
@@ -707,6 +708,7 @@ class AmbientMusic {
     this.bus.connect(this.input);
     this.duckGain.gain.cancelScheduledValues(now);
     this.duckGain.gain.setValueAtTime(1, now);
+    this.applyVolume();
     if (this.fileUrl) {
       this.startFile();
       return;
@@ -735,7 +737,11 @@ class AmbientMusic {
   startFile() {
     const ctx = this.ctx;
     const el = new Audio(this.fileUrl);
-    el.loop = true;
+    // Lặp 1 bài: lặp mãi. Phát theo danh sách: hết bài báo ra ngoài để chuyển bài kế
+    el.loop = this.loopFile !== false;
+    el.addEventListener('ended', () => {
+      if (this.fileEl === el && typeof this.onFileEnded === 'function') this.onFileEnded();
+    });
     el.crossOrigin = 'anonymous';
     const src = ctx.createMediaElementSource(el);
     const meter = ctx.createAnalyser();
@@ -820,6 +826,13 @@ class AmbientMusic {
     }
   }
 
+  /** Phát lại bài hiện tại từ đầu (danh sách có bài trùng liền nhau / chỉ một bài) */
+  restart() {
+    if (!this.running) return;
+    this.stop();
+    setTimeout(() => this.start(), 1600);
+  }
+
   setNature(on) {
     this.natureEnabled = Boolean(on);
     if (!this.running) return;
@@ -832,11 +845,27 @@ class AmbientMusic {
     }
   }
 
+  /** Âm lượng theo loại bài đang phát: nhạc tự tạo hay nhạc YouTube / file — chỉnh riêng từng loại */
+  currentVolume() {
+    return this.fileUrl ? this.fileVolume : this.volume;
+  }
+
+  applyVolume() {
+    this.volumeGain.gain.setTargetAtTime(this.currentVolume() * AmbientMusic.BOOST, this.ctx.currentTime, 0.2);
+  }
+
   setVolume(v) {
     const n = Number(v);
     if (!Number.isFinite(n)) return;
     this.volume = Math.max(0, Math.min(1, n));
-    this.volumeGain.gain.setTargetAtTime(this.volume * AmbientMusic.BOOST, this.ctx.currentTime, 0.2);
+    if (!this.fileUrl) this.applyVolume();
+  }
+
+  setFileVolume(v) {
+    const n = Number(v);
+    if (!Number.isFinite(n)) return;
+    this.fileVolume = Math.max(0, Math.min(1, n));
+    if (this.fileUrl) this.applyVolume();
   }
 
   /** Mức âm hiện tại (RMS 0..1) */

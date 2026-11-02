@@ -25,6 +25,11 @@ const CORE_DEFAULT_SETTINGS = {
 
 const MAX_RECENT_EVENTS = 35;
 
+// Nhạc nền: "preset:<id>" (nhạc thiền tự tạo) hoặc "file:<tên file>" trong public/music
+function isTrack(v) {
+  return /^preset:[a-z]{2,20}$/.test(v) || /^file:[\p{L}\p{N} ._()\-]{1,100}\.(mp3|m4a|ogg|wav|webm|opus)$/iu.test(v);
+}
+
 // Chỉ nhận các khoá cài đặt đã biết, đúng kiểu và trong khoảng hợp lệ
 function sanitizeSettings(params, schema) {
   const out = {};
@@ -34,9 +39,11 @@ function sanitizeSettings(params, schema) {
     if (rule === 'boolean') {
       if (typeof val === 'boolean') out[key] = val;
     } else if (rule === 'track') {
-      // Nhạc nền: "preset:<id>" (nhạc thiền tự tạo) hoặc "file:<tên file>" trong public/music
       const v = String(val || '').trim();
-      if (/^preset:[a-z]{2,20}$/.test(v) || /^file:[\p{L}\p{N} ._()\-]{1,100}\.(mp3|m4a|ogg|wav|webm|opus)$/iu.test(v)) out[key] = v;
+      if (isTrack(v)) out[key] = v;
+    } else if (rule === 'trackList') {
+      // Danh sách phát: các bài hợp lệ, tối đa 40 bài
+      if (Array.isArray(val)) out[key] = val.map((x) => String(x || '').trim()).filter(isTrack).slice(0, 40);
     } else if (rule === 'voice') {
       const v = String(val || '').trim().toLowerCase();
       if (/^[a-z0-9_-]{1,32}$/.test(v)) out[key] = v;
@@ -123,6 +130,8 @@ class Room {
       broadcastState: () => room.broadcastState(),
       scheduleStateBroadcast: () => room.scheduleStateBroadcast(),
       broadcast: (method, params) => room.broadcast(method, params),
+      updateSettings: (params) => room.updateSettings(params),
+      viewerCount: () => (room.source && room.source.status ? Number(room.source.status.viewerCount) || 0 : 0),
       // Chạy fn như một tương tác giả lập (sự kiện được gắn simulated: true) — cho các hoạt động hẹn giờ
       simulated: (fn) => {
         const prev = room.simulating;

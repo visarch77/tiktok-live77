@@ -1,7 +1,7 @@
 /**
  * Giả lập người xem cho Phòng Tụng Kinh (chỉ để thử khi chưa live — room.js tự tắt khi kết nối TikTok thật).
  * Tạo một đám đông có tên Việt đa dạng (nam/nữ, biệt danh, kiểu tài khoản TikTok) với đủ hoạt động:
- * vào đạo tràng, thả tim (dồn lại sau tiếng chuông), lời nguyện, đề nghị bài kinh, thắp nhang, quà, mời bạn,
+ * vào đạo tràng, thả tim (dồn lại sau tiếng chuông), lời nguyện, đề nghị bài kinh, dâng hương, quà, mời bạn,
  * tự sửa hình nam/nữ khi bị đoán sai theo tên.
  */
 const { guessGender } = require('./gender');
@@ -119,7 +119,7 @@ function createSimulator(api) {
     if (r < 0.52) api.like(u, 1 + Math.floor(Math.random() * 12));
     else if (r < 0.66) api.comment(u, WISHES[Math.floor(Math.random() * WISHES.length)]);
     else if (r < 0.71) api.comment(u, `kinh ${1 + Math.floor(Math.random() * 9)}`);
-    else if (r < 0.78) api.comment(u, Math.random() < 0.6 ? 'thắp nhang' : 'dâng hương');
+    else if (r < 0.78) api.comment(u, Math.random() < 0.8 ? 'dâng hương' : '🔥');
     else if (r < 0.86) api.gift(u, { giftName: GIFTS[Math.floor(Math.random() * GIFTS.length)] });
     else if (r < 0.91) api.invite(u);
     else api.like(u, 1 + Math.floor(Math.random() * 4));

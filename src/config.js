@@ -1,6 +1,14 @@
 const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
+
+// Đọc file .env ở thư mục dự án (nếu có), ví dụ dòng: EULER_API_KEY=xxxx — biến môi trường đặt sẵn được ưu tiên
+try {
+  for (const line of require('fs').readFileSync(path.join(ROOT, '.env'), 'utf8').split(/\r?\n/)) {
+    const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$/);
+    if (m && !(m[1] in process.env)) process.env[m[1]] = m[2].replace(/^["']|["']$/g, '');
+  }
+} catch (_) {}
 // Có thể trỏ sang thư mục dữ liệu khác (chạy thử, nhiều bản cài trên cùng máy) bằng biến DATA_DIR
 const DATA_DIR = process.env.DATA_DIR ? path.resolve(process.env.DATA_DIR) : path.join(ROOT, 'data');
 
