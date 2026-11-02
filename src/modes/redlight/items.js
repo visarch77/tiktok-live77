@@ -4,7 +4,7 @@
  *
  * Loại vật phẩm (kind):
  *   turbo     chạy nhanh: cộng bước + tăng tốc vài giây
- *   shield    khiên: đỡ một lần bị loại lúc đèn đỏ
+ *   shield    khiên: chịu một phát bắn lúc đèn đỏ, đổi lại được nhấp tim suốt lần búp bê quay lại đó (tim vẫn cộng)
  *   buffalo   lính bắn: lính canh bắn 2 người đang chạy ngẫu nhiên (không bắn người có khiên / khổng lồ); chỉ quà đắt
  *   clones    bản sao: chạy cùng chủ, chết thay chủ (số bản sao theo giá quà)
  *   wind      búp bê hét: sóng âm đẩy lùi 5 người dẫn đầu (mỗi người được miễn 10 giây sau khi bị đẩy)
@@ -44,7 +44,7 @@ const LEGEND = [
   { gift: 'Hoa hồng', tiktok: 'Rose', coins: 1, kind: 'turbo', emoji: '👟', label: 'Chạy nhanh', short: 'VÀO + CHẠY', desc: 'vào chơi ngay + lao lên vài bước' },
   { gift: 'Kem', tiktok: 'Ice Cream Cone', coins: 1, kind: 'clones', emoji: '👥', label: 'Bản sao', short: '1 BẢN SAO', desc: 'bản sao chết thay mình' },
   { gift: 'GG', tiktok: 'GG', coins: 1, kind: 'shove', emoji: '🤚', label: 'Đẩy ngã', short: 'ĐẨY NGÃ', desc: 'đẩy người gần nhất ngã, bị lính bắn' },
-  { gift: 'Finger Heart', tiktok: 'Finger Heart', coins: 5, kind: 'shield', emoji: '🛡️', label: 'Khiên', short: 'KHIÊN', desc: 'đỡ 1 lần bị bắn' },
+  { gift: 'Finger Heart', tiktok: 'Finger Heart', coins: 5, kind: 'shield', emoji: '🛡️', label: 'Khiên', short: 'KHIÊN', desc: 'chịu 1 phát bắn, được nhấp tim cả lúc búp bê quay lại' },
   { gift: 'Vòng cổ', tiktok: 'Friendship Necklace', coins: 10, kind: 'crowd', emoji: '👥', label: '10 bản sao', short: '10 BẢN SAO', desc: 'cả đám bản sao chạy quanh mình' },
   { gift: 'Donut', tiktok: 'Doughnut', coins: 30, kind: 'wind', emoji: '📢', label: 'Búp bê hét', short: 'ĐẨY LÙI 5', desc: 'đẩy lùi 5 người dẫn đầu' },
   { gift: 'Mũ & ria', tiktok: 'Hat and Mustache', coins: 99, kind: 'giant', emoji: '💪', label: 'Khổng lồ', short: 'KHỔNG LỒ', desc: '15 giây mỗi tim đi gấp đôi' },

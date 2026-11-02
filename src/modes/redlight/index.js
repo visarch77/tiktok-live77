@@ -364,6 +364,15 @@ function create(ctx, saved = {}) {
     if (light === 'red' && redArmedFor(p)) {
       if (isMeasured(p)) {
         p.redOverGrace = true; // đang đo: không bắn, chỉ đánh dấu "lẽ ra bị bắn"
+      } else if (p.shieldRedAt === lightStartedAt) {
+        // khiên đã đỡ 1 phát trong lần búp bê quay lại này: nhấp tiếp thoải mái tới hết đèn đỏ, tim vẫn được cộng
+      } else if (p.shield > 0) {
+        // Khiên: chịu 1 phát bắn, đổi lại được nhấp tim suốt lần búp bê quay lại này (tim cộng vào bước dồn)
+        p.shield--;
+        p.shieldRedAt = lightStartedAt;
+        logViolation(p, units);
+        ctx.broadcast('rl.fx', { kind: 'shieldSave', id: p.id });
+        rosterDirty = true;
       } else {
         p.redShot = true;
         logViolation(p, units);
