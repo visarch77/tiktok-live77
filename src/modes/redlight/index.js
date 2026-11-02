@@ -730,7 +730,7 @@ function create(ctx, saved = {}) {
         const victims = runners()
           .filter((v) => v.key !== p.key && v.shield <= 0 && v.giantUntil < now)
           .sort(() => Math.random() - 0.5)
-          .slice(0, Math.min(6, 2 * n));
+          .slice(0, Math.min(15, 5 * n)); // Hand Hearts: lính bắn 5 người mỗi quà (combo tối đa 15)
         const shot = victims.map(standIn); // có bản sao thì bản sao chết thay
         for (const v of shot) eliminate(v, 'buffalo');
         ctx.broadcast('rl.fx', { kind: 'buffalo', from: p.id, ids: shot.map((v) => v.id) });
@@ -1480,7 +1480,7 @@ module.exports = {
     momentumSec: 20, // đà chạy: có tim / bình luận trong chừng này giây thì tự chạy suốt lúc búp bê hát (0 = tắt)
     commentLikes: 2, // 1 bình luận lúc búp bê hát = chừng này tim (0 = bình luận không giúp chạy)
     npcMin: 6, // sân ít người thật hơn số này thì thêm người máy cho đủ (0 = tắt)
-    stompMax: 5, // Kính râm: khổng lồ dẫm tối đa chừng này người (mỗi quà)
+    stompMax: 10, // Kính râm: khổng lồ dẫm tối đa chừng này người (mỗi quà)
     queueLikes: 50, // thả đủ chừng này tim là tham gia (lúc chờ: vào luôn; đang chơi: giữ chỗ hàng chờ ván sau)
     songMode: 'random',
     bgMusicEnabled: true,

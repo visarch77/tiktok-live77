@@ -314,9 +314,9 @@ Thời gian về đích gần như không đổi với mọi quà (về đích t
 | Donut (30) | đẩy 5 người dẫn đầu lùi 10 bước, mỗi người miễn 10 s | +1,1 / +4,4 | 5 người lùi ~2 s |
 | Mũ & ria (99) | khổng lồ 15 s | +1,8 / +6,8 | — |
 | Confetti (100) | khiên cho 10 người gần + người tặng | — | có lợi |
-| Hand Hearts (100) | lính bắn 2 người đang chạy | — | 2 người bị loại |
+| Hand Hearts (100) | lính bắn 5 người đang chạy (combo tối đa 15) | — | 5 người bị loại (bản sao chết thay chủ) |
 | Vòng cổ / Friendship Necklace (10) | 10 bản sao | không nhanh hơn; người thả tim bất chấp vẫn 0% về đích | — |
-| Kính râm / Sunglasses (199) | cướp biển chân gỗ khổng lồ (Scenario, 6 khung chạy khập khiễn) lết chậm 230 px/s theo đường ngẫu nhiên qua 3 chỗ đông người; ai đứng sát chân lúc nó đi qua bị dẫm (xét theo thời gian thực — kịp chạy khỏi đường là thoát), tối đa `stompMax` người (mặc định 5; khiên đỡ, khổng lồ miễn) | hạng 21 → 18–20 | 5 người bị loại |
+| Kính râm / Sunglasses (199) | cướp biển chân gỗ khổng lồ (Scenario, 6 khung chạy khập khiễn) lết chậm 230 px/s theo đường ngẫu nhiên qua 3 chỗ đông người; ai đứng sát chân lúc nó đi qua bị dẫm (xét theo thời gian thực — kịp chạy khỏi đường là thoát), tối đa `stompMax` người (mặc định 10; khiên đỡ, khổng lồ miễn) | hạng 21 → 18–20 | tối đa 10 người bị loại |
 
 Trước khi cân lại: Heart Me (1 xu) giết 3 người — đã đổi thành chạy nhanh; "lính bắn" chỉ còn ở Hand Hearts (100 xu).
 
