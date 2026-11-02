@@ -1,4 +1,4 @@
-const { sanitizeUserName, isBlockedSpamOrToxic } = require('../../util/sanitize');
+const { sanitizeUserName, isBlockedSpamOrToxic, sanitizeWishText } = require('../../util/sanitize');
 const { LEGEND, itemForGift } = require('./items');
 const { createSim } = require('./sim');
 const { CUTS, MODES, MODE_NAMES, planSong } = require('./song');
@@ -30,6 +30,11 @@ const GRACE_MAX = 9000;
 const GRACE_MARGIN = 1500;
 // Bị búp bê phát hiện: nháy đỏ trên màn hình chừng này rồi mới bị bắn (mỗi lần nháy đỏ là một phát bắn)
 const SPOT_MS = 1200;
+// Khổng lồ dẫm: đi ngang sân trái → phải; người ở vị trí x (0..1) bị dẫm lúc STOMP_LEAD + x * STOMP_CROSS
+const STOMP_LEAD = 250;
+const STOMP_CROSS = 1500;
+const STOMP_BAND = 6; // nửa bề dày làn dẫm (đơn vị sân, sân dài 120)
+const STOMP_MAX = 5;
 // Hết giờ: lính canh tiến vào sân (PURGE_MARCH_MS) rồi bắn lần lượt mọi người chưa về đích
 const PURGE_MARCH_MS = 1300;
 const PURGE_SHOOT_MS = 3200; // tổng thời gian bắn (chia đều cho số người), mỗi phát cách nhau tối đa 220ms
@@ -65,6 +70,10 @@ function create(ctx, saved = {}) {
   const queue = new Map(); // khoá người xem -> { user, name, likes, ok, okAt, hue }
   let song = null; // câu hát đang phát (đèn xanh): { mode, rates, startAt, durationMs }
   let nextSongMode = null; // người điều phối chọn kiểu cho lần hát sau
+  // Quà tặng lúc nhạc dừng (đèn đỏ): kỹ năng chạy / tấn công để dành, búp bê hát câu sau mới có tác dụng.
+  // Khiên, khiên đội, bản sao (bảo vệ) vẫn có tác dụng ngay.
+  const DEFER_KINDS = new Set(['turbo', 'buffalo', 'wind', 'giant', 'chicken', 'stomp']);
+  let heldGifts = []; // [{ id, item, count }]
   const redActs = new Set(); // người vẫn thả tim sau khi nhạc dừng (màn hình vẽ đang chạy tại chỗ)
   let finishCount = 0;
   let results = [];
@@ -142,6 +151,11 @@ function create(ctx, saved = {}) {
     return p;
   }
 
+  // Lúc chờ ván: người đứng ở vạch xuất phát bình luận thì hiện trên đầu
+  function sayFx(p, raw) {
+    const text = sayText(raw);
+    if (text) ctx.broadcast('rl.fx', { kind: 'say', id: p.id, text, ms: SAY_MS });
+  }
   function queueAdd(u) {
     const key = viewerKey(u);
     if (!key || queue.has(key)) return;
@@ -164,11 +178,25 @@ function create(ctx, saved = {}) {
     q.okAt = Date.now();
     broadcastQueue();
   }
+  const SAY_MS = 6000; // bình luận hiện trên đầu người ở hàng chờ / người đứng chờ ván
+  function sayText(raw) {
+    const t = sanitizeWishText(raw);
+    return t.length > 42 ? `${t.slice(0, 41)}…` : t;
+  }
   function queueView() {
+    const now = Date.now();
     return [...queue.values()]
       .filter((q) => q.ok)
       .sort((a, b) => a.okAt - b.okAt)
-      .map((q) => ({ n: q.name, h: q.hue }));
+      .map((q) => (q.say && now - q.sayAt < SAY_MS ? { n: q.name, h: q.hue, s: q.say, sa: now - q.sayAt } : { n: q.name, h: q.hue }));
+  }
+  function queueSay(u, raw) {
+    const q = queue.get(viewerKey(u));
+    const text = q && sayText(raw);
+    if (!text) return;
+    q.say = text;
+    q.sayAt = Date.now();
+    if (q.ok) broadcastQueue();
   }
   function broadcastQueue() {
     ctx.broadcast('rl.queue', { queue: queueView(), need: S().queueLikes });
@@ -293,6 +321,7 @@ function create(ctx, saved = {}) {
 
   function spot(p) {
     p.doomAt = Date.now() + SPOT_MS;
+    p.doomCause = 'red';
     p.pending = 0;
     ctx.broadcast('rl.fx', { kind: 'spotted', id: p.id, ms: SPOT_MS });
   }
@@ -301,6 +330,7 @@ function create(ctx, saved = {}) {
     if (!p.alive || p.finishRank) return;
     p.alive = false;
     p.doomAt = 0;
+    p.doomCause = '';
     p.pending = 0;
     p.deadAt = Date.now();
     rosterDirty = true;
@@ -403,7 +433,7 @@ function create(ctx, saved = {}) {
 
   function leaders(n, except) {
     return runners()
-      .filter((p) => !p.cloneOf && p !== except)
+      .filter((p) => !p.cloneOf && !p.doomAt && p !== except)
       .sort((a, b) => b.y - a.y)
       .slice(0, n);
   }
@@ -430,6 +460,7 @@ function create(ctx, saved = {}) {
         ctx.broadcast('rl.fx', { kind: 'buffalo', from: p.id, ids: victims.map((v) => v.id) });
         break;
       }
+      case 'crowd':
       case 'clones':
         addClones(p, (item.clones || 1) * n);
         if (item.turbo) p.turboUntil = Math.max(p.turboUntil, now) + 2500;
@@ -450,13 +481,48 @@ function create(ctx, saved = {}) {
         rosterDirty = true;
         break;
       case 'chicken': {
-        const lead = leaders(10, p).find((v) => (v.chickenImmuneUntil || 0) < now);
-        if (lead) {
-          lead.chickenUntil = now + 5000;
-          lead.chickenImmuneUntil = now + 20000;
-          rosterDirty = true;
-          ctx.broadcast('rl.fx', { kind: 'chicken', from: p.id, ids: [lead.id] });
+        // Luôn nhắm đúng người dẫn đầu (trừ người tặng). Người dẫn đầu vừa bị hoá gà (còn miễn 20 giây kể từ lúc hoá)
+        // thì quà không có tác dụng — không chuyển sang người hạng sau, để ai xem cũng thấy gà chỉ rơi vào người đứng đầu.
+        const lead = leaders(1, p)[0];
+        if (!lead) break;
+        if ((lead.chickenImmuneUntil || 0) >= now) {
+          ctx.broadcast('rl.fx', { kind: 'chickenBlocked', from: p.id, ids: [lead.id] });
+          break;
         }
+        lead.chickenUntil = now + 5000;
+        lead.chickenImmuneUntil = now + 20000;
+        rosterDirty = true;
+        ctx.broadcast('rl.fx', { kind: 'chicken', from: p.id, ids: [lead.id] });
+        break;
+      }
+      case 'stomp': {
+        // Làn dẫm: ngay trước mặt người tặng (người gần nhất phía trước; mình dẫn đầu thì người gần nhất phía sau)
+        const others = runners().filter((v) => v.key !== p.key && !v.doomAt);
+        if (!others.length) break;
+        const ahead = others.filter((v) => v.y > p.y).sort((a, b) => a.y - b.y)[0];
+        const near = ahead || others.sort((a, b) => b.y - a.y)[0];
+        const bandY = Math.min(TRACK - STOMP_BAND, Math.max(STOMP_BAND, near.y));
+        const inBand = others
+          .filter((v) => !v.cloneOf && Math.abs(v.y - bandY) <= STOMP_BAND)
+          .sort((a, b) => Math.abs(a.y - bandY) - Math.abs(b.y - bandY))
+          .slice(0, STOMP_MAX * Math.min(n, 2));
+        const ids = [];
+        const saved = [];
+        for (const v of inBand) {
+          if (v.giantUntil > now) continue; // khổng lồ không bị dẫm
+          if (v.shield > 0) {
+            v.shield--;
+            saved.push(v.id);
+            continue;
+          }
+          // có bản sao thì bản sao chết thay (bản sao đứng sát chủ)
+          const victim = clonesOf(v).find((c) => c.alive && !c.doomAt) || v;
+          victim.doomAt = now + STOMP_LEAD + victim.x * STOMP_CROSS;
+          victim.doomCause = 'stomp';
+          victim.pending = 0;
+          ids.push(victim.id);
+        }
+        ctx.broadcast('rl.fx', { kind: 'stomp', from: p.id, y: bandY, ids, saved, lead: STOMP_LEAD, cross: STOMP_CROSS });
         break;
       }
       case 'teamShield': {
@@ -526,6 +592,7 @@ function create(ctx, saved = {}) {
 
   function enterLobby() {
     purge = null;
+    heldGifts = [];
     song = null;
     phase = 'lobby';
     phaseStartedAt = Date.now();
@@ -590,8 +657,20 @@ function create(ctx, saved = {}) {
       lightEndsAt = lightStartedAt + rand(st.redMin, st.redMax) * 1000;
     }
     broadcastPhase();
+    if (next === 'green') releaseHeldGifts();
     // có câu hát thì búp bê là tín hiệu, không đọc thêm cho khỏi đè tiếng hát
     if (!quiet && next === 'warn' && !song) say(pick(LINES.red));
+  }
+
+  function releaseHeldGifts() {
+    const list = heldGifts;
+    heldGifts = [];
+    for (const h of list) {
+      const p = players.get(h.id);
+      if (!p || !p.alive || p.finishRank || p.doomAt) continue;
+      applyItem(p, h.item, h.count);
+      ctx.broadcast('rl.fx', { kind: 'giftApply', id: p.id, itemKind: h.item.kind, count: h.count });
+    }
   }
 
   // Hết giờ: đèn đỏ đứng im, lính canh tiến lên bắn hết người chưa về đích, xong mới ra kết quả
@@ -670,7 +749,7 @@ function create(ctx, saved = {}) {
       const dt = TICK_MS / 1000;
       let moved = false;
       for (const p of [...players.values()]) {
-        if (p.doomAt && now >= p.doomAt) eliminate(p, 'red');
+        if (p.doomAt && now >= p.doomAt) eliminate(p, p.doomCause || 'red');
         if (!p.alive || p.finishRank || p.doomAt || p.pending <= 0 || light === 'red') continue;
         const step = Math.min(p.pending, speedOf(p, now) * dt);
         p.pending -= step;
@@ -766,9 +845,12 @@ function create(ctx, saved = {}) {
           // đang chơi / xem kết quả: vào hàng chờ ván sau (phải thả đủ tim để giữ chỗ)
           if (phase !== 'lobby') {
             queueAdd(u);
+            queueSay(u, evt.text);
             return null;
           }
-          return join(u);
+          const np = join(u);
+          if (np) sayFx(np, evt.text);
+          return np;
         }
         const now = Date.now();
         // Bình luận lúc đèn xanh cũng tiến 1,5 bước (tối đa 1 lần / 1,5 giây)
@@ -779,7 +861,10 @@ function create(ctx, saved = {}) {
             p.lastChatStepAt = now;
             move(p, 1.5);
           }
-        } else p.lastActiveAt = now;
+        } else {
+          p.lastActiveAt = now;
+          if (phase === 'lobby') sayFx(p, evt.text);
+        }
         return p;
       }
       case 'like': {
@@ -796,7 +881,9 @@ function create(ctx, saved = {}) {
         const p = join(u, { announce: true }) || players.get(byKey.get(viewerKey(u)));
         if (!p) return null;
         const item = itemForGift(evt.giftName, evt.coins);
-        applyItem(p, item, Number(evt.count) || 1);
+        const held = phase === 'play' && light === 'red' && !purge && DEFER_KINDS.has(item.kind);
+        if (held) heldGifts.push({ id: p.id, item, count: Number(evt.count) || 1 });
+        else applyItem(p, item, Number(evt.count) || 1);
         p.lastActiveAt = Date.now();
         ctx.broadcast('rl.fx', {
           kind: 'gift',
@@ -806,7 +893,8 @@ function create(ctx, saved = {}) {
           count: Number(evt.count) || 1,
           emoji: item.emoji,
           label: item.label,
-          itemKind: item.kind
+          itemKind: item.kind,
+          held
         });
         ctx.emitEvent({ type: 'rlGift', user: p.name, gift: evt.giftName, label: item.label, emoji: item.emoji });
         return p;
@@ -877,6 +965,7 @@ function create(ctx, saved = {}) {
       const clampN = (v, max) => Math.max(1, Math.min(max, Math.round(Number(v) || 1)));
       ctx.simulated(() => {
         if (params.action === 'join') onEvent({ type: 'chat', user: u, text: 'vào' });
+        else if (params.action === 'chat') onEvent({ type: 'chat', user: u, text: String(params.text || '').slice(0, 150) });
         else if (params.action === 'like') onEvent({ type: 'like', user: u, count: clampN(params.count, 50) });
         else if (params.action === 'gift') {
           const it = LEGEND.find((x) => x.kind === params.kind);

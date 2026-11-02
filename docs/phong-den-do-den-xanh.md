@@ -243,6 +243,12 @@ Mô phỏng một người thả tim hết công suất, dừng khi THẤY đèn
 - Nhạc dừng mà vẫn thả tim: trong ân hạn riêng của người đó (3–9 giây theo độ trễ đo được) chỉ hiện chạy tại chỗ,
   bước dồn lại cho đèn xanh sau; quá ân hạn thì búp bê khoá tia vào, người đó nháy đỏ 1,2 giây rồi lính bắn.
   Mỗi lần nháy đỏ chắc chắn là một phát bắn (server gửi `rl.fx spotted`, hết 1,2 giây mới loại).
+- Quà tặng lúc nhạc dừng: Chạy nhanh, Lính bắn, Búp bê hét, Khổng lồ, Hoá gà được để dành, búp bê bắt đầu hát câu sau mới có tác dụng
+  (thanh cảm ơn ghi "dùng khi búp bê hát lại"). Khiên, Khiên đội, Bản sao có tác dụng ngay. Hoá gà luôn rơi vào đúng người dẫn đầu
+  (trừ người tặng); người đó đang miễn thì hiện "Miễn gà!", không chuyển sang người khác.
+- Bình luận của người ở hàng chờ và người đứng chờ ván (vạch xuất phát) hiện thành bong bóng trên đầu 6 giây.
+- Búp bê quay đầu có tiếng mô-tơ + "cạch"; mắt quét giật từng nhịp kèm tiếng servo; khoá vào người bị phát hiện có tiếng "bíp".
+- 2,8 giây đầu mỗi câu hát: chữ "TAP TAP ❤️👆" trong suốt rung ở góc phải khu hàng chờ, nhắc người xem chạm màn hình thả tim.
 - Bình luận lúc đèn đỏ không bị tính là cử động. Mỗi lần bắt lỗi đèn đỏ (người thật) ghi vào `DATA_DIR/redlight-fairness.log`.
 - Cân lại theo câu hát: tốc độ 3,8 bước/giây, tối đa 10 bước/gói tim, dồn tối đa 22 bước → người thả tim hết công suất,
   dừng khi búp bê quay đầu, trễ 1–4,5 giây về đích ~64–67 giây / ván 90 giây; thả tim bất chấp vẫn bị loại 100%.
@@ -272,12 +278,14 @@ Thời gian về đích gần như không đổi với mọi quà (về đích t
 | Hoa hồng / Heart Me (1) | +6 / +4 bước | ≈0 / ≈1 | — |
 | Finger Heart (5) | khiên 1 lần | chỉ có ích khi lỡ tay | — |
 | Kem (1) / Gift Box (1) / Teddy (10) | 1 / 2 / 3 bản sao | chỉ có ích khi lỡ tay | — |
-| GG (1) | 1 người dẫn đầu chậm 5 s, sau đó miễn 20 s | ≈0 | nhẹ |
+| GG (1) | Người dẫn đầu (trừ người tặng) chậm 5 s; người đó miễn 20 s kể từ lúc hoá gà — trong lúc miễn quà không có tác dụng (hiện "Miễn gà!"), không chuyển sang người hạng sau | ≈0 | nhẹ |
 | Perfume (20) | khổng lồ 8 s (tim ×2) | +1,3 / +4,5 | — |
 | Donut (30) | đẩy 5 người dẫn đầu lùi 10 bước, mỗi người miễn 10 s | +1,1 / +4,4 | 5 người lùi ~2 s |
 | Mũ & ria (99) | khổng lồ 15 s | +1,8 / +6,8 | — |
 | Confetti (100) | khiên cho 10 người gần + người tặng | — | có lợi |
 | Hand Hearts (100) | lính bắn 2 người đang chạy | — | 2 người bị loại |
+| Vòng cổ / Friendship Necklace (10) | 10 bản sao | không nhanh hơn; người thả tim bất chấp vẫn 0% về đích | — |
+| Kính râm / Sunglasses (199) | hoá khổng lồ đi ngang làn ngay trước mặt, dẫm tối đa 5 người (khiên đỡ, khổng lồ miễn) | hạng 20,8 → 16,4 | 5 người bị loại |
 
 Trước khi cân lại: Heart Me (1 xu) giết 3 người — đã đổi thành chạy nhanh; "lính bắn" chỉ còn ở Hand Hearts (100 xu).
 

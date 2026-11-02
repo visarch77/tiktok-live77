@@ -244,8 +244,7 @@
       this.stopSong();
       this.stopLoops();
       const t = this.t;
-      // tiếng gỗ "cạch" quay đầu + nốt trầm
-      this.noise(t, 0.08, { vol: 0.35, type: 'bandpass', freq: 900, q: 3 });
+      // nốt trầm (tiếng máy quay đầu đã phát lúc búp bê bắt đầu quay: dollTurn)
       this.osc(midi(38), t, 1.4, { type: 'sawtooth', vol: 0.09, slide: -20, attack: 0.02 });
       this.osc(midi(26), t, 1.6, { type: 'sine', vol: 0.25, attack: 0.02 });
       this.loopKind = 'red';
@@ -395,6 +394,71 @@
       const t = this.t;
       for (let i = 0; i < 3; i++) this.osc(800, t + 0.05 + i * 0.13, 0.09, { type: 'square', vol: 0.1, slide: 600, attack: 0.003 });
       this.osc(1000, t + 0.5, 0.3, { type: 'square', vol: 0.1, slide: -500, attack: 0.01 });
+    }
+
+    // Búp bê quay đầu: mô-tơ trầm ~100 Hz rè theo nhịp bánh răng, tiếng rít hộp số ~1,9 / 2,9 kHz, dừng thì "cạch"
+    dollTurn(dur = 0.5, back = false) {
+      const c = this.ensure();
+      if (!c) return;
+      const t = this.t;
+      const d = dur + 0.12;
+      const o = c.createOscillator();
+      o.type = 'sawtooth';
+      o.frequency.setValueAtTime(back ? 112 : 92, t);
+      o.frequency.linearRampToValueAtTime(back ? 92 : 116, t + d);
+      const lp = c.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.value = 950;
+      lp.Q.value = 2;
+      // bánh răng: biên độ rung theo nhịp vuông ~30 Hz
+      const gear = c.createGain();
+      gear.gain.value = 0.65;
+      const lfo = c.createOscillator();
+      lfo.type = 'square';
+      lfo.frequency.value = 29 + Math.random() * 6;
+      const depth = c.createGain();
+      depth.gain.value = 0.35;
+      lfo.connect(depth).connect(gear.gain);
+      const env = c.createGain();
+      const vol = back ? 0.12 : 0.18;
+      env.gain.setValueAtTime(0.0001, t);
+      env.gain.exponentialRampToValueAtTime(vol, t + 0.04);
+      env.gain.setValueAtTime(vol, t + d - 0.06);
+      env.gain.exponentialRampToValueAtTime(0.0001, t + d);
+      o.connect(lp).connect(gear).connect(env).connect(this.sfxBus);
+      o.start(t);
+      lfo.start(t);
+      o.stop(t + d + 0.05);
+      lfo.stop(t + d + 0.05);
+      this.osc(1906, t + 0.03, d, { vol: back ? 0.018 : 0.028, slide: back ? -60 : 90, attack: 0.06 });
+      this.osc(2859, t + 0.03, d, { vol: back ? 0.012 : 0.018, slide: back ? -90 : 130, attack: 0.06 });
+      this.noise(t, d, { vol: 0.05, type: 'bandpass', freq: 1700, q: 1.3 });
+      // khớp đầu dừng lại
+      this.noise(t + d - 0.03, 0.08, { vol: back ? 0.18 : 0.32, type: 'bandpass', freq: 650, q: 2.5 });
+      this.osc(72, t + d - 0.03, 0.16, { vol: back ? 0.2 : 0.32, slide: -25, attack: 0.003 });
+    }
+
+    // Lòng mắt người máy lia sang chỗ khác: "zzt" servo ~4 kHz ngắn; lock = khoá vào người vừa bị phát hiện
+    eyeServo(lock = false) {
+      if (!this.ensure()) return;
+      const t = this.t;
+      if (t - (this.lastEye || 0) < 0.1) return;
+      this.lastEye = t;
+      const f0 = 3750 + Math.random() * 450;
+      const dir = Math.random() < 0.5 ? -1 : 1;
+      this.noise(t, 0.015, { vol: 0.05, type: 'highpass', freq: 5000 });
+      this.osc(f0, t, 0.16, { type: 'triangle', vol: 0.045, slide: lock ? 600 : dir * 260, attack: 0.012 });
+      this.osc(f0 / 2, t, 0.16, { vol: 0.018, slide: dir * 120, attack: 0.012 });
+      this.noise(t, 0.16, { vol: 0.03, type: 'bandpass', freq: f0, q: 9 });
+      if (lock) this.osc(2637, t + 0.16, 0.12, { type: 'square', vol: 0.04, attack: 0.003 });
+    }
+
+    // Bước chân khổng lồ: "thịch" trầm + bụi
+    stompStep() {
+      if (!this.ensure()) return;
+      const t = this.t;
+      this.osc(58, t, 0.28, { vol: 0.45, slide: -22, attack: 0.004 });
+      this.noise(t, 0.18, { vol: 0.18, type: 'lowpass', freq: 380 });
     }
 
     shieldSave() {

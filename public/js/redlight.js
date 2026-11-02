@@ -42,7 +42,7 @@
   // Ảnh vẽ bằng Scenario (public/assets/redlight). manifest.json: tên → [rộng, cao, phụ]
   //   người chơi: phụ = [tâm x, tâm y, rộng] miếng vải số sau lưng; búp bê: phụ = [[x, y], ...] vị trí mắt (tỉ lệ)
   const ASSET = '/assets/redlight/';
-  const AV = 8; // đổi số này mỗi khi thay ảnh: /assets được cache 1 ngày
+  const AV = 10; // đổi số này mỗi khi thay ảnh: /assets được cache 1 ngày
   const IMG = {};
   // prettier-ignore
   const NAMES = ['bg', 'doll_0', 'doll_1', 'doll_2', 'doll_3', 'doll_4', 'guard_0', 'guard_1', 'guard_2',
@@ -50,7 +50,8 @@
     'ic_turbo', 'ic_shield', 'ic_shot', 'ic_clones', 'ic_push', 'ic_giant', 'ic_chicken', 'ic_team',
     'fx_shield', 'fx_flash', 'fx_spark', 'fx_trail', 'fx_aura', 'fx_wave', 'fx_smoke', 'fx_feather',
     'ui_panel', 'ui_rank1', 'ui_rank2', 'ui_rank3', 'ui_rank4', 'ui_rank5',
-    'gift_turbo', 'gift_shield', 'gift_buffalo', 'gift_clones', 'gift_wind', 'gift_giant', 'gift_chicken', 'gift_teamShield'];
+    'gift_turbo', 'gift_shield', 'gift_buffalo', 'gift_clones', 'gift_wind', 'gift_giant', 'gift_chicken', 'gift_teamShield',
+    'gift_crowd', 'gift_stomp'];
   for (let v = 0; v < VARIANTS; v++) for (const f of P_FRAMES) NAMES.push(`v${v}_${f}`);
   for (const n of NAMES) {
     const im = new Image();
@@ -63,7 +64,7 @@
     .then((m) => (MAN = m))
     .catch(() => {});
   const ready = (im) => im && im.complete && im.naturalWidth > 0;
-  const ICON_OF = { turbo: 'ic_turbo', shield: 'ic_shield', buffalo: 'ic_shot', clones: 'ic_clones', wind: 'ic_push', giant: 'ic_giant', chicken: 'ic_chicken', teamShield: 'ic_team' };
+  const ICON_OF = { turbo: 'ic_turbo', shield: 'ic_shield', buffalo: 'ic_shot', clones: 'ic_clones', wind: 'ic_push', giant: 'ic_giant', chicken: 'ic_chicken', teamShield: 'ic_team', crowd: 'ic_clones', stomp: 'ic_giant' };
   // 6 lính canh trên lối đi sau vạch đích, hai bên búp bê (điểm chân)
   const GUARDS = [-1, 1].flatMap((side) => [0, 1, 2].map((i) => ({ x: W / 2 + side * (150 + i * 74), y: FY - 10, img: `guard_${i}`, side, fireAt: -1e9 })));
   // Hết giờ: 6 lính dàn hàng ngang tiến vào sân
@@ -93,7 +94,8 @@
   let results = [];
   let lastWinners = [];
   let legend = [];
-  let queueList = []; // hàng chờ ván sau: [{ n, h }]
+  let queueList = []; // hàng chờ ván sau: [{ n, h, s?, sa? }]
+  const queueSays = new Map(); // tên → { text, until } bình luận đang hiện trên đầu người ở hàng chờ
   let queueNeed = 15;
   let settings = {};
   const fx = []; // hiệu ứng đang chạy
@@ -135,6 +137,13 @@
     for (const id of [...sprites.keys()]) if (!seen.has(id)) sprites.delete(id);
   }
 
+  function setQueue(list) {
+    queueList = list;
+    const tn = performance.now();
+    for (const q of list) if (q.s) queueSays.set(q.n, { text: q.s, until: tn + 6000 - (q.sa || 0) });
+    for (const [n, v] of queueSays) if (v.until < tn) queueSays.delete(n);
+  }
+
   function applyState(st) {
     if (!st) return;
     settings = st.settings || settings;
@@ -146,7 +155,7 @@
     results = rl.results || results;
     lastWinners = rl.lastWinners || lastWinners;
     legend = rl.legend || legend;
-    if (rl.queue) queueList = rl.queue;
+    if (rl.queue) setQueue(rl.queue);
     if (rl.queueNeed) queueNeed = rl.queueNeed;
   }
 
@@ -330,15 +339,34 @@
           const hitAt = t0 + (e.cause === 'red' || e.cause === 'purge' ? 120 : 0);
           burst(p.x, p.y - PH * 0.45, '#ff3b6b', 16, hitAt);
           addSprite('fx_spark', p.x, p.y - PH * 0.45, 40, 130, 380, hitAt);
-          if (e.cause !== 'purge') fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.3, text: 'Loại!', color: '#ff6b6b', size: 30, t0: hitAt, life: 1100 });
+          if (e.cause === 'stomp') {
+            // bị khổng lồ dẫm: bụi tung, chữ "Bẹp!"
+            addSprite('fx_smoke', p.x, p.y - 12, 40, 150, 700, t0);
+            fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.1, text: 'Bẹp!', color: '#ffd43b', size: 30, t0, life: 1000 });
+          } else if (e.cause !== 'purge') fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.3, text: 'Loại!', color: '#ff6b6b', size: 30, t0: hitAt, life: 1100 });
         }
         if (e.name) pushTicker(`❌ Số ${e.num} ${e.name} bị loại`);
+        break;
+      case 'stomp': {
+        // Khổng lồ dẫm: nhân vật của người tặng phóng to đi ngang làn sân (trái → phải), dẫm người theo thời điểm server tính
+        const giver = e.from && sprites.get(e.from);
+        stompers.push({ t0, y: project(0.5, e.y).y, v: giver ? (giver.h || 0) % VARIANTS : 0, num: giver ? giver.num : '', lead: e.lead || 250, cross: e.cross || 1500, steps: 0 });
+        for (const id of e.saved || []) {
+          const v = sprites.get(id);
+          if (v) fx.push({ type: 'text', x: spritePos(v).x, y: spritePos(v).y - PH * 1.4, text: 'Khiên đỡ!', color: '#74c0fc', size: 24, t0: t0 + 600, life: 1100 });
+        }
+        break;
+      }
+      case 'say':
+        // bình luận của người đứng chờ ván (vạch xuất phát)
+        if (s) s.say = { text: e.text, until: t0 + (e.ms || 6000) };
         break;
       case 'spotted':
         // Búp bê thấy người còn động sau ân hạn: tia mắt khoá vào, nháy đỏ, hết e.ms thì server loại (sự kiện "out")
         if (s) {
           const p = spritePos(s);
           s.spotUntil = t0 + (e.ms || 1200) + 300;
+          if (unlocked) audio.eyeServo(true);
           laserLocks.push({ id: s.id, x: p.x, y: p.y - PH * 0.45, t0, until: t0 + (e.ms || 1200) });
         }
         break;
@@ -353,7 +381,11 @@
         break;
       case 'gift':
         if (unlocked) audio.gift(e.itemKind);
-        giftBanner = { name: e.name, gift: e.gift, count: e.count, emoji: e.emoji, label: e.label, kind: e.itemKind, until: t0 + 3000 };
+        giftBanner = { name: e.name, gift: e.gift, count: e.count, emoji: e.emoji, label: e.label, kind: e.itemKind, held: e.held, until: t0 + 3000 };
+        if (s && !e.held) giftFx(s, e.itemKind, e.count || 1, t0);
+        break;
+      case 'giftApply':
+        // quà tặng lúc nhạc dừng: búp bê bắt đầu hát câu sau thì kỹ năng mới có tác dụng
         if (s) giftFx(s, e.itemKind, e.count || 1, t0);
         break;
       case 'buffalo':
@@ -397,6 +429,16 @@
           addSprite('fx_smoke', p.x, p.y - PH * 0.4, 40, 150, 650, t0);
           for (let i = 0; i < 3; i++) addSprite('fx_feather', p.x + (Math.random() - 0.5) * 40, p.y - PH * 0.5, 50, 140, 1100, t0 + i * 90, (Math.random() - 0.5) * 2);
           fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.4, text: 'Cục tác!', color: '#ffe066', size: 28, t0, life: 1400 });
+        }
+        break;
+      case 'chickenBlocked':
+        // người dẫn đầu vừa bị hoá gà, đang được miễn
+        for (const id of e.ids || []) {
+          const v = sprites.get(id);
+          if (!v) continue;
+          const p = spritePos(v);
+          addSprite('fx_shield', p.x, p.y - PH * 0.5, 20, PH * 1.3, 600, t0);
+          fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.4, text: 'Miễn gà!', color: '#ffe066', size: 24, t0, life: 1200 });
         }
         break;
       case 'teamShield': {
@@ -447,6 +489,10 @@
         break;
       case 'clones':
         fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.4, text: 'Phân thân!', color: '#9ff0b9', size: 26, t0, life: 1100 });
+        break;
+      case 'crowd':
+        for (let i = 0; i < 5; i++) addSprite('fx_smoke', p.x + (Math.random() - 0.5) * 160, p.y - 20, 30, 120, 700, t0 + i * 60);
+        fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.5, text: '×10 BẢN SAO!', color: '#9ff0b9', size: 30, t0, life: 1400 });
         break;
       default:
         break;
@@ -562,7 +608,18 @@
   const TURN_MS = 480; // quay đầu nhìn ra sân: xong đúng lúc câu hát dứt
   const BACK_MS = 380; // quay lưng lại khi bắt đầu hát
   const ease = (k) => k * k * (3 - 2 * k);
+  // Bắt đầu quay mặt ra / quay lưng lại: tiếng máy (gọi qua updateDoll)
+  let dollPrev = 0;
+  function dollSound() {
+    if (unlocked && dollPrev <= 0.02 && dollPos > 0.02) audio.dollTurn(TURN_MS / 1000);
+    else if (unlocked && dollPrev >= 3.98 && dollPos < 3.98) audio.dollTurn(BACK_MS / 1000, true);
+    dollPrev = dollPos;
+  }
   function updateDoll(dt) {
+    turnDoll(dt);
+    dollSound();
+  }
+  function turnDoll(dt) {
     const back = () => (dollPos = Math.max(0, dollPos - (dt * 4) / (BACK_MS / 1000)));
     if (ph.phase !== 'play') return back();
     if (ph.light === 'red') {
@@ -686,6 +743,7 @@
       g.stroke();
     }
   }
+  const eyeScan = { from: { x: W / 2, y: (FY + SY) / 2 }, to: { x: W / 2, y: (FY + SY) / 2 }, cur: { x: W / 2, y: (FY + SY) / 2 }, at: 0, next: 0 };
   function drawLasers(t) {
     const tn = performance.now();
     for (let i = laserLocks.length - 1; i >= 0; i--) if (laserLocks[i].until < tn) laserLocks.splice(i, 1);
@@ -693,9 +751,19 @@
     if ((!scanning && !laserLocks.length) || !dollEyes.length) return;
     g.save();
     g.globalCompositeOperation = 'lighter';
-    // điểm quét đi lại trên sân
-    const sx = W / 2 + 400 * Math.sin(t / 1150);
-    const sy = FY + 110 + (SY - FY - 170) * (0.5 + 0.5 * Math.sin(t / 1730 + 1));
+    // điểm quét: mắt người máy giật từng nhịp tới chỗ mới (kèm tiếng servo), giữa các nhịp rung nhẹ
+    if (scanning && tn >= eyeScan.next) {
+      eyeScan.from = eyeScan.cur;
+      eyeScan.to = { x: FX0 + 40 + Math.random() * (FX1 - FX0 - 80), y: FY + 110 + Math.random() * (SY - FY - 170) };
+      eyeScan.at = tn;
+      eyeScan.next = tn + 800 + Math.random() * 700;
+      if (unlocked) audio.eyeServo();
+    }
+    if (!scanning) eyeScan.next = 0;
+    const k = ease(Math.min(1, (tn - eyeScan.at) / 170));
+    eyeScan.cur = { x: eyeScan.from.x + (eyeScan.to.x - eyeScan.from.x) * k, y: eyeScan.from.y + (eyeScan.to.y - eyeScan.from.y) * k };
+    const sx = eyeScan.cur.x + Math.sin(t / 37) * 2;
+    const sy = eyeScan.cur.y + Math.cos(t / 43) * 2;
     dollEyes.forEach((e, i) => {
       const lock = laserLocks.length ? laserLocks[i % laserLocks.length] : null;
       let tx = sx + (i ? 10 : -10);
@@ -841,6 +909,8 @@
     // tên (người bị loại chỉ hiện tên thêm một lúc cho đỡ rối)
     if (s.n && !s.f && (!dead || tn - deadAt < 2500)) {
       const fs = Math.round(18 * (s.gi ? 1.4 : 1));
+      s.headX = x;
+      s.headY = top - fs * 1.1;
       text(s.n, x, top - fs * 0.55, { size: fs, weight: 400, color: flashing || spotted ? '#ff6b6b' : dead ? '#bbb' : '#fff', stroke: 3 });
     }
     g.restore();
@@ -1011,7 +1081,7 @@
         g.drawImage(ic, x0 + 48 - (ic.naturalWidth * sc) / 2, y + 52 - (ic.naturalHeight * sc) / 2, ic.naturalWidth * sc, ic.naturalHeight * sc);
       }
       text(`${giftBanner.name} tặng ${giftBanner.gift}${count}`, x0 + 92, y + 34, { size: 26, weight: 900, color: '#222', align: 'left' });
-      text(`→ ${giftBanner.label}`, x0 + 92, y + 66, { size: 24, weight: 700, color: '#c2255c', align: 'left' });
+      text(`→ ${giftBanner.label}${giftBanner.held ? ' (dùng khi búp bê hát lại)' : ''}`, x0 + 92, y + 66, { size: 24, weight: 700, color: '#c2255c', align: 'left' });
       g.globalAlpha = 1;
       return;
     }
@@ -1030,14 +1100,20 @@
       const ic = IMG[ICON_OF[it.kind]];
       if (ready(ic)) fitImg(ic, x, y + 20, 34);
       else text(it.emoji, x, y + 20, { size: 28 });
-      text(it.label, x, y + 46, { size: 15, weight: 900, color: '#fff' });
+      const lab = it.short || it.label;
+      g.font = `900 16px ${FONT}`;
+      const fsz = Math.max(10, Math.min(16, Math.floor((16 * (cw - 6)) / g.measureText(lab).width)));
+      text(lab, x, y + 46, { size: fsz, weight: 900, color: '#ffe066', stroke: 3 });
       // quà TikTok để tặng (ảnh thật của TikTok) đặt ngay dưới
       const gi = IMG[`gift_${it.kind}`];
       g.fillStyle = 'rgba(255,255,255,0.08)';
       roundRect(x - cw / 2 + 6, y + 57, cw - 12, 38, 12);
       g.fill();
-      if (ready(gi)) fitImg(gi, x - cw / 2 + 22, y + 76, 28);
-      text(clip(it.gift, 12), ready(gi) ? x - cw / 2 + 38 : x, y + 76, { size: 11, weight: 700, color: '#ffd8a8', align: ready(gi) ? 'left' : 'center' });
+      if (ready(gi)) fitImg(gi, x - cw / 2 + 21, y + 76, 26);
+      const gw = cw - 44; // chỗ cho tên quà bên phải ảnh quà
+      g.font = `700 11px ${FONT}`;
+      const gsz = Math.max(8, Math.min(11, Math.floor((11 * gw) / g.measureText(it.gift).width)));
+      text(it.gift, ready(gi) ? x - cw / 2 + 36 : x, y + 76, { size: gsz, weight: 700, color: '#ffd8a8', align: ready(gi) ? 'left' : 'center' });
     });
   }
 
@@ -1089,7 +1165,8 @@
       { text: `❤️ Thả ${queueNeed} tim hoặc bình luận để tham gia` },
       { text: '🎵 Búp bê hát: thả tim để chạy' },
       { text: '🛑 Hết nhạc: đứng im, cử động là bị bắn' },
-      { text: '⏱ Hết giờ chưa về đích cũng bị bắn' }
+      { text: '⏱ Hết giờ chưa về đích cũng bị bắn' },
+      { text: '🎁 Quà tặng lúc nhạc dừng: búp bê hát lại mới có tác dụng (khiên, bản sao có ngay)' }
     ];
     for (const it of legend) parts.push({ icon: `gift_${it.kind}`, text: `${it.gift} → ${it.label}${it.desc ? `: ${it.desc}` : ''}` });
     return parts;
@@ -1133,7 +1210,7 @@
 
   // Hàng chờ ván sau: đứng dãn đều một hàng dưới thanh kỹ năng để đọc được tên
   const QY = 1300; // dòng chữ tiêu đề
-  const QFEET = 1380; // chân người đứng chờ
+  const QFEET = 1410; // chừa chỗ cho bong bóng bình luận trên đầu // chân người đứng chờ
   const QMAX = 10;
   function drawQueue(t) {
     if (ph.phase === 'lobby' || !queueList.length) return;
@@ -1164,6 +1241,15 @@
       }
       text(clip(q.n, 10), x, top - 9, { size: 15, weight: 400, color: '#fff', stroke: 3 });
     });
+    // bong bóng vẽ sau cùng để nằm trên người bên cạnh
+    shown.forEach((q, i) => {
+      const say = queueSays.get(q.n);
+      if (!say || say.until < performance.now()) return;
+      const v = (q.h || 0) % VARIANTS;
+      const hgt = 50 * ((MAN.heights && MAN.heights[v]) || 1);
+      // hẹp hơn khoảng cách hai người để bong bóng cạnh nhau không đè lên nhau
+      drawBubble(x0 + i * gap, QFEET - hgt - 22, say.text, say.until, Math.max(90, gap - 26));
+    });
     if (more) {
       const x = x0 + shown.length * gap;
       g.fillStyle = 'rgba(255,45,120,0.85)';
@@ -1171,6 +1257,110 @@
       g.fill();
       text(`+${more}`, x, QFEET - 28, { size: 18, weight: 900, color: '#fff' });
     }
+  }
+
+  // Khổng lồ dẫm: chân chạm đất mỗi bước → bụi + rung + tiếng "thịch"
+  const stompers = [];
+  function drawStompers(t) {
+    const tn = performance.now();
+    for (let i = stompers.length - 1; i >= 0; i--) {
+      const st = stompers[i];
+      const age = tn - st.t0;
+      const end = st.lead + st.cross + 400;
+      if (age > end) {
+        stompers.splice(i, 1);
+        continue;
+      }
+      // x khớp server: người ở vị trí x bị dẫm lúc lead + x * cross
+      const k = (age - st.lead) / st.cross;
+      const x = FX0 + k * (FX1 - FX0);
+      const step = Math.floor(age / 250);
+      if (step > st.steps) {
+        st.steps = step;
+        addSprite('fx_smoke', x, st.y - 6, 50, 170, 600, tn);
+        if (unlocked) audio.stompStep();
+      }
+      const im = IMG[`v${st.v}_run${(step % 4) + 1}`];
+      if (!ready(im)) continue;
+      const h = PH * 3.4;
+      const w = (im.naturalWidth / im.naturalHeight) * h;
+      const bob = -Math.abs(Math.sin((age / 250) * Math.PI)) * 14;
+      const fade = Math.min(1, age / 200, (end - age) / 300);
+      g.save();
+      g.globalAlpha = fade;
+      g.fillStyle = 'rgba(0,0,0,0.35)';
+      g.beginPath();
+      g.ellipse(x, st.y, w * 0.35, 18, 0, 0, Math.PI * 2);
+      g.fill();
+      // quay mặt sang phải (đi ngang): lật ảnh không cần — ảnh nhìn từ sau lưng, chỉ nghiêng người về hướng đi
+      g.translate(x, st.y + bob);
+      g.rotate(0.12);
+      g.drawImage(im, -w / 2, -h, w, h);
+      g.restore();
+    }
+  }
+
+  // Bong bóng lời nói: đáy (mũi nhọn) ở (x, y), tự xuống dòng tối đa 2 dòng, mờ dần lúc sắp hết
+  function drawBubble(x, y, str, until, maxW = 230) {
+    const tn = performance.now();
+    const fs = 15;
+    g.save();
+    g.globalAlpha = Math.max(0, Math.min(1, (until - tn) / 400));
+    g.font = `500 ${fs}px ${FONT}`;
+    const lines = [];
+    let cur = '';
+    for (const w of str.split(' ')) {
+      const t = cur ? `${cur} ${w}` : w;
+      if (g.measureText(t).width > maxW && cur) {
+        lines.push(cur);
+        cur = w;
+      } else cur = t;
+    }
+    lines.push(cur);
+    for (let i = 0; i < lines.length; i++) while (lines[i].length > 1 && g.measureText(lines[i]).width > maxW) lines[i] = `${lines[i].slice(0, -2)}…`;
+    if (lines.length > 2) lines.splice(2, lines.length, `${lines[1].slice(0, -1)}…`);
+    const bw = Math.min(maxW, Math.max(...lines.map((l) => g.measureText(l).width))) + 20;
+    const bh = lines.length * (fs + 4) + 10;
+    const bx = Math.max(SAFE_L, Math.min(SAFE_R - bw, x - bw / 2));
+    const by = y - 7 - bh;
+    g.fillStyle = 'rgba(255,255,255,0.95)';
+    roundRect(bx, by, bw, bh, 12);
+    g.fill();
+    g.beginPath();
+    g.moveTo(x - 6, by + bh - 1);
+    g.lineTo(x, y);
+    g.lineTo(x + 6, by + bh - 1);
+    g.fill();
+    lines.forEach((l, i) => text(l, bx + bw / 2, by + 5 + (fs + 4) * i + (fs + 4) / 2, { size: fs, weight: 500, color: '#222' }));
+    g.restore();
+  }
+
+  // Nhạc vừa cất lên: chữ "TAP TAP" trong suốt giật giật ở góc phải khu hàng chờ — chỗ ngón tay người xem hay chạm để thả tim
+  const TAP_MS = 2800;
+  function drawTapHint(t) {
+    if (ph.phase !== 'play' || ph.purging || !ph.song || ph.light === 'red') return;
+    const age = now() - ph.song.startAt;
+    if (age < 0 || age > TAP_MS) return;
+    const beat = (age % 360) / 360; // mỗi nhịp một cú "chạm"
+    const pop = 1 + 0.18 * Math.max(0, 1 - beat * 3);
+    const fade = Math.min(1, age / 150, (TAP_MS - age) / 400);
+    const jx = (Math.random() - 0.5) * 8;
+    const jy = (Math.random() - 0.5) * 8;
+    g.save();
+    g.globalAlpha = 0.55 * fade;
+    g.translate(SAFE_R - 115 + jx, QFEET - 52 + jy);
+    g.rotate((Math.random() - 0.5) * 0.12);
+    g.scale(pop, pop);
+    text('TAP TAP', 0, -22, { size: 46, weight: 900, color: '#ffffff', stroke: 6 });
+    text('❤️ 👆', 0, 26, { size: 38, weight: 900 });
+    g.restore();
+  }
+
+  // Bình luận của người đứng chờ ván ở vạch xuất phát
+  function drawSays() {
+    if (ph.phase !== 'lobby') return;
+    const tn = performance.now();
+    for (const s of sprites.values()) if (s.say && s.say.until > tn && s.headY) drawBubble(s.headX, s.headY, s.say.text, s.say.until);
   }
 
   function drawFx(t) {
@@ -1291,13 +1481,16 @@
       if (it.gd) drawGuard(it.gd, tn);
       else drawPerson(it.s, t);
     }
+    drawStompers(t);
     drawLasers(t);
     drawFx(t);
+    drawSays();
     drawHeader(t);
     drawBanner(t);
     drawMarquee(t);
     drawLegend(t);
     drawQueue(t);
+    drawTapHint(t);
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
@@ -1331,7 +1524,7 @@
           applyRoster(p.roster);
           break;
         case 'rl.queue':
-          queueList = p.queue || [];
+          setQueue(p.queue || []);
           queueNeed = p.need || queueNeed;
           break;
         case 'rl.act':

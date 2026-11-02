@@ -955,6 +955,10 @@
                     <div class="field" style="width:150px"><label for="rlLag">Trễ giả lập (giây)</label><input class="input" id="rlLag" type="number" min="0" max="8" step="0.5" value="${esc(lsGet('rl_test_lag') || '0')}" /></div>
                     <button class="btn primary" data-act="rl-join">💬 Vào chơi</button>
                   </div>
+                  <div class="rl-row">
+                    <div class="field" style="flex:1;min-width:200px"><label for="rlSay">Bình luận như người chơi</label><input class="input" id="rlSay" maxlength="150" placeholder="vd: chờ ván sau nha" /></div>
+                    <button class="btn" data-act="rl-say">💬 Gửi</button>
+                  </div>
                   <span class="help">Tim được gộp gói 1,2 giây như TikTok rồi mới gửi; “trễ giả lập” cộng thêm độ trễ hình/mạng để thử người xem ở xa. Người chơi thử không vào kỉ lục thật.</span>
                   <div class="rl-status" id="rlStatus"><div class="rl-stat"><b>—</b><span>Chưa vào chơi</span></div></div>
                   <button class="rl-heart" id="rlHeart" type="button">❤️ Giữ để thả tim liên tục<br><small style="font-weight:500;font-size:13px">hoặc giữ phím Space · bấm nhanh = thả từng tim</small></button>
@@ -2060,6 +2064,7 @@
     document.addEventListener('pointerup', () => { if (rl.holdTimer) rlHold(false); });
     document.addEventListener('pointercancel', () => { if (rl.holdTimer) rlHold(false); });
     document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && e.target.id === 'rlSay') return document.querySelector('[data-act="rl-say"]')?.click();
       if (e.code !== 'Space' || e.repeat || studioTab !== 'play' || !$('#rlHeart') || e.target.closest('input,textarea,select')) return;
       e.preventDefault();
       rlHold(true);
@@ -2181,6 +2186,13 @@
         case 'rl-join':
           await rlSend({ action: 'join' });
           break;
+        case 'rl-say': {
+          const text = ($('#rlSay')?.value || '').trim();
+          if (!text) break;
+          await rlSend({ action: 'chat', text });
+          $('#rlSay').value = '';
+          break;
+        }
         case 'rl-like':
           rlTap(Number(btn.dataset.count) || 1);
           break;
