@@ -89,6 +89,9 @@ function create(ctx, saved = {}) {
   // Kỉ lục thời gian về đích nhanh nhất (mỗi người 1 dòng, giữ 10 người) — đứng thành hàng dưới tán cây
   const RECORDS_MAX = 10;
   let records = Array.isArray(saved.records) ? saved.records.slice(0, RECORDS_MAX) : [];
+  // Đo độ trễ: tài khoản đang đo (không bị bắn lúc đèn đỏ, chỉ ghi số liệu) + nhật ký mỗi lần nhạc dừng
+  let measureNames = Array.isArray(saved.measureNames) ? saved.measureNames.slice(0, 10) : [];
+  const latency = []; // [{ at, round, name, measured, tailMs, packs, shot, graceMs, lag }] (gần nhất cuối)
   const simRecords = []; // người ảo: không lưu, chỉ để xem thử khi giả lập
   let testActiveUntil = 0; // admin đang chơi thử: cho hiện kỉ lục / bảng của người thử
 
@@ -333,10 +336,20 @@ function create(ctx, saved = {}) {
     p.lastActiveAt = Date.now();
     if (phase !== 'play' || paused || !p.alive || p.finishRank || p.doomAt) return false;
     if (units > 0) measureLag(p, Date.now());
+    if (light === 'red' && !purge && !p.npc && !p.sim && units > 0) {
+      // tim về sau lúc nhạc dừng: ghi lại muộn nhất bao lâu (đo độ trễ thật trên live)
+      p.redTail = Math.max(p.redTail || 0, Date.now() - lightStartedAt);
+      p.redPacks = (p.redPacks || 0) + 1;
+    }
     if (light === 'red' && redArmedFor(p)) {
-      logViolation(p, units);
-      violate(p);
-      return false;
+      if (isMeasured(p)) {
+        p.redOverGrace = true; // đang đo: không bắn, chỉ đánh dấu "lẽ ra bị bắn"
+      } else {
+        p.redShot = true;
+        logViolation(p, units);
+        violate(p);
+        return false;
+      }
     }
     if (light === 'red') redActs.add(p.id);
     // Khổng lồ: mỗi lượt tim đi gấp đôi (chạy bị giới hạn bởi số tim, không phải tốc độ)
@@ -345,6 +358,75 @@ function create(ctx, saved = {}) {
     p.pending = Math.min(p.pending + units, MAX_PENDING);
     for (const c of clonesOf(p)) c.pending = Math.min(c.pending + units, MAX_PENDING);
     return light !== 'red';
+  }
+
+  // --------------------------------------------------------------------------
+  // Đo độ trễ tim: mỗi lần đèn đỏ kết thúc, ghi với từng người thật có tim về sau lúc nhạc dừng:
+  // tim cuối về muộn bao lâu (tailMs), số gói, có bị bắn không, ân hạn lúc đó. Người trong danh sách đo không bị bắn.
+  // --------------------------------------------------------------------------
+  const latencyLog = path.join(config.DATA_DIR, 'redlight-latency.log');
+  const normName = (x) => String(x || '').trim().replace(/^@/, '').toLowerCase();
+  function isMeasured(p) {
+    if (!measureNames.length || p.cloneOf) return false;
+    const owner = p;
+    return measureNames.includes(normName(owner.name)) || measureNames.includes(normName(owner.key));
+  }
+  function closeRedLatency() {
+    const at = Date.now();
+    for (const p of players.values()) {
+      if (p.cloneOf || p.npc || p.sim || !p.redPacks) continue;
+      const row = {
+        at: new Date(at).toISOString(),
+        round,
+        name: p.name,
+        measured: isMeasured(p),
+        tailMs: p.redTail,
+        packs: p.redPacks,
+        shot: Boolean(p.redShot),
+        overGrace: Boolean(p.redOverGrace),
+        graceMs: graceFor(p),
+        lag: p.lagSamples || []
+      };
+      latency.push(row);
+      if (latency.length > 300) latency.shift();
+      fs.appendFile(latencyLog, JSON.stringify({ room: ctx.roomId, ...row }) + '\n', () => {});
+    }
+    for (const p of players.values()) {
+      p.redTail = 0;
+      p.redPacks = 0;
+      p.redShot = false;
+      p.redOverGrace = false;
+    }
+  }
+  function latencyReport() {
+    const byName = new Map();
+    for (const r of latency) {
+      const e = byName.get(r.name) || { name: r.name, measured: r.measured, reds: 0, tails: [], shots: 0, over: 0, graceMs: 0, lag: [] };
+      e.reds++;
+      e.tails.push(r.tailMs);
+      if (r.shot) e.shots++;
+      if (r.overGrace) e.over++;
+      e.graceMs = r.graceMs;
+      e.lag = r.lag;
+      e.measured = e.measured || r.measured;
+      byName.set(r.name, e);
+    }
+    const people = [...byName.values()].map((e) => {
+      const sorted = [...e.tails].sort((a, b) => a - b);
+      return { ...e, maxTail: sorted[sorted.length - 1] || 0, p90Tail: sorted[Math.floor(sorted.length * 0.9)] || 0, tails: e.tails.slice(-12) };
+    });
+    // gợi ý: người đang đo (dừng đúng lúc) phải sống → ân hạn tối thiểu = tim muộn nhất của họ + 0,8 s, làm tròn 250 ms
+    const ref = people.filter((e) => e.measured);
+    const base = (ref.length ? ref : people).reduce((m, e) => Math.max(m, e.maxTail), 0);
+    const suggest = base ? Math.min(9000, Math.ceil((base + 800) / 250) * 250) : null;
+    return {
+      measureNames,
+      graceMinMs: S().graceMinMs,
+      redMin: S().redMin,
+      suggestGraceMinMs: suggest,
+      people,
+      recent: latency.slice(-30).reverse()
+    };
   }
 
   // Nhật ký mỗi lần bắt lỗi đèn đỏ (người thật) để soát sau buổi live: tim về sau lúc nhạc dừng bao lâu, ân hạn bao nhiêu
@@ -764,6 +846,7 @@ function create(ctx, saved = {}) {
   function setLight(next, quiet = false) {
     light = next;
     lightStartedAt = Date.now();
+    if (next === 'green' && lightLog.length && lightLog[lightLog.length - 1].light === 'red') closeRedLatency();
     lightLog.push({ t: lightStartedAt, light: next });
     if (lightLog.length > 12) lightLog.shift();
     const st = S();
@@ -822,6 +905,7 @@ function create(ctx, saved = {}) {
   }
 
   function endRound(reason) {
+    if (light === 'red') closeRedLatency(); // lần đèn đỏ cuối ván cũng ghi độ trễ
     purge = null;
     song = null;
     phase = 'result';
@@ -1110,6 +1194,18 @@ function create(ctx, saved = {}) {
       return testStatus(u);
     },
     testStatus: (params = {}) => testStatus(testUser(params.name)),
+    // Đo độ trễ tim trên live thật (chỉ đọc số liệu + miễn bắn cho tài khoản đang đo)
+    latencyReport: () => latencyReport(),
+    setMeasureNames: (params = {}) => {
+      const list = Array.isArray(params.names) ? params.names : String(params.names || '').split(/[,\n]/);
+      measureNames = list.map(normName).filter(Boolean).slice(0, 10);
+      ctx.save();
+      return latencyReport();
+    },
+    clearLatency: () => {
+      latency.length = 0;
+      return latencyReport();
+    },
     testCrowd: (params = {}) => {
       if (ctx.isLive && ctx.isLive()) throw new Error('Phòng đang live thật: không thêm người ảo');
       return ctx.simulated(() => sim.burst(Number(params.count) || 20));
@@ -1178,7 +1274,7 @@ function create(ctx, saved = {}) {
       };
     },
     serialize() {
-      return { round, lastWinners, records };
+      return { round, lastWinners, records, measureNames };
     },
     dispose() {
       clearInterval(tickTimer);

@@ -262,6 +262,10 @@ Mô phỏng một người thả tim hết công suất, dừng khi THẤY đèn
 - Live thật lần đầu (03/11/2026): người dừng đúng lúc vẫn có tim về server 4–6 s sau khi nhạc dừng (đo được lúc đầu câu chỉ 0,3–1,8 s
   vì bấm trước nhịp) → bị bắn oan. Sửa: ân hạn tối thiểu 5 s, bỏ mẫu đo < 1,5 s, lấy mẫu lớn nhất + 2,5 s (5–9 s); đèn đỏ 8–11 s;
   tốc độ chạy 5,8 bước/s (chỉnh được trong Cài đặt: "Ân hạn tối thiểu" graceMinMs, "Ân hạn cộng thêm" graceMarginMs, "Tốc độ chạy" runSpeed). Mô phỏng trễ 1–7 s: người đúng luật về đích 79–88%, 0% bị bắn oan; người thả tim bất chấp bị bắt 92–100%.
+- Đo độ trễ tim (admin tab "📏 Độ trễ", RPC `redlight.latencyReport` / `setMeasureNames` / `clearLatency`): mỗi lần đèn đỏ kết thúc,
+  với từng người thật có tim về sau lúc nhạc dừng, ghi tim cuối về muộn bao lâu (`tailMs`), có bị bắn không, ân hạn lúc đó
+  (cũng ghi vào `DATA_DIR/redlight-latency.log`). Tài khoản trong danh sách đo không bị bắn lúc đèn đỏ (chỉ đánh dấu "lẽ ra bị bắn").
+  Gợi ý "Ân hạn tối thiểu" = tim muộn nhất của người đang đo + 0,8 s.
 - Bình luận lúc đèn đỏ không bị tính là cử động. Mỗi lần bắt lỗi đèn đỏ (người thật) ghi vào `DATA_DIR/redlight-fairness.log`.
 - Cân lại theo câu hát: tốc độ 3,8 bước/giây, tối đa 10 bước/gói tim, dồn tối đa 22 bước → người thả tim hết công suất,
   dừng khi búp bê quay đầu, trễ 1–4,5 giây về đích ~64–67 giây / ván 90 giây; thả tim bất chấp vẫn bị loại 100%.

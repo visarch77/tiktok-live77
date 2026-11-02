@@ -825,6 +825,7 @@
               { id: 'interact', label: '🕹 Điều khiển ván' },
               { id: 'feed', label: '📡 Hoạt động' },
               { id: 'settings', label: '⚙️ Cài đặt' },
+              { id: 'lag', label: '📏 Độ trễ' },
               { id: 'play', label: '🎮 Chơi thử' }
             ]
           : [
@@ -852,6 +853,7 @@
       }
       if (id === 'control') renderChantPanel();
       if (id === 'play') startRlPlay();
+      if (id === 'lag') startRlLag();
       if (id === 'interact' && $('[data-panel="comment"]:not(.hidden)')) $('#simComment')?.focus();
     }
 
@@ -956,6 +958,16 @@
                 </div>
 
                 ${room.mode === 'redlight' ? `
+                <div class="spanel" data-spanel="lag"><div class="rlplay">
+                  <div class="rl-row">
+                    <div class="field" style="flex:1;min-width:200px"><label for="rlMeasure">Tài khoản đang đo (cách nhau dấu phẩy)</label><input class="input" id="rlMeasure" placeholder="vd: visuzu" /></div>
+                    <button class="btn primary" data-act="rl-measure">💾 Lưu</button>
+                    <button class="btn" data-act="rl-lag-clear">🧹 Xoá số liệu</button>
+                  </div>
+                  <span class="help">Tài khoản đang đo <b>không bị bắn lúc đèn đỏ</b> (chỉ ghi số liệu; khiên, dẫm, hết giờ vẫn như thường). Cách đo: chơi bình thường, luôn dừng thả tim trước khi búp bê quay mặt ra. Mỗi lần nhạc dừng, bảng ghi tim cuối của bạn về server muộn bao lâu. Đo khoảng 10 lần đèn đỏ rồi áp dụng gợi ý. Đo xong nhớ xoá tên để chơi thật.</span>
+                  <div class="rl-status" id="rlLagSummary"><div class="rl-stat"><b>—</b><span>Chưa có số liệu</span></div></div>
+                  <div id="rlLagTable" class="muted">Chưa có ai thả tim sau lúc nhạc dừng.</div>
+                </div></div>
                 <div class="spanel" data-spanel="play"><div class="rlplay">
                   <div class="rl-row">
                     <div class="field" style="flex:1;min-width:160px"><label for="rlName">Tên người chơi thử</label><input class="input" id="rlName" value="${esc(lsGet('rl_test_name') || 'Admin thử')}" /></div>
@@ -2065,6 +2077,51 @@
           <span class="g-desc">${esc(it.desc || '')}</span>
         </button>`).join('') || '<div class="muted">Không có quà.</div>';
     }
+    // Đo độ trễ tim (live thật): đọc số liệu server mỗi 2 giây khi đang mở tab
+    let rlLagTimer = null;
+    const sec = (ms) => (ms == null ? '—' : `${(ms / 1000).toFixed(1)}s`);
+    function renderRlLag(r) {
+      const box = $('#rlLagSummary');
+      if (!box) return;
+      const inp = $('#rlMeasure');
+      if (inp && document.activeElement !== inp && !inp.dataset.dirty) inp.value = (r.measureNames || []).join(', ');
+      const warn = r.suggestGraceMinMs && r.suggestGraceMinMs > r.redMin * 1000 - 2000;
+      box.innerHTML = `
+        <div class="rl-stat"><b>${sec(r.graceMinMs)}</b><span>Ân hạn tối thiểu đang dùng</span></div>
+        <div class="rl-stat ${r.suggestGraceMinMs > r.graceMinMs ? 'bad' : 'good'}"><b>${sec(r.suggestGraceMinMs)}</b><span>Gợi ý (tim muộn nhất + 0,8s)</span></div>
+        <div class="rl-stat"><b>${r.redMin}s</b><span>Đèn đỏ ngắn nhất</span></div>
+        ${r.suggestGraceMinMs ? `<div class="rl-stat" style="display:flex;align-items:center"><button class="btn primary" data-act="rl-lag-apply" data-v="${r.suggestGraceMinMs}">Áp dụng gợi ý</button></div>` : ''}
+        ${warn ? `<div class="rl-stat bad" style="grid-column:1/-1"><b>⚠️</b><span>Ân hạn gợi ý gần bằng đèn đỏ ngắn nhất: nên tăng “Đèn đỏ ngắn nhất” lên ít nhất ${Math.ceil(r.suggestGraceMinMs / 1000) + 2}s để vẫn bắt được người thả tim bất chấp</span></div>` : ''}`;
+      const t = $('#rlLagTable');
+      if (!r.people.length) {
+        t.innerHTML = '<div class="muted">Chưa có ai thả tim sau lúc nhạc dừng.</div>';
+        return;
+      }
+      const rows = r.people
+        .sort((a, b) => Number(b.measured) - Number(a.measured) || b.maxTail - a.maxTail)
+        .map((e) => `<tr><td>${e.measured ? '📏 ' : ''}<b>${esc(e.name)}</b></td><td>${e.reds}</td><td><b>${sec(e.maxTail)}</b></td><td>${sec(e.p90Tail)}</td><td>${e.tails.map(sec).join(' ')}</td><td>${e.shots ? `❌ ${e.shots}` : '—'}</td><td>${e.over ? `⚠️ ${e.over}` : '—'}</td><td>${sec(e.graceMs)}</td><td>${e.lag.map(sec).join(' ') || '—'}</td></tr>`)
+        .join('');
+      t.innerHTML = `<div style="overflow-x:auto"><table class="lag-table" style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead><tr style="text-align:left;color:var(--text-2)"><th>Người chơi</th><th>Lần đỏ</th><th>Tim muộn nhất</th><th>90%</th><th>Các lần gần đây</th><th>Bị bắn</th><th>Lẽ ra bị bắn</th><th>Ân hạn</th><th>Trễ đầu câu</th></tr></thead>
+        <tbody>${rows}</tbody></table></div>
+        <span class="help">“Tim muộn nhất”: tim cuối về server sau lúc nhạc dừng bao lâu. “Lẽ ra bị bắn”: người đang đo có tim về sau ân hạn (nếu không đo đã bị bắn).</span>`;
+    }
+    async function loadRlLag(method = 'redlight.latencyReport', extra = {}) {
+      const room = currentRoom();
+      if (!room || room.mode !== 'redlight') return;
+      const res = await rpc(method, { roomId: room.id, ...extra }, { silent: true }).catch(() => null);
+      if (res) renderRlLag(res);
+    }
+    function startRlLag() {
+      clearInterval(rlLagTimer);
+      if (currentRoom()?.mode !== 'redlight') return;
+      loadRlLag();
+      rlLagTimer = setInterval(() => {
+        if (studioTab !== 'lag' || !$('#rlLagSummary')) return clearInterval(rlLagTimer);
+        loadRlLag();
+      }, 2000);
+    }
+
     function startRlPlay() {
       clearInterval(rl.statusTimer);
       if (currentRoom()?.mode !== 'redlight') return;
@@ -2093,6 +2150,7 @@
     document.addEventListener('keyup', (e) => { if (e.code === 'Space' && rl.holdTimer) rlHold(false); });
     document.addEventListener('change', (e) => {
       if (e.target.id === 'rlName') lsSet('rl_test_name', e.target.value);
+      if (e.target.id === 'rlMeasure') e.target.dataset.dirty = '1';
       if (e.target.id === 'rlLag') lsSet('rl_test_lag', e.target.value);
     });
 
@@ -2206,6 +2264,19 @@
           break;
         case 'rl-join':
           await rlSend({ action: 'join' });
+          break;
+        case 'rl-measure': {
+          const inp = $('#rlMeasure');
+          delete inp.dataset.dirty;
+          await loadRlLag('redlight.setMeasureNames', { names: inp.value });
+          break;
+        }
+        case 'rl-lag-clear':
+          await loadRlLag('redlight.clearLatency');
+          break;
+        case 'rl-lag-apply':
+          await rpc('room.updateSettings', { roomId: currentRoom().id, graceMinMs: Number(btn.dataset.v) });
+          await loadRlLag();
           break;
         case 'rl-say': {
           const text = ($('#rlSay')?.value || '').trim();
