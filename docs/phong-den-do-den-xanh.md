@@ -247,7 +247,7 @@ quần, che sợi tóc, chim mổ đầu). Vẽ bằng Scenario (nano-banana-2, 
 - Nhạc dừng mà vẫn thả tim: trong ân hạn riêng của người đó (3–9 giây theo độ trễ đo được) chỉ hiện chạy tại chỗ,
   bước dồn lại cho đèn xanh sau; quá ân hạn thì búp bê khoá tia vào, người đó nháy đỏ 1,2 giây rồi lính bắn.
   Mỗi lần nháy đỏ chắc chắn là một phát bắn (server gửi `rl.fx spotted`, hết 1,2 giây mới loại).
-- Quà tặng lúc nhạc dừng: Chạy nhanh, Lính bắn, Búp bê hét, Khổng lồ, Hoá gà được để dành, búp bê bắt đầu hát câu sau mới có tác dụng
+- Quà tặng lúc nhạc dừng: Chạy nhanh, Thả boom, Búp bê hét, Khổng lồ, Hoá gà được để dành, búp bê bắt đầu hát câu sau mới có tác dụng
   (thanh cảm ơn ghi "dùng khi búp bê hát lại"). Khiên, Khiên đội, Bản sao có tác dụng ngay. Hoá gà luôn rơi vào đúng người dẫn đầu
   (trừ người tặng); người đó đang miễn thì hiện "Miễn gà!", không chuyển sang người khác.
 - Bình luận của người ở hàng chờ và người đứng chờ ván (vạch xuất phát) hiện thành bong bóng trên đầu 6 giây.
@@ -318,7 +318,7 @@ Thời gian về đích gần như không đổi với mọi quà (về đích t
 | Donut (30) | đẩy 5 người dẫn đầu lùi 10 bước, mỗi người miễn 10 s | +1,1 / +4,4 | 5 người lùi ~2 s |
 | Mũ & ria (99) | khổng lồ 15 s | +1,8 / +6,8 | — |
 | Confetti (100) | khiên cho 10 người gần + người tặng | — | có lợi |
-| Hand Hearts (100) | lính bắn 5 người đang chạy (combo tối đa 15) | — | 5 người bị loại (bản sao chết thay chủ) |
+| Hand Hearts (100) | **thả boom** (11/2026): tiếng xì hơi "tẹtttt" dài, khói vàng phụt ra từ mông người tặng; 5 người đứng gần nhất (combo tối đa 15) choáng váng 1,8 s rồi bị lính bắn; khiên đỡ được, khổng lồ miễn. Giọng đọc: "A thả boom làm 5 người xung quanh choáng váng!" | — | tối đa 5 người bị loại (bản sao chết thay chủ) |
 | Vòng cổ / Friendship Necklace (10) | 10 bản sao | không nhanh hơn; người thả tim bất chấp vẫn 0% về đích | — |
 | Kính râm / Sunglasses (199) | cướp biển chân gỗ khổng lồ (Scenario, 6 khung chạy khập khiễn) lết chậm 230 px/s theo đường ngẫu nhiên qua 3 chỗ đông người; ai đứng sát chân lúc nó đi qua bị dẫm (xét theo thời gian thực — kịp chạy khỏi đường là thoát), tối đa `stompMax` người (mặc định 10; khiên đỡ, khổng lồ miễn) | hạng 21 → 18–20 | tối đa 10 người bị loại |
 | (người điều phối) | nút 🦶 "Thả khổng lồ" trong trang quản lý (lệnh `redlight.releaseGiant`, chỉ khi đang chơi): thả cướp biển như Kính râm, dẫm tối đa `stompMax` người, không có người tặng | — | tối đa 10 người bị loại |

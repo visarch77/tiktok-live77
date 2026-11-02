@@ -18,6 +18,7 @@ const config = require('../../config');
 
 const TRACK = 120; // độ dài sân (đơn vị) — 6 hàng gạch trên nền, mỗi hàng 20 đơn vị
 const TICK_MS = 100;
+const FART_DAZE_MS = 1800; // thả boom: choáng váng chừng này rồi lính bắn
 const FAKE_TURN_MS = 2600; // búp bê giả vờ quay: quay mặt 1 s + nhìn 0,9 s + quay lưng 0,7 s
 const DOLL_SLEEP_MS = 6000; // búp bê ngủ gật
 const REVIVE_MAX = 5; // hồi sinh tối đa mấy người mỗi lần bấm
@@ -96,7 +97,7 @@ function create(ctx, saved = {}) {
   let nextSongMode = null; // người điều phối chọn kiểu cho lần hát sau
   // Quà tặng lúc nhạc dừng (đèn đỏ): kỹ năng chạy / tấn công để dành, búp bê hát câu sau mới có tác dụng.
   // Khiên, khiên đội, bản sao (bảo vệ) vẫn có tác dụng ngay.
-  const DEFER_KINDS = new Set(['turbo', 'buffalo', 'wind', 'giant', 'chicken', 'stomp']); // đẩy ngã: có tác dụng ngay, kể cả lúc búp bê nhìn
+  const DEFER_KINDS = new Set(['turbo', 'fart', 'wind', 'giant', 'chicken', 'stomp']); // đẩy ngã: có tác dụng ngay, kể cả lúc búp bê nhìn
   let heldGifts = []; // [{ id, item, count }]
   let stompers = []; // khổng lồ đang chạy: { giverKey, path, startAt, cap, hit, count }
   const redActs = new Set(); // người vẫn thả tim sau khi nhạc dừng (màn hình vẽ đang chạy tại chỗ)
@@ -746,14 +747,32 @@ function create(ctx, saved = {}) {
       case 'shield':
         p.shield = Math.min(3, p.shield + n);
         break;
-      case 'buffalo': {
-        const victims = runners()
-          .filter((v) => v.key !== p.key && v.shield <= 0 && v.giantUntil < now)
-          .sort(() => Math.random() - 0.5)
-          .slice(0, Math.min(15, 5 * n)); // Hand Hearts: lính bắn 5 người mỗi quà (combo tối đa 15)
-        const shot = victims.map(standIn); // có bản sao thì bản sao chết thay
-        for (const v of shot) eliminate(v, 'buffalo');
-        ctx.broadcast('rl.fx', { kind: 'buffalo', from: p.id, ids: shot.map((v) => v.id) });
+      case 'fart': {
+        // Hand Hearts: thả boom (xì hơi) — 5 người đứng gần người tặng nhất (combo tối đa 15) choáng váng rồi bị lính bắn.
+        // Khiên đỡ được, khổng lồ không choáng; có bản sao thì bản sao choáng thay.
+        const px = (v) => ({ X: v.x * STOMP_FIELD_W, Y: v.y * STOMP_PX_PER_UNIT });
+        const me = px(p);
+        const near = runners()
+          .filter((v) => v.key !== p.key && !v.cloneOf && !v.doomAt && v.giantUntil < now)
+          .map((v) => ({ v, d: Math.hypot(px(v).X - me.X, px(v).Y - me.Y) }))
+          .sort((a, b) => a.d - b.d)
+          .slice(0, Math.min(15, 5 * n));
+        const dazed = [];
+        for (const { v } of near) {
+          if (v.shield > 0) {
+            v.shield--;
+            ctx.broadcast('rl.fx', { kind: 'shieldSave', id: v.id });
+            continue;
+          }
+          const fall = standIn(v);
+          fall.doomAt = now + FART_DAZE_MS;
+          fall.doomCause = 'fart';
+          fall.pending = 0;
+          dazed.push(fall);
+        }
+        ctx.broadcast('rl.fx', { kind: 'fart', from: p.id, ids: dazed.map((v) => v.id), ms: FART_DAZE_MS });
+        const giver = speakName(p.name) || `Số ${p.num}`;
+        announce(dazed.length ? `${giver} thả boom làm ${dazed.length} người xung quanh choáng váng!` : `${giver} thả boom nhưng không ai bị choáng!`);
         break;
       }
       case 'crowd':
@@ -867,7 +886,6 @@ function create(ctx, saved = {}) {
     giant: (n) => `${n} hoá khổng lồ!`,
     chicken: (n) => `${n} biến người dẫn đầu thành gà!`,
     teamShield: (n) => `${n} tặng khiên cho người xung quanh!`,
-    buffalo: (n) => `${n} gọi lính bắn!`,
     stomp: (n) => `${n} gọi cướp biển chân gỗ dẫm người!`
   };
   const speakName = (n) => String(n || '').replace(/[^\p{L}\p{M}\s]/gu, ' ').replace(/\s+/g, ' ').trim().slice(0, 24);

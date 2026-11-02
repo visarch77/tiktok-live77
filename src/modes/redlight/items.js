@@ -5,7 +5,7 @@
  * Loại vật phẩm (kind):
  *   turbo     chạy nhanh: lao lên thêm vài bước (cả khi đang có đà) + chạy ×2 trong 2,5 giây
  *   shield    khiên: chịu một phát bắn lúc đèn đỏ, đổi lại được nhấp tim suốt lần búp bê quay lại đó (tim vẫn cộng)
- *   buffalo   lính bắn: lính canh bắn 5 người đang chạy ngẫu nhiên (không bắn người có khiên / khổng lồ); chỉ quà đắt
+ *   fart      thả boom: xì hơi vàng làm 5 người đứng gần người tặng nhất choáng váng rồi bị lính bắn (khiên đỡ được, khổng lồ miễn); quà đắt
  *   clones    bản sao: chạy cùng chủ, chết thay chủ (số bản sao theo giá quà)
  *   wind      búp bê hét: sóng âm đẩy lùi 5 người dẫn đầu (mỗi người được miễn 10 giây sau khi bị đẩy)
  *   giant     khổng lồ: chạy gấp đôi (giờ chỉ trôi lúc búp bê hát), mỗi lượt tim đi gấp đôi, không bị bắn / dẫm / đẩy
@@ -33,7 +33,7 @@ const ITEMS = {
   gg: { kind: 'shove', emoji: '🤚', label: 'Đẩy ngã' },
   confetti: { kind: 'teamShield', emoji: '🫧', label: 'Khiên đồng đội' },
   fireworks: { kind: 'teamShield', emoji: '🫧', label: 'Khiên đồng đội' },
-  'hand hearts': { kind: 'buffalo', emoji: '🎯', label: 'Lính bắn' },
+  'hand hearts': { kind: 'fart', emoji: '💨', label: 'Thả boom' },
   'friendship necklace': { kind: 'crowd', emoji: '👥', label: '5 bản sao', clones: 5 },
   sunglasses: { kind: 'stomp', emoji: '🦶', label: 'Khổng lồ dẫm' }
 };
@@ -48,7 +48,7 @@ const LEGEND = [
   { gift: 'Vòng cổ', tiktok: 'Friendship Necklace', coins: 10, kind: 'crowd', emoji: '👥', label: '5 bản sao', short: '5 BẢN SAO', desc: '5 bản sao chạy quanh mình, chết thay mình' },
   { gift: 'Donut', tiktok: 'Doughnut', coins: 30, kind: 'wind', emoji: '📢', label: 'Búp bê hét', short: 'ĐẨY LÙI 5', desc: 'đẩy lùi 5 người dẫn đầu' },
   { gift: 'Mũ & ria', tiktok: 'Hat and Mustache', coins: 99, kind: 'giant', emoji: '💪', label: 'Khổng lồ', short: 'KHỔNG LỒ', desc: 'chạy gấp đôi 15 giây hát, miễn bắn / dẫm / đẩy' },
-  { gift: 'Hand Hearts', tiktok: 'Hand Hearts', coins: 100, kind: 'buffalo', emoji: '🎯', label: 'Lính bắn', short: 'BẮN 5', desc: 'lính bắn 5 người đang chạy' },
+  { gift: 'Hand Hearts', tiktok: 'Hand Hearts', coins: 100, kind: 'fart', emoji: '💨', label: 'Thả boom', short: 'BOOM 5', desc: 'xì hơi làm 5 người quanh mình choáng, bị bắn' },
   { gift: 'Confetti', tiktok: 'Confetti', coins: 100, kind: 'teamShield', emoji: '🫧', label: 'Khiên đội', short: 'KHIÊN ĐỘI', desc: 'khiên cho 10 người quanh mình' },
   { gift: 'Kính râm', tiktok: 'Sunglasses', coins: 199, kind: 'stomp', emoji: '🦶', label: 'Khổng lồ dẫm', short: 'DẪM 10', desc: 'hoá khổng lồ chạy dẫm tối đa 10 người' }
 ];

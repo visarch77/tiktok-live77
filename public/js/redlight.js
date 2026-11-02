@@ -53,7 +53,7 @@
   // Ảnh vẽ bằng Scenario (public/assets/redlight). manifest.json: tên → [rộng, cao, phụ]
   //   người chơi: phụ = [tâm x, tâm y, rộng] miếng vải số sau lưng; búp bê: phụ = [[x, y], ...] vị trí mắt (tỉ lệ)
   const ASSET = '/assets/redlight/';
-  const AV = 23; // đổi số này mỗi khi thay ảnh: /assets được cache 1 ngày
+  const AV = 24; // đổi số này mỗi khi thay ảnh: /assets được cache 1 ngày
   const IMG = {};
   // prettier-ignore
   const NAMES = ['bg', 'doll_0', 'doll_1', 'doll_2', 'doll_3', 'doll_4', 'guard_0', 'guard_1', 'guard_2',
@@ -61,7 +61,7 @@
     'ic_turbo', 'ic_shield', 'ic_shot', 'ic_clones', 'ic_push', 'ic_giant', 'ic_chicken', 'ic_team',
     'fx_shield', 'fx_flash', 'fx_spark', 'fx_trail', 'fx_aura', 'fx_wave', 'fx_smoke', 'fx_feather',
     'ui_panel', 'ui_rank1', 'ui_rank2', 'ui_rank3', 'ui_rank4', 'ui_rank5',
-    'gift_turbo', 'gift_shield', 'gift_buffalo', 'gift_clones', 'gift_wind', 'gift_giant', 'gift_chicken', 'gift_teamShield', 'gift_shove',
+    'gift_turbo', 'gift_shield', 'gift_fart', 'gift_clones', 'gift_wind', 'gift_giant', 'gift_chicken', 'gift_teamShield', 'gift_shove',
     'gift_crowd', 'gift_stomp',
     'giant_run1', 'giant_run2', 'giant_run3', 'giant_run4', 'giant_run5', 'giant_run6'];
   for (const v of VLIST) for (const f of P_FRAMES) NAMES.push(`v${v}_${f}`);
@@ -76,7 +76,7 @@
     .then((m) => (MAN = m))
     .catch(() => {});
   const ready = (im) => im && im.complete && im.naturalWidth > 0;
-  const ICON_OF = { turbo: 'ic_turbo', shield: 'ic_shield', buffalo: 'ic_shot', clones: 'ic_clones', wind: 'ic_push', giant: 'ic_giant', chicken: 'ic_chicken', teamShield: 'ic_team', crowd: 'ic_clones', stomp: 'ic_giant' };
+  const ICON_OF = { turbo: 'ic_turbo', shield: 'ic_shield', fart: 'ic_shot', clones: 'ic_clones', wind: 'ic_push', giant: 'ic_giant', chicken: 'ic_chicken', teamShield: 'ic_team', crowd: 'ic_clones', stomp: 'ic_giant' };
   // 6 lính canh trên lối đi sau vạch đích, hai bên búp bê (điểm chân)
   const GUARDS = [-1, 1].flatMap((side) => [0, 1, 2].map((i) => ({ x: W / 2 + side * (150 + i * 74), y: FY - 10, img: `guard_${i}`, side, fireAt: -1e9 })));
   // Hết giờ: 6 lính dàn hàng ngang tiến vào sân
@@ -410,7 +410,7 @@
           const p = spritePos(s);
           // Đèn đỏ: tia mắt búp bê khoá vào người bị loại
           // đèn đỏ: đã nháy đỏ từ sự kiện "spotted" → giờ lính bắn
-          if (e.cause === 'purge' || e.cause === 'red' || e.cause === 'shove') shootAt(s, t0);
+          if (e.cause === 'purge' || e.cause === 'red' || e.cause === 'shove' || e.cause === 'fart') shootAt(s, t0);
           const hitAt = t0 + (e.cause === 'red' || e.cause === 'purge' ? 120 : 0);
           burst(p.x, p.y - PH * 0.45, '#ff3b6b', 16, hitAt);
           addSprite('fx_spark', p.x, p.y - PH * 0.45, 40, 130, 380, hitAt);
@@ -483,13 +483,30 @@
         // quà tặng lúc nhạc dừng: búp bê bắt đầu hát câu sau thì kỹ năng mới có tác dụng
         if (s) giftFx(s, e.itemKind, e.count || 1, t0);
         break;
-      case 'buffalo':
-        // Lính canh gần nhất giương súng bắn từng người bị chọn, cách nhau một nhịp
+      case 'fart': {
+        // Thả boom: khói vàng phụt ra từ mông người tặng lan ra xung quanh, người trúng choáng (sao quay, nháy đỏ) rồi bị bắn
+        if (unlocked) audio.fart();
+        const g0 = e.from && sprites.get(e.from);
+        if (g0) {
+          const gp = spritePos(g0);
+          const by = gp.y - PH * 0.32; // ngang mông
+          for (let i = 0; i < 14; i++) {
+            const a = Math.PI * (0.15 + 0.7 * Math.random()) + (Math.random() < 0.5 ? 0 : Math.PI * 0.0);
+            const sp = 0.06 + Math.random() * 0.1;
+            fx.push({ type: 'gas', x: gp.x, y: by, vx: Math.cos(a) * sp * (Math.random() < 0.5 ? -1 : 1), vy: Math.sin(a) * sp * 0.6, r0: 10, r1: 70 + Math.random() * 50, t0: t0 + i * 60, life: 2200 });
+          }
+          fx.push({ type: 'text', x: gp.x, y: gp.y - PH * 1.45, text: 'TẸTTTT 💨', color: '#d8f55a', size: 30, t0, life: 1600 });
+        }
         (e.ids || []).forEach((id, i) => {
           const v = sprites.get(id);
-          if (v) shootAt(v, t0 + i * 220);
+          if (!v) return;
+          const p = spritePos(v);
+          v.spotUntil = t0 + (e.ms || 1800) + 300;
+          fx.push({ type: 'gas', x: p.x, y: p.y - PH * 0.6, vx: 0, vy: -0.01, r0: 20, r1: 55, t0: t0 + 300 + i * 80, life: 1500 });
+          fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.4, text: 'Choáng! 😵', color: '#c0eb75', size: 26, t0: t0 + 300 + i * 80, life: 1500 });
         });
         break;
+      }
       case 'record':
         recordFlash = { name: e.name, until: t0 + 4000 };
         if (s) {
@@ -1581,6 +1598,20 @@
         if (e.flat) g.ellipse(e.x, e.y, e.r * (0.3 + k), e.r * 0.4 * (0.3 + k), 0, 0, Math.PI * 2);
         else g.arc(e.x, e.y, e.r * (0.6 + k), 0, Math.PI * 2);
         g.stroke();
+      } else if (e.type === 'gas') {
+        // khói xì hơi: đám mây vàng xanh nở to dần, trôi đi rồi tan
+        const r = e.r0 + (e.r1 - e.r0) * (1 - Math.pow(1 - k, 2));
+        const x = e.x + e.vx * age;
+        const y = e.y + e.vy * age;
+        const grd = g.createRadialGradient(x, y, 0, x, y, r);
+        grd.addColorStop(0, 'rgba(214,232,90,0.55)');
+        grd.addColorStop(0.6, 'rgba(176,196,60,0.32)');
+        grd.addColorStop(1, 'rgba(150,170,40,0)');
+        g.globalAlpha = 1 - k * k;
+        g.fillStyle = grd;
+        g.beginPath();
+        g.arc(x, y, r, 0, Math.PI * 2);
+        g.fill();
       } else if (e.type === 'sprite') {
         const im = IMG[e.img];
         if (ready(im)) {

@@ -385,11 +385,6 @@
         case 'teamShield':
           [93, 100, 105].forEach((m, i) => this.osc(midi(m), t + 0.08 + i * 0.07, 0.6, { vol: 0.06 }));
           break;
-        case 'buffalo': // "ò…" trâu rống + vó
-          this.osc(110, t + 0.05, 0.9, { type: 'sawtooth', vol: 0.12, slide: 50, attack: 0.08 });
-          this.osc(165, t + 0.05, 0.9, { type: 'sawtooth', vol: 0.05, slide: 60, attack: 0.08 });
-          for (let i = 0; i < 6; i++) this.noise(t + 0.4 + i * 0.12, 0.06, { vol: 0.15, type: 'lowpass', freq: 400 });
-          break;
         case 'clones': // bụp bụp bụp
           for (let i = 0; i < 5; i++) this.osc(500 + i * 120, t + 0.05 + i * 0.07, 0.08, { type: 'sine', vol: 0.09, slide: 300, attack: 0.003 });
           break;
@@ -405,6 +400,40 @@
         default:
           break;
       }
+    }
+
+    // Thả boom: tiếng "tẹtttt" dài — giọng trầm rung (răng cưa + điều tần nhanh) qua lọc thấp, kèm tiếng xì
+    fart() {
+      const c = this.ensure();
+      if (!c) return;
+      const t = this.t + 0.02;
+      const dur = 1.6;
+      const o = c.createOscillator();
+      o.type = 'sawtooth';
+      o.frequency.setValueAtTime(95, t);
+      o.frequency.linearRampToValueAtTime(70, t + dur * 0.7);
+      o.frequency.linearRampToValueAtTime(110, t + dur);
+      const lfo = c.createOscillator();
+      lfo.frequency.setValueAtTime(26, t);
+      lfo.frequency.linearRampToValueAtTime(18, t + dur);
+      const lfoGain = c.createGain();
+      lfoGain.gain.value = 35;
+      lfo.connect(lfoGain).connect(o.frequency);
+      const f = c.createBiquadFilter();
+      f.type = 'lowpass';
+      f.frequency.value = 520;
+      f.Q.value = 6;
+      const g = c.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.32, t + 0.04);
+      g.gain.setValueAtTime(0.3, t + dur * 0.8);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(f).connect(g).connect(this.sfxBus);
+      o.start(t);
+      lfo.start(t);
+      o.stop(t + dur + 0.05);
+      lfo.stop(t + dur + 0.05);
+      this.noise(t, dur, { vol: 0.06, type: 'bandpass', freq: 700, q: 1.5 });
     }
 
     chicken() {
