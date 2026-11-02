@@ -781,6 +781,45 @@ function create(ctx, saved = {}) {
   }
 
   // --------------------------------------------------------------------------
+  // Giọng đọc khi người chơi dùng vật phẩm: "<tên> <vật phẩm>". Lúc búp bê đang hát thì giữ lại, đọc khi nhạc dừng
+  // (người chơi cần nghe câu hát để biết lúc dừng). Chống dồn: cùng người + cùng vật phẩm 8 s đọc 1 lần, chờ tối đa 3 câu.
+  // --------------------------------------------------------------------------
+  const ITEM_SAY = {
+    turbo: (n) => `${n} tăng tốc!`,
+    shield: (n) => `${n} có khiên!`,
+    clones: (n) => `${n} phân thân!`,
+    crowd: (n) => `${n} gọi mười bản sao!`,
+    wind: (n) => `${n} cho búp bê hét, đẩy lùi người dẫn đầu!`,
+    giant: (n) => `${n} hoá khổng lồ!`,
+    chicken: (n) => `${n} biến người dẫn đầu thành gà!`,
+    teamShield: (n) => `${n} tặng khiên cho người xung quanh!`,
+    buffalo: (n) => `${n} gọi lính bắn!`,
+    stomp: (n) => `${n} gọi cướp biển chân gỗ dẫm người!`
+  };
+  const speakName = (n) => String(n || '').replace(/[^\p{L}\p{M}\s]/gu, ' ').replace(/\s+/g, ' ').trim().slice(0, 24);
+  const itemSaid = new Map(); // "khoá người|vật phẩm" → lúc đọc
+  let itemSayQueue = [];
+  function sayItem(p, kind) {
+    const line = ITEM_SAY[kind];
+    if (!line || p.npc) return;
+    const now = Date.now();
+    const k = `${p.key}|${kind}`;
+    if (now - (itemSaid.get(k) || 0) < 8000) return; // combo cùng quà: chỉ đọc 1 lần
+    itemSaid.set(k, now);
+    if (itemSaid.size > 500) itemSaid.clear();
+    const text = line(speakName(p.name) || `Số ${p.num}`);
+    if (phase === 'play' && light !== 'red') {
+      itemSayQueue.push(text);
+      if (itemSayQueue.length > 3) itemSayQueue.shift();
+    } else say(text);
+  }
+  function flushItemSay() {
+    const list = itemSayQueue;
+    itemSayQueue = [];
+    for (const t of list) say(t);
+  }
+
+  // --------------------------------------------------------------------------
   // Vòng đời ván
   // --------------------------------------------------------------------------
   // Top 5 kỉ lục tổng qua các ván (người thật; chưa có ai thì khi giả lập hiện bảng người ảo)
@@ -817,6 +856,7 @@ function create(ctx, saved = {}) {
   }
 
   function enterLobby() {
+    flushItemSay();
     purge = null;
     heldGifts = [];
     stompers = [];
@@ -868,6 +908,7 @@ function create(ctx, saved = {}) {
     light = next;
     lightStartedAt = Date.now();
     if (next === 'green' && lightLog.length && lightLog[lightLog.length - 1].light === 'red') closeRedLatency();
+    if (next === 'red') flushItemSay(); // nhạc dừng: đọc tên người dùng vật phẩm lúc nãy
     lightLog.push({ t: lightStartedAt, light: next });
     if (lightLog.length > 12) lightLog.shift();
     const st = S();
@@ -1122,6 +1163,7 @@ function create(ctx, saved = {}) {
         const held = phase === 'play' && light === 'red' && !purge && DEFER_KINDS.has(item.kind);
         if (held) heldGifts.push({ id: p.id, item, count: Number(evt.count) || 1 });
         else applyItem(p, item, Number(evt.count) || 1);
+        sayItem(p, item.kind);
         p.lastActiveAt = Date.now();
         ctx.broadcast('rl.fx', {
           kind: 'gift',
