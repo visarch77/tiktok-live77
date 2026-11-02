@@ -338,6 +338,13 @@ Trước khi cân lại: Heart Me (1 xu) giết 3 người — đã đổi thàn
 | 😴 Búp bê ngủ gật | `redlight.dollSleep` | đang chơi (cả lúc đèn đỏ) | 6 s đèn xanh không câu hát, không bắn, chữ Z bay trên đầu búp bê; hết giờ búp bê tỉnh dậy quay mặt (báo trước → đỏ) |
 | 🙏 Hồi sinh | `redlight.revive` | đang chơi, có người bị loại | tối đa 5 người bị loại gần nhất (ưu tiên người xem thật, không tính bản sao) sống lại ở chỗ cũ |
 
+## Camera zoom người tặng quà (tuỳ chọn, mặc định tắt)
+
+Cài đặt `giftCam` (trang quản lý → ⚙️ Cài đặt → "Camera zoom người tặng quà"). Bật: mỗi lần có quà, phần sân (nền,
+búp bê, người chơi, hiệu ứng, bình luận) lướt tới phóng to ×1,8 vào người tặng trong 2,6 s rồi lướt về toàn sân; thanh trên
+cùng, chữ chạy, bảng kỹ năng, hàng chờ đứng yên. Quà dồn dập thì giữ người đang zoom ít nhất 1,2 s. Chỉ zoom lúc chờ ván /
+đang chơi; khung hình kẹp trong ảnh nền nên không lộ mép. Tắt: hiển thị y như cũ.
+
 ## Bình luận trên đầu người chơi
 
 Người chơi bình luận thì lời bình luận hiện thành bong bóng trên đầu nhân vật, ở mọi lúc: màn chờ (6 s), đang chạy

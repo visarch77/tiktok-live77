@@ -1218,6 +1218,10 @@
           <div><div class="setting-name">Kiểu hát mặc định</div><div class="setting-desc">Nút “Lần hát sau” ở mục điều khiển chỉ đổi một lần</div></div>
           <select class="input" data-setting="songMode">${[['random', 'Ngẫu nhiên'], ['steady', 'Đều đều'], ['slowFast', 'Chậm → nhanh'], ['fastSlow', 'Nhanh → chậm'], ['jerky', 'Thất thường']].map(([v, n]) => `<option value="${v}" ${v === (s.songMode || 'random') ? 'selected' : ''}>${n}</option>`).join('')}</select>
         </div>
+        <div class="setting">
+          <div><div class="setting-name">Camera zoom người tặng quà</div><div class="setting-desc">Bật: mỗi lần có quà, khung hình lướt tới phóng to người tặng khoảng 2,6 giây rồi quay về toàn sân (thanh trên cùng, bảng kỹ năng vẫn đứng yên). Tắt: giữ nguyên như cũ</div></div>
+          <label class="switch"><input type="checkbox" data-setting="giftCam" ${s.giftCam ? 'checked' : ''} /><span></span></label>
+        </div>
         ${rlRange('resultSeconds', 'Thời gian xem kết quả', 'Bảng kết quả ván vừa rồi; nhạc nền chờ bắt đầu từ đây', 5, 60, 1, 's')}
         ${rlRange('lobbySeconds', 'Thời gian nghỉ chờ ván mới', 'Người xem bình luận / thả tim để vào sân; chưa ai vào thì chờ thêm', 5, 300, 5, 's')}
         <div class="setting">

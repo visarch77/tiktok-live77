@@ -114,6 +114,12 @@
   const ticker = []; // dòng chữ chạy
   let banner = null; // { text, color, until }
   let giftBanner = null;
+  // Camera zoom người tặng quà (cài đặt giftCam, mặc định tắt): lướt tới người tặng, giữ một lúc rồi quay về toàn sân
+  const GIFT_CAM_MS = 2600;
+  const GIFT_CAM_ZOOM = 1.8;
+  const CAM_ANCHOR_Y = 0.45; // điểm nhìn mặc định (toàn sân) theo chiều cao khung hình
+  let camFocus = null; // { id, start, until }
+  const cam = { x: 0, y: 0, z: 1 }; // gán sau khi biết W, H
 
   function applyPhase(p) {
     if (!p) return;
@@ -467,6 +473,8 @@
         pushTicker(`🏁 Số ${e.num} ${e.name} về đích hạng ${e.rank}`);
         break;
       case 'gift':
+        // không đổi người đang zoom quá nhanh khi quà dồn dập (giữ ít nhất 1,2 giây)
+        if (settings.giftCam && s && (!camFocus || t0 > camFocus.until || t0 - camFocus.start > 1200)) camFocus = { id: e.id, start: t0, until: t0 + GIFT_CAM_MS };
         if (unlocked) audio.gift(e.itemKind);
         giftBanner = { name: e.name, gift: e.gift, count: e.count, emoji: e.emoji, label: e.label, kind: e.itemKind, held: e.held, until: t0 + 3000 };
         if (s && !e.held) giftFx(s, e.itemKind, e.count || 1, t0);
@@ -1626,6 +1634,27 @@
     }
   }
 
+  // Camera: chỉ phóng to phần sân (nền, búp bê, người chơi, hiệu ứng); thanh trên, chữ chạy, bảng kỹ năng đứng yên
+  function updateCam(dt, tn) {
+    if (!cam.x) Object.assign(cam, { x: W / 2, y: H * CAM_ANCHOR_Y, z: 1 });
+    const s = camFocus && tn < camFocus.until && settings.giftCam && (ph.phase === 'play' || ph.phase === 'lobby') && sprites.get(camFocus.id);
+    let tx = W / 2;
+    let ty = H * CAM_ANCHOR_Y;
+    let tz = 1;
+    if (s) {
+      const p = spritePos(s);
+      tz = GIFT_CAM_ZOOM;
+      // giữ khung hình trong ảnh nền (không lộ mép đen khi zoom sát mép sân)
+      tx = Math.max(W / 2 / tz, Math.min(W - W / 2 / tz, p.x));
+      ty = Math.max((H * CAM_ANCHOR_Y) / tz, Math.min(H - (H * (1 - CAM_ANCHOR_Y)) / tz, p.y - PH * 0.5));
+    } else camFocus = null;
+    const k = 1 - Math.exp(-dt * 5); // lướt mượt ~0,5 giây
+    cam.x += (tx - cam.x) * k;
+    cam.y += (ty - cam.y) * k;
+    cam.z += (tz - cam.z) * k;
+    if (!s && Math.abs(cam.z - 1) < 0.002) Object.assign(cam, { x: W / 2, y: H * CAM_ANCHOR_Y, z: 1 });
+  }
+
   let lastFrame = performance.now();
   function frame(t) {
     const dt = Math.min(0.1, (t - lastFrame) / 1000);
@@ -1642,6 +1671,14 @@
     finalCountdown();
 
     g.clearRect(0, 0, W, H);
+    updateCam(dt, tn);
+    const camOn = cam.z > 1.001;
+    if (camOn) {
+      g.save();
+      g.translate(W / 2, H * CAM_ANCHOR_Y);
+      g.scale(cam.z, cam.z);
+      g.translate(-cam.x, -cam.y);
+    }
     drawBackground(t);
     drawRecords(t);
     drawDoll(t);
@@ -1657,6 +1694,7 @@
     drawLasers(t);
     drawFx(t);
     drawSays();
+    if (camOn) g.restore();
     drawHeader(t);
     drawBanner(t);
     drawMarquee(t);

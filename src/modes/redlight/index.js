@@ -1543,6 +1543,7 @@ module.exports = {
     stompMax: [1, 15],
     graceMinMs: [2000, 9000],
     perPlayerGrace: 'boolean',
+    giftCam: 'boolean',
     graceMarginMs: [0, 5000],
     runSpeed: [2, 12],
     dollTurnVolume: [0, 1],
@@ -1567,6 +1568,7 @@ module.exports = {
     simCrowd: 60,
     songEnabled: true, // đèn xanh theo câu hát của búp bê; tắt thì dùng greenMin/greenMax
     dollTurnVolume: 0.1, // âm lượng tiếng servo búp bê xoay đầu (0 = tắt, 1 = to nhất)
+    giftCam: false, // camera lướt tới, zoom vào người tặng quà vài giây rồi quay về toàn sân
     graceMinMs: GRACE_MIN, // ân hạn đèn đỏ chung cho mọi người (tối thiểu khi bật perPlayerGrace)
     perPlayerGrace: false, // bật: ân hạn từng người = độ trễ đo được lớn nhất + graceMarginMs (không nhỏ hơn graceMinMs)
     graceMarginMs: GRACE_MARGIN, // ân hạn = độ trễ lớn nhất đo được + chừng này
