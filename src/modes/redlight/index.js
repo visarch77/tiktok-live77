@@ -647,6 +647,15 @@ function create(ctx, saved = {}) {
 
   // Đường chạy của khổng lồ: vào từ một mép (ngẫu nhiên trái/phải), lần lượt qua 3 chỗ đông người, ra mép kia.
   // Trả về [{ x (0..1), y (đơn vị sân), t (ms từ lúc bắt đầu) }]
+  // Thả cướp biển khổng lồ: người tặng Kính râm (không dẫm người tặng), hoặc người điều phối thả (giver = null)
+  function releaseStomper(giver, cap) {
+    const others = runners().filter((v) => (!giver || v.key !== giver.key) && !v.doomAt);
+    if (!others.length) return false;
+    const path = stompPath(others);
+    stompers.push({ giverKey: giver ? giver.key : null, path, startAt: Date.now(), cap, hit: new Set(), count: 0 });
+    ctx.broadcast('rl.fx', { kind: 'stomp', from: giver ? giver.id : null, path });
+    return true;
+  }
   function stompPath(others) {
     const px = (v) => ({ X: v.x * STOMP_FIELD_W, Y: v.y * STOMP_PX_PER_UNIT });
     const pts = others.map(px);
@@ -804,14 +813,9 @@ function create(ctx, saved = {}) {
         ctx.broadcast('rl.fx', { kind: 'chicken', from: p.id, ids: [lead.id] });
         break;
       }
-      case 'stomp': {
-        const others = runners().filter((v) => v.key !== p.key && !v.doomAt);
-        if (!others.length) break;
-        const path = stompPath(others);
-        stompers.push({ giverKey: p.key, path, startAt: now, cap: S().stompMax * Math.min(n, 2), hit: new Set(), count: 0 });
-        ctx.broadcast('rl.fx', { kind: 'stomp', from: p.id, path });
+      case 'stomp':
+        releaseStomper(p, S().stompMax * Math.min(n, 2));
         break;
-      }
       case 'teamShield': {
         const near = runners()
           .filter((v) => !v.cloneOf)
@@ -1308,6 +1312,13 @@ function create(ctx, saved = {}) {
         phaseEndsAt = Math.max(phaseEndsAt, Date.now() + 10000);
         setLight('green', true);
       } else broadcastPhase();
+      return phaseInfo();
+    },
+    // Người điều phối thả cướp biển khổng lồ (lâu lâu một lần cho hấp dẫn) — chỉ khi đang chạy ván
+    releaseGiant: () => {
+      if (phase !== 'play' || purge) throw new Error('Chỉ thả được khi đang chơi ván');
+      if (!releaseStomper(null, S().stompMax)) throw new Error('Không có ai đang chạy trên sân');
+      announce('Cướp biển khổng lồ xuất hiện! Chạy khỏi đường nó đi!');
       return phaseInfo();
     },
     forceRed: () => {

@@ -317,6 +317,7 @@ Thời gian về đích gần như không đổi với mọi quà (về đích t
 | Hand Hearts (100) | lính bắn 5 người đang chạy (combo tối đa 15) | — | 5 người bị loại (bản sao chết thay chủ) |
 | Vòng cổ / Friendship Necklace (10) | 10 bản sao | không nhanh hơn; người thả tim bất chấp vẫn 0% về đích | — |
 | Kính râm / Sunglasses (199) | cướp biển chân gỗ khổng lồ (Scenario, 6 khung chạy khập khiễn) lết chậm 230 px/s theo đường ngẫu nhiên qua 3 chỗ đông người; ai đứng sát chân lúc nó đi qua bị dẫm (xét theo thời gian thực — kịp chạy khỏi đường là thoát), tối đa `stompMax` người (mặc định 10; khiên đỡ, khổng lồ miễn) | hạng 21 → 18–20 | tối đa 10 người bị loại |
+| (người điều phối) | nút 🦶 "Thả khổng lồ" trong trang quản lý (lệnh `redlight.releaseGiant`, chỉ khi đang chơi): thả cướp biển như Kính râm, dẫm tối đa `stompMax` người, không có người tặng | — | tối đa 10 người bị loại |
 
 Cân lại khi có "đà chạy" (người có đà luôn chạy đúng `runSpeed`, bước dồn từ tim không còn tác dụng):
 - Hoa hồng: bước cộng thêm đi vào `dash` riêng, chạy chồng lên tốc độ thường (đo: 3 giây chạy 32,5 bước so với 14,5 của người thường).
