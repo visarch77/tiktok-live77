@@ -162,11 +162,11 @@ function create(ctx, saved = {}) {
   }
 
   // --------------------------------------------------------------------------
-  // Người máy lấp chỗ: sân ít người thật hơn npcMin thì thêm người máy (biệt danh vui, màn hình gắn 🤖) cho đủ,
+  // Người máy lấp chỗ: sân ít người thật hơn npcMin thì thêm người máy (biệt danh vui, chữ tên hơi xám) cho đủ,
   // để vừa vào live đã có ván chạy. Người máy chỉ thả tim trong game — không bình luận, không tặng quà,
   // không vào kỉ lục / bảng xếp hạng thật. Có người thật vào lúc chờ ván thì người máy rút bớt tương ứng.
   // --------------------------------------------------------------------------
-  // biệt danh kiểu nhân vật game (màn hình vẫn gắn 🤖 để người xem biết đây không phải người thật)
+  // biệt danh kiểu nhân vật game
   const NPC_NAMES = ['Bé Su', 'Tí Đẹp Trai', 'Hai Lúa', 'Mây Lang Thang', 'Sóc Nâu', 'Gió Đồng', 'Bin Bon', 'Nắng Mai', 'Đá Cuội', 'Cún Con',
     'Mèo Mập', 'Gấu Trúc', 'Tèo Em', 'Bông Gòn', 'Ốc Sên', 'Cá Mập Con', 'Bánh Bao', 'Kẹo Dẻo', 'Su Hào', 'Bắp Rang',
     'Chuột Lắt', 'Heo Hồng', 'Vịt Bầu', 'Cà Rốt', 'Mít Ướt', 'Trà Sữa', 'Xoài Non', 'Bí Đỏ', 'Ếch Xanh', 'Thỏ Ngọc'];

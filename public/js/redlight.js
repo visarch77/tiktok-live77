@@ -954,8 +954,8 @@
       const fs = Math.round(18 * (s.gi ? 1.4 : 1));
       s.headX = x;
       s.headY = top - fs * 1.1;
-      // người máy lấp chỗ (không phải người xem): ghi 🤖, chữ xám xanh
-      text(s.b ? `🤖${s.n}` : s.n, x, top - fs * 0.55, { size: fs, weight: 400, color: flashing || spotted ? '#ff6b6b' : dead ? '#bbb' : s.b ? '#a9c1d6' : '#fff', stroke: 3 });
+      // người máy lấp chỗ: tên biệt danh, chữ hơi xám xanh để khác người xem thật một chút
+      text(s.n, x, top - fs * 0.55, { size: fs, weight: 400, color: flashing || spotted ? '#ff6b6b' : dead ? '#bbb' : s.b ? '#d6e2ec' : '#fff', stroke: 3 });
     }
     g.restore();
   }
