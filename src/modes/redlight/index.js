@@ -319,6 +319,9 @@ function create(ctx, saved = {}) {
   // (= trễ hình + gộp tim + mạng). Tim cuối họ bấm khi còn thấy xanh sẽ về muộn đúng chừng đó sau lúc đỏ.
   // Ân hạn = trung vị 5 lần gần nhất + 1,5 s (3–9 s). Người thả tim liên tục thì đo ra rất nhỏ → vẫn bị bắt.
   function graceFor(p) {
+    // Mặc định: một mức ân hạn chung cho mọi người (graceMinMs). Live thật 11/2026: độ trễ đo lúc bắt đầu câu hát
+    // không liên quan tới độ trễ lúc dừng (người bắt đầu thả tim muộn bị đo 7–9 s rồi được nới ân hạn tối đa, bấm lố vẫn sống).
+    if (!S().perPlayerGrace) return S().graceMinMs ?? GRACE_MIN;
     const s = p.lagSamples;
     if (!s || !s.length) return Math.max(S().redGraceMs, S().graceMinMs ?? GRACE_MIN);
     // chỉnh được trong cài đặt: graceMinMs (ân hạn tối thiểu), graceMarginMs (cộng thêm vào độ trễ đo được)
@@ -1316,6 +1319,7 @@ module.exports = {
     npcMin: [0, 30],
     stompMax: [1, 15],
     graceMinMs: [2000, 9000],
+    perPlayerGrace: 'boolean',
     graceMarginMs: [0, 5000],
     runSpeed: [2, 12],
     dollTurnVolume: [0, 1],
@@ -1340,7 +1344,8 @@ module.exports = {
     simCrowd: 60,
     songEnabled: true, // đèn xanh theo câu hát của búp bê; tắt thì dùng greenMin/greenMax
     dollTurnVolume: 0.1, // âm lượng tiếng servo búp bê xoay đầu (0 = tắt, 1 = to nhất)
-    graceMinMs: GRACE_MIN, // ân hạn đèn đỏ tối thiểu cho mọi người
+    graceMinMs: GRACE_MIN, // ân hạn đèn đỏ chung cho mọi người (tối thiểu khi bật perPlayerGrace)
+    perPlayerGrace: false, // bật: ân hạn từng người = độ trễ đo được lớn nhất + graceMarginMs (không nhỏ hơn graceMinMs)
     graceMarginMs: GRACE_MARGIN, // ân hạn = độ trễ lớn nhất đo được + chừng này
     runSpeed: BASE_SPEED, // bước/giây khi chạy (sân dài 120 bước)
     npcMin: 6, // sân ít người thật hơn số này thì thêm người máy cho đủ (0 = tắt)

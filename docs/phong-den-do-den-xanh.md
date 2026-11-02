@@ -266,6 +266,9 @@ Mô phỏng một người thả tim hết công suất, dừng khi THẤY đèn
   với từng người thật có tim về sau lúc nhạc dừng, ghi tim cuối về muộn bao lâu (`tailMs`), có bị bắn không, ân hạn lúc đó
   (cũng ghi vào `DATA_DIR/redlight-latency.log`). Tài khoản trong danh sách đo không bị bắn lúc đèn đỏ (chỉ đánh dấu "lẽ ra bị bắn").
   Gợi ý "Ân hạn tối thiểu" = tim muộn nhất của người đang đo + 0,8 s.
+- Đo bằng tài khoản visuzu trên live (03/11/2026): chơi chuẩn tim về muộn nhất 7,2 s → sống với ân hạn 7,5 s; bấm lố 2 s → 8,0 s → bị bắn.
+  Độ trễ đo đầu câu không liên quan độ trễ lúc dừng (người bắt đầu thả tim muộn bị đo 7–9 s, được nới ân hạn tối đa) → mặc định dùng
+  MỘT mức ân hạn chung (`graceMinMs`, phòng Squid đặt 7500 ms); `perPlayerGrace` bật lại cách tính riêng từng người.
 - Bình luận lúc đèn đỏ không bị tính là cử động. Mỗi lần bắt lỗi đèn đỏ (người thật) ghi vào `DATA_DIR/redlight-fairness.log`.
 - Cân lại theo câu hát: tốc độ 3,8 bước/giây, tối đa 10 bước/gói tim, dồn tối đa 22 bước → người thả tim hết công suất,
   dừng khi búp bê quay đầu, trễ 1–4,5 giây về đích ~64–67 giây / ván 90 giây; thả tim bất chấp vẫn bị loại 100%.
