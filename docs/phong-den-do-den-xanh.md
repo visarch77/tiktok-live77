@@ -324,6 +324,12 @@ Cân lại khi có "đà chạy" (người có đà luôn chạy đúng `runSpee
 
 Trước khi cân lại: Heart Me (1 xu) giết 3 người — đã đổi thành chạy nhanh; "lính bắn" chỉ còn ở Hand Hearts (100 xu).
 
+## Bình luận trên đầu người chơi
+
+Người chơi bình luận thì lời bình luận hiện thành bong bóng trên đầu nhân vật, ở mọi lúc: màn chờ (6 s), đang chạy
+và xem kết quả (4 s). Lúc chạy chỉ hiện 8 lời mới nhất cho sân đỡ rối; người đã bị loại / về đích không hiện.
+Vẫn lọc spam / lời xấu như cũ.
+
 ## Bảng kỉ lục
 
 Màn chờ hiện BẢNG KỈ LỤC (top 5 tổng qua các ván, lưu theo phòng): về đích +3 điểm, hạng 1/2/3 thêm 3/2/1,

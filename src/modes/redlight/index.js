@@ -225,7 +225,7 @@ function create(ctx, saved = {}) {
   // Lúc chờ ván: người đứng ở vạch xuất phát bình luận thì hiện trên đầu
   function sayFx(p, raw) {
     const text = sayText(raw);
-    if (text) ctx.broadcast('rl.fx', { kind: 'say', id: p.id, text, ms: SAY_MS });
+    if (text) ctx.broadcast('rl.fx', { kind: 'say', id: p.id, text, ms: phase === 'play' ? SAY_PLAY_MS : SAY_MS });
   }
   function queueAdd(u) {
     const key = viewerKey(u);
@@ -255,6 +255,7 @@ function create(ctx, saved = {}) {
     broadcastQueue();
   }
   const SAY_MS = 6000; // bình luận hiện trên đầu người ở hàng chờ / người đứng chờ ván
+  const SAY_PLAY_MS = 4000; // lúc đang chạy: hiện ngắn hơn cho sân đỡ rối
   function sayText(raw) {
     const t = sanitizeWishText(raw);
     return t.length > 42 ? `${t.slice(0, 41)}…` : t;
@@ -1206,6 +1207,7 @@ function create(ctx, saved = {}) {
           return np;
         }
         const now = Date.now();
+        sayFx(p, evt.text); // lời bình luận hiện trên đầu người chơi (cả lúc đang chạy / xem kết quả)
         // Bình luận lúc búp bê hát = commentLikes tim (mặc định 2), tối đa 1 lần / 1,5 giây
         if (phase === 'play') {
           // Luật chỉ bắt người còn thả tim: bình luận lúc đèn đỏ không bị bắn (người xem hay chat)
@@ -1219,7 +1221,6 @@ function create(ctx, saved = {}) {
           }
         } else {
           p.lastActiveAt = now;
-          if (phase === 'lobby') sayFx(p, evt.text);
         }
         return p;
       }

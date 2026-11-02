@@ -400,7 +400,7 @@
         break;
       }
       case 'say':
-        // bình luận của người đứng chờ ván (vạch xuất phát)
+        // bình luận của người chơi (vạch xuất phát / đang chạy / xem kết quả)
         if (s) s.say = { text: e.text, until: t0 + (e.ms || 6000) };
         break;
       case 'spotted':
@@ -969,6 +969,7 @@
       const fs = Math.round(18 * (s.gi ? 1.4 : 1));
       s.headX = x;
       s.headY = top - fs * 1.1;
+      s.headAt = tn; // đầu đang được vẽ ở khung này (bình luận chỉ hiện trên người đang hiện tên)
       // người máy lấp chỗ: tên biệt danh, chữ hơi xám xanh để khác người xem thật một chút
       text(s.n, x, top - fs * 0.55, { size: fs, weight: 400, color: flashing || spotted ? '#ff6b6b' : dead ? '#bbb' : s.b ? '#d6e2ec' : '#fff', stroke: 3 });
     }
@@ -1462,11 +1463,15 @@
     g.restore();
   }
 
-  // Bình luận của người đứng chờ ván ở vạch xuất phát
+  // Bình luận của người chơi hiện trên đầu: màn chờ hiện hết; lúc chạy chỉ hiện SAYS_MAX lời mới nhất cho sân đỡ rối
+  const SAYS_MAX = 8;
   function drawSays() {
-    if (ph.phase !== 'lobby') return;
     const tn = performance.now();
-    for (const s of sprites.values()) if (s.say && s.say.until > tn && s.headY) drawBubble(s.headX, s.headY, s.say.text, s.say.until);
+    let says = [...sprites.values()].filter((s) => s.say && s.say.until > tn && s.headY && tn - (s.headAt || 0) < 300);
+    if (ph.phase !== 'lobby') says = says.sort((a, b) => b.say.until - a.say.until).slice(0, SAYS_MAX);
+    // người phía trên sân vẽ trước để bong bóng người phía dưới (gần màn hình hơn) đè lên
+    says.sort((a, b) => a.headY - b.headY);
+    for (const s of says) drawBubble(s.headX, s.headY, s.say.text, s.say.until, ph.phase === 'lobby' ? 230 : 190);
   }
 
   function drawFx(t) {
