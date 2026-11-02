@@ -588,6 +588,38 @@
         describe: describeTempleEvent
       }
     };
+    MODE_UI.redlight = {
+      pointsLabel: 'Điểm (về đích +3, sống sót +1)',
+      actions: [
+        { icon: '▶️', name: 'Bắt đầu ván', desc: 'Bắt đầu ngay / tiếp tục', method: 'redlight.startRound' },
+        { icon: '🔴', name: 'Ép đèn đỏ', desc: 'Báo trước rồi chuyển đèn đỏ', method: 'redlight.forceRed' },
+        { icon: '🟢', name: 'Ép đèn xanh', desc: 'Chuyển đèn xanh ngay', method: 'redlight.forceGreen' },
+        { icon: '⏸', name: 'Tạm dừng / tiếp tục', desc: 'Dừng đồng hồ và đèn', method: 'redlight.pause' },
+        { icon: '🏁', name: 'Kết thúc ván', desc: 'Hiện kết quả ngay', method: 'redlight.endRound' },
+        { icon: '🔄', name: 'Ván mới', desc: 'Về màn chờ vào', method: 'redlight.newLobby' },
+        { icon: '👥', name: 'Thêm 20 người thử', desc: 'Người ảo vào game', method: 'redlight.testCrowd', params: { count: 20 } },
+        { icon: '🎁', name: 'Tặng quà thử', desc: 'Quà ngẫu nhiên → vật phẩm', method: 'redlight.testGift' }
+      ],
+      commentHint: 'Bình luận bất kỳ để vào chơi; đang chơi thì bình luận = động',
+      stats: (st) => [
+        { label: 'Ván', value: fmt(st.rl?.round), hint: st.rl?.phase === 'play' ? 'Đang chơi' : st.rl?.phase === 'lobby' ? 'Đang chờ vào' : 'Kết quả' },
+        { label: 'Đang chạy', value: fmt(st.rl?.counts?.alive), hint: `${fmt(st.rl?.counts?.players)} người chơi · ${fmt(st.rl?.counts?.clones)} bản sao` },
+        { label: 'Về đích', value: fmt(st.rl?.counts?.finished) }
+      ],
+      dangerActions: [
+        { label: '🧹 Xoá hết người chơi', method: 'redlight.clearPlayers', confirm: 'Xoá toàn bộ người chơi đang có trên sân?' }
+      ],
+      describe: (e) => {
+        const u = `<b>${esc(e.user || 'Người chơi')}</b>`;
+        switch (e.type) {
+          case 'rlRound': return { icon: '▶️', text: `Ván ${fmt(e.round)} bắt đầu với ${fmt(e.players)} người` };
+          case 'rlResult': return { icon: '🏆', text: `Ván ${fmt(e.round)} kết thúc: ${fmt(e.winners)}/${fmt(e.players)} về đích` };
+          case 'rlFinish': return { icon: '🏁', text: `${u} (số ${esc(e.num)}) về đích hạng ${esc(e.rank)}` };
+          case 'rlGift': return { icon: esc(e.emoji || '🎁'), text: `${u} tặng ${esc(e.gift)} → ${esc(e.label)}` };
+          default: return { icon: '✨', text: `${u} tương tác` };
+        }
+      }
+    };
     const DEFAULT_MODE_UI = { pointsLabel: 'Điểm', actions: [], stats: () => [], dangerActions: [], describe: (e) => ({ icon: '✨', text: `<b>${esc(e.user || 'Người xem')}</b> tương tác` }) };
 
     // ======================================================================
@@ -1091,7 +1123,27 @@
         `;
         return;
       }
-      body.innerHTML = `
+      const rlRange = (key, label, desc, min, max, step, unit) => `
+        <div class="setting">
+          <div><div class="setting-name">${label}</div>${desc ? `<div class="setting-desc">${desc}</div>` : ''}</div>
+          <div class="range-wrap"><input type="range" min="${min}" max="${max}" step="${step}" value="${esc(s[key])}" data-setting="${key}" data-raw="1" data-unit="${unit}" /><output>${esc(s[key])}${unit}</output></div>
+        </div>`;
+      const rlExtra = currentRoom()?.mode !== 'redlight' ? '' : `
+        <div class="setting">
+          <div><div class="setting-name">Tự chạy liên tục</div><div class="setting-desc">Tắt: hết ván thì dừng, chờ bấm “Bắt đầu ván” (có người điều phối)</div></div>
+          <label class="switch"><input type="checkbox" data-setting="autoLoop" ${s.autoLoop !== false ? 'checked' : ''} /><span></span></label>
+        </div>
+        ${rlRange('lobbySeconds', 'Thời gian chờ vào', '', 5, 120, 1, 's')}
+        ${rlRange('roundSeconds', 'Thời gian một ván', '', 30, 600, 5, 's')}
+        ${rlRange('greenMin', 'Đèn xanh ngắn nhất', '', 1, 20, 1, 's')}
+        ${rlRange('greenMax', 'Đèn xanh dài nhất', '', 1, 30, 1, 's')}
+        ${rlRange('redMin', 'Đèn đỏ ngắn nhất', 'Phải dài hơn thời gian ân hạn', 2, 20, 1, 's')}
+        ${rlRange('redMax', 'Đèn đỏ dài nhất', '', 2, 30, 1, 's')}
+        ${rlRange('redGraceMs', 'Ân hạn đèn đỏ', 'Hình trên TikTok tới người xem chậm vài giây — chỉ bắt lỗi sau khoảng này', 0, 6000, 100, 'ms')}
+        ${rlRange('stepPerLike', 'Bước mỗi lượt tim', 'Sân dài 100 bước', 0.05, 5, 0.05, '')}
+        ${rlRange('maxPlayers', 'Số người chơi tối đa', '', 5, 200, 5, ' người')}
+        ${rlRange('simCrowd', 'Số người ảo khi giả lập', '', 5, 200, 5, ' người')}`;
+      body.innerHTML = `${rlExtra}
         <div class="setting">
           <div><div class="setting-name">Giọng đọc</div><div class="setting-desc">Đọc tên & lời nhắn của người xem</div></div>
           <label class="switch"><input type="checkbox" data-setting="ttsEnabled" ${s.ttsEnabled !== false ? 'checked' : ''} /><span></span></label>
@@ -1188,7 +1240,7 @@
       const manualGather = ph.id === 'gather' && s.autoRun === false;
       body.innerHTML = `
         <div class="now-line">
-          <span class="badge ${ph.id === 'gather' || isPaused ? 'wait' : 'live'}">${ph.id === 'gather' ? '🌸 Dâng hương' : isPaused ? 'Tạm dừng' : '📿 Tụng kinh'}</span>
+          <span class="badge ${ph.id === 'gather' || isPaused ? 'wait' : 'live'}">${ph.id === 'gather' ? '🌸 Dâng hương' : isPaused ? 'Tạm dừng' : ph.id === 'dharma' ? (ph.talk && ph.talk.kind === 'kinh' ? '📿 Nghe tụng kinh' : '🎧 Nghe pháp') : '📿 Tụng kinh'}</span>
           <span>Bước hiện tại:</span>
           <b>${esc(ph.sutra ? `${ph.title} (bài ${ph.sutra.num})` : ph.title || '—')}</b>
           ${ph.sessionSutra && !ph.sutra ? `<span class="muted">· khoá này: ${esc(ph.sessionSutra.name)}</span>` : ''}
@@ -1208,9 +1260,14 @@
             ? '<button class="btn" data-act="chant-resume">▶ Tiếp tục</button>'
             : '<button class="btn" data-act="chant-pause">⏸ Tạm dừng</button>'}
         </div>
+        ${ph.id === 'dharma' ? `<div class="btn-row" style="margin-top:10px"><span class="muted">🎧 Đang phát:</span> <b>${esc(ph.talk ? ph.talk.title : 'chưa có bài pháp')}</b>
+          <button class="btn sm" data-act="dharma-next">⏭ Bài kế</button>
+          <select class="input" data-setting="dharmaLabel" style="width:auto;height:32px" title="Tiêu đề trên màn hình live">
+            ${[['auto', 'Tiêu đề: tự đoán theo tên bài'], ['kinh', 'Tiêu đề: 📿 Nghe tụng kinh'], ['phap', 'Tiêu đề: 🎧 Nghe pháp']].map(([v, l]) => `<option value="${v}" ${(s.dharmaLabel || 'auto') === v ? 'selected' : ''}>${l}</option>`).join('')}
+          </select></div>` : ''}
         <div class="mode-pick">
           <span class="muted">Chế độ phòng:</span>
-          ${[['auto', '🔄 Tự động', `Dâng hương ${fmt(Number(s.offeringMinutes) || 5)}′ ⇄ Tụng kinh ${fmt(Number(s.chantMinutes) || 20)}′`], ['offering', '🌸 Dâng hương', 'Ở lại Dâng hương, không tự vào tụng'], ['chant', '📿 Tụng kinh', 'Tụng liên tục, hết khoá vào khoá mới']]
+          ${[['auto', '🔄 Tự động', `Dâng hương ${fmt(Number(s.offeringMinutes) || 5)}′ ⇄ Tụng kinh ${fmt(Number(s.chantMinutes) || 20)}′`], ['offering', '🌸 Dâng hương', 'Ở lại Dâng hương, không tự vào tụng'], ['chant', '📿 Tụng kinh', 'Tụng liên tục, hết khoá vào khoá mới'], ['dharma', '🎧 Nghe pháp / kinh', `Phát bài pháp, bài kinh YouTube · ${fmt((s.dharmaList || []).length)} bài`]]
             .map(([v, l, d]) => `<button class="mode-btn ${roomModeOf(s) === v ? 'on' : ''}" data-act="room-mode" data-mode="${v}"><b>${l}</b><small>${d}</small></button>`).join('')}
         </div>
         <div class="ctl-grid" style="margin-top:16px">
@@ -1374,12 +1431,27 @@
       };
       return `<div class="playlists">${box('musicList', '🌸 Danh sách Dâng hương', false)}${box('musicListChant', '📿 Danh sách Tụng kinh', true)}</div>`;
     }
+    // Bài pháp cho chế độ Nghe pháp: chỉ chọn trong nhạc đã nhập (YouTube / file)
+    function dharmaListHtml() {
+      const s = roomState?.settings || {};
+      const list = s.dharmaList || [];
+      const files = (musicFiles || []).map((f) => `<option value="file:${esc(f.file)}">${f.source === 'youtube' ? '▶️' : '🎵'} ${esc(f.title)}</option>`).join('');
+      return `<div class="playlist">
+          <div class="setting-name">🎧 Danh sách bài pháp <span class="muted">· ${list.length} bài · phát lần lượt, hết thì quay lại bài đầu</span></div>
+          <ol class="pl-items">${list.map((t, i) => `<li><span class="pl-title">${esc(trackTitle(t))}</span>
+            <button class="btn sm" data-act="pl-up" data-key="dharmaList" data-idx="${i}" ${i === 0 ? 'disabled' : ''} title="Lên trên">↑</button>
+            <button class="btn sm danger" data-act="pl-remove" data-key="dharmaList" data-idx="${i}" title="Bỏ khỏi danh sách">✕</button></li>`).join('') || '<li class="muted">Trống — nhập bài pháp từ YouTube ở mục bên dưới rồi thêm vào đây</li>'}</ol>
+          <div class="input-group"><select class="input" id="plAdd-dharmaList">${files || '<option value="">(chưa có file nào)</option>'}</select><button class="btn sm" data-act="pl-add" data-key="dharmaList">＋ Thêm</button></div>
+        </div>`;
+    }
     async function savePlaylist(key, list) {
       try {
         await rpc('room.updateSettings', { roomId: currentId, [key]: list });
         if (roomState?.settings) roomState.settings[key] = list;
         const box = $('#playlists');
         if (box) box.innerHTML = playlistsHtml();
+        const dl = $('#dharmaList');
+        if (dl) dl.innerHTML = dharmaListHtml();
         toast('Đã lưu danh sách phát');
       } catch (_) {}
     }
@@ -1408,6 +1480,8 @@
       renderMusicLibrary();
       const pl = $('#playlists');
       if (pl) pl.innerHTML = playlistsHtml();
+      const dl = $('#dharmaList');
+      if (dl) dl.innerHTML = dharmaListHtml();
       // Đang tải: hỏi lại sau 3 giây
       clearTimeout(musicPoll);
       if (musicJobs.some((j) => j.status === 'running')) musicPoll = setTimeout(loadMusicFiles, 3000);
@@ -1535,6 +1609,7 @@
             `)}
             ${section('offering', `
               ${group('Lúc dâng hương (tụ hội)', `${sw('speakWishes', 'Đọc lời chúc & lời cảm ơn', 'Đọc lời chúc thật tâm (bỏ qua bình luận khiếm nhã), chào người mới, cảm ơn người dâng quà. Lúc tụng kinh chỉ có tiếng pháp — lời chúc hiện ở bảng trái')}
+                ${num('autoIncenseBelow', '🔥 Người mới vào tự lên dâng hương khi dưới', 0, 100000, 'người xem', 'Phòng ít người: ai vào live cũng tự bước lên chánh điện dâng hương, không cần bình luận (không tính vào lượt dâng hương). 0 = tắt')}
                 ${num('welcomeEachBelow', '👋 Chào từng người khi dưới', 0, 100000, 'người xem', 'Phòng còn ít người xem: đọc tên từng người mới vào kèm một lời chúc cho đạo tràng không im lặng. Đông hơn thì gom tên, 25 giây chào một lần. 0 = tắt')}`)}
               ${group('Lời dẫn chuyển chế độ', `
                 ${sw('speakTransitions', 'Đọc lời dẫn khi chuyển Dâng hương ⇄ Tụng kinh', 'Sau kết chuông: tuỳ hỷ & mời dâng hương, báo giờ khoá sau · Còn 1 phút: nhắc gửi lời chúc · Trước khi tụng: mời ngồi ngay ngắn, tạm ngưng bình luận, thả tim theo mõ')}
@@ -1584,6 +1659,11 @@
                     </div></div>`;
                 }).join('')}
                 </div>`, 'Nhạc tự đổi khi phòng chuyển Dâng hương ⇄ Tụng kinh. Bật “🔇 Nghe thử” dưới khung live để nghe.')}
+              ${group('Bài pháp — chế độ Nghe pháp', `
+                <div id="dharmaList">${dharmaListHtml()}</div>
+                ${sel('dharmaLabel', 'Tiêu đề trên màn hình live', [['auto', 'Tự đoán theo tên bài (có chữ “kinh”, “tụng”, “chú”… → Nghe tụng kinh)'], ['kinh', '📿 Luôn ghi “Nghe tụng kinh”'], ['phap', '🎧 Luôn ghi “Nghe pháp”']], 'auto')}
+                ${vol('dharmaVolume', '🎧 Âm lượng bài pháp', 0.9, 'Lúc nghe pháp nhạc nền tắt, không đọc lời chúc để mọi người nghe rõ')}`,
+                'Chọn chế độ <b>🎧 Nghe pháp</b> ở tab Điều khiển. Nhập bài pháp bằng link YouTube ở mục bên dưới (chỉ phần âm thanh). <b>Chỉ dùng bài pháp được phép phát lại trên livestream.</b>')}
               ${group('Nhạc của bạn — nhập từ YouTube', `
                 <div class="input-group">
                   <input class="input" id="ytUrl" placeholder="Dán link YouTube, ví dụ https://www.youtube.com/watch?v=…" />
@@ -1663,9 +1743,10 @@
         case 'chant-start': return call('chanting.startSession', {}, 'Đã bắt đầu khoá tụng');
         case 'chant-next': return call('chanting.nextPhase', {}, 'Đã sang bước tiếp');
         case 'room-mode': {
-          const labels = { auto: 'Tự động', offering: 'Dâng hương', chant: 'Tụng kinh' };
+          const labels = { auto: 'Tự động', offering: 'Dâng hương', chant: 'Tụng kinh', dharma: 'Nghe pháp' };
           return call('room.updateSettings', { roomMode: btn.dataset.mode }, `Đã chuyển sang ${labels[btn.dataset.mode]}`);
         }
+        case 'dharma-next': return call('chanting.dharmaNext', {}, 'Đã chuyển sang bài kế');
         case 'chant-pause': return call('chanting.pause', {}, 'Đã tạm dừng');
         case 'chant-resume': return call('chanting.resume', {}, 'Đã tiếp tục');
         case 'chant-jump': return call('chanting.jumpTo', { phase: btn.dataset.phase }, `Đã chuyển đến: ${btn.textContent.trim()}`);
