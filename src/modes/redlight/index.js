@@ -245,6 +245,11 @@ function create(ctx, saved = {}) {
       join(u);
       return;
     }
+    queueReserve(q);
+  }
+  // giữ chỗ hàng chờ ván sau (bình luận hoặc thả đủ tim lúc đang chơi / xem kết quả)
+  function queueReserve(q) {
+    if (q.ok) return;
     q.ok = true;
     q.okAt = Date.now();
     broadcastQueue();
@@ -1073,9 +1078,11 @@ function create(ctx, saved = {}) {
         const id = byKey.get(viewerKey(u));
         const p = id && players.get(id);
         if (!p) {
-          // đang chơi / xem kết quả: vào hàng chờ ván sau (phải thả đủ tim để giữ chỗ)
+          // đang chơi / xem kết quả: bình luận là giữ chỗ hàng chờ ván sau ngay (như thả đủ tim), lời bình luận hiện trên đầu
           if (phase !== 'lobby') {
             queueAdd(u);
+            const q = queue.get(viewerKey(u));
+            if (q) queueReserve(q);
             queueSay(u, evt.text);
             return null;
           }

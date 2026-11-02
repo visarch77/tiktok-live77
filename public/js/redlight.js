@@ -1295,7 +1295,7 @@
   function drawQueue(t) {
     if (ph.phase === 'lobby' || !queueList.length) return;
     text('⏳ HÀNG CHỜ VÁN SAU', SAFE_L + 6, QY, { size: 17, weight: 900, color: '#ffd43b', align: 'left', stroke: 3 });
-    text(`thả ${queueNeed} ❤️ để giữ chỗ`, SAFE_R - 6, QY, { size: 15, weight: 500, color: '#fff', align: 'right', stroke: 3 });
+    text(`bình luận / thả ${queueNeed} ❤️ để giữ chỗ`, SAFE_R - 6, QY, { size: 15, weight: 500, color: '#fff', align: 'right', stroke: 3 });
     const more = queueList.length > QMAX ? queueList.length - (QMAX - 1) : 0;
     const shown = more ? queueList.slice(0, QMAX - 1) : queueList;
     const slots = shown.length + (more ? 1 : 0);
