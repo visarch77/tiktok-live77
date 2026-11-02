@@ -255,7 +255,7 @@ function create(ctx, saved = {}) {
     broadcastQueue();
   }
   const SAY_MS = 6000; // bình luận hiện trên đầu người ở hàng chờ / người đứng chờ ván
-  const SAY_PLAY_MS = 2500; // lúc đang chạy / xem kết quả: hiện nhanh rồi tắt cho sân đỡ rối
+  const SAY_PLAY_MS = 1000; // lúc đang chạy / xem kết quả: hiện nhanh rồi tắt cho sân đỡ rối
   function sayText(raw) {
     const t = sanitizeWishText(raw);
     return t.length > 42 ? `${t.slice(0, 41)}…` : t;

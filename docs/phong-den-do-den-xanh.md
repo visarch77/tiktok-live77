@@ -327,7 +327,7 @@ Trước khi cân lại: Heart Me (1 xu) giết 3 người — đã đổi thàn
 ## Bình luận trên đầu người chơi
 
 Người chơi bình luận thì lời bình luận hiện thành bong bóng trên đầu nhân vật, ở mọi lúc: màn chờ (6 s), đang chạy
-và xem kết quả (2,5 s, nền trắng trong suốt 55%). Lúc chạy chỉ hiện 8 lời mới nhất cho sân đỡ rối; người đã bị loại / về đích không hiện.
+và xem kết quả (1 s, nền trắng trong suốt 55%). Lúc chạy chỉ hiện 8 lời mới nhất cho sân đỡ rối; người đã bị loại / về đích không hiện.
 Vẫn lọc spam / lời xấu như cũ.
 
 ## Bảng kỉ lục
