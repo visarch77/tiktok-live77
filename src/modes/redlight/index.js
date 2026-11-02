@@ -490,6 +490,12 @@ function create(ctx, saved = {}) {
     for (const c of clonesOf(p)) c.momentumUntil = until;
   }
 
+  // Bản sao chết thay chủ (đèn đỏ, bị dẫm, đẩy ngã, lính bắn — trừ hết giờ): trả về bản sao còn sống, không thì chính chủ
+  function standIn(v) {
+    if (v.cloneOf) return v;
+    return clonesOf(v).find((c) => c.alive && !c.doomAt) || v;
+  }
+
   function violate(p) {
     if (!p.alive || p.finishRank) return;
     if (p.shield > 0) {
@@ -702,7 +708,7 @@ function create(ctx, saved = {}) {
           continue;
         }
         st.count++;
-        eliminate(v, 'stomp');
+        eliminate(standIn(v), 'stomp'); // có bản sao thì bản sao chết thay
       }
     }
   }
@@ -725,8 +731,9 @@ function create(ctx, saved = {}) {
           .filter((v) => v.key !== p.key && v.shield <= 0 && v.giantUntil < now)
           .sort(() => Math.random() - 0.5)
           .slice(0, Math.min(6, 2 * n));
-        for (const v of victims) eliminate(v, 'buffalo');
-        ctx.broadcast('rl.fx', { kind: 'buffalo', from: p.id, ids: victims.map((v) => v.id) });
+        const shot = victims.map(standIn); // có bản sao thì bản sao chết thay
+        for (const v of shot) eliminate(v, 'buffalo');
+        ctx.broadcast('rl.fx', { kind: 'buffalo', from: p.id, ids: shot.map((v) => v.id) });
         break;
       }
       case 'crowd':
@@ -771,11 +778,12 @@ function create(ctx, saved = {}) {
             announce(`${giver} đẩy ${victim} nhưng khiên đỡ được!`);
             continue;
           }
-          v.doomAt = now + SPOT_MS;
-          v.doomCause = 'shove';
-          v.pending = 0;
-          ctx.broadcast('rl.fx', { kind: 'shove', from: p.id, id: v.id, ms: SPOT_MS });
-          announce(`${victim} bị ${giver} trượt tay đẩy ngã!`);
+          const fall = standIn(v); // có bản sao thì bản sao ngã thay
+          fall.doomAt = now + SPOT_MS;
+          fall.doomCause = 'shove';
+          fall.pending = 0;
+          ctx.broadcast('rl.fx', { kind: 'shove', from: p.id, id: fall.id, ms: SPOT_MS });
+          announce(fall === v ? `${victim} bị ${giver} trượt tay đẩy ngã!` : `${victim} bị ${giver} trượt tay đẩy, bản sao ngã thay!`);
         }
         break;
       }
@@ -839,7 +847,7 @@ function create(ctx, saved = {}) {
     turbo: (n) => `${n} tăng tốc!`,
     shield: (n) => `${n} có khiên!`,
     clones: (n) => `${n} phân thân!`,
-    crowd: (n) => `${n} gọi mười bản sao!`,
+    crowd: (n) => `${n} gọi năm bản sao!`,
     wind: (n) => `${n} cho búp bê hét, đẩy lùi người dẫn đầu!`,
     giant: (n) => `${n} hoá khổng lồ!`,
     chicken: (n) => `${n} biến người dẫn đầu thành gà!`,

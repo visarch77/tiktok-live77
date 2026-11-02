@@ -549,7 +549,7 @@
         break;
       case 'crowd':
         for (let i = 0; i < 5; i++) addSprite('fx_smoke', p.x + (Math.random() - 0.5) * 160, p.y - 20, 30, 120, 700, t0 + i * 60);
-        fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.5, text: '×10 BẢN SAO!', color: '#9ff0b9', size: 30, t0, life: 1400 });
+        fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.5, text: '×5 BẢN SAO!', color: '#9ff0b9', size: 30, t0, life: 1400 });
         break;
       default:
         break;

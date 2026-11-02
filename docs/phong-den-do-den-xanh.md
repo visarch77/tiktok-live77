@@ -278,6 +278,8 @@ Mô phỏng một người thả tim hết công suất, dừng khi THẤY đèn
   1,2 s rồi lính bắn; khiên đỡ được, khổng lồ không ngã; có tác dụng ngay kể cả lúc đèn đỏ. Giọng đọc: "A bị B trượt tay đẩy ngã!".
 - Khiên (Finger Heart): chịu 1 phát bắn lúc đèn đỏ, đổi lại được nhấp tim suốt lần búp bê quay lại đó mà không bị bắn thêm;
   tim nhấp lúc đỏ vẫn cộng vào bước dồn, chạy ở câu hát sau. Lần đèn đỏ kế tiếp cần khiên khác.
+- Vòng cổ còn 5 bản sao (trước 10). Bản sao chết thay chủ trong mọi trường hợp — lỗi đèn đỏ, bị cướp biển dẫm, bị đẩy ngã,
+  lính bắn (Hand Hearts) — trừ lúc hết giờ lính xả súng.
 - Bình luận lúc đèn đỏ không bị tính là cử động. Mỗi lần bắt lỗi đèn đỏ (người thật) ghi vào `DATA_DIR/redlight-fairness.log`.
 - Cân lại theo câu hát: tốc độ 3,8 bước/giây, tối đa 10 bước/gói tim, dồn tối đa 22 bước → người thả tim hết công suất,
   dừng khi búp bê quay đầu, trễ 1–4,5 giây về đích ~64–67 giây / ván 90 giây; thả tim bất chấp vẫn bị loại 100%.

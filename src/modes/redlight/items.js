@@ -12,7 +12,7 @@
  *   chicken   hoá gà: người dẫn đầu (trừ người tặng) chạy chậm 5 giây (không còn quà nào dùng)
  *   shove     đẩy ngã: người tặng "trượt tay" đẩy người đứng gần nhất ngã → lính bắn (khiên đỡ được, khổng lồ không ngã)
  *   teamShield khiên cho 10 người đứng gần và người tặng
- *   crowd     đám bản sao: 10 bản sao chạy quanh mình, chết thay mình (không hại ai)
+ *   crowd     đám bản sao: 5 bản sao chạy quanh mình, chết thay mình (đèn đỏ, bị dẫm / đẩy / bắn; trừ hết giờ)
  *   stomp     khổng lồ dẫm: nhân vật của người tặng hoá khổng lồ đi ngang một làn sân ngay trước mặt mình,
  *             dẫm tối đa 5 người trong làn (khiên đỡ được, khổng lồ không bị dẫm); quà đắt
  */
@@ -34,7 +34,7 @@ const ITEMS = {
   confetti: { kind: 'teamShield', emoji: '🫧', label: 'Khiên đồng đội' },
   fireworks: { kind: 'teamShield', emoji: '🫧', label: 'Khiên đồng đội' },
   'hand hearts': { kind: 'buffalo', emoji: '🎯', label: 'Lính bắn' },
-  'friendship necklace': { kind: 'crowd', emoji: '👥', label: '10 bản sao', clones: 10 },
+  'friendship necklace': { kind: 'crowd', emoji: '👥', label: '5 bản sao', clones: 5 },
   sunglasses: { kind: 'stomp', emoji: '🦶', label: 'Khổng lồ dẫm' }
 };
 
@@ -45,7 +45,7 @@ const LEGEND = [
   { gift: 'Kem', tiktok: 'Ice Cream Cone', coins: 1, kind: 'clones', emoji: '👥', label: 'Bản sao', short: '1 BẢN SAO', desc: 'bản sao chết thay mình' },
   { gift: 'GG', tiktok: 'GG', coins: 1, kind: 'shove', emoji: '🤚', label: 'Đẩy ngã', short: 'ĐẨY NGÃ', desc: 'đẩy người gần nhất ngã, bị lính bắn' },
   { gift: 'Finger Heart', tiktok: 'Finger Heart', coins: 5, kind: 'shield', emoji: '🛡️', label: 'Khiên', short: 'KHIÊN', desc: 'chịu 1 phát bắn, được nhấp tim cả lúc búp bê quay lại' },
-  { gift: 'Vòng cổ', tiktok: 'Friendship Necklace', coins: 10, kind: 'crowd', emoji: '👥', label: '10 bản sao', short: '10 BẢN SAO', desc: 'cả đám bản sao chạy quanh mình' },
+  { gift: 'Vòng cổ', tiktok: 'Friendship Necklace', coins: 10, kind: 'crowd', emoji: '👥', label: '5 bản sao', short: '5 BẢN SAO', desc: '5 bản sao chạy quanh mình, chết thay mình' },
   { gift: 'Donut', tiktok: 'Doughnut', coins: 30, kind: 'wind', emoji: '📢', label: 'Búp bê hét', short: 'ĐẨY LÙI 5', desc: 'đẩy lùi 5 người dẫn đầu' },
   { gift: 'Mũ & ria', tiktok: 'Hat and Mustache', coins: 99, kind: 'giant', emoji: '💪', label: 'Khổng lồ', short: 'KHỔNG LỒ', desc: '15 giây mỗi tim đi gấp đôi' },
   { gift: 'Hand Hearts', tiktok: 'Hand Hearts', coins: 100, kind: 'buffalo', emoji: '🎯', label: 'Lính bắn', short: 'BẮN 2', desc: 'lính bắn 2 người đang chạy' },
