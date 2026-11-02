@@ -38,7 +38,7 @@ function list() {
     files = fs.readdirSync(MUSIC_DIR).filter((f) => AUDIO_RE.test(f)).sort();
   } catch (_) {}
   const lib = readLibrary();
-  return files.map((file) => ({ file, title: (lib[file] && lib[file].title) || file.replace(AUDIO_RE, ''), source: lib[file] ? lib[file].source : 'file', url: lib[file] ? lib[file].url : null }));
+  return files.map((file) => ({ file, title: (lib[file] && lib[file].title) || file.replace(AUDIO_RE, ''), source: lib[file] ? lib[file].source : 'file', url: lib[file] ? lib[file].url : null, duration: lib[file] && lib[file].duration ? Number(lib[file].duration) : null }));
 }
 
 /** Tách mã video (11 ký tự) từ link YouTube */

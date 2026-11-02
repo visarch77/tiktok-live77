@@ -116,8 +116,8 @@
   }
   // Nhạc theo chế độ: Dâng hương một bài/danh sách, Tụng kinh một bài/danh sách ("preset:none" = tắt nhạc, chỉ tiếng pháp)
   function applyModeMusic() {
-    if (phase && phase.id === 'ended') {
-      // Buổi live đã viên mãn: nhạc nhỏ dần rồi tắt
+    if (phase && (phase.id === 'ended' || phase.id === 'dharma')) {
+      // Buổi live đã viên mãn / đang nghe pháp: nhạc nhỏ dần rồi tắt
       clearTimeout(presetTimer);
       if (ambient && ambient.running) ambient.stop();
       musicTrack = 'preset:none';
@@ -174,10 +174,60 @@
     }
   })();
 
+  // ------------------------------------------------------------------------
+  // Nghe pháp: phát bài pháp (file nhạc đã nhập từ YouTube) đồng bộ theo giờ server — mở trang giữa chừng
+  // thì nghe tiếp đúng đoạn đang phát. Đi qua AudioContext để nút tắt tiếng / xem trước vẫn điều khiển được.
+  // ------------------------------------------------------------------------
+  let talk = null; // { key, el, gain }
+  let talkAllowed = false; // chỉ phát sau khi đã bật âm thanh (hoặc trang OBS)
+  let dharmaVolume = 0.9;
+  function stopTalk() {
+    if (!talk) return;
+    const { el, gain, src } = talk;
+    talk = null;
+    try { gain.gain.setTargetAtTime(0.0001, gain.context.currentTime, 0.5); } catch (_) {}
+    setTimeout(() => { el.pause(); el.removeAttribute('src'); try { src.disconnect(); gain.disconnect(); } catch (_) {} }, 2000);
+  }
+  // Chữ hiển thị theo loại bài: tụng kinh hay pháp thoại
+  function talkWords() {
+    const kinh = phase && phase.talk && phase.talk.kind === 'kinh';
+    return kinh
+      ? { head: '📿 Nghe tụng kinh', doing: 'Đang nghe tụng kinh', body: 'Mời đại chúng cùng lắng nghe và tụng theo trong tâm', hint: 'Lắng nghe · tụng theo trong tâm' }
+      : { head: '🎧 Nghe pháp', doing: 'Đang nghe pháp', body: 'Mời đại chúng cùng lắng nghe pháp thoại', hint: 'Lắng nghe pháp thoại · thả tim tuỳ hỷ' };
+  }
+  function syncDharma() {
+    const t = phase && phase.id === 'dharma' ? phase.talk : null;
+    if (!t) return stopTalk();
+    if (!talkAllowed) return;
+    const key = `${t.url}|${phase.startedAt}`;
+    if (talk && talk.key === key) {
+      talk.gain.gain.setTargetAtTime(dharmaVolume, talk.gain.context.currentTime, 0.2);
+      return;
+    }
+    stopTalk();
+    const ctx = audio.ensureContext();
+    const el = new Audio(t.url);
+    el.preload = 'auto';
+    const src = ctx.createMediaElementSource(el);
+    const gain = ctx.createGain();
+    gain.gain.value = dharmaVolume;
+    src.connect(gain);
+    gain.connect(ctx.destination);
+    talk = { key, el, gain, src };
+    const startedAt = phase.startedAt;
+    el.addEventListener('loadedmetadata', () => {
+      const offset = Math.max(0, (serverNow() - startedAt) / 1000);
+      if (offset > 1 && offset < el.duration - 1) el.currentTime = offset;
+      el.play().catch(() => {});
+    }, { once: true });
+  }
+
   function startMusic() {
+    talkAllowed = true;
+    syncDharma();
     const ctx = audio.ensureContext();
     if (!ambient) ambient = new window.AmbientMusic(ctx, { volume: musicVolume, fileVolume: fileMusicVolume, nature: natureOn });
-    if (useList(musicKey()) || (phase && phase.id === 'ended')) {
+    if (useList(musicKey()) || (phase && (phase.id === 'ended' || phase.id === 'dharma'))) {
       listSig = '';
       musicTrack = '';
       return applyModeMusic();
@@ -282,7 +332,8 @@
     nextCue: phase && phase.cues ? phase.cues[cueIdx] || null : null,
     elapsed: phase ? serverNow() - phase.startedAt : 0,
     played: { ...cueCount },
-    music: ambient ? { running: ambient.running, track: musicTrack, level: Number(ambient.level().toFixed(4)) } : null
+    music: ambient ? { running: ambient.running, track: musicTrack, level: Number(ambient.level().toFixed(4)) } : null,
+    talk: talk ? { url: talk.el.src, time: Math.round(talk.el.currentTime), paused: talk.el.paused } : null
   });
 
   // Xem trước trong trang quản lý: tắt tiếng mặc định, bật / tắt qua postMessage
@@ -472,9 +523,9 @@
     const show = new Set();
     for (const c of cands) {
       if (show.size >= MAX_NAMES) break;
-      const font = Math.round((9 + 5 * c.pos.scale) * 1.2); // người ngồi: tên nhỏ, nhẹ (người đi lên mới nổi bật)
+      const font = Math.round((9 + 5 * c.pos.scale) * 1.56); // người ngồi: chữ thẳng dễ đọc, vừa đủ to (người đi lên mới nổi bật)
       const label = c.name.length > 16 ? `${c.name.slice(0, 15)}…` : c.name;
-      const w = Math.min(label.length * font * 0.48 + 14, 150);
+      const w = Math.min(label.length * font * 0.66 + 24, 220);
       const h = font + 6;
       const cx = Math.min(1080 - w / 2 - 4, Math.max(w / 2 + 4, c.pos.x));
       const cy = c.pos.y - 50 * c.pos.scale; // giữa lưng người quỳ
@@ -710,6 +761,7 @@
     const wasOffering = $('stage').classList.contains('offering');
     $('stage').classList.toggle('offering', isOfferingPhase(p) || p.id === 'ended');
     applyModeMusic();
+    syncDharma();
     renderEnding();
     if (lastCatalog) renderMarquee(lastCatalog);
     // Đổi chế độ (dâng hương ⇄ tụng kinh): nhắc hướng dẫn một lượt
@@ -717,9 +769,10 @@
     if (p.id === 'bell_close') fx.shower(6, 1.6); // khoá tụng viên mãn: mưa hoa
 
     const style = p.voice === 'intoned' ? ' · xướng' : p.voice === 'mo' ? ' · đồng tụng' : '';
-    $('spPhase').textContent = p.sutra ? `Tụng kinh · Bài ${p.sutra.num}${style}` : `${p.title}${style}`;
-    $('spTitle').textContent = p.sutra ? p.sutra.name : p.title;
-    $('spSub').textContent = p.subtitle || '';
+    $('spPhase').textContent = p.id === 'dharma' ? talkWords().head : p.sutra ? `Tụng kinh · Bài ${p.sutra.num}${style}` : `${p.title}${style}`;
+    $('spTitle').textContent = p.id === 'dharma' && p.talk ? p.talk.title : p.sutra ? p.sutra.name : p.title;
+    $('spSub').textContent = p.id === 'dharma' ? '' : p.subtitle || '';
+    $('spQuiet').textContent = p.id === 'dharma' ? `${talkWords().head.split(' ')[0]} ${talkWords().doing} — mời mọi người lắng nghe, thả tim tuỳ hỷ` : '🙏 Đang tụng kinh — xin tạm ngưng bình luận, cùng thả tim theo nhịp mõ';
     renderPhaseBody();
     renderNextUp();
   }
@@ -740,6 +793,12 @@
       body.innerHTML = `<div class="sp-message">Đạo tràng đang tụ hội — nam ngồi bên trái, nữ bên phải<br>${
         next ? `Khoá sắp tới sẽ cùng tụng <b>${esc(next.name)}</b>` : 'Bình luận <b>“kinh 1–9”</b> để đề nghị bài kinh cho cả phòng'
       }<br><span style="font-size:17px;opacity:.75">Hình chưa đúng? Bình luận <b>“nam”</b> hoặc <b>“nữ”</b></span></div>`;
+      return;
+    }
+    if (phase.id === 'dharma') {
+      body.innerHTML = phase.talk
+        ? `<div class="sp-message">${talkWords().body}<br><span style="font-size:17px;opacity:.75">Thả tim tuỳ hỷ · gửi lời chúc trong khung bình luận</span></div>`
+        : `<div class="sp-message">${esc(phase.subtitle || '')}</div>`;
       return;
     }
     if (phase.id === 'ended') {
@@ -776,7 +835,9 @@
   function renderNextUp() {
     const el = $('spNext');
     const next = nextUpList[0];
-    if (next) {
+    if (phase && phase.id === 'dharma') {
+      el.innerHTML = 'Hết bài sẽ tự phát bài kế tiếp';
+    } else if (next) {
       const who = next.chosen ? 'được chọn' : `${fmt(next.votes)} bạn đề nghị`;
       el.innerHTML = `Khoá sau: <b>${esc(next.name)}</b> · ${who}`;
     } else {
@@ -887,6 +948,7 @@
     if (phase.voice === 'mo') $('rhythmText').textContent = 'Thả tim theo nhịp mõ';
     else if (phase.voice === 'intoned') $('rhythmText').textContent = 'Lắng nghe · chắp tay khi chuông vang';
     else if (phase.id === 'silence') $('rhythmText').textContent = 'Ngồi yên · không cần thả tim';
+    else if (phase.id === 'dharma') $('rhythmText').textContent = talkWords().hint;
     else $('rhythmText').textContent = 'Chắp tay khi chuông vang';
     el.classList.add('show');
   }
@@ -1010,6 +1072,7 @@
       if (st.settings.musicTrack) trackOffering = st.settings.musicTrack;
       if (st.settings.musicTrackChant) trackChant = st.settings.musicTrackChant;
       if (st.settings.musicPlayMode) playMode = st.settings.musicPlayMode;
+      if (typeof st.settings.dharmaVolume === 'number') dharmaVolume = st.settings.dharmaVolume;
       presetMusicOn = st.settings.presetMusicOn !== false;
       fileMusicOn = st.settings.fileMusicOn !== false;
       if (typeof st.settings.fileMusicVolume === 'number') {
@@ -1020,6 +1083,7 @@
       if (Array.isArray(st.settings.musicListChant)) lists.chant = st.settings.musicListChant;
       if (Number(st.settings.musicPresetMinutes) > 0) presetMinutes = Number(st.settings.musicPresetMinutes);
       applyModeMusic();
+      syncDharma();
       showRhythm = st.settings.showRhythmGuide !== false;
       camOn = st.settings.cameraFollow !== false;
       fx.setLevel(st.settings.fxLevel || 'normal');
@@ -1092,7 +1156,7 @@
     const chanting = !isOfferingPhase(phase);
     const sutras = catalog.map((c) => `<b>${c.num}</b>. ${esc(c.name)}`).join(' · ');
     const items = [
-      ...(chanting ? ['🙏 <b>Đang tụng kinh</b> — xin tạm ngưng bình luận, cùng <b>thả tim theo nhịp mõ</b> để tâm lắng lại'] : ['🌸 <b>Đang dâng hương</b> — gửi lời chúc, thả tim; mỗi tấm lòng đều được đạo tràng ghi nhận và chúc phúc']),
+      ...(phase && phase.id === 'dharma' ? [`${talkWords().head.split(' ')[0]} <b>${talkWords().doing}</b> — mời mọi người lắng nghe, thả tim tuỳ hỷ`] : chanting ? ['🙏 <b>Đang tụng kinh</b> — xin tạm ngưng bình luận, cùng <b>thả tim theo nhịp mõ</b> để tâm lắng lại'] : ['🌸 <b>Đang dâng hương</b> — gửi lời chúc, thả tim; mỗi tấm lòng đều được đạo tràng ghi nhận và chúc phúc']),
       '🤍 <b>Thả tim theo nhịp mõ</b> khi tụng kinh — mỗi tiếng mõ một lần thả tim, là đang cùng tụng với đạo tràng',
       '🔥 Bình luận <b>“dâng hương”</b> hoặc <b>🔥</b> để lên chánh điện dâng hương',
       `📜 Bình luận <b>“kinh + số”</b> để đề nghị bài kinh cho khoá sau: ${sutras}`,
@@ -1102,7 +1166,7 @@
       '🎁 Mỗi món quà là một <b>lễ vật tượng trưng</b> dâng lên Tam Bảo, quý như nhau',
       '🪷 Tụng kinh đều đặn, <b>tinh tấn</b> mỗi ngày — tâm an là phước lành lớn nhất'
     ];
-    const sig = `${chanting ? 'c' : 'o'}|${sutras}`;
+    const sig = `${phase && phase.id === 'dharma' ? `d${phase.talk ? phase.talk.kind : ''}` : chanting ? 'c' : 'o'}|${sutras}`;
     if (sig === marqueeSig && $('mqTrack').children.length) return;
     marqueeSig = sig;
     const html = items.map((t) => `<span class="mq-item">${t}<span class="mq-sep">✦</span></span>`).join('');
@@ -1178,6 +1242,7 @@
     }
     // Đang ở lại Dâng hương chờ tới giờ tắt live (không vào khoá tụng nữa)
     if (ending && ending.stage === 'scheduled' && phase && phase.id === 'gather' && left === 0) return void ($('feedTitle').textContent = `🌸 Dâng hương · đến ${hhmm(ending.at)}`);
+    if (phase && phase.id === 'dharma') return void ($('feedTitle').textContent = `${talkWords().head.split(' ')[0]} ${talkWords().doing}`);
     $('feedTitle').textContent = isOfferingPhase(phase) ? `🌸 Dâng hương${mins}` : `📿 Đang tụng kinh${mins}`;
   }
   setInterval(renderModeTitle, 15000);
@@ -1591,7 +1656,7 @@
     el.style.width = `${CHAR_W}px`;
     el.style.height = `${CHAR_H}px`;
     el.style.transformOrigin = `50% ${CHAR_FLOOR * 100}%`;
-    el.innerHTML = `<div class="w-glow"></div><img class="w-a" alt="" /><img class="w-b" alt="" />${ev.ambient ? '' : `<div class="w-name">${ev.gift ? '🎁' : '🔥'} ${esc(ev.user)}</div>`}`;
+    el.innerHTML = `<div class="w-glow"></div>${ev.ambient ? '' : '<div class="w-halo"></div>'}<img class="w-a" alt="" /><img class="w-b" alt="" />${ev.ambient ? '' : `<div class="w-name">${ev.gift ? '🎁' : '🔥'} ${esc(ev.user)}</div>`}`;
     $('hall').appendChild(el);
     const imgs = [el.querySelector('.w-a'), el.querySelector('.w-b')];
     const name = el.querySelector('.w-name');
@@ -1619,8 +1684,8 @@
         const s = SeatLayout.scaleAt(y);
         el.style.transform = `translate(${(x - CHAR_W / 2).toFixed(1)}px, ${(y - CHAR_H * CHAR_FLOOR + extraY).toFixed(1)}px) scale(${s.toFixed(4)})`;
         el.style.zIndex = String(10 + Math.round(y / 10));
-        // Người đi lên: tên to (~28px trên màn hình dù đứng xa hay gần), màu riêng theo việc đang làm
-        if (name) name.style.fontSize = `${Math.round(28 / Math.max(0.25, s * cam.z))}px`;
+        // Người đi lên: tên to (~34px trên màn hình dù đứng xa hay gần), màu riêng theo việc đang làm
+        if (name) name.style.fontSize = `${Math.round(34 / Math.max(0.25, s * cam.z))}px`;
       },
       hideName() {
         if (name) name.style.opacity = '0';
