@@ -11,8 +11,8 @@
   const HORIZON_Y = 255;
   const FRONT_Y = 1590; // hàng gần nhất (ngay trên khung kinh)
   const BACK_Y = 727; // hàng xa nhất (bỏ 2 hàng sát bậc bàn thờ: quá nhỏ và dính cầu thang)
-  const ROW_GAP = 56; // khoảng cách hàng ở tỉ lệ 1
-  const SEAT_GAP = 58; // khoảng cách người ở tỉ lệ 1 (hình người rộng ~86 px nên ngồi sát, hơi chồng)
+  const ROW_GAP = 66; // khoảng cách hàng ở tỉ lệ 1 (người to hơn 30% nên hàng thưa hơn)
+  const SEAT_GAP = 70; // khoảng cách người ở tỉ lệ 1 (người ngồi rộng ~85–110 px nên ngồi sát, hơi chồng)
   const CARPET_PAD = 36; // chừa lối đi trên thảm cho người lên dâng hương
   const EDGE_PAD = 14;
 
