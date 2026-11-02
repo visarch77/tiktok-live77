@@ -10,6 +10,14 @@
   if (OBS || PREVIEW) document.body.classList.add('obs');
   const roomMatch = location.pathname.match(/^\/room\/([^/?#]+)/);
   const ROOM_ID = decodeURIComponent((roomMatch && roomMatch[1]) || params.get('room') || 'main');
+  // Số phiên bản của chính file này (?v= server gắn vào link): TikTok LIVE Studio / OBS giữ trang cũ khi server khởi động lại
+  const MY_V = (() => {
+    try {
+      return new URL(document.currentScript.src).searchParams.get('v');
+    } catch (_) {
+      return null;
+    }
+  })();
 
   const W = 1080;
   const H = 1920;
@@ -106,6 +114,11 @@
 
   function applyPhase(p) {
     if (!p) return;
+    // có bản mã màn hình mới: tự tải lại, đợi lúc không đang chạy ván cho khỏi giật
+    if (MY_V && p.clientV && String(p.clientV) !== MY_V && p.phase !== 'play') {
+      location.reload();
+      return;
+    }
     if (p.serverNow) clockOffset = p.serverNow - Date.now();
     const prevLight = ph.light;
     const prevPhase = ph.phase;

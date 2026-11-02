@@ -899,8 +899,17 @@ function create(ctx, saved = {}) {
       .map((v) => ({ name: v.name, avatar: v.avatar, points: v.points, wins: v.stats.wins || 0, podium: v.stats.podium || 0, rounds: v.stats.rounds || 0 }));
   }
 
+  // Phiên bản mã màn hình (cùng số ?v= server gắn vào link JS): màn hình đang chạy bản cũ thì tự tải lại
+  function clientVersion() {
+    try {
+      return Math.round(fs.statSync(path.join(config.PUBLIC_DIR, 'js/redlight.js')).mtimeMs);
+    } catch (_) {
+      return 0;
+    }
+  }
   function phaseInfo() {
     return {
+      clientV: clientVersion(),
       phase,
       light,
       round,
