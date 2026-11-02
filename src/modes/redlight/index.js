@@ -59,11 +59,6 @@ const LINES = {
     'Luật chơi: bình luận để vào chơi. Nhạc lên thì nhấp thả tim liên tục, nhấp càng nhiều chạy càng xa. Dừng tay trước khi nhạc dừng, nhạc dừng mà tim vẫn về là bị bắn!',
     'Ván mới sắp bắt đầu! Nhạc lên nhấp tim liên tục để chạy, nhạc sắp dừng thì buông tay. Về đích trước khi hết giờ là sống sót!'
   ],
-  // đọc lúc hiện bảng kết quả (luân phiên): quà tặng = kỹ năng
-  gifts: [
-    'Tặng quà để dùng kỹ năng! Hoa hồng: vào chơi và lao lên. Finger Heart: khiên đỡ đạn. Vòng cổ: mười bản sao chết thay. Kính râm: gọi cướp biển chân gỗ dẫm người khác!',
-    'Muốn thắng nhanh thì tặng quà! Hoa hồng chạy nhanh, Mũ và ria hoá khổng lồ, Donut đẩy lùi người dẫn đầu, GG biến người dẫn đầu thành gà. Quà tặng lúc nhạc dừng sẽ dùng ở câu hát sau!'
-  ],
   start: ['Bắt đầu! Đèn xanh, chạy nào!', 'Xuất phát! Thả tim để chạy!'],
   green: ['Đèn xanh!', 'Chạy đi!', 'Đèn xanh, chạy nào!'],
   red: ['Đèn đỏ!', 'Đứng im!', 'Búp bê quay lại rồi, đứng im!', 'Đèn đỏ! Lính canh đang nhìn!'],
@@ -854,7 +849,7 @@ function create(ctx, saved = {}) {
     fillNpcs();
     rosterDirty = true;
     broadcastPhase();
-    say(LINES.lobby[round % LINES.lobby.length]); // luân phiên luật chơi / quà kỹ năng
+    say(LINES.lobby[round % LINES.lobby.length]); // chỉ đọc luật chơi, không kêu gọi tặng quà
   }
 
   function startRound() {
@@ -965,10 +960,6 @@ function create(ctx, saved = {}) {
     ctx.broadcast('rl.results', { round, results, reason });
     ctx.emitEvent({ type: 'rlResult', round, winners: finished.length, players: real.length });
     if (!finished.length) setTimeout(() => say(pick(LINES.noWinner)), 1500);
-    // giới thiệu quà = kỹ năng trong lúc xem kết quả (không đè lên câu hát của búp bê)
-    setTimeout(() => {
-      if (phase === 'result') say(LINES.gifts[round % LINES.gifts.length]);
-    }, 2500);
   }
 
   function tick() {
