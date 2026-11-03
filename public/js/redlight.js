@@ -110,6 +110,8 @@
   const queueSays = new Map(); // tên → { text, until } bình luận đang hiện trên đầu người ở hàng chờ
   let queueNeed = 15;
   let settings = {};
+  // Ngôn ngữ màn hình (cài đặt lang của phòng): 'vi' giữ nguyên chữ cũ, 'en' dùng chữ tiếng Anh
+  const L = (vi, en) => (settings.lang === 'en' ? en : vi);
   const fx = []; // hiệu ứng đang chạy
   const ticker = []; // dòng chữ chạy
   let banner = null; // { text, color, until }
@@ -170,6 +172,10 @@
   function applyState(st) {
     if (!st) return;
     settings = st.settings || settings;
+    // tiêu đề trang + nút bật tiếng (redlight.html viết sẵn tiếng Việt)
+    document.title = L('Đèn Xanh – Đèn Đỏ', 'Red Light, Green Light');
+    const un = document.getElementById('unlock');
+    if (un) un.textContent = L('🔊 Bấm để bật âm thanh', '🔊 Click to turn on sound');
     applyAudioSettings();
     const rl = st.rl;
     if (!rl) return;
@@ -402,7 +408,7 @@
     switch (e.kind) {
       case 'join':
         if (unlocked) audio.join();
-        pushTicker(`👋 ${e.name} vào chơi — số ${e.num}`);
+        pushTicker(L(`👋 ${e.name} vào chơi — số ${e.num}`, `👋 ${e.name} joined — No. ${e.num}`));
         break;
       case 'out':
         if (unlocked) audio.out();
@@ -417,21 +423,21 @@
           if (e.cause === 'stomp') {
             // bị khổng lồ dẫm: bụi tung, chữ "Bẹp!"
             addSprite('fx_smoke', p.x, p.y - 12, 40, 150, 700, t0);
-            fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.1, text: 'Bẹp!', color: '#ffd43b', size: 30, t0, life: 1000 });
-          } else if (e.cause !== 'purge') fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.3, text: 'Loại!', color: '#ff6b6b', size: 30, t0: hitAt, life: 1100 });
+            fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.1, text: L('Bẹp!', 'Squash!'), color: '#ffd43b', size: 30, t0, life: 1000 });
+          } else if (e.cause !== 'purge') fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.3, text: L('Loại!', 'Out!'), color: '#ff6b6b', size: 30, t0: hitAt, life: 1100 });
         }
-        if (e.name) pushTicker(`❌ Số ${e.num} ${e.name} bị loại`);
+        if (e.name) pushTicker(L(`❌ Số ${e.num} ${e.name} bị loại`, `❌ No. ${e.num} ${e.name} is out`));
         break;
       case 'fakeTurn': {
         // búp bê quay mặt (1 s) rồi "Đùa thôi!" — không ai bị bắn
         const dy = FY - DOLL_H - 40;
-        fx.push({ type: 'text', x: W / 2, y: dy, text: 'HÙ!', color: '#ff4d6d', size: 56, t0: t0 + 900, life: 900 });
-        fx.push({ type: 'text', x: W / 2, y: dy, text: 'ĐÙA THÔI 😜', color: '#ffd43b', size: 46, t0: t0 + 1800, life: 1400 });
+        fx.push({ type: 'text', x: W / 2, y: dy, text: L('HÙ!', 'BOO!'), color: '#ff4d6d', size: 56, t0: t0 + 900, life: 900 });
+        fx.push({ type: 'text', x: W / 2, y: dy, text: L('ĐÙA THÔI 😜', 'JUST KIDDING 😜'), color: '#ffd43b', size: 46, t0: t0 + 1800, life: 1400 });
         break;
       }
       case 'dollSleep':
-        banner = { text: '😴 NGỦ GẬT!', color: '#4dabf7', until: t0 + (e.ms || 6000) };
-        fx.push({ type: 'text', x: W / 2, y: FY - DOLL_H - 40, text: 'CHẠY MAU!', color: '#bfe3ff', size: 46, t0, life: 1800 });
+        banner = { text: L('😴 NGỦ GẬT!', '😴 DOLL NAP!'), color: '#4dabf7', until: t0 + (e.ms || 6000) };
+        fx.push({ type: 'text', x: W / 2, y: FY - DOLL_H - 40, text: L('CHẠY MAU!', 'RUN NOW!'), color: '#bfe3ff', size: 46, t0, life: 1800 });
         syncMusic();
         break;
       case 'revive':
@@ -441,7 +447,7 @@
           const p = spritePos(r);
           burst(p.x, p.y - PH * 0.45, '#69db7c', 18, t0);
           fx.push({ type: 'ring', x: p.x, y: p.y, r: 40, color: '#69db7c', flat: true, t0, life: 700 });
-          fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.3, text: 'Hồi sinh!', color: '#69db7c', size: 30, t0, life: 1500 });
+          fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.3, text: L('Hồi sinh!', 'Revived!'), color: '#69db7c', size: 30, t0, life: 1500 });
         }
         break;
       case 'stomp': {
@@ -470,7 +476,7 @@
           addSprite('fx_aura', p.x, p.y - 30, 60, 220, 900, t0);
           for (let i = 0; i < 30; i++) fx.push({ type: 'confetti', x: p.x, y: p.y, vx: (Math.random() - 0.5) * 10, vy: -4 - Math.random() * 8, hue: Math.random() * 360, t0, life: 1600 });
         }
-        pushTicker(`🏁 Số ${e.num} ${e.name} về đích hạng ${e.rank}`);
+        pushTicker(L(`🏁 Số ${e.num} ${e.name} về đích hạng ${e.rank}`, `🏁 No. ${e.num} ${e.name} finished #${e.rank}`));
         break;
       case 'gift':
         // không đổi người đang zoom quá nhanh khi quà dồn dập (giữ ít nhất 1,2 giây)
@@ -495,7 +501,7 @@
             const sp = 0.06 + Math.random() * 0.1;
             fx.push({ type: 'gas', x: gp.x, y: by, vx: Math.cos(a) * sp * (Math.random() < 0.5 ? -1 : 1), vy: Math.sin(a) * sp * 0.6, r0: 10, r1: 70 + Math.random() * 50, t0: t0 + i * 60, life: 2200 });
           }
-          fx.push({ type: 'text', x: gp.x, y: gp.y - PH * 1.45, text: 'BỦMMM 💨', color: '#d8f55a', size: 30, t0, life: 1600 });
+          fx.push({ type: 'text', x: gp.x, y: gp.y - PH * 1.45, text: L('BỦMMM 💨', 'PFFFRRT 💨'), color: '#d8f55a', size: 30, t0, life: 1600 });
         }
         (e.ids || []).forEach((id, i) => {
           const v = sprites.get(id);
@@ -503,7 +509,7 @@
           const p = spritePos(v);
           v.spotUntil = t0 + (e.ms || 1800) + 300;
           fx.push({ type: 'gas', x: p.x, y: p.y - PH * 0.6, vx: 0, vy: -0.01, r0: 20, r1: 55, t0: t0 + 300 + i * 80, life: 1500 });
-          fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.4, text: 'Choáng! 😵', color: '#c0eb75', size: 26, t0: t0 + 300 + i * 80, life: 1500 });
+          fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.4, text: L('Choáng! 😵', 'Dizzy! 😵'), color: '#c0eb75', size: 26, t0: t0 + 300 + i * 80, life: 1500 });
         });
         break;
       }
@@ -511,14 +517,14 @@
         recordFlash = { name: e.name, until: t0 + 4000 };
         if (s) {
           const p = spritePos(s);
-          fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.6, text: e.rank === 1 ? 'KỈ LỤC MỚI #1!' : `KỈ LỤC #${e.rank}!`, color: '#ffd43b', size: 28, t0, life: 1800 });
+          fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.6, text: e.rank === 1 ? L('KỈ LỤC MỚI #1!', 'NEW RECORD #1!') : L(`KỈ LỤC #${e.rank}!`, `RECORD #${e.rank}!`), color: '#ffd43b', size: 28, t0, life: 1800 });
         }
         break;
       case 'purge':
         // Hết giờ: lính dàn hàng tiến vào sân, các phát bắn đến theo từng sự kiện "out"
         purgeAt = t0;
         purgeMarch = e.marchMs || 1300;
-        banner = { text: '⏱ HẾT GIỜ', color: '#ff4040', until: t0 + 3500 };
+        banner = { text: L('⏱ HẾT GIỜ', "⏱ TIME'S UP"), color: '#ff4040', until: t0 + 3500 };
         if (unlocked) audio.warn();
         break;
       case 'wind':
@@ -530,7 +536,7 @@
           if (!v) continue;
           const p = spritePos(v);
           addSprite('fx_smoke', p.x, p.y - 10, 30, 90, 700, t0 + 350);
-          fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.3, text: 'Lùi!', color: '#d0a2ff', size: 24, t0: t0 + 350, life: 900 });
+          fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.3, text: L('Lùi!', 'Pushed!'), color: '#d0a2ff', size: 24, t0: t0 + 350, life: 900 });
         }
         break;
       case 'chicken':
@@ -540,7 +546,7 @@
           const p = spritePos(v);
           addSprite('fx_smoke', p.x, p.y - PH * 0.4, 40, 150, 650, t0);
           for (let i = 0; i < 3; i++) addSprite('fx_feather', p.x + (Math.random() - 0.5) * 40, p.y - PH * 0.5, 50, 140, 1100, t0 + i * 90, (Math.random() - 0.5) * 2);
-          fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.4, text: 'Cục tác!', color: '#ffe066', size: 28, t0, life: 1400 });
+          fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.4, text: L('Cục tác!', 'Bawk bawk!'), color: '#ffe066', size: 28, t0, life: 1400 });
         }
         break;
       case 'shove': {
@@ -549,12 +555,12 @@
           const p = spritePos(s);
           s.spotUntil = t0 + (e.ms || 1200) + 300;
           addSprite('fx_smoke', p.x, p.y - 10, 30, 120, 600, t0);
-          fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.4, text: 'Bị đẩy!', color: '#ffa94d', size: 28, t0, life: 1300 });
+          fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.4, text: L('Bị đẩy!', 'Shoved!'), color: '#ffa94d', size: 28, t0, life: 1300 });
         }
         const g = e.from && sprites.get(e.from);
         if (g) {
           const gp = spritePos(g);
-          fx.push({ type: 'text', x: gp.x, y: gp.y - PH * 1.4, text: 'Trượt tay!', color: '#ffe066', size: 22, t0, life: 1100 });
+          fx.push({ type: 'text', x: gp.x, y: gp.y - PH * 1.4, text: L('Trượt tay!', 'Oops!'), color: '#ffe066', size: 22, t0, life: 1100 });
         }
         break;
       }
@@ -565,7 +571,7 @@
           if (!v) continue;
           const p = spritePos(v);
           addSprite('fx_shield', p.x, p.y - PH * 0.5, 20, PH * 1.3, 600, t0);
-          fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.4, text: 'Miễn gà!', color: '#ffe066', size: 24, t0, life: 1200 });
+          fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.4, text: L('Miễn gà!', 'Chicken-proof!'), color: '#ffe066', size: 24, t0, life: 1200 });
         }
         break;
       case 'teamShield': {
@@ -587,7 +593,7 @@
             const a = (i / 18) * Math.PI * 2;
             fx.push({ type: 'shard', x: p.x, y: p.y - PH * 0.5, vx: Math.cos(a) * (4 + Math.random() * 4), vy: Math.sin(a) * (4 + Math.random() * 4) - 2, rot: a, t0, life: 700 });
           }
-          fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.45, text: 'Khiên đỡ!', color: '#74c0fc', size: 28, t0, life: 1200 });
+          fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.45, text: L('Khiên đỡ!', 'Blocked!'), color: '#74c0fc', size: 28, t0, life: 1200 });
         }
         break;
       default:
@@ -603,7 +609,7 @@
       case 'turbo':
         s.turboUntil = Math.max(s.turboUntil || 0, t0) + 2500 * Math.min(count, 5);
         addSprite('fx_aura', p.x, p.y - 20, 30, 150, 500, t0);
-        fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.4, text: 'TĂNG TỐC!', color: '#ffb703', size: 28, t0, life: 1100 });
+        fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.4, text: L('TĂNG TỐC!', 'SPEED UP!'), color: '#ffb703', size: 28, t0, life: 1100 });
         break;
       case 'shield':
         addSprite('fx_shield', p.x, cy, 10, PH * 1.9, 450, t0);
@@ -612,14 +618,14 @@
       case 'giant':
         addSprite('fx_aura', p.x, p.y - 60, 60, 320, 900, t0);
         fx.push({ type: 'ring', x: p.x, y: p.y, r: 140, color: '#ffd43b', flat: true, t0, life: 700 });
-        fx.push({ type: 'text', x: p.x, y: p.y - PH * 2.6, text: 'KHỔNG LỒ!', color: '#ffd43b', size: 34, t0, life: 1300 });
+        fx.push({ type: 'text', x: p.x, y: p.y - PH * 2.6, text: L('KHỔNG LỒ!', 'GIANT!'), color: '#ffd43b', size: 34, t0, life: 1300 });
         break;
       case 'clones':
-        fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.4, text: 'Phân thân!', color: '#9ff0b9', size: 26, t0, life: 1100 });
+        fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.4, text: L('Phân thân!', 'Clone!'), color: '#9ff0b9', size: 26, t0, life: 1100 });
         break;
       case 'crowd':
         for (let i = 0; i < 5; i++) addSprite('fx_smoke', p.x + (Math.random() - 0.5) * 160, p.y - 20, 30, 120, 700, t0 + i * 60);
-        fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.5, text: '×5 BẢN SAO!', color: '#9ff0b9', size: 30, t0, life: 1400 });
+        fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.5, text: L('×5 BẢN SAO!', '×5 CLONES!'), color: '#9ff0b9', size: 30, t0, life: 1400 });
         break;
       default:
         break;
@@ -1080,7 +1086,7 @@
       else out++;
     }
     const LX = SAFE_L + 120;
-    text(`VÁN ${ph.round || 0}`, LX, TOP_Y + 22, { size: 28, weight: 900, color: '#ffd43b', stroke: 4 });
+    text(L(`VÁN ${ph.round || 0}`, `ROUND ${ph.round || 0}`), LX, TOP_Y + 22, { size: 28, weight: 900, color: '#ffd43b', stroke: 4 });
     text(`🏃${alive}  🏁${fin}  ❌${out}`, LX, TOP_Y + 51, { size: 20, weight: 700 });
 
     // Đồng hồ / trạng thái
@@ -1089,15 +1095,15 @@
     if (ph.phase === 'play') {
       const mm = String(Math.floor(remain / 60)).padStart(2, '0');
       const ss = String(remain % 60).padStart(2, '0');
-      text(ph.purging ? 'HẾT GIỜ' : 'THỜI GIAN CÒN', TX, TOP_Y + 13, { size: 14, color: ph.purging ? '#ff6b6b' : '#ddd', weight: 700 });
+      text(ph.purging ? L('HẾT GIỜ', "TIME'S UP") : L('THỜI GIAN CÒN', 'TIME LEFT'), TX, TOP_Y + 13, { size: 14, color: ph.purging ? '#ff6b6b' : '#ddd', weight: 700 });
       text(`${mm}:${ss}`, TX, TOP_Y + 44, { size: 44, weight: 900, color: remain <= 10 ? '#ff6b6b' : '#fff', stroke: 5 });
     } else if (ph.phase === 'lobby') {
-      text('VÁN MỚI SAU', TX, TOP_Y + 13, { size: 14, color: '#ddd' });
+      text(L('VÁN MỚI SAU', 'NEXT ROUND IN'), TX, TOP_Y + 13, { size: 14, color: '#ddd' });
       text(`${remain}s`, TX, TOP_Y + 44, { size: 44, weight: 900, color: '#ffd43b', stroke: 5 });
     } else {
-      text('KẾT QUẢ', TX, TOP_Y + 36, { size: 38, weight: 900, color: '#ffd43b', stroke: 5 });
+      text(L('KẾT QUẢ', 'RESULTS'), TX, TOP_Y + 36, { size: 38, weight: 900, color: '#ffd43b', stroke: 5 });
     }
-    if (ph.paused) text('TẠM DỪNG', TX, TOP_Y + HEAD_H - 6, { size: 15, color: '#ffa94d', weight: 900 });
+    if (ph.paused) text(L('TẠM DỪNG', 'PAUSED'), TX, TOP_Y + HEAD_H - 6, { size: 15, color: '#ffa94d', weight: 900 });
   }
 
   // Chỉ còn nhãn "hết giờ": nhỏ, nằm thay dòng chữ chạy dưới vạch xuất phát để không che người chơi
@@ -1117,14 +1123,14 @@
     g.lineWidth = 3;
     roundRect(cx - w / 2, top, w, h, 28);
     g.stroke();
-    text('LUẬT CHƠI', cx, top + 50, { size: 44, weight: 900, color: '#ffd43b', stroke: 6 });
+    text(L('LUẬT CHƠI', 'HOW TO PLAY'), cx, top + 50, { size: 44, weight: 900, color: '#ffd43b', stroke: 6 });
     const beat = 1 + 0.08 * Math.max(0, Math.sin(t / 120)); // tim đập nhanh: nhắc nhấp thật nhanh
     const rows = [
-      { icon: '🎵', a: 'Nhạc lên:', b: 'NHẤP THẢ TIM THẬT NHANH để chạy', color: '#8ce99a', pulse: true },
-      ...(cmt > 0 ? [{ icon: '💬', a: 'Bình luận khi nhạc lên:', b: `chạy nhanh hơn (1 bình luận = ${cmt} tim)`, color: '#ff8fbf' }] : []),
-      { icon: '✋', a: 'DỪNG thả tim', b: 'TRƯỚC KHI nhạc dừng', color: '#ffd43b' },
-      { icon: '🎯', a: 'Nhạc dừng mà tim vẫn về:', b: 'búp bê thấy, lính BẮN', color: '#ff6b6b' },
-      { icon: '🏁', a: 'Về đích trước khi hết giờ', b: 'để sống sót', color: '#74c0fc' }
+      { icon: '🎵', a: L('Nhạc lên:', 'Music on:'), b: L('NHẤP THẢ TIM THẬT NHANH để chạy', 'TAP HEARTS FAST to run'), color: '#8ce99a', pulse: true },
+      ...(cmt > 0 ? [{ icon: '💬', a: L('Bình luận khi nhạc lên:', 'Comment while music plays:'), b: L(`chạy nhanh hơn (1 bình luận = ${cmt} tim)`, `run faster (1 comment = ${cmt} hearts)`), color: '#ff8fbf' }] : []),
+      { icon: '✋', a: L('DỪNG thả tim', 'STOP tapping'), b: L('TRƯỚC KHI nhạc dừng', 'BEFORE the music stops'), color: '#ffd43b' },
+      { icon: '🎯', a: L('Nhạc dừng mà tim vẫn về:', 'Hearts after the music stops:'), b: L('búp bê thấy, lính BẮN', 'the doll sees you, guards SHOOT'), color: '#ff6b6b' },
+      { icon: '🏁', a: L('Về đích trước khi hết giờ', 'Reach the finish before time runs out'), b: L('để sống sót', 'to survive'), color: '#74c0fc' }
     ];
     rows.forEach((r, i) => {
       const y = top + 118 + i * 72;
@@ -1136,7 +1142,7 @@
       text(r.a, cx - w / 2 + 120, y - 15, { size: 26, weight: 700, color: '#fff', align: 'left', stroke: 3 });
       text(r.b, cx - w / 2 + 120, y + 17, { size: 28, weight: 900, color: r.color, align: 'left', stroke: 4 });
     });
-    text(`Thả ${queueNeed} tim hoặc bình luận để vào chơi`, cx, top + h - 28, { size: 24, weight: 700, color: '#ff8fbf', stroke: 3 });
+    text(L(`Thả ${queueNeed} tim hoặc bình luận để vào chơi`, `Send ${queueNeed} hearts or comment to join`), cx, top + h - 28, { size: 24, weight: 700, color: '#ff8fbf', stroke: 3 });
     g.restore();
   }
 
@@ -1240,9 +1246,9 @@
     let total = 0; // kết quả chỉ gửi top 10 — đếm người về đích trên sân
     for (const s of sprites.values()) if (s.f && !s.c) total++;
     drawRankPanel(
-      `KẾT QUẢ VÁN ${ph.round || ''}`.trim(),
-      fin.map((r) => ({ name: r.name, sub: `Số ${r.num}`, value: `${(r.ms / 1000).toFixed(1)}s` })),
-      { empty: 'Không ai sống sót', footer: total ? `${total} người sống sót` : '', shine: performance.now() }
+      L(`KẾT QUẢ VÁN ${ph.round || ''}`, `ROUND ${ph.round || ''} RESULTS`).trim(),
+      fin.map((r) => ({ name: r.name, sub: L(`Số ${r.num}`, `No. ${r.num}`), value: `${(r.ms / 1000).toFixed(1)}s` })),
+      { empty: L('Không ai sống sót', 'Nobody survived'), footer: total ? L(`${total} người sống sót`, `${total} survivor${total > 1 ? 's' : ''}`) : '', shine: performance.now() }
     );
   }
 
@@ -1263,8 +1269,8 @@
         const sc = 60 / Math.max(ic.naturalWidth, ic.naturalHeight);
         g.drawImage(ic, x0 + 48 - (ic.naturalWidth * sc) / 2, y + 52 - (ic.naturalHeight * sc) / 2, ic.naturalWidth * sc, ic.naturalHeight * sc);
       }
-      text(`${giftBanner.name} tặng ${giftBanner.gift}${count}`, x0 + 92, y + 34, { size: 26, weight: 900, color: '#222', align: 'left' });
-      text(`→ ${giftBanner.label}${giftBanner.held ? ' (dùng khi búp bê hát lại)' : ''}`, x0 + 92, y + 66, { size: 24, weight: 700, color: '#c2255c', align: 'left' });
+      text(L(`${giftBanner.name} tặng ${giftBanner.gift}${count}`, `${giftBanner.name} sent ${giftBanner.gift}${count}`), x0 + 92, y + 34, { size: 26, weight: 900, color: '#222', align: 'left' });
+      text(`→ ${giftBanner.label}${giftBanner.held ? L(' (dùng khi búp bê hát lại)', ' (works when the doll sings again)') : ''}`, x0 + 92, y + 66, { size: 24, weight: 700, color: '#c2255c', align: 'left' });
       g.globalAlpha = 1;
       return;
     }
@@ -1345,12 +1351,12 @@
   const TICK_SPEED = 85; // px/giây
   function marqueeParts() {
     const parts = [
-      { text: `❤️ Thả ${queueNeed} tim hoặc bình luận để tham gia` },
-      { text: '🎵 Nhạc lên: nhấp thả tim thật nhanh để chạy' },
-      ...(settings.commentLikes === 0 ? [] : [{ text: `💬 Bình luận khi nhạc lên để chạy nhanh hơn (1 bình luận = ${settings.commentLikes ?? 2} tim)` }]),
-      { text: '✋ Dừng thả tim TRƯỚC khi nhạc dừng, tim về lúc nhạc tắt là bị bắn' },
-      { text: '⏱ Hết giờ chưa về đích cũng bị bắn' },
-      { text: '🎁 Quà tặng lúc nhạc dừng: búp bê hát lại mới có tác dụng (khiên, bản sao có ngay)' }
+      { text: L(`❤️ Thả ${queueNeed} tim hoặc bình luận để tham gia`, `❤️ Send ${queueNeed} hearts or comment to join`) },
+      { text: L('🎵 Nhạc lên: nhấp thả tim thật nhanh để chạy', '🎵 Music on: tap hearts as fast as you can to run') },
+      ...(settings.commentLikes === 0 ? [] : [{ text: L(`💬 Bình luận khi nhạc lên để chạy nhanh hơn (1 bình luận = ${settings.commentLikes ?? 2} tim)`, `💬 Comment while the music plays to run faster (1 comment = ${settings.commentLikes ?? 2} hearts)`) }]),
+      { text: L('✋ Dừng thả tim TRƯỚC khi nhạc dừng, tim về lúc nhạc tắt là bị bắn', '✋ Stop tapping BEFORE the music stops — hearts that arrive after it stops get you shot') },
+      { text: L('⏱ Hết giờ chưa về đích cũng bị bắn', "⏱ Not at the finish when time's up? You get shot too") },
+      { text: L('🎁 Quà tặng lúc nhạc dừng: búp bê hát lại mới có tác dụng (khiên, bản sao có ngay)', '🎁 Gifts sent while the music is stopped work when the doll sings again (shields and clones work right away)') }
     ];
     for (const it of legend) parts.push({ icon: `gift_${it.kind}`, text: `${it.gift} → ${it.label}${it.desc ? `: ${it.desc}` : ''}` });
     return parts;
@@ -1398,8 +1404,8 @@
   const QMAX = 10;
   function drawQueue(t) {
     if (ph.phase === 'lobby' || !queueList.length) return;
-    text('⏳ HÀNG CHỜ VÁN SAU', SAFE_L + 6, QY, { size: 17, weight: 900, color: '#ffd43b', align: 'left', stroke: 3 });
-    text(`bình luận / thả ${queueNeed} ❤️ để giữ chỗ`, SAFE_R - 6, QY, { size: 15, weight: 500, color: '#fff', align: 'right', stroke: 3 });
+    text(L('⏳ HÀNG CHỜ VÁN SAU', '⏳ NEXT ROUND QUEUE'), SAFE_L + 6, QY, { size: 17, weight: 900, color: '#ffd43b', align: 'left', stroke: 3 });
+    text(L(`bình luận / thả ${queueNeed} ❤️ để giữ chỗ`, `comment / send ${queueNeed} ❤️ to save a spot`), SAFE_R - 6, QY, { size: 15, weight: 500, color: '#fff', align: 'right', stroke: 3 });
     const more = queueList.length > QMAX ? queueList.length - (QMAX - 1) : 0;
     const shown = more ? queueList.slice(0, QMAX - 1) : queueList;
     const slots = shown.length + (more ? 1 : 0);
@@ -1787,7 +1793,7 @@
           if (p.url) enqueueTts(p.url);
           break;
         case 'room.notFound':
-          banner = { text: `KHÔNG CÓ PHÒNG "${ROOM_ID}"`, color: '#ff6b6b', until: Infinity };
+          banner = { text: L(`KHÔNG CÓ PHÒNG "${ROOM_ID}"`, `NO ROOM "${ROOM_ID}"`), color: '#ff6b6b', until: Infinity };
           break;
         default:
           break;

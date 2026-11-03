@@ -1,5 +1,7 @@
 const { sanitizeUserName, isBlockedSpamOrToxic, sanitizeWishText } = require('../../util/sanitize');
-const { LEGEND, itemForGift } = require('./items');
+const { LEGEND, BY_GIFT_ID, itemForGift } = require('./items');
+const EN = require('./i18n-en');
+const ttsEn = require('./tts-en');
 const { createSim } = require('./sim');
 const { CUTS, MODES, MODE_NAMES, planSong } = require('./song');
 const { ViewerBoard } = require('../../core/viewers');
@@ -77,6 +79,11 @@ const rand = (a, b) => a + Math.random() * (b - a);
 
 function create(ctx, saved = {}) {
   const S = () => ctx.settings;
+  // Ngôn ngữ phòng: 'vi' (mặc định, giữ nguyên mọi câu chữ cũ) hoặc 'en' (bản tiếng Anh trong i18n-en.js)
+  const isEn = () => S().lang === 'en';
+  const L = (vi, en) => (isEn() ? en : vi);
+  const lines = () => (isEn() ? EN.LINES : LINES);
+  const numName = (p) => speakName(p.name) || L(`Số ${p.num}`, `Number ${p.num}`);
   let round = Number(saved.round) || 0;
   let phase = 'lobby';
   let phaseStartedAt = Date.now();
@@ -212,8 +219,8 @@ function create(ctx, saved = {}) {
     for (let i = list.length; i < want; i++) {
       npcSeq = (npcSeq % 999) + 1;
       const used = new Set(npcList().map((x) => x.name));
-      const free = NPC_NAMES.filter((n) => !used.has(n));
-      const name = free.length ? free[Math.floor(Math.random() * free.length)] : `Máy ${npcSeq}`;
+      const free = (isEn() ? EN.NPC_NAMES : NPC_NAMES).filter((n) => !used.has(n));
+      const name = free.length ? free[Math.floor(Math.random() * free.length)] : L(`Máy ${npcSeq}`, `Bot ${npcSeq}`);
       const p = makePlayer({ user: name, uniqueId: `npc_${npcSeq}_${Date.now() % 100000}`, avatar: '', sim: true, npc: true });
       p.npcLag = rand(1000, 3200); // trễ hình như người xem thật
       p.npcEager = rand(0.45, 0.85);
@@ -560,7 +567,8 @@ function create(ctx, saved = {}) {
     noteRecord(p);
     if (p.finishRank <= 3) {
       const place = ['nhất', 'nhì', 'ba'][p.finishRank - 1];
-      say(`Số ${p.num}, ${p.name}, về đích thứ ${place}!`);
+      const placeEn = ['first', 'second', 'third'][p.finishRank - 1];
+      say(L(`Số ${p.num}, ${p.name}, về đích thứ ${place}!`, `Number ${p.num}, ${p.name}, finishes ${placeEn}!`));
       ctx.emitEvent({ type: 'rlFinish', user: p.name, num: p.num, rank: p.finishRank });
     }
   }
@@ -795,16 +803,27 @@ function create(ctx, saved = {}) {
           dazed.push(fall);
         }
         ctx.broadcast('rl.fx', { kind: 'fart', from: p.id, ids: dazed.map((v) => v.id), ms: FART_DAZE_MS });
-        const giver = speakName(p.name) || `Số ${p.num}`;
-        announce(dazed.length ? `${giver} thả boom làm ${dazed.length} người xung quanh choáng váng!` : `${giver} thả boom nhưng không ai bị choáng!`);
+        const giver = numName(p);
+        announce(
+          dazed.length
+            ? L(`${giver} thả boom làm ${dazed.length} người xung quanh choáng váng!`, `${giver} dropped a fart bomb and knocked out ${dazed.length} players nearby!`)
+            : L(`${giver} thả boom nhưng không ai bị choáng!`, `${giver} dropped a fart bomb but nobody got knocked out!`)
+        );
         break;
       }
       case 'revive': {
         // Vòng cổ: hồi sinh 2 người vừa bị bắn gần nhất mỗi quà (combo tối đa 6)
         const back = reviveRecent(Math.min(6, 2 * n));
-        const giver = speakName(p.name) || `Số ${p.num}`;
-        const names = back.filter((v) => !v.npc).map((v) => speakName(v.name) || `Số ${v.num}`);
-        if (back.length) announce(`${giver} hồi sinh ${names.length ? names.slice(0, 3).join(' và ') : `${back.length} người`}!`);
+        const giver = numName(p);
+        const names = back.filter((v) => !v.npc).map(numName);
+        if (back.length) {
+          announce(
+            L(
+              `${giver} hồi sinh ${names.length ? names.slice(0, 3).join(' và ') : `${back.length} người`}!`,
+              `${giver} revived ${names.length ? names.slice(0, 3).join(' and ') : `${back.length} players`}!`
+            )
+          );
+        }
         break;
       }
       case 'crowd':
@@ -837,16 +856,16 @@ function create(ctx, saved = {}) {
           .sort((a, b) => a.d - b.d)
           .slice(0, Math.min(n, 3));
         for (const { v } of near) {
-          const giver = speakName(p.name) || `Số ${p.num}`;
-          const victim = speakName(v.name) || `Số ${v.num}`;
+          const giver = numName(p);
+          const victim = numName(v);
           if (v.giantUntil > now) {
-            announce(`${giver} đẩy ${victim} nhưng khổng lồ không ngã!`);
+            announce(L(`${giver} đẩy ${victim} nhưng khổng lồ không ngã!`, `${giver} shoved ${victim}, but giants don't fall!`));
             continue;
           }
           if (v.shield > 0) {
             v.shield--;
             ctx.broadcast('rl.fx', { kind: 'shieldSave', id: v.id });
-            announce(`${giver} đẩy ${victim} nhưng khiên đỡ được!`);
+            announce(L(`${giver} đẩy ${victim} nhưng khiên đỡ được!`, `${giver} shoved ${victim}, but the shield blocked it!`));
             continue;
           }
           const fall = standIn(v); // có bản sao thì bản sao ngã thay
@@ -854,7 +873,11 @@ function create(ctx, saved = {}) {
           fall.doomCause = 'shove';
           fall.pending = 0;
           ctx.broadcast('rl.fx', { kind: 'shove', from: p.id, id: fall.id, ms: SPOT_MS });
-          announce(fall === v ? `${victim} bị ${giver} trượt tay đẩy ngã!` : `${victim} bị ${giver} trượt tay đẩy, bản sao ngã thay!`);
+          announce(
+            fall === v
+              ? L(`${victim} bị ${giver} trượt tay đẩy ngã!`, `${giver} "accidentally" shoved ${victim} down!`)
+              : L(`${victim} bị ${giver} trượt tay đẩy, bản sao ngã thay!`, `${giver} shoved ${victim}, but a clone fell instead!`)
+          );
         }
         break;
       }
@@ -896,7 +919,18 @@ function create(ctx, saved = {}) {
   // Giọng đọc (ZeroTTS → màn hình phát)
   // --------------------------------------------------------------------------
   function say(text) {
-    if (S().ttsEnabled === false || !ctx.tts || !ctx.tts.ready) return;
+    if (S().ttsEnabled === false) return;
+    // English: giọng macOS (tts-en.js); tiếng Việt: ZeroTTS như cũ
+    if (isEn()) {
+      ttsEn
+        .synthesize(text, S().enVoice)
+        .then((res) => {
+          if (res && res.ok) ctx.broadcast('rl.say', { text, url: res.url });
+        })
+        .catch(() => {});
+      return;
+    }
+    if (!ctx.tts || !ctx.tts.ready) return;
     ctx.tts
       .synthesize(text, S().ttsVoice)
       .then((res) => {
@@ -931,14 +965,14 @@ function create(ctx, saved = {}) {
     } else say(text);
   }
   function sayItem(p, kind) {
-    const line = ITEM_SAY[kind];
+    const line = (isEn() ? EN.ITEM_SAY : ITEM_SAY)[kind];
     if (!line || p.npc) return;
     const now = Date.now();
     const k = `${p.key}|${kind}`;
     if (now - (itemSaid.get(k) || 0) < 8000) return; // combo cùng quà: chỉ đọc 1 lần
     itemSaid.set(k, now);
     if (itemSaid.size > 500) itemSaid.clear();
-    const text = line(speakName(p.name) || `Số ${p.num}`);
+    const text = line(numName(p));
     if (phase === 'play' && light !== 'red') {
       itemSayQueue.push(text);
       if (itemSayQueue.length > 3) itemSayQueue.shift();
@@ -1031,7 +1065,7 @@ function create(ctx, saved = {}) {
     fillNpcs();
     rosterDirty = true;
     broadcastPhase();
-    say(LINES.lobby[round % LINES.lobby.length]); // chỉ đọc luật chơi, không kêu gọi tặng quà
+    say(lines().lobby[round % lines().lobby.length]); // chỉ đọc luật chơi, không kêu gọi tặng quà
   }
 
   function startRound() {
@@ -1043,7 +1077,7 @@ function create(ctx, saved = {}) {
     results = [];
     setLight('green', true);
     ctx.emitEvent({ type: 'rlRound', round, players: realPlayers().length });
-    say(pick(LINES.start));
+    say(pick(lines().start));
   }
 
   function setLight(next, quiet = false, greenMs = 0) {
@@ -1080,7 +1114,7 @@ function create(ctx, saved = {}) {
     broadcastPhase();
     if (next === 'green') releaseHeldGifts();
     // có câu hát thì búp bê là tín hiệu, không đọc thêm cho khỏi đè tiếng hát
-    if (!quiet && next === 'warn' && !song) say(pick(LINES.red));
+    if (!quiet && next === 'warn' && !song) say(pick(lines().red));
   }
 
   function releaseHeldGifts() {
@@ -1096,7 +1130,7 @@ function create(ctx, saved = {}) {
 
   // Hết giờ: đèn đỏ đứng im, lính canh tiến lên bắn hết người chưa về đích, xong mới ra kết quả
   function startPurge() {
-    say(pick(LINES.timeUp));
+    say(pick(lines().timeUp));
     const victims = runners().sort((a, b) => b.y - a.y);
     if (!victims.length) return endRound('time');
     const now = Date.now();
@@ -1148,7 +1182,7 @@ function create(ctx, saved = {}) {
     broadcastPhase();
     ctx.broadcast('rl.results', { round, results, reason });
     ctx.emitEvent({ type: 'rlResult', round, winners: finished.length, players: real.length });
-    if (!finished.length) setTimeout(() => say(pick(LINES.noWinner)), 1500);
+    if (!finished.length) setTimeout(() => say(pick(lines().noWinner)), 1500);
   }
 
   function tick() {
@@ -1257,8 +1291,13 @@ function create(ctx, saved = {}) {
 
   // Đọc trước các câu cố định để lúc cần không phải chờ tổng hợp giọng
   setTimeout(() => {
+    const all = [...lines().green, ...lines().red, ...lines().start, ...lines().lobby, ...lines().timeUp];
+    if (isEn()) {
+      for (const t of all) ttsEn.synthesize(t, S().enVoice).catch(() => {});
+      return;
+    }
     if (!ctx.tts) return;
-    for (const t of [...LINES.green, ...LINES.red, ...LINES.start, ...LINES.lobby, ...LINES.timeUp]) {
+    for (const t of all) {
       ctx.tts.synthesize(t, S().ttsVoice).catch(() => {});
     }
   }, 20000);
@@ -1327,10 +1366,10 @@ function create(ctx, saved = {}) {
           kind: 'gift',
           id: p.id,
           name: p.name,
-          gift: evt.giftName,
+          gift: isEn() ? (BY_GIFT_ID[String(evt.giftId || '')] ? EN.titleCase(BY_GIFT_ID[String(evt.giftId)]) : evt.giftName) : evt.giftName,
           count: Number(evt.count) || 1,
           emoji: item.emoji,
-          label: item.label,
+          label: isEn() ? (EN.LEGEND[item.kind] || {}).label || item.label : item.label,
           itemKind: item.kind,
           held
         });
@@ -1351,7 +1390,8 @@ function create(ctx, saved = {}) {
   const sim = createSim({
     onEvent: (evt) => ctx.simulated(() => onEvent(evt)),
     getPhase: () => ({ phase, light, lightStartedAt, graceMs: S().redGraceMs }),
-    crowd: () => S().simCrowd
+    crowd: () => S().simCrowd,
+    lang: () => S().lang
   });
   // Phòng khởi động lại khi giả lập đang bật: room.js không báo onAutoSimChange
   if (S().autoSim) sim.setRunning(true);
@@ -1393,7 +1433,7 @@ function create(ctx, saved = {}) {
       lightEndsAt += FAKE_TURN_MS;
       broadcastPhase();
       ctx.broadcast('rl.fx', { kind: 'fakeTurn', ms: FAKE_TURN_MS });
-      setTimeout(() => say(pick(LINES.fakeTurn)), 1200); // nói lúc búp bê đã quay mặt (nhạc đang ngừng)
+      setTimeout(() => say(pick(lines().fakeTurn)), 1200); // nói lúc búp bê đã quay mặt (nhạc đang ngừng)
       return phaseInfo();
     },
     // Búp bê ngủ gật: DOLL_SLEEP_MS không hát, không bắn — ai nhanh tay thì lao lên; tỉnh dậy là quay mặt luôn
@@ -1404,7 +1444,7 @@ function create(ctx, saved = {}) {
       sleepUntil = lightEndsAt;
       broadcastPhase();
       ctx.broadcast('rl.fx', { kind: 'dollSleep', ms: DOLL_SLEEP_MS });
-      say(pick(LINES.dollSleep));
+      say(pick(lines().dollSleep));
       return phaseInfo();
     },
     // Hồi sinh: tối đa REVIVE_MAX người vừa bị loại gần nhất (ưu tiên người xem thật) đứng dậy chạy tiếp ở chỗ cũ
@@ -1413,14 +1453,18 @@ function create(ctx, saved = {}) {
       const dead = reviveRecent(REVIVE_MAX);
       if (!dead.length) throw new Error('Chưa có ai bị loại để hồi sinh');
       const names = dead.filter((p) => !p.npc).map((p) => p.name);
-      announce(names.length ? `Hồi sinh! ${names.slice(0, 3).join(', ')}${names.length > 3 ? ' và mấy người nữa' : ''} sống lại rồi!` : 'Hồi sinh! Có người vừa sống lại!');
+      announce(
+        names.length
+          ? L(`Hồi sinh! ${names.slice(0, 3).join(', ')}${names.length > 3 ? ' và mấy người nữa' : ''} sống lại rồi!`, `Revive! ${names.slice(0, 3).join(', ')}${names.length > 3 ? ' and a few others' : ''} are back in the game!`)
+          : L('Hồi sinh! Có người vừa sống lại!', 'Revive! Someone is back in the game!')
+      );
       return { revived: dead.map((p) => p.name) };
     },
     // Người điều phối thả cướp biển khổng lồ (lâu lâu một lần cho hấp dẫn) — chỉ khi đang chạy ván
     releaseGiant: () => {
       if (phase !== 'play' || purge) throw new Error('Chỉ thả được khi đang chơi ván');
       if (!releaseStomper(null, S().stompMax)) throw new Error('Không có ai đang chạy trên sân');
-      announce('Cướp biển khổng lồ xuất hiện! Chạy khỏi đường nó đi!');
+      announce(L('Cướp biển khổng lồ xuất hiện! Chạy khỏi đường nó đi!', 'The pirate giant is here! Get out of its way!'));
       return phaseInfo();
     },
     forceRed: () => {
@@ -1516,6 +1560,14 @@ function create(ctx, saved = {}) {
         broadcastRoster();
       }
       if ('autoLoop' in changed) broadcastPhase();
+      // đổi ngôn ngữ: người máy đổi sang biệt danh theo ngôn ngữ mới
+      if ('lang' in changed) {
+        const names = (isEn() ? EN.NPC_NAMES : NPC_NAMES).slice().sort(() => Math.random() - 0.5);
+        npcList().forEach((p, i) => {
+          p.name = names[i % names.length];
+        });
+        broadcastRoster();
+      }
     },
     getPublicState() {
       const real = realPlayers();
@@ -1525,7 +1577,14 @@ function create(ctx, saved = {}) {
           roster: rosterView(),
           results,
           lastWinners,
-          legend: LEGEND.map((it) => (it.kind === 'stomp' ? { ...it, short: `DẪM ${S().stompMax}`, desc: `hoá khổng lồ chạy dẫm tối đa ${S().stompMax} người` } : it)),
+          legend: LEGEND.map((it) => {
+        if (isEn()) {
+          const e = EN.LEGEND[it.kind] || {};
+          const n = S().stompMax;
+          return { ...it, gift: it.tiktok, label: e.label || it.label, short: typeof e.short === 'function' ? e.short(n) : e.short || it.short, desc: typeof e.desc === 'function' ? e.desc(n) : e.desc || it.desc };
+        }
+        return it.kind === 'stomp' ? { ...it, short: `DẪM ${S().stompMax}`, desc: `hoá khổng lồ chạy dẫm tối đa ${S().stompMax} người` } : it;
+      }),
           queue: queueView(),
           queueNeed: S().queueLikes,
           counts: {
@@ -1581,7 +1640,9 @@ module.exports = {
     graceMarginMs: [0, 5000],
     runSpeed: [2, 12],
     dollTurnVolume: [0, 1],
-    songMode: { type: 'enum', values: ['random', ...MODES] }
+    songMode: { type: 'enum', values: ['random', ...MODES] },
+    lang: { type: 'enum', values: ['vi', 'en'] },
+    enVoice: { type: 'enum', values: ttsEn.VOICES }
   },
   defaultSettings: {
     lobbySeconds: 15,
@@ -1603,6 +1664,8 @@ module.exports = {
     songEnabled: true, // đèn xanh theo câu hát của búp bê; tắt thì dùng greenMin/greenMax
     dollTurnVolume: 0.1, // âm lượng tiếng servo búp bê xoay đầu (0 = tắt, 1 = to nhất)
     giftCam: false, // camera lướt tới, zoom vào người tặng quà vài giây rồi quay về toàn sân
+    lang: 'vi', // ngôn ngữ màn hình + giọng đọc: 'vi' (mặc định) hoặc 'en' (bản tiếng Anh)
+    enVoice: ttsEn.DEFAULT_VOICE, // giọng đọc tiếng Anh (giọng macOS) khi lang = 'en'
     graceMinMs: GRACE_MIN, // ân hạn đèn đỏ chung cho mọi người (tối thiểu khi bật perPlayerGrace)
     perPlayerGrace: false, // bật: ân hạn từng người = độ trễ đo được lớn nhất + graceMarginMs (không nhỏ hơn graceMinMs)
     graceMarginMs: GRACE_MARGIN, // ân hạn = độ trễ lớn nhất đo được + chừng này

@@ -6,6 +6,7 @@ const FAMILY = 'Nguyễn Trần Lê Phạm Hoàng Huỳnh Phan Vũ Võ Đặng B
 const GIVEN = 'Lan Hùng Mai Tuấn Linh Khang Trang Phong Thảo Nam Vy Huy Nhi Long Hà Quân Yến Đạt Chi Sơn'.split(' ');
 const NICKS = ['Bé Su', 'Tí Đẹp Trai', 'Hai Lúa', 'Mây Lang Thang', 'Sóc Nâu', 'Gió Đồng', 'Bin Bon', 'Nắng Mai', 'Đá Cuội', 'Cún Con'];
 const CHATS = ['vào', 'me', '1', 'cho mình chơi', 'chạy nè', 'hihi', 'ai về nhất', 'đèn đỏ kìa', '❤️', 'chơi với'];
+const EN = require('./i18n-en').SIM;
 const GIFTS = [
   { giftName: 'Rose', coins: 1 },
   { giftName: 'Rose', coins: 1 },
@@ -22,10 +23,12 @@ const GIFTS = [
 
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-function makeCrowd(n) {
+function makeCrowd(n, en = false) {
   const out = [];
   for (let i = 0; i < n; i++) {
-    const name = Math.random() < 0.3 ? pick(NICKS) : `${pick(FAMILY)} ${pick(GIVEN)}`;
+    const name = en
+      ? Math.random() < 0.3 ? pick(EN.NICKS) : `${pick(EN.FIRST)} ${pick(EN.LAST)}`
+      : Math.random() < 0.3 ? pick(NICKS) : `${pick(FAMILY)} ${pick(GIVEN)}`;
     out.push({
       user: { user: name, uniqueId: `sim_${i}`, avatar: '', sim: true },
       joined: false,
@@ -37,13 +40,19 @@ function makeCrowd(n) {
   return out;
 }
 
-function createSim({ onEvent, getPhase, crowd }) {
-  let people = makeCrowd(crowd());
+function createSim({ onEvent, getPhase, crowd, lang = () => 'vi' }) {
+  let people = makeCrowd(crowd(), lang() === 'en');
+  let peopleLang = lang();
   let timer = null;
 
   function ensureCrowd() {
     const n = crowd();
-    if (people.length < n) people = people.concat(makeCrowd(n).slice(people.length).map((p, i) => ({ ...p, user: { ...p.user, uniqueId: `sim_${people.length + i}` } })));
+    // đổi ngôn ngữ phòng: tạo lại người ảo với tên theo ngôn ngữ mới (người đã vào sân giữ tên cũ tới hết ván)
+    if (lang() !== peopleLang) {
+      peopleLang = lang();
+      people = makeCrowd(n, peopleLang === 'en');
+    }
+    if (people.length < n) people = people.concat(makeCrowd(n, lang() === 'en').slice(people.length).map((p, i) => ({ ...p, user: { ...p.user, uniqueId: `sim_${people.length + i}` } })));
   }
 
   // Lịch sử đèn để mỗi người ảo "thấy" đèn trễ lagMs
@@ -65,12 +74,12 @@ function createSim({ onEvent, getPhase, crowd }) {
         // Vào dần: lúc chờ vào nhanh hơn
         if (Math.random() < (phase === 'lobby' ? 0.08 : 0.01)) {
           p.joined = true;
-          onEvent({ type: 'chat', user: p.user, text: pick(CHATS) });
+          onEvent({ type: 'chat', user: p.user, text: pick(lang() === 'en' ? EN.CHATS : CHATS) });
         }
         continue;
       }
       if (phase !== 'play') {
-        if (Math.random() < 0.004) onEvent({ type: 'chat', user: p.user, text: pick(CHATS) });
+        if (Math.random() < 0.004) onEvent({ type: 'chat', user: p.user, text: pick(lang() === 'en' ? EN.CHATS : CHATS) });
         continue;
       }
       const seen = seenLight(p.lagMs);
@@ -98,7 +107,7 @@ function createSim({ onEvent, getPhase, crowd }) {
       const idle = people.filter((p) => !p.joined).length;
       if (idle < n && people.length < 200) {
         const start = people.length;
-        people = people.concat(makeCrowd(Math.min(n - idle, 200 - start)).map((p, i) => ({ ...p, user: { ...p.user, uniqueId: `sim_${start + i}` } })));
+        people = people.concat(makeCrowd(Math.min(n - idle, 200 - start), lang() === 'en').map((p, i) => ({ ...p, user: { ...p.user, uniqueId: `sim_${start + i}` } })));
       }
       let added = 0;
       for (const p of people) {
@@ -106,7 +115,7 @@ function createSim({ onEvent, getPhase, crowd }) {
         if (p.joined) continue;
         p.joined = true;
         added++;
-        onEvent({ type: 'chat', user: p.user, text: pick(CHATS) });
+        onEvent({ type: 'chat', user: p.user, text: pick(lang() === 'en' ? EN.CHATS : CHATS) });
       }
       return { added };
     },

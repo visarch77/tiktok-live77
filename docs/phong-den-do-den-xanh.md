@@ -338,6 +338,14 @@ Trước khi cân lại: Heart Me (1 xu) giết 3 người — đã đổi thàn
 | 😴 Búp bê ngủ gật | `redlight.dollSleep` | đang chơi (cả lúc đèn đỏ) | 6 s đèn xanh không câu hát, không bắn, chữ Z bay trên đầu búp bê; hết giờ búp bê tỉnh dậy quay mặt (báo trước → đỏ) |
 | 🙏 Hồi sinh | `redlight.revive` | đang chơi, có người bị loại | tối đa 5 người bị loại gần nhất (ưu tiên người xem thật, không tính bản sao) sống lại ở chỗ cũ |
 
+## Bản tiếng Anh (cài đặt `lang`, mặc định `vi`)
+
+Trang quản lý → ⚙️ Cài đặt → "Ngôn ngữ phòng": Tiếng Việt (giữ nguyên mọi chữ / giọng đọc cũ) hoặc English. English đổi:
+chữ trên màn hình (`L(vi, en)` trong redlight.js), tiêu đề trang, bảng kỹ năng + tên quà TikTok tiếng Anh, băng quà,
+giọng đọc (câu trong `src/modes/redlight/i18n-en.js`, đọc bằng giọng macOS qua lệnh `say` — `tts-en.js`, cache
+`/tts-cache/en_*.m4a`; chọn giọng ở "Giọng đọc tiếng Anh", mặc định Samantha), biệt danh người máy (đổi ngay khi đổi
+ngôn ngữ), tên / bình luận người ảo khi chơi thử. Trang quản lý vẫn tiếng Việt (cho người điều phối).
+
 ## Camera zoom người tặng quà (tuỳ chọn, mặc định tắt)
 
 Cài đặt `giftCam` (trang quản lý → ⚙️ Cài đặt → "Camera zoom người tặng quà"). Bật: mỗi lần có quà, phần sân (nền,
