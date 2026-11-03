@@ -1355,7 +1355,7 @@
       g.fill();
       const ink = tm.id === 3 ? '#222' : '#fff';
       text(`${tm.id} · ${L('ĐỘI', 'TEAM')} ${(tm.name || '').toUpperCase()}`, x + 20, y + 26, { size: 19, weight: 900, color: ink, align: 'left' });
-      text(`${tm.count}/${tm.max}${tm.wins ? `  🏆${tm.wins}` : ''}`, x + cw - 18, y + 26, { size: 17, weight: 800, color: ink, align: 'right' });
+      text(`${tm.bank ? `🎒${tm.bank}  ` : ''}${tm.count}/${tm.max}${tm.wins ? `  🏆${tm.wins}` : ''}`, x + cw - 18, y + 26, { size: 17, weight: 800, color: ink, align: 'right' });
       let when = '';
       if (tm.status === 'wait' || tm.status === 'final') {
         if (!ph.bracket || ph.exhibition) when = (ph.ready || []).includes(tm.id) ? L('✅ đủ người', '✅ ready') : L(`cần ${ph.minTeamPlayers || 1} người`, `needs ${ph.minTeamPlayers || 1}`);
@@ -1365,15 +1365,20 @@
       else if (tm.status === 'out') when = L('tặng quà tiếp sức đội thua', 'gift to help the losers');
       text(`${st[0]} ${st[1]}`, x + 16, y + 60, { size: 17, weight: 900, color: st[2], align: 'left' });
       if (when) text(when, x + cw - 16, y + 60, { size: 15, weight: 800, color: tm.nextIn === 1 ? '#ffe066' : '#bbb', align: 'right', maxW: cw / 2 });
+      // danh sách 2 cột × 4 hàng (tối đa 8 người, theo lực cả giải; điểm nhỏ bên phải mỗi tên)
       const list = tm.top || [];
       if (!list.length) text(L('Chưa có ai · bình luận ', 'Empty · comment ') + tm.id, x + cw / 2, y + 112, { size: 16, color: '#888' });
-      list.slice(0, 3).forEach((p, j) => {
-        const ly = y + 86 + j * 23;
-        text(j === 0 && p.force > 0 ? '👑' : `${j + 1}.`, x + 26, ly, { size: 15, weight: 800, color: '#ddd' });
-        text(p.name, x + 46, ly, { size: 16, weight: 700, color: '#fff', align: 'left', maxW: cw - 120 });
-        if (p.force > 0) text(`${p.force}`, x + cw - 16, ly, { size: 15, weight: 800, color: tm.color, align: 'right' });
+      const colW = (cw - 24) / 2;
+      list.slice(0, 8).forEach((p, j) => {
+        const col = Math.floor(j / 4);
+        const ly = y + 82 + (j % 4) * 19;
+        const cx = x + 12 + col * colW;
+        text(j === 0 && p.force > 0 ? '👑' : `${j + 1}`, cx + 10, ly, { size: 13, weight: 800, color: j === 0 ? '#ffd43b' : '#aab' });
+        text(p.name, cx + 22, ly, { size: 14, weight: 700, color: '#fff', align: 'left', maxW: colW - (p.force > 0 ? 64 : 28) });
+        if (p.force > 0) text(`${p.force}`, cx + colW - 6, ly, { size: 13, weight: 800, color: tm.color, align: 'right' });
       });
-      if (tm.bank) text(L(`🎒${tm.bank} để dành`, `🎒${tm.bank} saved`), x + cw - 16, y + 146, { size: 14, weight: 800, color: '#ffd43b', align: 'right' });
+
+
       g.globalAlpha = 1;
     });
   }

@@ -757,7 +757,7 @@ function create(ctx, saved = {}) {
       top: hs
         .slice()
         .sort((x, y) => y.cupForce - x.cupForce || x.joinedAt - y.joinedAt)
-        .slice(0, 5)
+        .slice(0, 10)
         .map((p) => ({ key: p.key, name: p.name, force: Math.round(p.cupForce), variant: p.variant })),
       onLine: m && onField(t) ? lineup[sideOf(t)].length : 0
     };
