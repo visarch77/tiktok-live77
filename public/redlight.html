@@ -2,14 +2,19 @@
 <html lang="vi">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <!-- mở từ biểu tượng ngoài màn hình chính điện thoại: chạy toàn màn hình, không thanh địa chỉ -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0b1020" />
   <title>Đèn Xanh – Đèn Đỏ</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;900&display=swap" rel="stylesheet" />
   <style>
     html, body { margin: 0; height: 100%; background: #0b1020; overflow: hidden; }
     body { display: flex; align-items: center; justify-content: center; font-family: 'Be Vietnam Pro', system-ui, sans-serif; }
-    canvas { display: block; }
+    canvas { display: block; flex: none; }
     #unlock {
       position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
       background: rgba(0,0,0,.65); color: #fff; padding: 8px 14px; border-radius: 999px; font-size: 13px; cursor: pointer;

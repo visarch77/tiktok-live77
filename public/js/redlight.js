@@ -88,8 +88,12 @@
   let purgeAt = 0; // lúc lính bắt đầu tiến (0 = ở chỗ cũ)
   let purgeMarch = 1300;
 
+  // Điện thoại (màn hình cảm ứng, dài hơn 9:16): phóng to cho lấp kín chiều cao, cắt bớt hai mép trái / phải nhưng không
+  // lấn vào vùng chữ SAFE_L…SAFE_R. ?fill=1 bật ở mọi máy, ?fill=0 tắt; OBS / LIVE Studio / xem trước giữ nguyên khung 9:16.
+  const FILL = params.get('fill') === '1' || (params.get('fill') !== '0' && !OBS && !PREVIEW && window.matchMedia('(pointer: coarse)').matches);
   function fit() {
-    const s = Math.min(window.innerWidth / W, window.innerHeight / H);
+    const contain = Math.min(window.innerWidth / W, window.innerHeight / H);
+    const s = FILL ? Math.max(contain, Math.min(window.innerHeight / H, window.innerWidth / (SAFE_R - SAFE_L))) : contain;
     canvas.style.width = `${W * s}px`;
     canvas.style.height = `${H * s}px`;
   }
