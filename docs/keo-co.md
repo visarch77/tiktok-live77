@@ -96,7 +96,7 @@ x = x − v·dt
 
 ## Màn hình
 
-Bố cục chừa chỗ cho giao diện TikTok LIVE: hai lề 48 px; trên cùng ~180 px (tên chủ phòng, người xem) và từ ~1340 trở xuống
+Bố cục chừa chỗ cho giao diện TikTok LIVE: hai lề 72 px; trên cùng ~180 px (tên chủ phòng, người xem) và từ ~1340 trở xuống
 (khung bình luận, nút quà) để trống / chỉ đặt chữ phụ.
 
 | Vùng (y) | Nội dung |
@@ -104,7 +104,7 @@ Bố cục chừa chỗ cho giao diện TikTok LIVE: hai lề 48 px; trên cùng
 | 184–330 | Tên giải + đồng hồ, sơ đồ BK1 · BK2 · CK |
 | 338–398 | **Thông báo đội ở giữa**: "🔥 BÁN KẾT 1: ĐỘI … vs ĐỘI …" + trận tiếp theo / tin vào đội (băng quà đè lên 2,6 s) |
 | 406–476 | **Thanh tiến độ kiểu thanh máu**: khung tối viền neon, hai nửa màu đội đặc (dải bóng mảnh), vệt sáng "vừa mất" bám theo khi dây trôi, tia điện ở chỗ giáp ranh, sóng năng lượng từ đội mạnh hơn, mốc 25/50/75%, nút dây chia đôi màu hai đội, đội sát mép vực nháy đỏ "⚠ NGUY HIỂM"; % (đội mạnh hơn màu vàng) + tên đội trong thanh |
-| 484–640 | Cận cảnh hai người đầu dây; hai góc: số người (+🤖), 👑 người kéo khoẻ nhất |
+| 484–640 | **Đồng hồ đếm ngược số to** ở giữa (số nảy mỗi giây; 10 giây cuối đỏ, rung, tích tắc; phút chót màu cam); hai bên: tên đội, số người (+🤖), 👑 người kéo khoẻ nhất; thẻ kỹ năng bật lên ở hai bên |
 | 640–720 | Dải bình luận (3 hàng) có đường chỉ xuống tên trên đầu |
 | 745–880 | Sân kéo |
 | 896–990 | **Hàng ảnh quà TikTok** ngay dưới sân (ảnh quà trên, tên kỹ năng dưới) |
@@ -144,6 +144,11 @@ Cù lét (🪶 + người đầu dây cười buông tay), Găng keo (keo xanh n
 Bôi mỡ (mỡ nhỏ giọt, đoạn dây bóng vàng nhấp nháy, "TRƠN TUỘT!"), Lực sĩ (khói + "LỰC SĨ ĐẾN!" + lực sĩ to đứng kéo),
 Thả boom (khói vàng bay sang + "BỦMMM", 💫), Hò dô ("HÒ!"/"DÔ!" luân phiên trên đội), Khổng lồ dẫm (bàn chân dẫm + "RẦM!" + rung màn hình).
 Đòn bị chặn: thẻ xanh "🧤 BỊ CHẶN!" + vòng khiên xanh quanh đội được bảo vệ.
+
+Mỗi kỹ năng còn có **tiếng hiệu ứng riêng** (WebAudio tự tạo): gồng "ting-ting-boing", tăng lực "ực ực + lấp lánh", cù lét tiếng cười,
+găng keo "nhóp nhép", cổ vũ kèn + đám đông, bôi mỡ "víuuu – bẹp", lực sĩ "BÙM + ta-da", thả boom xì hơi, hò dô hai tiếng trống lớn,
+khổng lồ "ẦMMM", bị chặn "keng". Và **bong bóng thoại trên đầu nhân vật**: người dùng kỹ năng la lên ("GỒNGGG!! 💪", "Xin lỗi... 😳💨"),
+người trúng đòn kêu ("Thối quá!! 🤢", "Ha ha ha nhột quá!", "Ai bôi mỡ vậy trời?!"), đội được găng keo bảo vệ đáp "Hụt rồi nhé! 😎".
 
 ## Chơi thử (trang quản lý → 🎮 Chơi thử, chỉ khi chưa live)
 

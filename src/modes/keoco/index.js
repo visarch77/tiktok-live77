@@ -1054,12 +1054,16 @@ function create(ctx, saved = {}) {
       if (!it) throw new Error(`Không có kỹ năng: ${params.skill}`);
       // người tặng thử của đội (tạo nếu chưa có)
       const u = { user: L(`Thử Đội ${team}`, `Tester ${team}`), uniqueId: `test_t${team}`, avatar: '', sim: true };
+      // người thử luôn ở đúng đội đang chọn (kể cả khi đội đã đầy)
       let p = players.get(u.uniqueId);
       if (!p) {
-        ctx.simulated(() => onEvent({ type: 'chat', user: u, text: String(team) }));
-        p = players.get(u.uniqueId);
+        const qi = queue.findIndex((q) => q.key === u.uniqueId);
+        if (qi >= 0) queue.splice(qi, 1);
+        p = makePlayer(u, team);
+        p.sim = true;
       }
-      if (p && p.team !== team && !eliminated(team)) p.team = team;
+      if (p.team !== team) p.team = team;
+      if (onField(team)) refreshLineup();
       ctx.simulated(() => onEvent({ type: 'gift', user: u, giftName: it.tiktok, coins: it.coins, count: clamp(Number(params.count) || 1, 1, 3) }));
       rosterDirty = true;
       return { team, skill: it.skill, onField: onField(team), phase };

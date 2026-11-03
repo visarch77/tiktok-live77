@@ -39,14 +39,14 @@
   const LINE_LEN = 410; // chiều dài hàng mỗi bên (px)
   // Bố cục chừa chỗ cho giao diện TikTok LIVE: trên cùng ~170 px (tên chủ phòng, số người xem), từ ~1340 trở xuống
   // (khung bình luận, nút quà) dễ bị che → thông tin quan trọng nằm trong 180…1335; hai lề cách 48 px
-  const MX = 48;
+  const MX = 72; // lề hai bên (tránh nút / viền giao diện TikTok che)
   const CW = W - MX * 2;
   const Y_HUD = 184;
   const Y_STATUS = 338;
   const Y_BAR = 406;
   const BAR_H = 70;
   const Y_CLOSE = 484;
-  const CLOSE_H = 156;
+  const CLOSE_H = 156; // vùng giữa: đồng hồ to + thông tin hai đội
   const Y_GIFTS = 896;
   const Y_TEAMS = 1002;
   const Y_JOIN = 1346;
@@ -308,7 +308,109 @@
       default: return '';
     }
   }
+  // Tiếng hiệu ứng riêng mỗi kỹ năng (tự tạo bằng WebAudio, không dùng file)
+  function skillSfx(skill, blocked) {
+    if (!unlocked || previewMuted) return;
+    const c = audio.ensure();
+    if (!c) return;
+    const T = c.currentTime + 0.02;
+    const o = (f, at, dur, opt) => audio.osc(f, T + at, dur, opt);
+    const nz = (at, dur, opt) => audio.noise(T + at, dur, opt);
+    if (blocked) {
+      // "keng!" khiên chặn
+      o(1320, 0, 0.5, { type: 'triangle', vol: 0.12, attack: 0.002 });
+      o(1980, 0, 0.35, { type: 'sine', vol: 0.06, attack: 0.002 });
+      o(2640, 0.02, 0.25, { type: 'sine', vol: 0.04, attack: 0.002 });
+      return;
+    }
+    switch (skill) {
+      case 'gong': // ting-ting-ting đi lên + "boing"
+        [523, 659, 784, 1047].forEach((f, i) => o(f, i * 0.06, 0.18, { type: 'square', vol: 0.05, attack: 0.003 }));
+        o(220, 0.26, 0.35, { type: 'sine', vol: 0.14, slide: 440, attack: 0.005 });
+        break;
+      case 'energy': // ực ực ực + lấp lánh
+        for (let i = 0; i < 3; i++) o(520 - i * 40, i * 0.13, 0.09, { type: 'sine', vol: 0.12, slide: -260, attack: 0.004 });
+        [1568, 2093, 2637].forEach((f, i) => o(f, 0.42 + i * 0.05, 0.25, { type: 'sine', vol: 0.04, attack: 0.002 }));
+        break;
+      case 'tickle': // cười khúc khích: chuỗi nốt cao nảy
+        for (let i = 0; i < 7; i++) o(900 + (i % 2) * 220 + i * 25, i * 0.07, 0.06, { type: 'triangle', vol: 0.07, attack: 0.003 });
+        break;
+      case 'glue': // nhóp nhép + "bụp"
+        nz(0, 0.3, { vol: 0.12, type: 'lowpass', freq: 900, q: 6, sweepTo: 200 });
+        o(300, 0.22, 0.12, { type: 'sine', vol: 0.12, slide: -200, attack: 0.003 });
+        break;
+      case 'cheer': // kèn cổ vũ ta-ta-ta-taaa + đám đông hò
+        [523, 523, 523, 659].forEach((f, i) => o(f, i * 0.12, i === 3 ? 0.45 : 0.1, { type: 'sawtooth', vol: 0.05, attack: 0.01 }));
+        nz(0, 1.1, { vol: 0.07, type: 'bandpass', freq: 1200, q: 0.6 });
+        break;
+      case 'grease': // còi trượt xuống "víuuu" + "bẹp"
+        o(1600, 0, 0.5, { type: 'sine', vol: 0.09, slide: -1300, attack: 0.02 });
+        nz(0.48, 0.12, { vol: 0.16, type: 'lowpass', freq: 600 });
+        break;
+      case 'strong': // BÙM + ta-da kèn đồng
+        audio.kick(T, 0.5);
+        nz(0, 0.25, { vol: 0.12, type: 'lowpass', freq: 400 });
+        [[392, 494, 587], [523, 659, 784]].forEach((ch, k) => ch.forEach((f) => o(f, 0.25 + k * 0.18, k ? 0.6 : 0.15, { type: 'sawtooth', vol: 0.035, attack: 0.01 })));
+        break;
+      case 'fart':
+        audio.fart();
+        break;
+      case 'heave': // trống lớn "HÒ" – "DÔ"
+        for (let k = 0; k < 2; k++) {
+          o(110 - k * 20, k * 0.32, 0.35, { type: 'sine', vol: 0.3, slide: -50, attack: 0.002 });
+          nz(k * 0.32, 0.15, { vol: 0.1, type: 'lowpass', freq: 800 });
+        }
+        break;
+      case 'stomp': // ẦMMM khổng lồ dẫm + rung
+        o(70, 0.3, 0.7, { type: 'sine', vol: 0.4, slide: -35, attack: 0.002 });
+        nz(0.3, 0.6, { vol: 0.16, type: 'lowpass', freq: 300, sweepTo: 80 });
+        break;
+      default:
+        break;
+    }
+  }
+  // Câu nhân vật la lên khi dùng / trúng kỹ năng (bong bóng thoại trên đầu)
+  const SAY_GIVER = {
+    gong: [['GỒNGGG!! 💪', 'Xem anh đây!', 'Sức mạnh cơ bắp!'], ['POWER UP!! 💪', 'Watch this!', 'Muscle time!']],
+    energy: [['Uống đi anh em! 🧃', 'Nước thần đây!'], ['Drink up, team! 🧃', 'Magic juice!']],
+    tickle: [['Cù cù cù~ 🪶', 'Nhột chưa? 😝'], ['Tickle tickle~ 🪶', 'Ticklish? 😝']],
+    glue: [['Găng keo thần thánh! 🧤', 'Dính chặt rồi nha!'], ['Sticky gloves! 🧤', 'Glued tight!']],
+    cheer: [['Cố lên đội ơi! 📣', 'Hò dô ta nào!'], ['Go team go! 📣', 'You got this!']],
+    grease: [['Hehe trơn chưa! 🧈', 'Mỡ heo đây!'], ['Hehe, slippery! 🧈', 'Butter time!']],
+    strong: [['LỰC SĨ ĐÂY! 🏋️', 'Tránh ra để anh kéo!'], ['STRONGMAN HERE! 🏋️', 'Step aside!']],
+    fart: [['Xin lỗi... 😳💨', 'BỦMMM! 💨', 'Ăn hơi nhiều đậu...'], ['Oops... 😳💨', 'PFFFRT! 💨', 'Too many beans...']],
+    heave: [['HÒ DÔ!! 🥁', 'Cả đội kéo nào!'], ['HEAVE HO!! 🥁', 'All together now!']],
+    stomp: [['Khổng lồ ơi dẫm đi! 🦶', 'RẦM cho tui!'], ['Giant, STOMP! 🦶', 'Crush them!']]
+  };
+  const SAY_HIT = {
+    tickle: [['Ha ha ha nhột quá! 🤣', 'Đừng cù mà!'], ['Ha ha ha stop! 🤣', 'Not the tickles!']],
+    grease: [['Ai bôi mỡ vậy trời?!', 'Trơn tuột tay! 😱'], ['Who greased this?!', 'So slippery! 😱']],
+    fart: [['Thối quá!! 🤢', 'Ặc ặc… choáng!', 'Mùi gì kinh vậy?!'], ['It stinks!! 🤢', 'I\'m dizzy…', 'What is that smell?!']],
+    stomp: [['Á Á Á!! 😵', 'Cứu với!'], ['AAAH!! 😵', 'Help!']],
+    energy: [['Sảng khoái! ⚡', 'Hồi sức rồi!'], ['Refreshed! ⚡', 'Full power!']]
+  };
+  const SAY_BLOCK = [['Hụt rồi nhé! 😎', 'Găng keo đó cưng!'], ['Missed me! 😎', 'Sticky gloves, baby!']];
+  const skillSays = new Map(); // khoá người chơi → { text, until }
+  const pickLine = (pair) => {
+    const arr = pair[settings.lang === 'en' ? 1 : 0];
+    return arr[Math.floor(Math.random() * arr.length)];
+  };
+  function skillSpeech(p, t) {
+    const until = t + 2200;
+    if (p.blocked) {
+      // đội được găng keo bảo vệ đáp lại
+      const m = curMatch();
+      const oppSide = m && (p.team === m.a ? 'b' : 'a');
+      const list = oppSide === 'a' ? roster.lineA : roster.lineB;
+      if (list && list[0]) skillSays.set(list[0].k, { text: pickLine(SAY_BLOCK), until });
+      return;
+    }
+    if (p.giverKey && SAY_GIVER[p.skill]) skillSays.set(p.giverKey, { text: pickLine(SAY_GIVER[p.skill]), until });
+    if (SAY_HIT[p.skill]) (p.targets || []).slice(0, 2).forEach((k, i) => skillSays.set(k, { text: pickLine(SAY_HIT[p.skill]), until: until + i * 150 }));
+  }
   function onSkill(p, t) {
+    skillSfx(p.skill, p.blocked);
+    skillSpeech(p, t);
     if (p.giverKey) marks.set(p.giverKey, { kind: p.skill, until: t + 2500 });
     for (const k of p.targets || []) marks.set(k, { kind: `hit_${p.skill}`, until: t + 2200 });
     const m = curMatch();
@@ -336,7 +438,6 @@
       const gx = lineX(side, 2);
       for (let i = 0; i < 46; i++) particles.push({ kind: 'gas', x: gx, y: ROPE_Y - 20, vx: dir * (120 + Math.random() * 240), vy: -20 - Math.random() * 60, life: 1.6 + Math.random() * 0.6, t: 0, r: 12 + Math.random() * 18 });
       popText(L('BỦMMM 💨', 'PFFFRRT 💨'), gx, ROPE_Y - 90, '#c3e66b', t);
-      if (unlocked) audio.fart();
     } else if (p.skill === 'stomp') {
       stomp = { at: t, side: oside };
       shake = 18;
@@ -376,7 +477,7 @@
         continue;
       }
       const idx = skillCards.filter((x, j) => x.side === c.side && j < i).length; // thẻ thứ mấy bên này
-      const w = 470;
+      const w = Math.min(336, W / 2 - 150 - MX - 8); // không đè đồng hồ giữa
       const h = 74;
       const x = c.side === 'a' ? MX : W - MX - w;
       const y = Y_CLOSE + 6 + idx * (h + 6);
@@ -398,8 +499,18 @@
         const sc = 58 / Math.max(im.naturalWidth, im.naturalHeight);
         g.drawImage(im, 40 - (im.naturalWidth * sc) / 2, h / 2 - (im.naturalHeight * sc) / 2, im.naturalWidth * sc, im.naturalHeight * sc);
       }
-      text(c.title, 80, 24, { size: 24, weight: 900, color: c.blocked ? '#69db7c' : '#ffe066', align: 'left', stroke: 4, maxW: w - 92 });
-      text(c.line, 80, 54, { size: 17, weight: 700, color: '#fff', align: 'left', maxW: w - 92 });
+      text(c.title, 78, 22, { size: 22, weight: 900, color: c.blocked ? '#69db7c' : '#ffe066', align: 'left', stroke: 4, maxW: w - 88 });
+      // câu giải thích 2 dòng nếu dài
+      g.font = `700 15px ${FONT}`;
+      const words = String(c.line).split(' ');
+      let l1 = '';
+      let l2 = '';
+      for (const wd of words) {
+        if (!l2 && g.measureText(`${l1} ${wd}`.trim()).width <= w - 88) l1 = `${l1} ${wd}`.trim();
+        else l2 = `${l2} ${wd}`.trim();
+      }
+      text(l1, 78, l2 ? 44 : 50, { size: 15, weight: 700, color: '#fff', align: 'left', maxW: w - 88 });
+      if (l2) text(l2, 78, 62, { size: 15, weight: 700, color: '#fff', align: 'left', maxW: w - 88 });
       g.restore();
     }
     for (let i = pops.length - 1; i >= 0; i--) {
@@ -975,6 +1086,32 @@
       else if (d.st === 'tickle') text(L('HAHA', 'HAHA'), x, headY - 8, { size: 16, weight: 900, color: '#ffe066', stroke: 4 });
       else if (d.st === 'strain' && Math.floor(t / 300 + d.i) % 3 === 0) text('💦', x + 14 * (side === 'a' ? 1 : -1), headY + 10, { size: 16 });
       if (mk && mk.until > t && SKILL_EMOJI[mk.kind]) text(SKILL_EMOJI[mk.kind], x, headY - 30 - (1 - (mk.until - t) / 2500) * 20, { size: 30 });
+      const say = skillSays.get(d.p.k);
+      if (say && say.until > t) {
+        g.font = `800 16px ${FONT}`;
+        const tw = Math.min(230, g.measureText(say.text).width) + 20;
+        const by = placeLabel(x, headY - 44, tw, 30) ?? headY - 44;
+        const bx = Math.max(MX, Math.min(W - MX - tw, x - tw / 2));
+        const appear = Math.min(1, (t - (say.until - 2200)) / 120);
+        g.save();
+        g.globalAlpha = Math.min(1, (say.until - t) / 250) * appear;
+        roundRect(bx, by - 15, tw, 30, 14);
+        g.fillStyle = '#fff';
+        g.fill();
+        g.lineWidth = 2.5;
+        g.strokeStyle = '#1a1030';
+        g.stroke();
+        // đuôi bong bóng chỉ xuống miệng nhân vật
+        g.beginPath();
+        g.moveTo(x - 6, by + 14);
+        g.lineTo(x + 6, by + 14);
+        g.lineTo(x, Math.min(headY - 4, by + 26));
+        g.closePath();
+        g.fillStyle = '#fff';
+        g.fill();
+        text(say.text, bx + tw / 2, by + 1, { size: 16, weight: 800, color: '#1a1030', maxW: tw - 14 });
+        g.restore();
+      } else if (say) skillSays.delete(d.p.k);
       const HIT = { hit_energy: '⚡', hit_tickle: '🪶', hit_fart: '💫', hit_stomp: '💥', hit_grease: '🧈' };
       if (mk && mk.until > t && HIT[mk.kind]) text(HIT[mk.kind], x + Math.sin(t / 70) * 6, headY - 22, { size: 26 });
       // tên ngay trên đầu người chơi thật: chữ nhỏ, so le 3 tầng theo vị trí (người cạnh nhau ở tầng khác nhau),
@@ -1637,7 +1774,7 @@
   // Lực sĩ đứng cuối hàng khi có kỹ năng Lực sĩ
   function drawStrongman(side, team, t) {
     const te = side === 'a' ? live.ta : live.tb;
-    if (!te || !(te.strong > 0)) return;
+    if (!te || !(te.strong > 0) || ph.phase === 'matchEnd') return;
     // đứng sau hàng người, ngay sau 3 người đầu dây (luôn thấy trên màn hình)
     const gx = lineX(side, 3) + (side === 'a' ? -10 : 10);
     drawPose(team, 99, Math.floor(t / 600) % 2 ? 'plank' : 'strain', gx, ropeYAt(gx, t), side === 'a' ? 1 : -1, { scale: SPRITE_SCALE * 1.45 });
@@ -1648,68 +1785,51 @@
   function drawArena(t, dt) {
     const m = curMatch();
     if (!m || (ph.phase !== 'pull' && ph.phase !== 'intro')) return;
-    drawCloseup(m, t, Y_CLOSE);
+    if (ph.phase === 'pull') drawBigTimer(t);
     const info = (list, team, x, align) => {
       const humans = list.filter((p) => !p.npc).length;
       const bots = list.length - humans;
-      text(L(`${humans} người${bots ? ` + ${bots}🤖` : ''}`, `${humans} players${bots ? ` + ${bots}🤖` : ''}`), x, Y_CLOSE + 24, { size: 16, weight: 800, color: teamColor(team), align, stroke: 4 });
+      text(teamLabel(team), x, Y_CLOSE + 22, { size: 20, weight: 900, color: teamColor(team), align, stroke: 5, maxW: 300 });
+      text(L(`${humans} người${bots ? ` + ${bots}🤖` : ''}`, `${humans} players${bots ? ` + ${bots}🤖` : ''}`), x, Y_CLOSE + 50, { size: 17, weight: 800, color: '#dde', align, stroke: 4 });
       const best = list
         .filter((p) => !p.npc)
         .map((p) => ({ n: p.n, f: (pstate.get(p.k) || {}).force || 0 }))
         .sort((a, b) => b.f - a.f)[0];
-      if (best && best.f > 0) text(`👑 ${best.n}`, x, Y_CLOSE + 48, { size: 17, weight: 800, color: '#ffe066', align, stroke: 4, maxW: 250 });
+      if (best && best.f > 0) text(`👑 ${best.n}`, x, Y_CLOSE + 78, { size: 18, weight: 800, color: '#ffe066', align, stroke: 4, maxW: 300 });
     };
     info(roster.lineA, m.a, MX + 18, 'left');
     info(roster.lineB, m.b, W - MX - 18, 'right');
   }
-  // Cận cảnh: hai người đầu dây phóng to, đối mặt nhau giữa màn hình — thấy rõ mặt gồng, cắn dây, bị lôi…
-  function drawCloseup(m, t, y) {
-    const pa = roster.lineA[0];
-    const pb = roster.lineB[0];
-    if (!pa || !pb) return;
-    const x0 = MX;
-    const x1 = W - MX;
-    const CH = CLOSE_H;
-    panel(x0, y, x1 - x0, CH, { r: 16, fill: 'rgba(8,8,24,.55)', border: 'rgba(255,255,255,.18)' });
-    text(L('🎥 CẬN CẢNH ĐẦU DÂY', '🎥 FRONT LINE CLOSE-UP'), (x0 + x1) / 2, y + 14, { size: 13, weight: 800, color: '#ccd' });
+  // Đồng hồ đếm ngược số to giữa màn hình: mỗi giây số nảy lên; 10 giây cuối đỏ, rung + tích tắc; phút chót màu cam
+  let lastTickSec = -1;
+  function drawBigTimer(t) {
+    const ms = Math.max(0, ph.phaseEndsAt - now());
+    const sec = Math.ceil(ms / 1000);
+    const frac = sec - ms / 1000; // 0 → 1 trong mỗi giây
+    const last = sec <= 10;
+    if (last && sec !== lastTickSec && sec > 0) {
+      lastTickSec = sec;
+      if (unlocked && !previewMuted) audio.finalTick(Math.min(10, sec));
+    }
+    const pop = 1 + Math.max(0, 0.22 - frac) / 0.22 * (last ? 0.3 : 0.14);
+    const cx = W / 2 + (last ? Math.sin(t / 25) * 2.5 : 0);
+    const cy = Y_CLOSE + 70;
+    const color = ph.overtime ? '#ff922b' : last ? '#ff4d4f' : '#fff';
     g.save();
-    roundRect(x0, y, x1 - x0, CH, 16);
-    g.clip();
-    const cy = y + 96;
-    const shift = Math.max(-40, Math.min(40, -ropeX * 60)); // dây trôi về bên nào thì cả hai nghiêng theo
-    const ga = (x0 + x1) / 2 - 40 + shift;
-    const gb = (x0 + x1) / 2 + 40 + shift;
-    // dây
-    g.lineCap = 'round';
-    g.beginPath();
-    g.moveTo(x0 - 10, cy + Math.sin(t / 40) * tension * 2);
-    g.lineTo(x1 + 10, cy - Math.sin(t / 40) * tension * 2);
-    g.lineWidth = 14;
-    g.strokeStyle = '#5c3d22';
+    roundRect(W / 2 - 150, Y_CLOSE + 4, 300, 132, 22);
+    g.fillStyle = 'rgba(8,8,24,.78)';
+    g.fill();
+    g.lineWidth = 3;
+    g.strokeStyle = last ? `rgba(255,77,79,${0.5 + 0.5 * Math.sin(t / 90)})` : 'rgba(255,79,163,.7)';
     g.stroke();
-    g.lineWidth = 8;
-    g.strokeStyle = '#c4935f';
-    g.setLineDash([12, 9]);
-    g.lineDashOffset = -ropeX * SHIFT * 2;
-    g.stroke();
-    g.setLineDash([]);
-    const one = (p, side, team, gx) => {
-      const face = side === 'a' ? 1 : -1;
-      const mem = poseMem.get(p.k);
-      const pose = ph.phase === 'intro' ? 'pullA' : (mem && mem.pose) || 'pullA';
-      const st = (pstate.get(p.k) || {}).st || 'idle';
-      let rot = -face * Math.sin(t / 240 + side.length) * 0.06;
-      if (st === 'strain' || pose === 'bite') rot += Math.sin(t / 22) * 0.03;
-      if (pose === 'drag') rot += -face * Math.sin(t / 90) * 0.08;
-      drawPose(team, p.v, pose, gx, cy, face, { scale: SPRITE_SCALE * 1.45, rot, footY: pose === 'cheer' ? cy + 52 : null });
-    };
-    one(pa, 'a', m.a, ga);
-    one(pb, 'b', m.b, gb);
     g.restore();
-    text(pa.n, (x0 + x1) / 2 - 60, y + CH - 12, { size: 15, weight: 800, color: '#fff', align: 'right', stroke: 4, strokeColor: teamColor(m.a), maxW: 220 });
-    text(pb.n, (x0 + x1) / 2 + 60, y + CH - 12, { size: 15, weight: 800, color: '#fff', align: 'left', stroke: 4, strokeColor: teamColor(m.b), maxW: 220 });
+    text(ph.overtime ? L('PHÚT CHÓT', 'OVERTIME') : L('THỜI GIAN CÒN', 'TIME LEFT'), W / 2, Y_CLOSE + 24, { size: 17, weight: 900, color: ph.overtime ? '#ff922b' : '#ccd' });
+    g.save();
+    g.translate(cx, cy + 8);
+    g.scale(pop, pop);
+    text(fmtTime(ms), 0, 0, { size: 76, weight: 900, color, stroke: 8, strokeColor: 'rgba(0,0,0,.85)' });
+    g.restore();
   }
-
   // Lúc chờ / bốc thăm / vô địch: các đội đứng cổ vũ trên hai tháp
   function drawCrowd(t) {
     const teams = roster.teams.length ? roster.teams : [];
