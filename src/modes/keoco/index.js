@@ -1211,7 +1211,7 @@ module.exports = {
     fastStartPlayers: [2, 80],
     minTeamPlayers: [1, 20],
     aiShow: 'boolean',
-    pullMusic: { type: 'enum', values: ['epic', 'funny'] },
+    pullMusic: { type: 'enum', values: ['auto', 'epic', 'funny'] },
     autoLoop: 'boolean',
     lang: { type: 'enum', values: ['vi', 'en'] },
     enVoice: { type: 'enum', values: ttsEn.VOICES }
@@ -1225,7 +1225,7 @@ module.exports = {
     fastStartPlayers: 24,
     minTeamPlayers: 1, // đội có từ chừng này người thật trở lên mới tính là "có người"; cần ít nhất 2 đội như vậy để vào giải
     aiShow: true, // chưa đủ 2 đội: người máy tự kéo biểu diễn (không tính điểm)
-    pullMusic: 'epic', // nhạc lúc kéo: 'epic' kịch tính / 'funny' hành khúc hài
+    pullMusic: 'auto', // nhạc lúc kéo: 'auto' file nhạc thật nếu có (assets/keoco/music), không thì kịch tính tự tạo · 'epic' · 'funny'
     autoLoop: true,
     lang: 'vi',
     enVoice: ttsEn.DEFAULT_VOICE,

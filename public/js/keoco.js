@@ -263,6 +263,7 @@
         };
         if (unlocked) audio.resultJingle(true);
         fallSfx();
+        winStinger();
         break;
       }
       case 'champion':
@@ -652,6 +653,66 @@
     audio.configure({ musicOn: settings.bgMusicEnabled !== false, sfxOn: true, musicVolume: settings.musicVolume ?? 0.5 });
   }
   // Nhạc: chờ giải / vinh danh = nhạc chờ Squid; lúc kéo = hành khúc "ùm-pa" tự sáng tác (kèn tuba, kazoo, trống, còi trượt)
+  // Nhạc lúc kéo bằng file thật (tạo bằng AI nhạc), đặt ở /assets/keoco/music/: có file nào dùng file đó, thiếu thì dùng nhạc tự tạo.
+  //   pull_main  — nền suốt trận · pull_tense — khi dây sát mép vực · pull_final — 10 giây cuối · win — đoạn ngắn khi hết trận
+  // Các bản kéo chạy lặp, chuyển qua lại bằng cách mờ dần (crossfade) theo diễn biến trận.
+  const MUSIC_DIR = '/assets/keoco/music/';
+  const pullFiles = {};
+  for (const key of ['pull_main', 'pull_tense', 'pull_final', 'win']) {
+    fetch(`${MUSIC_DIR}${key}.mp3`, { method: 'HEAD' })
+      .then((r) => {
+        if (!r.ok) return;
+        const el = new Audio(`${MUSIC_DIR}${key}.mp3?v=${AV}`);
+        el.loop = key !== 'win';
+        el.preload = 'auto';
+        pullFiles[key] = { el, wired: false, vol: 0 };
+      })
+      .catch(() => {});
+  }
+  const usePullFiles = () => settings.pullMusic !== 'epic' && settings.pullMusic !== 'funny' && Boolean(pullFiles.pull_main);
+  function filePullMusic(dt, want) {
+    const left = (ph.phaseEndsAt - now()) / 1000;
+    const edge = Math.abs(ropeX) > 0.55;
+    let cur = 'pull_main';
+    if (left < 10.5 && pullFiles.pull_final) cur = 'pull_final';
+    else if (edge && pullFiles.pull_tense) cur = 'pull_tense';
+    for (const key of ['pull_main', 'pull_tense', 'pull_final']) {
+      const tr = pullFiles[key];
+      if (!tr) continue;
+      const target = want && key === cur ? 1 : 0;
+      tr.vol += (target - tr.vol) * Math.min(1, dt * (target > tr.vol ? 2 : 3));
+      if (target === 0 && tr.vol < 0.01) {
+        tr.vol = 0;
+        if (!tr.el.paused) tr.el.pause();
+        // trận mới / hết trận: bản nền chạy lại từ đầu
+        if (!want) tr.el.currentTime = 0;
+        continue;
+      }
+      if (!tr.wired) tr.wired = audio.connectMusic(tr.el);
+      tr.el.volume = Math.max(0, Math.min(1, tr.vol));
+      if (tr.el.paused) {
+        if (key === 'pull_final') tr.el.currentTime = 0; // cao trào luôn vào từ đầu bài
+        tr.el.play().catch(() => {});
+      }
+    }
+  }
+  // đoạn thắng: chỉ dùng ~6 giây đầu của file, rồi mờ dần
+  function winFade(dt) {
+    const tr = pullFiles.win;
+    if (!tr || tr.el.paused) return;
+    if (tr.el.currentTime > 5.5) {
+      tr.el.volume = Math.max(0, tr.el.volume - dt * 1.2);
+      if (tr.el.volume <= 0.01) tr.el.pause();
+    }
+  }
+  function winStinger() {
+    const tr = pullFiles.win;
+    if (!tr || !unlocked || previewMuted || settings.bgMusicEnabled === false) return;
+    if (!tr.wired) tr.wired = audio.connectMusic(tr.el);
+    tr.el.currentTime = 0;
+    tr.el.volume = 1;
+    tr.el.play().catch(() => {});
+  }
   function musicTick(dt) {
     const resting = ph.phase === 'lobby' || ph.phase === 'draw' || ph.phase === 'champion';
     const want = unlocked && !previewMuted && settings.bgMusicEnabled !== false && resting;
@@ -671,7 +732,15 @@
       tr.el.volume = Math.max(0, Math.min(1, tr.vol));
       if (tr.el.paused) tr.el.play().catch(() => {});
     });
-    pullMusic();
+    const pulling = unlocked && !previewMuted && settings.bgMusicEnabled !== false && ph.phase === 'pull';
+    if (usePullFiles()) {
+      music.on = false;
+      filePullMusic(dt, pulling);
+    } else {
+      if (pullFiles.pull_main) filePullMusic(dt, false);
+      pullMusic();
+    }
+    winFade(dt);
     ambientSfx(dt);
   }
 

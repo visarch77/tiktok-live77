@@ -140,6 +140,8 @@ Bố cục chừa chỗ cho giao diện TikTok LIVE: hai lề 72 px; trên cùng
   người đang gồng / kiệt sức, giày rít + chà sàn khi một đội bị lôi, đám đông hô "HÒ… DÔ!" (dày hơn khi có Hò dô), "hự!" mỗi khi
   bong bóng hét bật lên. **Hết trận**: đội thua la thất thanh "Aaaaa…" rơi xuống vực rồi "bộp", còi trượt xuống; đội thắng hò "Yeee!".
 
+**Nhạc lúc kéo bằng file thật** (cài đặt "Nhạc lúc kéo" = Nhạc thật, mặc định): đặt MP3 vào `public/assets/keoco/music/` — `pull_main` (nền suốt trận), `pull_tense` (dây sát mép vực, |x| > 0,55), `pull_final` (10 giây cuối, luôn vào từ đầu bài), `win` (hết trận, dùng ~6 giây đầu rồi mờ). Ba bản kéo cùng 140 BPM, Rê thứ, chạy lặp, chuyển bằng mờ dần. Thiếu `pull_main` thì dùng nhạc tự tạo. Cách tạo bằng Suno/Udio: `design/keoco-music/HUONG-DAN.md`.
+
 ## Hiệu ứng kỹ năng
 
 Mỗi lần dùng kỹ năng: **thẻ to** bên phía đội dùng (ảnh quà + tên kỹ năng + một câu nói rõ chuyện gì xảy ra, vd. "💨 THẢ BOOM! 5 người
