@@ -53,7 +53,7 @@
   // Ảnh vẽ bằng Scenario (public/assets/redlight). manifest.json: tên → [rộng, cao, phụ]
   //   người chơi: phụ = [tâm x, tâm y, rộng] miếng vải số sau lưng; búp bê: phụ = [[x, y], ...] vị trí mắt (tỉ lệ)
   const ASSET = '/assets/redlight/';
-  const AV = 24; // đổi số này mỗi khi thay ảnh: /assets được cache 1 ngày
+  const AV = 25; // đổi số này mỗi khi thay ảnh: /assets được cache 1 ngày
   const IMG = {};
   // prettier-ignore
   const NAMES = ['bg', 'doll_0', 'doll_1', 'doll_2', 'doll_3', 'doll_4', 'guard_0', 'guard_1', 'guard_2',
@@ -62,7 +62,7 @@
     'fx_shield', 'fx_flash', 'fx_spark', 'fx_trail', 'fx_aura', 'fx_wave', 'fx_smoke', 'fx_feather',
     'ui_panel', 'ui_rank1', 'ui_rank2', 'ui_rank3', 'ui_rank4', 'ui_rank5',
     'gift_turbo', 'gift_shield', 'gift_fart', 'gift_clones', 'gift_wind', 'gift_giant', 'gift_chicken', 'gift_teamShield', 'gift_shove',
-    'gift_crowd', 'gift_stomp',
+    'gift_crowd', 'gift_revive', 'gift_stomp',
     'giant_run1', 'giant_run2', 'giant_run3', 'giant_run4', 'giant_run5', 'giant_run6'];
   for (const v of VLIST) for (const f of P_FRAMES) NAMES.push(`v${v}_${f}`);
   for (const n of NAMES) {
@@ -76,7 +76,7 @@
     .then((m) => (MAN = m))
     .catch(() => {});
   const ready = (im) => im && im.complete && im.naturalWidth > 0;
-  const ICON_OF = { turbo: 'ic_turbo', shield: 'ic_shield', fart: 'ic_shot', clones: 'ic_clones', wind: 'ic_push', giant: 'ic_giant', chicken: 'ic_chicken', teamShield: 'ic_team', crowd: 'ic_clones', stomp: 'ic_giant' };
+  const ICON_OF = { turbo: 'ic_turbo', shield: 'ic_shield', fart: 'ic_shot', clones: 'ic_clones', wind: 'ic_push', giant: 'ic_giant', chicken: 'ic_chicken', teamShield: 'ic_team', crowd: 'ic_clones', revive: 'ic_team', stomp: 'ic_giant' };
   // 6 lính canh trên lối đi sau vạch đích, hai bên búp bê (điểm chân)
   const GUARDS = [-1, 1].flatMap((side) => [0, 1, 2].map((i) => ({ x: W / 2 + side * (150 + i * 74), y: FY - 10, img: `guard_${i}`, side, fireAt: -1e9 })));
   // Hết giờ: 6 lính dàn hàng ngang tiến vào sân
@@ -495,7 +495,7 @@
             const sp = 0.06 + Math.random() * 0.1;
             fx.push({ type: 'gas', x: gp.x, y: by, vx: Math.cos(a) * sp * (Math.random() < 0.5 ? -1 : 1), vy: Math.sin(a) * sp * 0.6, r0: 10, r1: 70 + Math.random() * 50, t0: t0 + i * 60, life: 2200 });
           }
-          fx.push({ type: 'text', x: gp.x, y: gp.y - PH * 1.45, text: 'TẸTTTT 💨', color: '#d8f55a', size: 30, t0, life: 1600 });
+          fx.push({ type: 'text', x: gp.x, y: gp.y - PH * 1.45, text: 'BỦMMM 💨', color: '#d8f55a', size: 30, t0, life: 1600 });
         }
         (e.ids || []).forEach((id, i) => {
           const v = sprites.get(id);

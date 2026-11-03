@@ -318,8 +318,8 @@ Thời gian về đích gần như không đổi với mọi quà (về đích t
 | Donut (30) | đẩy 5 người dẫn đầu lùi 10 bước, mỗi người miễn 10 s | +1,1 / +4,4 | 5 người lùi ~2 s |
 | Mũ & ria (99) | khổng lồ 15 s | +1,8 / +6,8 | — |
 | Confetti (100) | khiên cho 10 người gần + người tặng | — | có lợi |
-| Hand Hearts (100) | **thả boom** (11/2026): tiếng xì hơi "tẹtttt" dài, khói vàng phụt ra từ mông người tặng; 5 người đứng gần nhất (combo tối đa 15) choáng váng 1,8 s rồi bị lính bắn; khiên đỡ được, khổng lồ miễn. Giọng đọc: "A thả boom làm 5 người xung quanh choáng váng!" | — | tối đa 5 người bị loại (bản sao chết thay chủ) |
-| Vòng cổ / Friendship Necklace (10) | 10 bản sao | không nhanh hơn; người thả tim bất chấp vẫn 0% về đích | — |
+| Hand Hearts (100) | **thả boom** (11/2026): tiếng xì hơi dài, chữ "BỦMMM", khói vàng phụt ra từ mông người tặng; 5 người đứng gần nhất (combo tối đa 15) choáng váng 1,8 s rồi bị lính bắn; khiên đỡ được, khổng lồ miễn. Giọng đọc: "A thả boom làm 5 người xung quanh choáng váng!" | — | tối đa 5 người bị loại (bản sao chết thay chủ) |
+| Vòng cổ / Friendship Necklace (10) | **hồi sinh** (11/2026, thay 5 bản sao): 2 người vừa bị loại gần nhất sống lại chạy tiếp ở chỗ cũ (ưu tiên người xem thật, combo tối đa 6). Giọng đọc: "A hồi sinh B và C!" | — | cứu 2 người |
 | Kính râm / Sunglasses (199) | cướp biển chân gỗ khổng lồ (Scenario, 6 khung chạy khập khiễn) lết chậm 230 px/s theo đường ngẫu nhiên qua 3 chỗ đông người; ai đứng sát chân lúc nó đi qua bị dẫm (xét theo thời gian thực — kịp chạy khỏi đường là thoát), tối đa `stompMax` người (mặc định 10; khiên đỡ, khổng lồ miễn) | hạng 21 → 18–20 | tối đa 10 người bị loại |
 | (người điều phối) | nút 🦶 "Thả khổng lồ" trong trang quản lý (lệnh `redlight.releaseGiant`, chỉ khi đang chơi): thả cướp biển như Kính râm, dẫm tối đa `stompMax` người, không có người tặng | — | tối đa 10 người bị loại |
 

@@ -657,6 +657,30 @@ function create(ctx, saved = {}) {
 
   // Đường chạy của khổng lồ: vào từ một mép (ngẫu nhiên trái/phải), lần lượt qua 3 chỗ đông người, ra mép kia.
   // Trả về [{ x (0..1), y (đơn vị sân), t (ms từ lúc bắt đầu) }]
+  // Hồi sinh tối đa max người vừa bị loại gần nhất (ưu tiên người xem thật, không tính bản sao), đứng dậy chạy tiếp ở chỗ cũ
+  function reviveRecent(max) {
+    if (phase !== 'play' || purge) return [];
+    const dead = [...players.values()]
+      .filter((p) => !p.alive && !p.finishRank && !p.cloneOf)
+      .sort((a, b) => (a.npc ? 1 : 0) - (b.npc ? 1 : 0) || b.deadAt - a.deadAt)
+      .slice(0, max);
+    const now = Date.now();
+    for (const p of dead) {
+      p.alive = true;
+      p.doomAt = 0;
+      p.doomCause = '';
+      p.deadAt = 0;
+      p.pending = 0;
+      p.dash = 0;
+      p.lastActiveAt = now;
+    }
+    if (dead.length) {
+      rosterDirty = true;
+      broadcastPositions();
+      ctx.broadcast('rl.fx', { kind: 'revive', ids: dead.map((p) => p.id) });
+    }
+    return dead;
+  }
   // Thả cướp biển khổng lồ: người tặng Kính râm (không dẫm người tặng), hoặc người điều phối thả (giver = null)
   function releaseStomper(giver, cap) {
     const others = runners().filter((v) => (!giver || v.key !== giver.key) && !v.doomAt);
@@ -773,6 +797,14 @@ function create(ctx, saved = {}) {
         ctx.broadcast('rl.fx', { kind: 'fart', from: p.id, ids: dazed.map((v) => v.id), ms: FART_DAZE_MS });
         const giver = speakName(p.name) || `Số ${p.num}`;
         announce(dazed.length ? `${giver} thả boom làm ${dazed.length} người xung quanh choáng váng!` : `${giver} thả boom nhưng không ai bị choáng!`);
+        break;
+      }
+      case 'revive': {
+        // Vòng cổ: hồi sinh 2 người vừa bị bắn gần nhất mỗi quà (combo tối đa 6)
+        const back = reviveRecent(Math.min(6, 2 * n));
+        const giver = speakName(p.name) || `Số ${p.num}`;
+        const names = back.filter((v) => !v.npc).map((v) => speakName(v.name) || `Số ${v.num}`);
+        if (back.length) announce(`${giver} hồi sinh ${names.length ? names.slice(0, 3).join(' và ') : `${back.length} người`}!`);
         break;
       }
       case 'crowd':
@@ -1378,24 +1410,8 @@ function create(ctx, saved = {}) {
     // Hồi sinh: tối đa REVIVE_MAX người vừa bị loại gần nhất (ưu tiên người xem thật) đứng dậy chạy tiếp ở chỗ cũ
     revive: () => {
       if (phase !== 'play' || purge) throw new Error('Chỉ dùng được khi đang chơi ván');
-      const dead = [...players.values()]
-        .filter((p) => !p.alive && !p.finishRank && !p.cloneOf)
-        .sort((a, b) => (a.npc ? 1 : 0) - (b.npc ? 1 : 0) || b.deadAt - a.deadAt)
-        .slice(0, REVIVE_MAX);
+      const dead = reviveRecent(REVIVE_MAX);
       if (!dead.length) throw new Error('Chưa có ai bị loại để hồi sinh');
-      const now = Date.now();
-      for (const p of dead) {
-        p.alive = true;
-        p.doomAt = 0;
-        p.doomCause = '';
-        p.deadAt = 0;
-        p.pending = 0;
-        p.dash = 0;
-        p.lastActiveAt = now;
-      }
-      rosterDirty = true;
-      broadcastPositions();
-      ctx.broadcast('rl.fx', { kind: 'revive', ids: dead.map((p) => p.id) });
       const names = dead.filter((p) => !p.npc).map((p) => p.name);
       announce(names.length ? `Hồi sinh! ${names.slice(0, 3).join(', ')}${names.length > 3 ? ' và mấy người nữa' : ''} sống lại rồi!` : 'Hồi sinh! Có người vừa sống lại!');
       return { revived: dead.map((p) => p.name) };
