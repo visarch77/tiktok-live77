@@ -53,7 +53,7 @@
   // Ảnh vẽ bằng Scenario (public/assets/redlight). manifest.json: tên → [rộng, cao, phụ]
   //   người chơi: phụ = [tâm x, tâm y, rộng] miếng vải số sau lưng; búp bê: phụ = [[x, y], ...] vị trí mắt (tỉ lệ)
   const ASSET = '/assets/redlight/';
-  const AV = 25; // đổi số này mỗi khi thay ảnh: /assets được cache 1 ngày
+  const AV = 26; // đổi số này mỗi khi thay ảnh: /assets được cache 1 ngày
   const IMG = {};
   // prettier-ignore
   const NAMES = ['bg', 'doll_0', 'doll_1', 'doll_2', 'doll_3', 'doll_4', 'guard_0', 'guard_1', 'guard_2',
@@ -1364,24 +1364,18 @@
     };
     items.forEach((it, i) => {
       const x = x0 + i * cw + cw / 2;
-      // kỹ năng
-      const ic = IMG[ICON_OF[it.kind]];
-      if (ready(ic)) fitImg(ic, x, y + 20, 34);
-      else text(it.emoji, x, y + 20, { size: 28 });
-      const lab = it.short || it.label;
-      g.font = `900 16px ${FONT}`;
-      const fsz = Math.max(10, Math.min(16, Math.floor((16 * (cw - 6)) / g.measureText(lab).width)));
-      text(lab, x, y + 46, { size: fsz, weight: 900, color: '#ffe066', stroke: 3 });
-      // quà TikTok để tặng (ảnh thật của TikTok) đặt ngay dưới
+      // ảnh quà TikTok to ở trên (nhìn là biết tặng quà gì), tên kỹ năng ở dưới
+      if (i > 0) {
+        g.fillStyle = 'rgba(255,255,255,0.10)';
+        g.fillRect(x - cw / 2, y + 14, 1, 72);
+      }
       const gi = IMG[`gift_${it.kind}`];
-      g.fillStyle = 'rgba(255,255,255,0.08)';
-      roundRect(x - cw / 2 + 6, y + 57, cw - 12, 38, 12);
-      g.fill();
-      if (ready(gi)) fitImg(gi, x - cw / 2 + 21, y + 76, 26);
-      const gw = cw - 44; // chỗ cho tên quà bên phải ảnh quà
-      g.font = `700 11px ${FONT}`;
-      const gsz = Math.max(8, Math.min(11, Math.floor((11 * gw) / g.measureText(it.gift).width)));
-      text(it.gift, ready(gi) ? x - cw / 2 + 36 : x, y + 76, { size: gsz, weight: 700, color: '#ffd8a8', align: ready(gi) ? 'left' : 'center' });
+      if (ready(gi)) fitImg(gi, x, y + 36, 56);
+      else text(it.emoji, x, y + 36, { size: 40 });
+      const lab = it.short || it.label;
+      g.font = `900 17px ${FONT}`;
+      const fsz = Math.max(10, Math.min(17, Math.floor((17 * (cw - 6)) / g.measureText(lab).width)));
+      text(lab, x, y + 80, { size: fsz, weight: 900, color: '#ffe066', stroke: 3 });
     });
   }
 
