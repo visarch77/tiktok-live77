@@ -561,7 +561,7 @@ function create(ctx, saved = {}) {
     p.deadAt = Date.now();
     rosterDirty = true;
     ctx.broadcast('rl.fx', { kind: 'out', id: p.id, cause, name: p.cloneOf ? '' : p.name, num: p.num });
-    if (!p.cloneOf && (cause === 'red' || cause === 'purge')) award(p, { stats: { rl_shot: 1 } });
+    if (!p.cloneOf && cause === 'red') award(p, { stats: { rl_shot: 1 } }); // lỡ tay thả tim lúc đèn đỏ
     if (!p.cloneOf) {
       // Chủ bị loại thì bản sao cũng ngã theo
       for (const c of clonesOf(p)) {
@@ -836,6 +836,7 @@ function create(ctx, saved = {}) {
         const back = reviveRecent(Math.min(6, 2 * n));
         const giver = numName(p);
         const names = back.filter((v) => !v.npc).map(numName);
+        for (const v of back) if (!v.npc && !v.cloneOf && v !== p) award(v, { stats: { rl_revived: 1 } });
         if (back.length) {
           announce(
             L(
@@ -1191,7 +1192,7 @@ function create(ctx, saved = {}) {
     // Người ảo ghi vào bảng riêng không lưu, chỉ để xem thử khi giả lập.
     for (const p of real) {
       const pts = p.finishRank ? 3 + Math.max(0, 4 - p.finishRank) : 0;
-      award(p, { points: pts, stats: { rounds: 1, wins: p.finishRank ? 1 : 0, podium: p.finishRank && p.finishRank <= 3 ? 1 : 0 } });
+      award(p, { points: pts, stats: { rounds: 1, wins: p.finishRank ? 1 : 0, podium: p.finishRank && p.finishRank <= 3 ? 1 : 0, rl_finish: p.finishRank ? 1 : 0, rl_first: p.finishRank === 1 ? 1 : 0 } });
     }
     if (finished.length) lastWinners = finished.slice(0, 10).map((p) => ({ name: p.name, num: p.num, avatar: p.avatar }));
     ctx.save();
@@ -1381,7 +1382,9 @@ function create(ctx, saved = {}) {
         else applyItem(p, item, Number(evt.count) || 1);
         sayItem(p, item.kind);
         const giftN = Math.max(1, Math.min(10, Number(evt.count) || 1));
-        award(p, { stats: { coins: (Number(evt.coins) || 1) * giftN, [item.kind === 'fart' ? 'fart' : `it_${item.kind}`]: giftN } });
+        const giftStats = { coins: (Number(evt.coins) || 1) * giftN, [item.kind === 'fart' ? 'fart' : `it_${item.kind}`]: giftN };
+        if (item.kind === 'shield' || item.kind === 'clones' || item.kind === 'teamShield') giftStats.rl_safe = giftN; // "Vua sợ die"
+        award(p, { stats: giftStats });
         p.lastActiveAt = Date.now();
         ctx.broadcast('rl.fx', {
           kind: 'gift',

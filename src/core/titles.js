@@ -27,17 +27,18 @@ const TITLES = [
   { stat: 'wins', emoji: '🏅', vi: 'Chiến thần', en: 'War God', at: [10, 50, 200], generic: true },
   { stat: 'mvp', emoji: '🪢', vi: 'Vua kéo co', en: 'Tug King', at: [3, 15, 50] },
   { stat: 'rounds', emoji: '🎖️', vi: 'Lão làng', en: 'Veteran', at: [20, 100, 400], generic: true },
-  // Đèn Xanh – Đèn Đỏ
-  { stat: 'it_turbo', emoji: '👟', vi: 'Vua tốc độ', en: 'Speed King', at: STD },
-  { stat: 'it_clones', emoji: '👥', vi: 'Ảo thuật gia', en: 'Magician', at: STD },
-  { stat: 'it_shove', emoji: '🤚', vi: 'Thánh đẩy', en: 'Pusher', at: STD },
-  { stat: 'it_shield', emoji: '🛡️', vi: 'Lá chắn thép', en: 'Iron Shield', at: STD },
-  { stat: 'it_revive', emoji: '🙏', vi: 'Bác sĩ hồi sinh', en: 'Medic', at: STD },
-  { stat: 'it_wind', emoji: '📢', vi: 'Loa phường', en: 'Loudspeaker', at: STD },
-  { stat: 'it_giant', emoji: '💪', vi: 'Người khổng lồ', en: 'Giant', at: STD },
-  { stat: 'it_teamShield', emoji: '🫧', vi: 'Bảo mẫu', en: 'Guardian', at: STD },
-  { stat: 'it_stomp', emoji: '🦶', vi: 'Khủng long dẫm', en: 'Stomper', at: STD },
-  { stat: 'rl_shot', emoji: '🎯', vi: 'Bia đỡ đạn', en: 'Bullet Magnet', at: [20, 100, 400] },
+  // Đèn Xanh – Đèn Đỏ (kiểu "Vua ...", mốc thấp hơn cho người chơi sớm thấy)
+  { stat: 'it_turbo', emoji: '👟', vi: 'Vua tốc độ', en: 'Speed King', at: [5, 25, 100] },
+  { stat: 'rl_shot', emoji: '🙌', vi: 'Vua trượt tay', en: 'Butterfinger King', at: [5, 25, 100] }, // lỡ tay thả tim lúc đèn đỏ → bị bắn
+  { stat: 'it_revive', emoji: '🙏', vi: 'Vua hồi sinh', en: 'Revive King', at: [3, 15, 60] },
+  { stat: 'rl_revived', emoji: '🐱', vi: 'Mạng mèo', en: 'Nine Lives', at: [3, 15, 60] }, // được người khác hồi sinh
+  { stat: 'rl_safe', emoji: '😱', vi: 'Vua sợ die', en: 'Scaredy King', at: [5, 25, 100] }, // khiên, bản sao, khiên đội
+  { stat: 'rl_finish', emoji: '🏁', vi: 'Vua về đích', en: 'Finish King', at: [5, 25, 100] },
+  { stat: 'rl_first', emoji: '🥇', vi: 'Vua về nhất', en: 'First Place King', at: [3, 15, 60] },
+  { stat: 'it_shove', emoji: '🤚', vi: 'Vua đẩy người', en: 'Shove King', at: [5, 25, 100] },
+  { stat: 'it_wind', emoji: '📢', vi: 'Vua loa phường', en: 'Loudspeaker King', at: [3, 15, 60] },
+  { stat: 'it_giant', emoji: '💪', vi: 'Vua khổng lồ', en: 'Giant King', at: [3, 15, 60] },
+  { stat: 'it_stomp', emoji: '🦶', vi: 'Vua dẫm đạp', en: 'Stomp King', at: [3, 15, 60] },
   // dùng chung hai trò
   { stat: 'fart', emoji: '💨', vi: 'Vua xì hơi', en: 'Fart King', at: STD },
   // Kéo Co
@@ -50,7 +51,7 @@ const TITLES = [
   { stat: 'sk_strong', emoji: '🏋️', vi: 'Bầu sô lực sĩ', en: 'Strongman Agent', at: STD },
   { stat: 'sk_heave', emoji: '🥁', vi: 'Thủ lĩnh hò dô', en: 'Chant Leader', at: STD },
   { stat: 'sk_banana', emoji: '🍌', vi: 'Vua vỏ chuối', en: 'Banana King', at: STD },
-  { stat: 'kc_greased', emoji: '🙌', vi: 'Vua trượt tay', en: 'Butterfingers', at: [10, 50, 200] },
+  { stat: 'kc_greased', emoji: '🧈', vi: 'Vua tuột tay', en: 'Slippery Hands', at: [10, 50, 200] },
   { stat: 'kc_tickled', emoji: '🤣', vi: 'Người nhột nhất', en: 'Most Ticklish', at: [5, 25, 100] },
   { stat: 'kc_slipped', emoji: '🤸', vi: 'Vua té oạch', en: 'Faceplant King', at: [5, 25, 100] },
   { stat: 'kc_tired', emoji: '😮‍💨', vi: 'Vua hụt hơi', en: 'Out of Breath', at: [10, 50, 200] }
