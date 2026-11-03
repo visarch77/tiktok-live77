@@ -107,6 +107,7 @@ class RoomManager {
       room.dispose();
       this.rooms.delete(id);
       const next = this.addRoom(cfg);
+      this.persist(); // lưu trò mới của phòng (khởi động lại server vẫn giữ)
       if (wasConnected || cfg.autoConnect) next.start();
       // báo màn hình đang mở (OBS / điện thoại): phòng đã sang trò khác → màn hình tự tải lại đúng trò mới
       next.broadcastState();

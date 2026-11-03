@@ -3,6 +3,8 @@ const { BY_GIFT_ID } = require('../redlight/items');
 const ttsEn = require('../redlight/tts-en');
 const { SKILLS, LEGEND, skillForGift } = require('./skills');
 const { skillComment, eventComment } = require('./commentary');
+const { ViewerBoard } = require('../../core/viewers');
+const { badgeOf, recordWithAwards, awardLine } = require('../../core/titles');
 const fs = require('fs');
 const path = require('path');
 const config = require('../../config');
@@ -159,6 +161,7 @@ function create(ctx, saved = {}) {
       avatar: u.avatar || '',
       team,
       variant: variantFor(key),
+      badge: npc ? { lv: 1, tt: '' } : badgeFor(u),
       npc,
       sim: Boolean(u.sim),
       joinedAt: Date.now(),
@@ -257,6 +260,37 @@ function create(ctx, saved = {}) {
   }
   let cm = { danger: { a: false, b: false }, last10: false, exhaustAt: 0 };
   const lastSkillSay = {};
+
+  // ---- cấp độ & danh hiệu (src/core/titles.js) ----
+  // Người ảo (thử) ghi vào bảng riêng không lưu, để xem thử hiệu ứng mà không làm bẩn bảng thật
+  const simBoard = new ViewerBoard();
+  const boardFor = (sim) => (sim ? simBoard : ctx.board);
+  function badgeFor(u) {
+    const v = boardFor(u.sim).peek({ user: u.user, uniqueId: viewerKey(u) });
+    return badgeOf(v ? v.stats : {}, isEn());
+  }
+  let lastAwardSayAt = 0;
+  // ghi điểm / thống kê cho một người; đạt cấp mới hay danh hiệu mới thì hiện hiệu ứng + đọc tên
+  function award(who, delta, p = null) {
+    if ((!who && !p) || (p && p.npc)) return;
+    const sim = p ? p.sim : Boolean(who.sim);
+    const key = p ? p.key : viewerKey(who);
+    if (!key) return;
+    const r = recordWithAwards(boardFor(sim), { user: p ? p.name : who.user, uniqueId: key, avatar: p ? p.avatar : who.avatar || '' }, delta, isEn());
+    const pl = p || players.get(key);
+    if (pl) {
+      pl.badge = r.badge;
+      rosterDirty = true;
+    }
+    for (const a of r.awards) {
+      fxMsg('award', { key, name: r.viewer.name, type: a.type, text: a.text, lv: r.badge.lv, tier: a.tier || 0 });
+      const now = Date.now();
+      if (now - lastAwardSayAt > 4000) {
+        lastAwardSayAt = now;
+        say(awardLine(speakName(r.viewer.name), a, isEn()), { prio: 1, ttl: 8000 });
+      }
+    }
+  }
 
   // ---- vào đội ----
   function joinTeam(u, want, { quiet = false } = {}) {
@@ -475,9 +509,9 @@ function create(ctx, saved = {}) {
     // điểm cá nhân: lực đã kéo; đội thắng +20% (trận biểu diễn không tính)
     for (const side of exhibition ? [] : ['a', 'b']) {
       for (const p of lineOf(side)) {
-        if (p.npc || p.sim) continue;
+        if (p.npc) continue;
         const pts = Math.round(p.matchForce * (side === winSide ? 1.2 : 1));
-        if (pts > 0) ctx.board.record({ user: p.name, uniqueId: p.key, avatar: p.avatar }, { points: pts, stats: { rounds: 1, wins: side === winSide ? 1 : 0 } });
+        if (pts > 0) award(p, { points: pts, stats: { rounds: 1, wins: side === winSide ? 1 : 0, mvp: mvp && mvp.key === p.key ? 1 : 0 } }, p);
       }
     }
     setPhase('matchEnd', 6000);
@@ -500,7 +534,7 @@ function create(ctx, saved = {}) {
       .map((p) => ({ name: p.name, force: Math.round(p.cupForce), variant: p.variant }));
     champion = { team, mvp, at: Date.now(), cup };
     history = [{ cup, team, mvp: mvp[0] ? mvp[0].name : '', at: Date.now() }, ...history].slice(0, 10);
-    for (const p of humans().filter((x) => x.team === team && !x.sim)) ctx.board.record({ user: p.name, uniqueId: p.key, avatar: p.avatar }, { points: 10, stats: { podium: 1 } });
+    for (const p of humans().filter((x) => x.team === team)) award(p, { points: 10, stats: { podium: 1, cups: 1 } }, p);
     ctx.save();
     setPhase('champion', S().championSeconds * 1000);
     fxMsg('champion', { team, mvp });
@@ -601,6 +635,13 @@ function create(ctx, saved = {}) {
         break;
     }
     fxMsg('skill', info);
+    // thống kê danh hiệu: người dùng kỹ năng + người bị trúng
+    if (giver) award(giver, { stats: { [skill === 'fart' ? 'fart' : `sk_${skill}`]: 1 } }, giver);
+    if (!blocked) {
+      const hitStat = { tickle: 'kc_tickled', banana: 'kc_slipped' }[skill];
+      if (hitStat) for (const k of info.targets || []) award(null, { stats: { [hitStat]: 1 } }, players.get(k));
+      if (skill === 'grease') for (const v of lineOf(sideOf(opp))) if (!v.npc) award(null, { stats: { kc_greased: 1 } }, v);
+    }
     // cùng một kỹ năng của cùng đội dùng liên tục: chỉ bình luận lần đầu trong 15 giây
     const sk = `${team}:${skill}`;
     if (now - (lastSkillSay[sk] || 0) < 15000) return;
@@ -644,6 +685,7 @@ function create(ctx, saved = {}) {
             p.stamina = 0.3;
             p.exhaustedUntil = now + EXHAUST_MS;
             fxMsg('exhaust', { key: p.key });
+            if (!p.npc) award(null, { stats: { kc_tired: 1 } }, p);
             if (!p.npc && now - cm.exhaustAt > 12000 && comment(eventComment('exhaust', { v: speakName(p.name) }, isEn()), 0)) cm.exhaustAt = now;
           }
         } else if (!out || now < p.exhaustedUntil) {
@@ -825,12 +867,12 @@ function create(ctx, saved = {}) {
         .slice()
         .sort((x, y) => y.cupForce - x.cupForce || x.joinedAt - y.joinedAt)
         .slice(0, 10)
-        .map((p) => ({ key: p.key, name: p.name, force: Math.round(p.cupForce), variant: p.variant })),
+        .map((p) => ({ key: p.key, name: p.name, force: Math.round(p.cupForce), variant: p.variant, lv: p.badge.lv, tt: p.badge.tt })),
       onLine: m && onField(t) ? lineup[sideOf(t)].length : 0
     };
   }
   function lineView(side) {
-    return lineOf(side).map((p) => ({ k: p.key, n: p.name, v: p.variant, npc: p.npc ? 1 : 0 }));
+    return lineOf(side).map((p) => ({ k: p.key, n: p.name, v: p.variant, npc: p.npc ? 1 : 0, lv: p.badge.lv, tt: p.badge.tt }));
   }
   function liveView() {
     const now = Date.now();
@@ -960,6 +1002,7 @@ function create(ctx, saved = {}) {
         } else return p;
         const giftLabel = isEn() ? (BY_GIFT_ID[String(evt.giftId || '')] ? String(BY_GIFT_ID[String(evt.giftId)]).replace(/\b\w/g, (c) => c.toUpperCase()) : evt.giftName) : evt.giftName;
         fxMsg('gift', { key: p ? p.key : '', name, team, gift: giftLabel, count, skill, mode });
+        award(u, { stats: { coins: (Number(evt.coins) || 1) * (Number(evt.count) || 1) } }, p && p.key === viewerKey(u) ? p : null);
         if (mode === 'bank') sayBanked(name, skill, team);
         ctx.emitEvent({ type: 'kcGift', user: name, gift: evt.giftName, label: SKILLS[skill].vi, emoji: SKILLS[skill].emoji });
         return p;

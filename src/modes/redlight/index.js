@@ -5,6 +5,7 @@ const ttsEn = require('./tts-en');
 const { createSim } = require('./sim');
 const { CUTS, MODES, MODE_NAMES, planSong } = require('./song');
 const { ViewerBoard } = require('../../core/viewers');
+const { badgeOf, recordWithAwards, awardLine } = require('../../core/titles');
 const fs = require('fs');
 const path = require('path');
 const config = require('../../config');
@@ -168,6 +169,7 @@ function create(ctx, saved = {}) {
       sim: Boolean(u.sim),
       npc: Boolean(u.npc)
     };
+    p.badge = p.npc ? { lv: 1, tt: '' } : badgeOf(((p.sim ? simBoard : ctx.board).peek({ user: p.name, uniqueId: p.key }) || {}).stats || {}, isEn());
     players.set(p.id, p);
     byKey.set(p.key, p.id);
     rosterDirty = true;
@@ -533,6 +535,23 @@ function create(ctx, saved = {}) {
     ctx.broadcast('rl.fx', { kind: 'spotted', id: p.id, ms: SPOT_MS });
   }
 
+  // Cấp độ & danh hiệu (src/core/titles.js): ghi thống kê, đạt cấp / danh hiệu mới thì hiệu ứng + đọc tên
+  let lastAwardSayAt = 0;
+  function award(p, delta) {
+    if (!p || p.npc || p.cloneOf) return;
+    const r = recordWithAwards(p.sim ? simBoard : ctx.board, { user: p.name, uniqueId: p.key, avatar: p.avatar }, delta, isEn());
+    p.badge = r.badge;
+    rosterDirty = true;
+    for (const a of r.awards) {
+      ctx.broadcast('rl.fx', { kind: 'award', id: p.id, name: p.name, type: a.type, text: a.text, lv: r.badge.lv, tier: a.tier || 0 });
+      const now = Date.now();
+      if (now - lastAwardSayAt > 4000) {
+        lastAwardSayAt = now;
+        say(awardLine(speakName(p.name), a, isEn()));
+      }
+    }
+  }
+
   function eliminate(p, cause) {
     if (!p.alive || p.finishRank) return;
     p.alive = false;
@@ -542,6 +561,7 @@ function create(ctx, saved = {}) {
     p.deadAt = Date.now();
     rosterDirty = true;
     ctx.broadcast('rl.fx', { kind: 'out', id: p.id, cause, name: p.cloneOf ? '' : p.name, num: p.num });
+    if (!p.cloneOf && (cause === 'red' || cause === 'purge')) award(p, { stats: { rl_shot: 1 } });
     if (!p.cloneOf) {
       // Chủ bị loại thì bản sao cũng ngã theo
       for (const c of clonesOf(p)) {
@@ -1171,10 +1191,7 @@ function create(ctx, saved = {}) {
     // Người ảo ghi vào bảng riêng không lưu, chỉ để xem thử khi giả lập.
     for (const p of real) {
       const pts = p.finishRank ? 3 + Math.max(0, 4 - p.finishRank) : 0;
-      (p.sim ? simBoard : ctx.board).record(
-        { user: p.name, uniqueId: p.key, avatar: p.avatar },
-        { points: pts, stats: { rounds: 1, wins: p.finishRank ? 1 : 0, podium: p.finishRank && p.finishRank <= 3 ? 1 : 0 } }
-      );
+      award(p, { points: pts, stats: { rounds: 1, wins: p.finishRank ? 1 : 0, podium: p.finishRank && p.finishRank <= 3 ? 1 : 0 } });
     }
     if (finished.length) lastWinners = finished.slice(0, 10).map((p) => ({ name: p.name, num: p.num, avatar: p.avatar }));
     ctx.save();
@@ -1252,7 +1269,9 @@ function create(ctx, saved = {}) {
       g: p.giantUntil > now ? 1 : 0,
       k: p.chickenUntil > now ? 1 : 0,
       h: p.hue,
-      b: p.npc ? 1 : 0
+      b: p.npc ? 1 : 0,
+      lv: p.cloneOf || !p.badge ? 1 : p.badge.lv,
+      tt: p.cloneOf || !p.badge ? '' : p.badge.tt
     }));
   }
 
@@ -1361,6 +1380,8 @@ function create(ctx, saved = {}) {
         if (held) heldGifts.push({ id: p.id, item, count: Number(evt.count) || 1 });
         else applyItem(p, item, Number(evt.count) || 1);
         sayItem(p, item.kind);
+        const giftN = Math.max(1, Math.min(10, Number(evt.count) || 1));
+        award(p, { stats: { coins: (Number(evt.coins) || 1) * giftN, [item.kind === 'fart' ? 'fart' : `it_${item.kind}`]: giftN } });
         p.lastActiveAt = Date.now();
         ctx.broadcast('rl.fx', {
           kind: 'gift',

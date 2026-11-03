@@ -61,6 +61,12 @@ class ViewerBoard {
     return v;
   }
 
+  /** Xem bản ghi của một người (không tạo mới) */
+  peek(who = {}) {
+    const key = (who.uniqueId || sanitizeUserName(who.user || who.uniqueId)).slice(0, 40);
+    return this.viewers[key] || null;
+  }
+
   top(limit = 6) {
     if (this.dirty) {
       this.topCache = Object.values(this.viewers)

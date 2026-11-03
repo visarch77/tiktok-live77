@@ -233,6 +233,12 @@
       case 'skill':
         onSkill(p, t);
         break;
+      case 'award':
+        // lên cấp / đạt danh hiệu mới: dòng chúc mừng giữa màn hình (tên rực rỡ theo cấp) + tiếng "ting"
+        awardToasts.push({ name: p.name, lv: p.lv || 1, text: p.type === 'level' ? L(`⬆️ LÊN CẤP ${String(p.text).toUpperCase()}`, `⬆️ ${String(p.text).toUpperCase()} LEVEL`) : p.text, level: p.type === 'level', at: t });
+        while (awardToasts.length > 2) awardToasts.shift();
+        awardSfx(p.type === 'level');
+        break;
       case 'exhaust':
         marks.set(p.key, { kind: 'tired', until: t + 2000 });
         vox('tired', { gap: 6000 });
@@ -1593,7 +1599,17 @@
         const lw = Math.min(maxW, g.measureText(nm).width) + 6;
         const ly = placeLabel(x, headY - 8 - tier * 16, lw, 15);
         if (ly !== null) {
-          text(nm, x, ly, { size: 13, weight: 800, color: chatting ? '#ffe066' : '#fff', stroke: 3.5, strokeColor: teamColor(side === 'a' ? curMatch().a : curMatch().b), maxW });
+          const sc = teamColor(side === 'a' ? curMatch().a : curMatch().b);
+          // cấp độ: tên đổi màu / hiệu ứng (public/js/name-style.js); đang bình luận thì vàng cho dễ thấy
+          if ((d.p.lv || 1) > 1 && !chatting) NameStyle.draw(g, nm, x, ly, { size: 13, weight: 800, lv: d.p.lv, t, stroke: 3.5, strokeColor: sc, font: FONT, maxW });
+          else text(nm, x, ly, { size: 13, weight: 800, color: chatting ? '#ffe066' : '#fff', stroke: 3.5, strokeColor: sc, maxW });
+          // danh hiệu: dòng chữ nhỏ ngay trên tên (có chỗ trống mới vẽ)
+          if (d.p.tt) {
+            g.font = `800 10px ${FONT}`;
+            const tw = g.measureText(d.p.tt).width + 4;
+            const ty = placeLabel(x, ly - 12, tw, 11);
+            if (ty !== null) NameStyle.title(g, d.p.tt, x, ty, { size: 10, lv: d.p.lv || 1, font: FONT, t });
+          }
         }
         if (chatting) labelReqs.push({ side, k: d.p.k, name: d.p.n, kind: 'chat', text: bub.text, crown: false, prio: 3 + bub.at / 1e9, hx: x, hy: (ly ?? headY) - 8, baseX: lineX(side, d.i) + (side === 'a' ? -10 : 10) });
       } else if (d.p.npc && ph.phase === 'pull' && d.i % 4 === 0) {
@@ -2092,7 +2108,8 @@
         const ly = y + 82 + (j % 4) * 19;
         const cx = x + 12 + col * colW;
         text(j === 0 && p.force > 0 ? '👑' : `${j + 1}`, cx + 10, ly, { size: 13, weight: 800, color: j === 0 ? '#ffd43b' : '#aab' });
-        text(p.name, cx + 22, ly, { size: 14, weight: 700, color: '#fff', align: 'left', maxW: colW - (p.force > 0 ? 64 : 28) });
+        if ((p.lv || 1) > 1) NameStyle.draw(g, p.name, cx + 22, ly, { size: 14, weight: 700, lv: p.lv, t, align: 'left', stroke: 3, font: FONT, maxW: colW - (p.force > 0 ? 64 : 28) });
+        else text(p.name, cx + 22, ly, { size: 14, weight: 700, color: '#fff', align: 'left', maxW: colW - (p.force > 0 ? 64 : 28) });
         if (p.force > 0) text(`${p.force}`, cx + colW - 6, ly, { size: 13, weight: 800, color: tm.color, align: 'right' });
       });
 
@@ -2273,6 +2290,46 @@
     info(roster.lineA, m.a, MX + 18, 'left');
     info(roster.lineB, m.b, W - MX - 18, 'right');
   }
+  // Thông báo lên cấp / danh hiệu: pill giữa màn hình phía trên sân, mỗi cái 3,8 giây, tối đa 2
+  const awardToasts = [];
+  function awardSfx(level) {
+    if (!unlocked || previewMuted) return;
+    const c = audio.ensure();
+    if (!c) return;
+    const T = c.currentTime + 0.02;
+    const notes = level ? [784, 988, 1175, 1568, 1976] : [1319, 1568, 2093];
+    notes.forEach((f, i) => {
+      audio.osc(f, T + i * 0.07, 0.35, { type: 'sine', vol: 0.07, attack: 0.003 });
+      audio.osc(f * 2, T + i * 0.07, 0.15, { type: 'sine', vol: 0.02, attack: 0.002 });
+    });
+  }
+  function drawAwards(t) {
+    for (let i = awardToasts.length - 1; i >= 0; i--) if (t - awardToasts[i].at > 3800) awardToasts.splice(i, 1);
+    awardToasts.forEach((a, i) => {
+      const e = (t - a.at) / 1000;
+      const y = Y_CLOSE + CLOSE_H + 22 + i * 46;
+      const pop = e < 0.25 ? 0.6 + (e / 0.25) * 0.4 : 1;
+      const alpha = e > 3.3 ? (3.8 - e) / 0.5 : 1;
+      g.save();
+      g.globalAlpha = Math.max(0, alpha);
+      g.translate(W / 2, y);
+      g.scale(pop, pop);
+      g.font = `900 20px ${FONT}`;
+      const nw = Math.min(260, g.measureText(a.name).width);
+      g.font = `800 18px ${FONT}`;
+      const tw = g.measureText(a.text).width;
+      const w = nw + tw + 54;
+      roundRect(-w / 2, -19, w, 38, 19);
+      g.fillStyle = 'rgba(20,12,40,.88)';
+      g.fill();
+      g.lineWidth = 2;
+      g.strokeStyle = NameStyle.TITLE_COLOR[Math.min(7, a.lv)];
+      g.stroke();
+      NameStyle.draw(g, a.name, -w / 2 + 18, 0, { size: 20, weight: 900, lv: Math.max(2, a.lv), t, align: 'left', font: FONT, maxW: 260 });
+      text(a.text, w / 2 - 18, 1, { size: 18, weight: 800, color: a.level ? '#7dffb0' : NameStyle.TITLE_COLOR[Math.min(7, a.lv)], align: 'right', stroke: 3 });
+      g.restore();
+    });
+  }
   // Đếm ngược 3-2-1 trước khi kéo: số to nảy giữa màn hình + tiếng "píp" (số 1 cao hơn); vào trận thì còi trọng tài
   let lastCount = 0;
   function countBeep(n) {
@@ -2432,6 +2489,7 @@
     drawTop(t);
     drawStatus(t);
     drawGiftBanner(t);
+    drawAwards(t);
     drawPowerBar(t, dt);
     drawGiftRow();
     drawTeams(t);

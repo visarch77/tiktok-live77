@@ -146,6 +146,12 @@ Tiếng sân thưa và nhỏ: dây kêu thưa, thở/giày rít thưa hơn, đá
 ## Tiếng nhân vật (thu sẵn) — `public/assets/keoco/voice/`
 72 câu kêu ngắn (2 MB) tạo bằng 8 giọng đọc tiếng Việt của ZeroTTS rồi nâng giọng ×1,3 kiểu hoạt hình (`tools/keoco-voices.py`, chạy lại khi muốn đổi câu). Theo loại: dùng từng kỹ năng, trúng cù lét / mỡ / xì hơi / vỏ chuối, bị chặn, mệt, bị lôi, gồng sức ("Hự!"), rơi vực ("Á á á", giọng tụt dần), thắng, "Hò dô". Phát lệch tốc độ nhẹ mỗi lần, cách nhau ≥ 0,7 s, tối đa 2 câu cùng lúc, mỗi loại có khoảng nghỉ riêng. Thiếu file thì quay về giọng tổng hợp cũ.
 
+## Cấp độ & danh hiệu (dùng chung mọi trò) — `src/core/titles.js`, `public/js/name-style.js`
+Tính từ bảng điểm người xem của phòng (lưu qua các buổi live, giữ khi chuyển trò). Người ảo (thử) ghi vào bảng riêng không lưu.
+- **Cấp** theo XP = ván ×10 + thắng ×30 + lên bục ×20 + MVP ×30 + vô địch ×80 + xu quà ×5: 1 Tân binh (trắng) · 2 Đồng 150 (đồng ánh cam) · 3 Bạc 500 (bạc sáng) · 4 Vàng 1500 (vàng + vệt sáng chạy) · 5 Bạch kim 4000 (xanh băng + vệt sáng + toả sáng) · 6 Kim cương 10000 (lam–tím–hồng đổi màu + toả sáng + lấp lánh) · 7 Huyền thoại 25000 (cầu vồng chạy + toả lửa + lấp lánh + 👑).
+- **Danh hiệu** theo việc làm nhiều nhất, 3 bậc (★★, ★★★): chung — 💎 Đại gia (xu 100/1000/10000), 🏆 Nhà vô địch, 🏅 Chiến thần (thắng), 🎖️ Lão làng (ván), 💨 Vua xì hơi; Đèn Đỏ — 👟 Vua tốc độ, 👥 Ảo thuật gia, 🤚 Thánh đẩy, 🛡️ Lá chắn thép, 🙏 Bác sĩ hồi sinh, 📢 Loa phường, 💪 Người khổng lồ, 🫧 Bảo mẫu, 🦶 Khủng long dẫm, 🎯 Bia đỡ đạn (bị bắn); Kéo Co — 💪 Thánh gồng, 🧃 Ông chủ nước tăng lực, 🪶 Thánh cù lét, 🧤 Bàn tay keo, 📣 Fan cứng, 🧈 Thánh bôi mỡ, 🏋️ Bầu sô lực sĩ, 🥁 Thủ lĩnh hò dô, 🍌 Vua vỏ chuối, 🪢 Vua kéo co (MVP), 🙌 Vua trượt tay (bị bôi mỡ), 🤣 Người nhột nhất, 🤸 Vua té oạch, 😮‍💨 Vua hụt hơi. Mốc thường 10 / 50 / 200 lần.
+- Đeo danh hiệu cao nhất (dòng chữ nhỏ trên tên, màu theo cấp). Đạt cấp / danh hiệu mới: dòng chúc mừng giữa màn hình + tiếng "ting" + đọc "Chúc mừng … đạt danh hiệu …" (≥ 4 giây một lần).
+
 ## Chuyển trò trong phòng
 Trang quản lý: ô 🎮 dưới tên phòng chọn trò (Đèn Xanh – Đèn Đỏ / Kéo Co …). Phòng khởi động lại với trò mới (giữ tên, TikTok, bảng xếp hạng; nối lại TikTok nếu đang live); màn hình OBS / điện thoại đang mở tự tải lại sang trò mới.
 

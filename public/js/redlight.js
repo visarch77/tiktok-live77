@@ -158,7 +158,7 @@
           addSprite('fx_smoke', p.x, p.y - PH * 0.45, 30, 120, 650, performance.now());
         }
       }
-      Object.assign(s, { n: r.n, num: r.num, av: r.av, c: r.c, x: r.x, a: r.a, f: r.f, s: r.s, gi: r.g, k: r.k, h: r.h, b: r.b });
+      Object.assign(s, { n: r.n, num: r.num, av: r.av, c: r.c, x: r.x, a: r.a, f: r.f, s: r.s, gi: r.g, k: r.k, h: r.h, b: r.b, lv: r.lv || 1, tt: r.tt || '' });
       if (Math.abs(r.y - s.ty) > 0.01) s.ty = r.y;
       if (!r.a && !s.deadSeenAt) s.deadSeenAt = performance.now();
       if (r.a) s.deadSeenAt = 0;
@@ -556,6 +556,16 @@
           for (let i = 0; i < 30; i++) fx.push({ type: 'confetti', x: p.x, y: p.y, vx: (Math.random() - 0.5) * 10, vy: -4 - Math.random() * 8, hue: Math.random() * 360, t0, life: 1600 });
         }
         pushTicker(L(`🏁 Số ${e.num} ${e.name} về đích hạng ${e.rank}`, `🏁 No. ${e.num} ${e.name} finished #${e.rank}`));
+        break;
+      case 'award':
+        // lên cấp / danh hiệu mới: dòng chúc mừng (tên rực rỡ theo cấp) + tiếng "ting" + chữ chạy
+        awardToasts.push({ name: e.name, lv: e.lv || 1, text: e.type === 'level' ? L(`⬆️ LÊN CẤP ${String(e.text).toUpperCase()}`, `⬆️ ${String(e.text).toUpperCase()} LEVEL`) : e.text, level: e.type === 'level', at: t0 });
+        while (awardToasts.length > 2) awardToasts.shift();
+        if (unlocked) {
+          const c = audio.ensure && audio.ensure();
+          if (c) (e.type === 'level' ? [784, 988, 1175, 1568, 1976] : [1319, 1568, 2093]).forEach((f, i) => audio.osc(f, c.currentTime + 0.02 + i * 0.07, 0.35, { type: 'sine', vol: 0.07, attack: 0.003 }));
+        }
+        pushTicker(e.type === 'level' ? L(`⬆️ ${e.name} lên cấp ${e.text}`, `⬆️ ${e.name} reached ${e.text}`) : `🏅 ${e.name}: ${e.text}`);
         break;
       case 'gift':
         // không đổi người đang zoom quá nhanh khi quà dồn dập (giữ ít nhất 1,2 giây)
@@ -1141,7 +1151,13 @@
       s.headY = top - fs * 1.1;
       s.headAt = tn; // đầu đang được vẽ ở khung này (bình luận chỉ hiện trên người đang hiện tên)
       // người máy lấp chỗ: tên biệt danh, chữ hơi xám xanh để khác người xem thật một chút
-      text(s.n, x, top - fs * 0.55, { size: fs, weight: 400, color: flashing || spotted ? '#ff6b6b' : dead ? '#bbb' : s.b ? '#d6e2ec' : '#fff', stroke: 3 });
+      // cấp độ: tên đổi màu / hiệu ứng (public/js/name-style.js); danh hiệu chữ nhỏ ngay trên tên
+      if (s.lv > 1 && !flashing && !spotted && !dead) NameStyle.draw(g, s.n, x, top - fs * 0.55, { size: fs, weight: 600, lv: s.lv, t: tn, stroke: 3, font: FONT });
+      else text(s.n, x, top - fs * 0.55, { size: fs, weight: 400, color: flashing || spotted ? '#ff6b6b' : dead ? '#bbb' : s.b ? '#d6e2ec' : '#fff', stroke: 3 });
+      if (s.tt && !dead) {
+        NameStyle.title(g, s.tt, x, top - fs * 1.45, { size: Math.round(fs * 0.62), lv: s.lv, font: FONT, t: tn });
+        s.headY = top - fs * 1.9; // bình luận đặt cao hơn dòng danh hiệu
+      }
     }
     g.restore();
   }
@@ -1385,6 +1401,33 @@
   // --------------------------------------------------------------------------
   const REC_X = [128, 206, 284, 362, 440, 640, 718, 796, 874, 952];
   let recordFlash = null; // { name, until }
+  // Thông báo lên cấp / danh hiệu (ngay dưới vạch đích), mỗi cái 3,8 giây, tối đa 2
+  const awardToasts = [];
+  function drawAwards(tn) {
+    for (let i = awardToasts.length - 1; i >= 0; i--) if (tn - awardToasts[i].at > 3800) awardToasts.splice(i, 1);
+    awardToasts.forEach((a, i) => {
+      const e = (tn - a.at) / 1000;
+      const pop = e < 0.25 ? 0.6 + (e / 0.25) * 0.4 : 1;
+      g.save();
+      g.globalAlpha = Math.max(0, e > 3.3 ? (3.8 - e) / 0.5 : 1);
+      g.translate(W / 2, FY + 40 + i * 48);
+      g.scale(pop, pop);
+      g.font = `900 22px ${FONT}`;
+      const nw = Math.min(280, g.measureText(a.name).width);
+      g.font = `700 20px ${FONT}`;
+      const tw = g.measureText(a.text).width;
+      const w = nw + tw + 56;
+      roundRect(-w / 2, -20, w, 40, 20);
+      g.fillStyle = 'rgba(20,12,40,.88)';
+      g.fill();
+      g.lineWidth = 2;
+      g.strokeStyle = NameStyle.TITLE_COLOR[Math.min(7, a.lv)];
+      g.stroke();
+      NameStyle.draw(g, a.name, -w / 2 + 18, 0, { size: 22, weight: 900, lv: Math.max(2, a.lv), t: tn, align: 'left', font: FONT, maxW: 280 });
+      text(a.text, w / 2 - 18, 1, { size: 20, weight: 700, color: a.level ? '#7dffb0' : NameStyle.TITLE_COLOR[Math.min(7, a.lv)], align: 'right', stroke: 3 });
+      g.restore();
+    });
+  }
   function drawRecords(t) {
     const list = ph.records || [];
     const tn = performance.now();
@@ -1807,6 +1850,7 @@
     if (camOn) g.restore();
     drawHeader(t);
     drawBanner(t);
+    drawAwards(performance.now());
     drawMarquee(t);
     drawLegend(t);
     drawQueue(t);
