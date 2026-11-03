@@ -1089,6 +1089,68 @@ function create(ctx, saved = {}) {
     say(lines().lobby[round % lines().lobby.length]); // chỉ đọc luật chơi, không kêu gọi tặng quà
   }
 
+  // --------------------------------------------------------------------------
+  // Tình huống ngẫu nhiên hài hước (chỉ lúc đèn xanh, người thật đang chạy; mỗi người tối đa 1 lần / ván;
+  // ảnh hưởng nhẹ, ngắn — không làm ai bị bắn). Tỉ lệ từng loại chỉnh trong admin (mishapW_<loại>, 0 = tắt);
+  // nút trong mục điều khiển gọi ngay một tình huống (redlight.mishap)
+  //   back: lùi (đơn vị sân) · stun: đứng yên (ms) · dash: lao thêm · bee: tự chạy nhanh
+  // --------------------------------------------------------------------------
+  const MISHAPS = {
+    sun: { emoji: '🥵', back: 6, stun: 1400, lucky: false, stat: 'ev_sun',
+      vi: ['{n} bị say nắng, chạy ngược về nhà!', 'Trời nắng quá, {n} say nắng quay vòng vòng!'], en: ['{n} got sunstroke and runs the wrong way!'] },
+    poop: { emoji: '🐦', dash: 5, lucky: true, stat: 'ev_poop',
+      vi: ['Chim ị trúng đầu {n}, hên quá chạy thêm mấy bước!', 'Bộp! Chim ị trúng {n}, xui mà hên!'], en: ['A bird pooped on {n}, lucky! Extra steps!'] },
+    bee: { emoji: '🐝', bee: 2200, lucky: true, stat: 'ev_bee',
+      vi: ['{n} bị ong đốt mông, chạy như bay!', 'Á á! Ong đốt {n}, chạy không kịp thở!'], en: ['A bee stung {n}, running like crazy!'] },
+    money: { emoji: '💵', stun: 1500, lucky: false, stat: 'ev_money',
+      vi: ['{n} thấy tiền rơi là quên cả chạy!', '{n} cúi nhặt tiền, tham quá!'], en: ['{n} found money and forgot to run!'] },
+    sneeze: { emoji: '🤧', back: 3, lucky: false, stat: 'ev_sneeze',
+      vi: ['Hắt xììì! {n} văng ra sau!', '{n} hắt xì một cái bay luôn mấy bước!'], en: ['Achoo! {n} sneezed backwards!'] }
+  };
+  let nextMishapAt = 0;
+  const fillName = (str, n) => str.replace(/\{n\}/g, n);
+  function scheduleMishap(now) {
+    const every = (S().mishapEverySec ?? 20) * 1000;
+    nextMishapAt = now + every * (0.7 + Math.random() * 0.6);
+  }
+  function mishapTick(now) {
+    if (S().mishaps === false || light !== 'green' || purge || !nextMishapAt || now < nextMishapAt) return;
+    if (lightEndsAt - now < 2500) return; // sắp đèn đỏ: để lần sau
+    scheduleMishap(now);
+    // bốc loại theo tỉ lệ cài đặt
+    const weights = Object.keys(MISHAPS).map((k) => [k, Math.max(0, Number(S()[`mishapW_${k}`] ?? 5))]);
+    const total = weights.reduce((a, [, w]) => a + w, 0);
+    if (total <= 0) return;
+    let r = Math.random() * total;
+    const type = (weights.find(([, w]) => (r -= w) < 0) || weights[0])[0];
+    if (!triggerMishap(type, now)) nextMishapAt = now + 2000; // chưa ai hợp lệ: thử lại sau 2 giây
+  }
+  // gây một tình huống cho một người ngẫu nhiên đang chạy; trả về người bị / null
+  function triggerMishap(type, now = Date.now(), { force = false } = {}) {
+    const m = MISHAPS[type];
+    if (!m) return null;
+    // tự động: chỉ người đã chạy được một đoạn (khỏi lùi ngay vạch xuất phát); bấm tay: ai đang trên sân cũng được
+    const ok = (p) => !p.cloneOf && !p.doomAt && !(p.giantUntil > now) && (force || p.y > 4) && p.y < TRACK - 8;
+    let pool = runners().filter((p) => ok(p) && !p.npc && p.mishapRound !== round);
+    if (force && !pool.length) pool = runners().filter((p) => ok(p) && !p.npc);
+    if (force && !pool.length) pool = runners().filter(ok); // bấm tay lúc chỉ có người máy: vẫn cho xem hiệu ứng
+    if (!pool.length) return null;
+    const p = pick(pool);
+    p.mishapRound = round;
+    if (m.back) p.backLeft = (p.backLeft || 0) + m.back;
+    if (m.stun) p.stunUntil = now + m.stun;
+    if (m.dash) p.dash = (p.dash || 0) + m.dash;
+    if (m.bee) {
+      p.turboUntil = Math.max(p.turboUntil, now + m.bee);
+      p.momentumUntil = Math.max(p.momentumUntil || 0, now + m.bee);
+    }
+    ctx.broadcast('rl.fx', { kind: 'mishap', type, emoji: m.emoji, lucky: m.lucky, id: p.id, name: p.name, ms: m.stun || m.bee || 1400 });
+    say(fillName(pick(isEn() ? m.en : m.vi), speakName(p.name) || L(`số ${p.num}`, `number ${p.num}`)));
+    award(p, { stats: { [m.stat]: 1 } });
+    rosterDirty = true;
+    return p;
+  }
+
   function startRound() {
     round++;
     phase = 'play';
@@ -1097,6 +1159,7 @@ function create(ctx, saved = {}) {
     finishCount = 0;
     results = [];
     setLight('green', true);
+    scheduleMishap(Date.now() + 4000); // không đổ tình huống ngay đầu ván
     ctx.emitEvent({ type: 'rlRound', round, players: realPlayers().length });
     say(pick(lines().start));
   }
@@ -1222,6 +1285,7 @@ function create(ctx, saved = {}) {
       if (now >= lightEndsAt) setLight(light === 'green' ? 'warn' : light === 'warn' ? 'red' : 'green');
       if (stompers.length) stepStompers(now);
       driveNpcs(now);
+      mishapTick(now);
       const dt = TICK_MS / 1000;
       let moved = false;
       for (const p of [...players.values()]) {
@@ -1229,6 +1293,15 @@ function create(ctx, saved = {}) {
         // khổng lồ chỉ tính giờ lúc búp bê hát: đèn đỏ thì đồng hồ khổng lồ đứng yên (vẫn miễn bắn / dẫm / đẩy)
         if (light === 'red' && p.giantUntil > now) p.giantUntil += TICK_MS;
         if (!p.alive || p.finishRank || p.doomAt || light === 'red') continue;
+        // tình huống: bị lùi (say nắng, mẹ gọi, gió lốc...) thì lùi trước, đang đứng hình (tuột quần, nhặt tiền) thì đứng yên
+        if (p.backLeft > 0) {
+          const b = Math.min(p.backLeft, 9 * dt);
+          p.backLeft -= b;
+          p.y = Math.max(0, p.y - b);
+          moved = true;
+          continue;
+        }
+        if ((p.stunUntil || 0) > now) continue;
         const momentum = (p.momentumUntil || 0) > now;
         if (!momentum && p.pending <= 0 && !(p.dash > 0)) continue;
         // có đà: chạy hết tốc lực (vẫn tiêu bước dồn); không đà: chạy bằng bước dồn từ tim như cũ
@@ -1461,6 +1534,14 @@ function create(ctx, saved = {}) {
       return phaseInfo();
     },
     // Búp bê ngủ gật: DOLL_SLEEP_MS không hát, không bắn — ai nhanh tay thì lao lên; tỉnh dậy là quay mặt luôn
+    mishap: (params = {}) => {
+      if (phase !== 'play' || purge) throw new Error('Chỉ dùng khi đang chơi');
+      const type = String(params.type || '');
+      if (!MISHAPS[type]) throw new Error(`Không có tình huống: ${type}`);
+      const p = triggerMishap(type, Date.now(), { force: true });
+      if (!p) throw new Error('Chưa có ai đang chạy trên sân');
+      return { type, name: p.name };
+    },
     dollSleep: () => {
       if (phase !== 'play' || purge || paused) throw new Error('Chỉ dùng được khi đang chơi ván');
       if (sleepUntil > Date.now()) throw new Error('Búp bê đang ngủ rồi');
@@ -1638,6 +1719,13 @@ module.exports = {
   description: 'Game sinh tồn: bình luận để vào, thả tim để chạy, đèn đỏ phải đứng im. Quà là vật phẩm.',
   overlay: 'redlight.html',
   settingsSchema: {
+    mishaps: 'boolean',
+    mishapEverySec: [8, 90],
+    mishapW_sun: [0, 10],
+    mishapW_poop: [0, 10],
+    mishapW_bee: [0, 10],
+    mishapW_money: [0, 10],
+    mishapW_sneeze: [0, 10],
     lobbySeconds: [5, 300],
     roundSeconds: [30, 600],
     resultSeconds: [5, 60],
@@ -1669,6 +1757,14 @@ module.exports = {
     enVoice: { type: 'enum', values: ttsEn.VOICES }
   },
   defaultSettings: {
+    mishaps: true, // tình huống ngẫu nhiên hài hước (say nắng, tuột quần, chim ị...)
+    mishapEverySec: 20, // trung bình bao nhiêu giây một tình huống
+    // tỉ lệ từng loại (0 = tắt): số càng lớn càng hay xảy ra
+    mishapW_sun: 5,
+    mishapW_poop: 5,
+    mishapW_bee: 5,
+    mishapW_money: 4,
+    mishapW_sneeze: 5,
     lobbySeconds: 15,
     roundSeconds: 90,
     resultSeconds: 10,

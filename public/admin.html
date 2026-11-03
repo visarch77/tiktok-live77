@@ -620,6 +620,12 @@
         { icon: '👀', name: 'Búp bê giả vờ quay', desc: 'Lúc đang hát: ngừng hát, quay mặt rồi "đùa thôi", không bắn ai', method: 'redlight.fakeTurn' },
         { icon: '😴', name: 'Búp bê ngủ gật', desc: '6 giây không hát, không bắn — ai nhanh tay thì lao lên', method: 'redlight.dollSleep' },
         { icon: '🙏', name: 'Hồi sinh', desc: '5 người vừa bị loại sống lại, chạy tiếp ở chỗ cũ', method: 'redlight.revive' },
+        // Tình huống hài: một người đang chạy (ngẫu nhiên) dính ngay
+        { icon: '🥵', name: 'Say nắng', desc: 'Một người chạy lùi một đoạn, choáng 1,4 giây', method: 'redlight.mishap', params: { type: 'sun' } },
+        { icon: '🐦', name: 'Chim ị', desc: 'Hên: một người được lao thêm mấy bước', method: 'redlight.mishap', params: { type: 'poop' } },
+        { icon: '🐝', name: 'Ong đốt', desc: 'Một người tự chạy nhanh gấp đôi 2 giây', method: 'redlight.mishap', params: { type: 'bee' } },
+        { icon: '💵', name: 'Nhặt tiền', desc: 'Một người đứng lại cúi nhặt tiền 1,5 giây', method: 'redlight.mishap', params: { type: 'money' } },
+        { icon: '🤧', name: 'Hắt xì', desc: 'Một người văng lùi vài bước', method: 'redlight.mishap', params: { type: 'sneeze' } },
         { icon: '⏸', name: 'Tạm dừng / tiếp tục', desc: 'Dừng đồng hồ và đèn', method: 'redlight.pause' },
         { icon: '🏁', name: 'Kết thúc ván', desc: 'Hiện kết quả ngay', method: 'redlight.endRound' },
         { icon: '🔄', name: 'Ván mới', desc: 'Về màn chờ vào', method: 'redlight.newLobby' },
@@ -1288,6 +1294,16 @@
           <div><div class="setting-name">Tự chạy liên tục</div><div class="setting-desc">Tắt: hết ván thì dừng, chờ bấm “Bắt đầu ván” (có người điều phối)</div></div>
           <label class="switch"><input type="checkbox" data-setting="autoLoop" ${s.autoLoop !== false ? 'checked' : ''} /><span></span></label>
         </div>
+        <div class="setting">
+          <div><div class="setting-name">Tình huống ngẫu nhiên</div><div class="setting-desc">Say nắng, chim ị, ong đốt, nhặt tiền, hắt xì — lúc đèn xanh, chọn ngẫu nhiên một người đang chạy (mỗi người tối đa 1 lần / ván)</div></div>
+          <label class="switch"><input type="checkbox" data-setting="mishaps" ${s.mishaps !== false ? 'checked' : ''} /><span></span></label>
+        </div>
+        ${rlRange('mishapEverySec', 'Bao lâu có một tình huống', 'Trung bình (lệch ngẫu nhiên ±30%)', 8, 90, 1, 's')}
+        ${rlRange('mishapW_sun', '🥵 Tỉ lệ say nắng', 'Chạy lùi một đoạn · 0 = tắt, số càng lớn càng hay xảy ra', 0, 10, 1, '')}
+        ${rlRange('mishapW_poop', '🐦 Tỉ lệ chim ị', 'Hên: lao thêm mấy bước', 0, 10, 1, '')}
+        ${rlRange('mishapW_bee', '🐝 Tỉ lệ ong đốt', 'Tự chạy nhanh gấp đôi 2 giây', 0, 10, 1, '')}
+        ${rlRange('mishapW_money', '💵 Tỉ lệ nhặt tiền', 'Đứng lại 1,5 giây', 0, 10, 1, '')}
+        ${rlRange('mishapW_sneeze', '🤧 Tỉ lệ hắt xì', 'Văng lùi vài bước', 0, 10, 1, '')}
         <div class="setting">
           <div><div class="setting-name">Búp bê hát làm đèn xanh</div><div class="setting-desc">Hát xong câu là đèn đỏ. Tắt: đèn xanh dài ngẫu nhiên theo hai thanh bên dưới</div></div>
           <label class="switch"><input type="checkbox" data-setting="songEnabled" ${s.songEnabled !== false ? 'checked' : ''} /><span></span></label>

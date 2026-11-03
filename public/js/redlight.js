@@ -628,6 +628,24 @@
           fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.3, text: L('Lùi!', 'Pushed!'), color: '#d0a2ff', size: 24, t0: t0 + 350, life: 900 });
         }
         break;
+      case 'mishap': {
+        // say nắng / chim ị / ong đốt / nhặt tiền / hắt xì: biểu tượng trên đầu + chữ to + hạt hiệu ứng + tiếng
+        const v = sprites.get(e.id);
+        const LBL = { sun: ['🥵 SAY NẮNG!', '🥵 SUNSTROKE!'], poop: ['🐦 CHIM Ị! HÊN!', '🐦 LUCKY POOP!'], bee: ['🐝 ONG ĐỐT!', '🐝 BEE STING!'], money: ['💵 NHẶT TIỀN!', '💵 FREE MONEY!'], sneeze: ['🤧 HẮT XÌ!', '🤧 ACHOO!'] };
+        const lbl = (LBL[e.type] || ['', ''])[settings.lang === 'en' ? 1 : 0];
+        if (v) {
+          v.mishap = { type: e.type, emoji: e.emoji, until: t0 + (e.ms || 1400) + 900 };
+          const p = spritePos(v);
+          fx.push({ type: 'text', x: p.x, y: p.y - PH * 1.5, text: lbl, color: e.lucky ? '#8ce99a' : '#ffd43b', size: 30, t0, life: 1800 });
+          if (e.type === 'poop') for (let i = 0; i < 10; i++) fx.push({ type: 'spark', x: p.x, y: p.y - PH * 0.95, vx: (Math.random() - 0.5) * 6, vy: -2 - Math.random() * 3, color: Math.random() < 0.5 ? '#f8f9fa' : '#8d6e63', t0, life: 700 });
+          if (e.type === 'money') for (let i = 0; i < 6; i++) fx.push({ type: 'text', x: p.x + (Math.random() - 0.5) * 70, y: p.y - PH * (0.6 + Math.random() * 0.6), text: '💵', size: 22, t0: t0 + i * 90, life: 900 });
+          if (e.type === 'sneeze') for (let i = 0; i < 14; i++) fx.push({ type: 'spark', x: p.x, y: p.y - PH * 0.8, vx: (Math.random() - 0.5) * 3, vy: -1 - Math.random() * 4, color: '#a5d8ff', t0, life: 600 });
+          if (e.type === 'bee') for (let i = 0; i < 3; i++) fx.push({ type: 'text', x: p.x + (Math.random() - 0.5) * 60, y: p.y - PH * (0.5 + Math.random() * 0.5), text: '🐝', size: 22, t0: t0 + i * 120, life: 1400 });
+        }
+        pushTicker(`${e.emoji} ${e.name}: ${lbl.replace(/^\S+\s/, '')}`);
+        mishapSfx(e.type);
+        break;
+      }
       case 'chicken':
         for (const id of e.ids || []) {
           const v = sprites.get(id);
@@ -1159,6 +1177,17 @@
         s.headY = top - fs * 1.9; // bình luận đặt cao hơn dòng danh hiệu
       }
     }
+    // tình huống ngẫu nhiên: biểu tượng nhún nhảy trên đầu (say nắng: sao xoay vòng)
+    if (s.mishap && tn < s.mishap.until && !dead) {
+      const my = top - 18 * (s.tt ? 2.6 : 1.9) - Math.abs(Math.sin(tn / 140)) * 8;
+      if (s.mishap.type === 'sun') {
+        for (let k = 0; k < 3; k++) {
+          const a = tn / 260 + (k * Math.PI * 2) / 3;
+          text('💫', x + Math.cos(a) * 22, top + 6 + Math.sin(a) * 7, { size: 18 });
+        }
+      }
+      text(s.mishap.emoji, x, my, { size: 34 });
+    }
     g.restore();
   }
 
@@ -1401,6 +1430,69 @@
   // --------------------------------------------------------------------------
   const REC_X = [128, 206, 284, 362, 440, 640, 718, 796, 874, 952];
   let recordFlash = null; // { name, until }
+  // Tiếng cho tình huống ngẫu nhiên: hiệu ứng tự tạo + câu kêu hoạt hình thu sẵn (dùng chung bộ giọng của Kéo Co)
+  const VOX = { list: {}, buf: {}, loading: false };
+  fetch('/assets/keoco/voice/voice.json')
+    .then((r) => (r.ok ? r.json() : null))
+    .then((m) => {
+      if (m) VOX.list = m;
+    })
+    .catch(() => {});
+  function voxPlay(cat, delay = 0) {
+    const c = audio.ctx;
+    if (!c || !unlocked) return;
+    if (!VOX.loading) {
+      VOX.loading = true;
+      for (const n of ['tired', 'farted', 'fall', 'win', 'slip'].flatMap((k) => VOX.list[k] || [])) {
+        fetch(`/assets/keoco/voice/${n}`)
+          .then((r) => r.arrayBuffer())
+          .then((ab) => c.decodeAudioData(ab))
+          .then((b) => {
+            VOX.buf[n] = b;
+          })
+          .catch(() => {});
+      }
+    }
+    const files = (VOX.list[cat] || []).filter((f) => VOX.buf[f]);
+    if (!files.length) return;
+    const src = c.createBufferSource();
+    const gn = c.createGain();
+    src.buffer = VOX.buf[files[Math.floor(Math.random() * files.length)]];
+    src.playbackRate.value = 0.95 + Math.random() * 0.12;
+    gn.gain.value = 0.85;
+    src.connect(gn).connect(audio.sfxBus);
+    src.start(c.currentTime + 0.02 + delay);
+  }
+  function mishapSfx(type) {
+    if (!unlocked) return;
+    const c = audio.ensure && audio.ensure();
+    if (!c) return;
+    const T = c.currentTime + 0.02;
+    const o = (f, at, d, opt) => audio.osc(f, T + at, d, opt);
+    const nz = (at, d, opt) => audio.noise(T + at, d, opt);
+    if (type === 'sun') {
+      // "uuu" chóng mặt: sóng lượn xuống
+      for (let k = 0; k < 3; k++) o(700 - k * 120, k * 0.18, 0.3, { type: 'sine', vol: 0.08, slide: -160 });
+      voxPlay('tired', 0.3);
+    } else if (type === 'poop') {
+      o(2600, 0, 0.07, { type: 'sine', vol: 0.06, slide: 500 });
+      o(2900, 0.1, 0.07, { type: 'sine', vol: 0.06, slide: 400 });
+      nz(0.35, 0.16, { vol: 0.16, type: 'lowpass', freq: 500 }); // bộp
+      voxPlay('farted', 0.55);
+    } else if (type === 'bee') {
+      o(220, 0, 1.2, { type: 'sawtooth', vol: 0.04, slide: 30 }); // vo ve
+      o(233, 0, 1.2, { type: 'sawtooth', vol: 0.03, slide: -20 });
+      voxPlay('fall', 0.25);
+    } else if (type === 'money') {
+      o(1319, 0, 0.12, { type: 'triangle', vol: 0.09 });
+      o(1760, 0.08, 0.35, { type: 'triangle', vol: 0.09 });
+      voxPlay('win', 0.3);
+    } else if (type === 'sneeze') {
+      o(500, 0, 0.35, { type: 'sine', vol: 0.06, slide: 300 }); // "hắt…"
+      nz(0.4, 0.22, { vol: 0.18, type: 'highpass', freq: 1800 }); // "…xì!"
+      voxPlay('slip', 0.65);
+    }
+  }
   // Thông báo lên cấp / danh hiệu (ngay dưới vạch đích), mỗi cái 3,8 giây, tối đa 2
   const awardToasts = [];
   function drawAwards(tn) {
