@@ -26,7 +26,7 @@
   const g = canvas.getContext('2d');
   const FONT = "'Be Vietnam Pro', system-ui, sans-serif";
   const ASSET = '/assets/keoco/';
-  const AV = 2;
+  const AV = 3;
 
   // Sân (đo trên bg.webp): mặt tháp y 745–880, mép trong tháp trái x≈442, tháp phải x≈634 (ở độ cao dây)
   const ROPE_Y = 792;
