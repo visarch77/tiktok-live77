@@ -84,6 +84,7 @@ const EVENT_VI = {
   star: ['{v} đang kéo như trâu cày ruộng!', '{v} kéo khoẻ nhất sân, ăn gì mà khoẻ vậy!'],
   lazy: ['{t} kéo nhẹ như kéo dây phơi đồ, mạnh lên chứ!', '{t} ơi, ngủ gật hả, thả tim đi!'],
   even: ['Hai đội giằng co, dây căng như dây đàn!', 'Ngang tài ngang sức, chưa ai chịu ai!'],
+  tap: ['Thả tim liên tục nào, đừng ngừng tay!', 'Càng thả tim liên tục, combo càng cao, kéo càng khoẻ!', '{t} ơi, thả tim liên tục lên, sắp rơi rồi!', 'Ai ngừng thả tim là mất combo đó nha!'],
   fall: ['{o} rơi tõm xuống vực!', '{o} bay xuống vực, la thất thanh!', '{o} rơi xuống vực, ướt như chuột lột!']
 };
 const EVENT_EN = {
@@ -94,6 +95,7 @@ const EVENT_EN = {
   star: ['{v} is pulling like a tractor!', '{v} is the strongest on the field!'],
   lazy: ['{t} is pulling like it is a laundry line, come on!'],
   even: ['Dead even, the rope is tight as a guitar string!'],
+  tap: ['Keep tapping hearts, do not stop!', 'The longer you keep tapping, the bigger your combo!', '{t}, keep tapping or you will fall!'],
   fall: ['{o} falls into the abyss!', '{o} flies off the edge screaming!']
 };
 

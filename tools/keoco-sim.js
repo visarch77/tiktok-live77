@@ -15,7 +15,7 @@ function run(scn) {
   const msgs = [];
   const ctx = {
     settings: { ...mode.defaultSettings, ttsEnabled: false, lobbySeconds: 10, autoSim: false },
-    board: { record() {}, top() { return []; } },
+    board: new (require(path.join(ROOT, 'src/core/viewers')).ViewerBoard)(),
     broadcast: (m, p) => msgs.push([m, p]),
     emitEvent() {}, save() {}, simulated: (fn) => fn(), isLive: () => false, tts: null
   };

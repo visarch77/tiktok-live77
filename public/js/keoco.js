@@ -184,7 +184,7 @@
     live = p;
     liveAt = performance.now();
     ropeTarget = p.x || 0;
-    for (const [k, st, stam, force] of [...(p.a || []), ...(p.b || [])]) pstate.set(k, { st, stam, force });
+    for (const [k, st, stam, force, combo] of [...(p.a || []), ...(p.b || [])]) pstate.set(k, { st, stam, force, combo: combo || 0 });
   }
 
   function onPhaseChange(prev, next) {
@@ -194,7 +194,7 @@
       ropeX = ropeTarget = 0;
       banner = { text: m.label.toUpperCase(), sub: `${teamLabel(m.a)}  VS  ${teamLabel(m.b)}`, color: '#fff', until: ph.phaseEndsAt - clockOffset - 3000 };
     } else if (next === 'pull') {
-      banner = { text: L('KÉO!', 'PULL!'), color: '#ffe066', until: Date.now() + 1100, big: true };
+      banner = { text: L('KÉO!', 'PULL!'), sub: L('❤️ Thả tim liên tục suốt trận!', '❤️ Keep tapping the whole match!'), color: '#ffe066', until: Date.now() + 1600, big: true };
       lastCount = 0;
       startWhistle();
     } else if (next === 'matchEnd') {
@@ -1633,6 +1633,11 @@
           g.fillRect(d.gx - bw / 2 - (side === 'a' ? 12 : -12), by, bw, 5);
           g.fillStyle = v > 0.5 ? '#51cf66' : v > 0.2 ? '#fcc419' : '#ff6b6b';
           g.fillRect(d.gx - bw / 2 - (side === 'a' ? 12 : -12), by, bw * v, 5);
+          // combo thả tim liên tục: 🔥×1,2 … ×1,5 ngay dưới thanh thể lực
+          if (s.combo >= 15) {
+            const cm = (1 + s.combo / 100).toFixed(1).replace('.', settings.lang === 'en' ? '.' : ',');
+            text(`🔥×${cm}`, d.gx - (side === 'a' ? 12 : -12), by + 14, { size: s.combo >= 50 ? 14 : 12, weight: 900, color: s.combo >= 50 ? '#ff922b' : '#ffd43b', stroke: 3 });
+          }
         }
       }
     }
@@ -2102,7 +2107,7 @@
         if (!ph.bracket || ph.exhibition) when = (ph.ready || []).includes(tm.id) ? L('✅ đủ người', '✅ ready') : L(`cần ${ph.minTeamPlayers || 1} người`, `needs ${ph.minTeamPlayers || 1}`);
         else if (tm.nextIn === 1) when = L('TRẬN TIẾP THEO!', 'NEXT MATCH!');
         else if (tm.nextIn > 1) when = L(`còn ${tm.nextIn - 1} trận`, `${tm.nextIn - 1} to go`);
-      } else if (tm.status === 'field') when = L('thả tim đều tay!', 'tap steadily!');
+      } else if (tm.status === 'field') when = L('thả tim liên tục!', 'keep tapping!');
       else if (tm.status === 'out') when = L('tặng quà tiếp sức đội thua', 'gift to help the losers');
       text(`${st[0]} ${st[1]}`, x + 16, y + 60, { size: 17, weight: 900, color: st[2], align: 'left' });
       if (when) text(when, x + cw - 16, y + 60, { size: 15, weight: 800, color: tm.nextIn === 1 ? '#ffe066' : '#bbb', align: 'right', maxW: cw / 2 });
@@ -2125,7 +2130,7 @@
     });
   }
   function drawJoinBar() {
-    text(L('💬 Bình luận 1 · 2 · 3 · 4 để vào đội · ❤️ thả tim đều tay để kéo', '💬 Comment 1 · 2 · 3 · 4 to join · ❤️ tap steadily to pull'), W / 2, Y_JOIN, { size: 18, weight: 800, color: '#ffe066', stroke: 4, maxW: CW });
+    text(L('💬 Bình luận 1 · 2 · 3 · 4 để vào đội · ❤️ thả tim LIÊN TỤC để kéo (combo 🔥 tới ×1,5)', '💬 Comment 1 · 2 · 3 · 4 to join · ❤️ keep tapping to pull (🔥 combo up to ×1.5)'), W / 2, Y_JOIN, { size: 18, weight: 800, color: '#ffe066', stroke: 4, maxW: CW });
     text(roster.queueCount ? L(`🪑 Phòng chờ giải sau: ${roster.queueCount} người`, `🪑 Waiting for next cup: ${roster.queueCount}`) : L('Đội đầy tự sang đội vắng nhất · tối đa 20 người/đội', 'Full teams overflow to the emptiest · max 20 per team'), W / 2, Y_JOIN + 26, { size: 15, weight: 600, color: '#ddd', stroke: 3, maxW: CW });
   }
   // Hàng ảnh quà TikTok ngay dưới sân: ảnh quà ở trên, tên kỹ năng ở dưới
@@ -2314,7 +2319,7 @@
     for (let i = awardToasts.length - 1; i >= 0; i--) if (t - awardToasts[i].at > 3800) awardToasts.splice(i, 1);
     awardToasts.forEach((a, i) => {
       const e = (t - a.at) / 1000;
-      const y = Y_CLOSE + CLOSE_H + 22 + i * 46;
+      const y = Y_CLOSE + CLOSE_H + 50 + i * 46;
       const pop = e < 0.25 ? 0.6 + (e / 0.25) * 0.4 : 1;
       const alpha = e > 3.3 ? (3.8 - e) / 0.5 : 1;
       g.save();
@@ -2378,6 +2383,13 @@
   // Đồng hồ đếm ngược số to giữa màn hình: mỗi giây số nảy lên; 10 giây cuối đỏ, rung + tích tắc; phút chót màu cam
   let lastTickSec = -1;
   function drawBigTimer(t) {
+    // nhắc ngay dưới đồng hồ: thả tim liên tục (nhịp đập nhẹ như tim)
+    const beat = 1 + 0.08 * Math.max(0, Math.sin(t / 160));
+    g.save();
+    g.translate(W / 2, Y_CLOSE + 156);
+    g.scale(beat, beat);
+    text(L('❤️ THẢ TIM LIÊN TỤC ĐỂ KÉO!', '❤️ KEEP TAPPING TO PULL!'), 0, 0, { size: 20, weight: 900, color: '#ff8fab', stroke: 5 });
+    g.restore();
     const ms = Math.max(0, ph.phaseEndsAt - now());
     const sec = Math.ceil(ms / 1000);
     const frac = sec - ms / 1000; // 0 → 1 trong mỗi giây

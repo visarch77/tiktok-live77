@@ -32,10 +32,16 @@ const TEAM_META = {
 // Lực kéo
 const BUF_MAX = 6; // tim dồn tối đa (không tích trữ được)
 const USE_PER_TICK = 0.6; // ≈ 6 tim/giây là trần có ích
-const STAMINA_COST = 0.028; // mỗi tim dùng
+// Thả tim LIÊN TỤC là cách chơi đúng: thể lực tụt chậm và vẫn hồi một ít ngay cả khi đang kéo
+// (thả vừa phải thì không bao giờ mệt; dồn hết cỡ cả trận mới hơi đuối về cuối), kèm combo thưởng
+const STAMINA_COST = 0.01; // mỗi tim dùng
 const STAMINA_REGEN = 0.05; // mỗi nhịp không kéo (≈ 2 giây là đầy)
+const PULL_REGEN = 0.004; // mỗi nhịp đang kéo vẫn hồi chút ít
 const WINDED_AT = 0.15;
-const EXHAUST_MS = 2000;
+const EXHAUST_MS = 1200;
+const COMBO_GAP_MS = 2000; // ngừng thả quá lâu chừng này thì mất combo (TikTok gộp tim ~1,2 giây/gói)
+const COMBO_FULL_MS = 10000; // thả liên tục 10 giây → combo tối đa
+const COMBO_MAX = 0.5; // lực ×1,5
 const TEAM_EXP = 0.6; // F = Σ lực / N^0,6
 const UNITY_BONUS = 0.25;
 const K_ROPE = 0.17; // vận tốc dây (đơn vị/giây) trên mỗi đơn vị chênh lực
@@ -49,20 +55,20 @@ const QUEUE_MAX = 200;
 
 const LINES = {
   lobby: [
-    'Kéo co bốn đội! Bình luận số đội một, hai, ba hoặc bốn để vào đội. Lúc đội mình ra sân, thả tim đều tay để kéo. Thả liên tục quá sẽ hụt hơi đó!',
+    'Kéo co bốn đội! Bình luận số đội một, hai, ba hoặc bốn để vào đội. Lúc đội mình ra sân, thả tim liên tục suốt trận để kéo. Càng thả liên tục, combo càng cao, kéo càng khoẻ!',
     'Giải kéo co sắp bắt đầu! Bình luận số đội để tham gia. Hai trận bán kết, đội thắng vào chung kết. Tặng quà để dùng kỹ năng!'
   ],
   draw: ['Bốc thăm cặp đấu!'],
-  pullGo: ['Kéo!', 'Bắt đầu kéo!', 'Kéo mạnh lên!'],
+  pullGo: ['Kéo! Thả tim liên tục nào!', 'Bắt đầu kéo! Thả tim liên tục đừng ngừng nhé!', 'Kéo mạnh lên! Thả tim liên tục suốt trận!'],
   noOne: ['Chưa có ai vào đội, các bạn máy kéo trước nhé! Bình luận số đội để vào chơi.']
 };
 const LINES_EN = {
   lobby: [
-    'Four team tug of war! Comment team number one, two, three or four to join. When your team is on the field, tap hearts steadily to pull. Tapping nonstop wears you out!',
+    'Four team tug of war! Comment team number one, two, three or four to join. When your team is on the field, keep tapping hearts the whole match. The longer you keep tapping, the higher your combo and the harder you pull!',
     'The tug of war cup is about to start! Comment a team number to join. Two semi finals, winners meet in the final. Send gifts to use skills!'
   ],
   draw: ['Drawing the matches!'],
-  pullGo: ['Pull!', 'Start pulling!', 'Pull harder!'],
+  pullGo: ['Pull! Keep tapping hearts!', 'Start pulling! Do not stop tapping!', 'Pull harder! Tap hearts the whole match!'],
   noOne: ['No one has joined yet, the bots will pull first! Comment a team number to play.']
 };
 const NPC_NAMES = ['Bé Su', 'Tí Đẹp Trai', 'Hai Lúa', 'Mây Lang Thang', 'Sóc Nâu', 'Gió Đồng', 'Bin Bon', 'Nắng Mai', 'Đá Cuội', 'Cún Con',
@@ -475,6 +481,7 @@ function create(ctx, saved = {}) {
       p.exhaustedUntil = p.boostUntil = p.dazedUntil = p.tickledUntil = p.slipUntil = 0;
       p.matchForce = 0;
       p.force = 0;
+      p.combo = p.comboSince = p.lastPullAt = 0;
     }
     refreshLineup();
     setPhase('intro', 4500);
@@ -679,8 +686,14 @@ function create(ctx, saved = {}) {
         let use = out ? 0 : Math.min(p.buffer, USE_PER_TICK);
         p.buffer = Math.max(0, p.buffer - use);
         const heave = now < f.heave;
+        // combo: thả liên tục (không ngừng quá COMBO_GAP_MS) thì lực tăng dần tới ×1,5
         if (use > 0) {
-          if (!heave) p.stamina -= use * STAMINA_COST;
+          if (!p.comboSince || now - (p.lastPullAt || 0) > COMBO_GAP_MS) p.comboSince = now;
+          p.lastPullAt = now;
+        } else if (now - (p.lastPullAt || 0) > COMBO_GAP_MS) p.comboSince = 0;
+        p.combo = p.comboSince ? Math.min(COMBO_MAX, (COMBO_MAX * (now - p.comboSince)) / COMBO_FULL_MS) : 0;
+        if (use > 0) {
+          if (!heave) p.stamina = Math.min(1, p.stamina - use * STAMINA_COST + PULL_REGEN * (now < f.cheer ? 2 : 1));
           if (p.stamina <= 0) {
             p.stamina = 0.3;
             p.exhaustedUntil = now + EXHAUST_MS;
@@ -692,7 +705,7 @@ function create(ctx, saved = {}) {
           p.stamina = Math.min(1, p.stamina + STAMINA_REGEN * (now < f.cheer ? 2 : 1));
         }
         const stam = p.stamina > WINDED_AT ? 0.3 + 0.7 * p.stamina : 0.3;
-        let mult = (now < p.boostUntil ? 2 : 1) * (heave ? 1.5 : 1) * (now < f.grease ? 0.5 : 1) * hoDo * (p.npc ? NPC_POWER : 1);
+        let mult = (1 + (p.npc ? 0 : p.combo)) * (now < p.boostUntil ? 2 : 1) * (heave ? 1.5 : 1) * (now < f.grease ? 0.5 : 1) * hoDo * (p.npc ? NPC_POWER : 1);
         if (sleeping) mult = 0;
         const force = use * stam * mult;
         p.force = force;
@@ -737,6 +750,10 @@ function create(ctx, saved = {}) {
         comment(eventComment('comeback', { t: teamName(m[side]) }, en), 1);
       }
     }
+    if (!cm.midTap && phaseEndsAt - now < (S().matchSeconds * 1000) / 2 && phaseEndsAt - now > 15000) {
+      cm.midTap = true;
+      if (comment(eventComment('tap', { t: teamName(rope.x > 0 ? m.a : m.b) }, en), 1)) return;
+    }
     if (!cm.last10 && phaseEndsAt - now < 10500 && phaseEndsAt - now > 8000) {
       cm.last10 = true;
       comment(eventComment('last10', {}, en), 1);
@@ -746,7 +763,8 @@ function create(ctx, saved = {}) {
     const all = [...lineOf('a'), ...lineOf('b')].filter((p) => !p.npc && p.matchForce > 0);
     const star = all.sort((x, y) => y.matchForce - x.matchForce)[0];
     const r = Math.random();
-    if (Math.abs(rope.x) < 0.15 && r < 0.4) comment(eventComment('even', {}, en), 0);
+    if (r < 0.35) comment(eventComment('tap', { t: teamName(rope.x > 0 ? m.a : m.b) }, en), 0); // nhắc thả tim liên tục
+    else if (Math.abs(rope.x) < 0.15 && r < 0.6) comment(eventComment('even', {}, en), 0);
     else if (star && r < 0.75) comment(eventComment('star', { v: speakName(star.name) }, en), 0);
     else if (Math.abs(rope.x) > 0.25) comment(eventComment('lazy', { t: teamName(rope.x > 0 ? m.a : m.b) }, en), 0);
     else lastSayAt = now - 3000; // không có gì để nói: thử lại sau ít giây
@@ -886,7 +904,7 @@ function create(ctx, saved = {}) {
       if (now < p.boostUntil || p.stamina <= WINDED_AT) return 'strain';
       return 'pull';
     };
-    const side = (s) => lineOf(s).map((p) => [p.key, st(p), Math.round(p.stamina * 100), Math.round(p.force * 100)]);
+    const side = (s) => lineOf(s).map((p) => [p.key, st(p), Math.round(p.stamina * 100), Math.round(p.force * 100), Math.round((p.combo || 0) * 100)]);
     const team = (t) => {
       const f = fx[t];
       return { glue: f.glue > now ? f.glue - now : 0, cheer: f.cheer > now ? f.cheer - now : 0, grease: f.grease > now ? f.grease - now : 0, heave: f.heave > now ? f.heave - now : 0, strong: f.strong > now ? f.strong - now : 0 };
@@ -1248,7 +1266,7 @@ function create(ctx, saved = {}) {
 module.exports = {
   id: 'keoco',
   name: 'Kéo Co 4 Đội',
-  description: 'Giải kéo co loại trực tiếp: bình luận số đội 1–4, thả tim đều tay để kéo, quà là kỹ năng.',
+  description: 'Giải kéo co loại trực tiếp: bình luận số đội 1–4, thả tim liên tục để kéo (càng liên tục combo càng cao), quà là kỹ năng.',
   overlay: 'keoco.html',
   settingsSchema: {
     lobbySeconds: [10, 300],
