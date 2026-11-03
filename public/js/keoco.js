@@ -36,11 +36,11 @@
   const SHIFT = 150; // |x| = 1 → hàng người dịch 150 px (người đầu dây bên thua qua mép vực)
   const FRONT_GAP = 26; // tay người đầu dây cách mép vực
   const SPRITE_SCALE = 0.75; // ảnh atlas = 1/4 ảnh gốc
-  const LINE_LEN = 410; // chiều dài hàng mỗi bên (px)
+  const LINE_LEN = 290; // chiều dài hàng mỗi bên (px): người cuối hàng vẫn trong lề MX
   // Bố cục chừa chỗ cho giao diện TikTok LIVE: trên cùng ~170 px (tên chủ phòng, số người xem), từ ~1340 trở xuống
   // (khung bình luận, nút quà) dễ bị che → thông tin quan trọng nằm trong 180…1335; hai lề cách 48 px
-  const MX = 72; // lề hai bên (tránh nút / viền giao diện TikTok che)
-  const CW = W - MX * 2;
+  let MX = 140; // lề hai bên: điện thoại / TikTok cắt hai mép nhiều → dồn vào trong (chỉnh trong admin: sideMargin)
+  let CW = W - MX * 2;
   const Y_HUD = 184;
   const Y_STATUS = 338;
   const Y_BAR = 406;
@@ -155,6 +155,11 @@
   function applyState(st) {
     if (!st) return;
     settings = st.settings || settings;
+    const sm = Number(settings.sideMargin);
+    if (sm >= 40 && sm <= 220) {
+      MX = sm;
+      CW = W - MX * 2;
+    }
     document.title = L('Kéo Co 4 Đội', 'Tug of War Cup');
     const un = document.getElementById('unlock');
     if (un) un.textContent = L('🔊 Chạm để bật âm thanh', '🔊 Tap to turn on sound');
@@ -1337,13 +1342,15 @@
     return Math.min(44, LINE_LEN / Math.max(1, n));
   }
   // x điểm nắm dây của người thứ i (0 = đầu dây) bên side, chưa tính dịch dây
-  function lineX0(side, i, n) {
-    const sp = spacing(n || 10);
-    return side === 'a' ? EDGE_L - FRONT_GAP - i * sp : EDGE_R + FRONT_GAP + i * sp;
-  }
+  // x điểm nắm dây của người thứ i (0 = đầu dây) bên side. Cả hàng dịch theo dây; khoảng cách giữa người co lại
+  // khi cần để người cuối hàng luôn nằm trong lề MX (không bị TikTok / điện thoại cắt mất)
   function lineX(side, i) {
     const n = side === 'a' ? roster.lineA.length : roster.lineB.length;
-    return lineX0(side, i, n) + ropeX * SHIFT; // x > 0: dây về phía đội phải → cả hai hàng dịch sang phải
+    const shift = ropeX * SHIFT; // x > 0: dây về phía đội phải → cả hai hàng dịch sang phải
+    const front = side === 'a' ? EDGE_L - FRONT_GAP + shift : EDGE_R + FRONT_GAP + shift;
+    const room = side === 'a' ? front - (MX + 16) : W - MX - 16 - front;
+    const sp = Math.max(6, Math.min(spacing(n), room / Math.max(1, n - 1)));
+    return side === 'a' ? front - i * sp : front + i * sp;
   }
   // Hết trận: hàng bên thua bị kéo tuột về phía vực (px), dùng chung cho người và dây
   function endSlide(side, t) {

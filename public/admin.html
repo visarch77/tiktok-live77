@@ -1362,7 +1362,8 @@
           <label class="switch"><input type="checkbox" data-setting="aiShow" ${s.aiShow !== false ? 'checked' : ''} /><span></span></label>
         </div>
         ${rlRange('npcMin', 'Người máy lấp chỗ', 'Mỗi bên trên sân được lấp người máy (🤖, kéo yếu hơn) tới max(số người thật bên đông hơn, số này)', 0, 20, 1, ' người')}
-        ${rlRange('championSeconds', 'Thời gian vinh danh vô địch', '', 5, 60, 1, 's')}`;
+        ${rlRange('championSeconds', 'Thời gian vinh danh vô địch', '', 5, 60, 1, 's')}
+        ${rlRange('sideMargin', 'Lề hai bên màn hình', 'Điện thoại / TikTok cắt mất hai mép thì tăng lên để dồn mọi thứ vào giữa', 40, 220, 4, ' px')}`;
       body.innerHTML = `${rlExtra}${kcExtra}
         <div class="setting">
           <div><div class="setting-name">Giọng đọc</div><div class="setting-desc">Đọc tên & lời nhắn của người xem</div></div>
