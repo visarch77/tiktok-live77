@@ -262,6 +262,7 @@
           until: Date.now() + 5500
         };
         if (unlocked) audio.resultJingle(true);
+        fallSfx();
         break;
       }
       case 'champion':
@@ -667,6 +668,107 @@
       if (tr.el.paused) tr.el.play().catch(() => {});
     });
     pullMusic();
+    ambientSfx(dt);
+  }
+
+  // ---- Tiếng người & tiếng sân (tự tạo): giọng hoạt hình = sóng răng cưa qua 2 bộ lọc nguyên âm (formant) ----
+  const VOWEL = { a: [800, 1200], o: [450, 800], u: [330, 700], e: [420, 2000], i: [300, 2300] };
+  function voice(at, dur, f0, f1, vowel = 'a', vol = 0.08, vib = 6) {
+    const c = audio.ctx;
+    if (!c) return;
+    at = Math.max(at, c.currentTime + 0.01);
+    const src = c.createOscillator();
+    src.type = 'sawtooth';
+    src.frequency.setValueAtTime(f0, at);
+    src.frequency.exponentialRampToValueAtTime(Math.max(40, f1), at + dur);
+    const lfo = c.createOscillator();
+    const lg = c.createGain();
+    lfo.frequency.value = vib;
+    lg.gain.value = f0 * 0.03;
+    lfo.connect(lg).connect(src.frequency);
+    const out = c.createGain();
+    out.gain.setValueAtTime(0.0001, at);
+    out.gain.exponentialRampToValueAtTime(vol, at + Math.min(0.05, dur / 4));
+    out.gain.setValueAtTime(vol, at + dur * 0.7);
+    out.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+    const [F1, F2] = VOWEL[vowel] || VOWEL.a;
+    for (const [f, q, g2] of [[F1, 6, 1], [F2, 8, 0.6]]) {
+      const bp = c.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.frequency.value = f;
+      bp.Q.value = q;
+      const gg = c.createGain();
+      gg.gain.value = g2;
+      src.connect(bp).connect(gg).connect(out);
+    }
+    out.connect(audio.sfxBus);
+    src.start(at);
+    lfo.start(at);
+    src.stop(at + dur + 0.05);
+    lfo.stop(at + dur + 0.05);
+  }
+  const ambient = { creakAt: 0, breathAt: 0, skidAt: 0, chantAt: 0 };
+  // Gọi mỗi khung hình lúc đang kéo: dây cót két, thở hộc hộc, giày rít khi bị lôi, đám đông hô HÒ – DÔ
+  function ambientSfx(dt) {
+    const c = audio.ctx;
+    if (!c || !unlocked || previewMuted || ph.phase !== 'pull' || settings.sfxEnabled === false) return;
+    const T = c.currentTime + 0.03; // luôn lên lịch sau thời điểm hiện tại
+    const tn = performance.now();
+    // dây cót két: căng càng mạnh càng dày
+    if (tn > ambient.creakAt) {
+      ambient.creakAt = tn + 1000 / (0.6 + 2.6 * tension) * (0.6 + Math.random() * 0.8);
+      const f = 260 + Math.random() * 160;
+      audio.noise(T, 0.22 + Math.random() * 0.12, { vol: 0.05 + tension * 0.05, type: 'bandpass', freq: f, q: 14, sweepTo: f * 0.6 });
+    }
+    // thở hộc hộc: theo số người đang gồng / kiệt sức trên sân
+    let tired = 0;
+    for (const v of pstate.values()) if (v.st === 'strain' || v.st === 'tired') tired++;
+    if (tired && tn > ambient.breathAt) {
+      ambient.breathAt = tn + Math.max(180, 900 - tired * 60) * (0.7 + Math.random() * 0.6);
+      const f = 900 + Math.random() * 700;
+      audio.noise(T, 0.16, { vol: Math.min(0.08, 0.025 + tired * 0.004), type: 'bandpass', freq: f, q: 2.2, sweepTo: f * 0.75 });
+      if (Math.random() < 0.35) voice(T + 0.02, 0.14, 240 + Math.random() * 80, 200, 'a', 0.03, 0); // "hộc"
+    }
+    // bị lôi đi: giày rít + chà sàn
+    const sp = Math.abs(ropeVel);
+    if (sp > 0.025 && tn > ambient.skidAt) {
+      ambient.skidAt = tn + 110 + Math.random() * 90;
+      audio.noise(T, 0.12, { vol: Math.min(0.07, sp * 1.2), type: 'highpass', freq: 2600 });
+      if (Math.random() < 0.3) audio.osc(1700 + Math.random() * 500, T, 0.09, { type: 'sine', vol: 0.03, slide: 400, attack: 0.004 });
+    }
+    // đám đông hô "HÒ… DÔ!" (dày hơn khi có Hò dô / căng)
+    const heave = (live.ta && live.ta.heave > 0) || (live.tb && live.tb.heave > 0);
+    if (tn > ambient.chantAt) {
+      ambient.chantAt = tn + (heave ? 900 : 2600 - tension * 900) * (0.85 + Math.random() * 0.3);
+      for (let k = 0; k < 3; k++) {
+        const d = Math.random() * 0.04; // lệch nhẹ cho giống nhiều người hô
+        voice(T + d, 0.28, 150 + k * 18, 135 + k * 15, 'o', 0.035, 5);
+        voice(T + 0.36 + d, 0.32, 190 + k * 20, 175 + k * 18, 'o', 0.04, 5);
+      }
+    }
+  }
+  // "Hự!" khi có tiếng hét truyện tranh bật lên
+  function gruntSfx() {
+    const c = audio.ctx;
+    if (!c || !unlocked || previewMuted) return;
+    const f = 180 + Math.random() * 120;
+    voice(c.currentTime + 0.02, 0.18, f * 1.2, f * 0.8, Math.random() < 0.5 ? 'u' : 'a', 0.05, 0);
+  }
+  // Hết trận: đội thua la thất thanh "Aaaaa…" rơi xuống vực rồi "bộp"; đội thắng hò "Yeee!"
+  function fallSfx() {
+    const c = audio.ctx;
+    if (!c || !unlocked || previewMuted) return;
+    const T = c.currentTime + 0.03;
+    for (let k = 0; k < 6; k++) {
+      const at = T + 0.5 + k * 0.22 + Math.random() * 0.1;
+      const f0 = 520 + Math.random() * 260;
+      voice(at, 1.7, f0, f0 * 0.28, 'a', 0.055, 7 + Math.random() * 3);
+      audio.osc(55, at + 1.75, 0.25, { type: 'sine', vol: 0.18, slide: -20, attack: 0.002 }); // bộp dưới đáy vực
+      audio.noise(at + 1.75, 0.18, { vol: 0.06, type: 'lowpass', freq: 500 });
+    }
+    // còi trượt xuống kiểu hoạt hình
+    audio.osc(1500, T + 0.45, 1.4, { type: 'sine', vol: 0.06, slide: -1250, attack: 0.03 });
+    for (let k = 0; k < 4; k++) voice(T + 0.2 + k * 0.05, 0.6, 330 + k * 30, 420 + k * 30, 'e', 0.04, 6);
   }
 
   // ---- Hành khúc kéo co: Đô trưởng, 8 ô nhịp lặp lại, mỗi ô 8 móc đơn ----
@@ -1030,6 +1132,7 @@
       if (loud && ph.phase === 'pull' && shouts.length < 4 && Math.random() < dt * 0.25) {
         const list = settings.lang === 'en' ? SHOUT_EN : SHOUT_VI;
         shouts.push({ text: list[Math.floor(Math.random() * list.length)], x: d.gx - face * 12, y: d.box.top - 10, at: t, rot: (Math.random() - 0.5) * 0.4, side });
+        gruntSfx();
       }
     }
   }

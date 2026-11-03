@@ -136,6 +136,10 @@ Bố cục chừa chỗ cho giao diện TikTok LIVE: hai lề 72 px; trên cùng
   hợp âm "pa" phách 2–4, kick + snare + hi-hat, giai điệu kiểu kèn kazoo (sawtooth có rung qua lọc dải), còi trượt hoạt hình cuối mỗi 4 ô.
   10 giây cuối: 128 → 156 BPM và lên 2 cung; dây sát mép vực: thêm nốt trầm rung dồn dập. Âm lượng theo "Âm lượng nhạc nền", tắt theo "Nhạc chờ".
 
+- **Tiếng sân lúc kéo** (giọng hoạt hình = sóng răng cưa qua 2 bộ lọc nguyên âm): dây cót két (dày hơn khi căng), thở "hộc hộc" theo số
+  người đang gồng / kiệt sức, giày rít + chà sàn khi một đội bị lôi, đám đông hô "HÒ… DÔ!" (dày hơn khi có Hò dô), "hự!" mỗi khi
+  bong bóng hét bật lên. **Hết trận**: đội thua la thất thanh "Aaaaa…" rơi xuống vực rồi "bộp", còi trượt xuống; đội thắng hò "Yeee!".
+
 ## Hiệu ứng kỹ năng
 
 Mỗi lần dùng kỹ năng: **thẻ to** bên phía đội dùng (ảnh quà + tên kỹ năng + một câu nói rõ chuyện gì xảy ra, vd. "💨 THẢ BOOM! 5 người
