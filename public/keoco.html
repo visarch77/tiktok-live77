@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#0b1020" />
+  <title>Kéo Co 4 Đội</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    html, body { margin: 0; height: 100%; background: #0b1020; overflow: hidden; }
+    body { display: flex; align-items: center; justify-content: center; font-family: 'Be Vietnam Pro', system-ui, sans-serif; }
+    canvas { display: block; flex: none; }
+    #unlock {
+      position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
+      background: rgba(0,0,0,.65); color: #fff; padding: 8px 14px; border-radius: 999px; font-size: 13px; cursor: pointer;
+    }
+    body.obs #unlock { display: none; }
+  </style>
+</head>
+<body>
+  <canvas id="stage" width="1080" height="1920"></canvas>
+  <div id="unlock">🔊 Chạm để bật âm thanh</div>
+  <script src="/js/redlight-audio.js"></script>
+  <script src="/js/keoco.js"></script>
+</body>
+</html>

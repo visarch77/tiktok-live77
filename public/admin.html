@@ -649,6 +649,39 @@
         }
       }
     };
+    MODE_UI.keoco = {
+      pointsLabel: 'Điểm kéo co (lực đã kéo; đội thắng +20%, vô địch +10)',
+      actions: [
+        { icon: '▶️', name: 'Bắt đầu giải ngay', desc: 'Bốc thăm 4 đội và vào bán kết (khi đang chờ)', method: 'keoco.startCup' },
+        { icon: '🏁', name: 'Kết thúc trận', desc: 'Bên đang được lợi thắng ngay', method: 'keoco.endMatch' },
+        { icon: '✂️', name: 'Dây đứt', desc: 'Hai đội ngã ngửa, 2 giây sau nối lại (vị trí giữ nguyên)', method: 'keoco.ropeBreak' },
+        { icon: '😴', name: 'Trọng tài ngủ gật', desc: '4 giây kéo không tính — ai lỡ kéo thì mất thể lực oan', method: 'keoco.refSleep' },
+        { icon: '🥁', name: 'HÒ DÔ!', desc: '3 giây mọi tim của cả hai đội ×1,3', method: 'keoco.hoDo' },
+        { icon: '⏸', name: 'Tạm dừng / tiếp tục', desc: 'Dừng đồng hồ', method: 'keoco.pause' },
+        { icon: '🔄', name: 'Về phòng chờ', desc: 'Huỷ giải đang chơi, giữ người trong đội', method: 'keoco.newLobby' },
+        { icon: '👥', name: 'Thêm 30 người thử', desc: 'Người ảo chọn đội ngẫu nhiên (chỉ khi chưa live)', method: 'keoco.testCrowd', params: { count: 30 } },
+        { icon: '🎁', name: 'Tặng quà thử', desc: 'Quà ngẫu nhiên (chỉ khi chưa live)', method: 'keoco.testGift' }
+      ],
+      commentHint: 'Bình luận 1–4 (hoặc đỏ / xanh / vàng / tím) để vào đội; đội đầy tự sang đội vắng nhất. Đổi đội được trong lúc chờ giải',
+      stats: (st) => {
+        const k = st.kc || {};
+        const ph = { lobby: 'Đang chờ vào đội', draw: 'Bốc thăm', intro: 'Giới thiệu trận', pull: 'Đang kéo', matchEnd: 'Hết trận', champion: 'Vinh danh vô địch' }[k.phase] || '';
+        const m = k.bracket && k.matchIdx >= 0 ? k.bracket[k.matchIdx] : null;
+        return [
+          { label: 'Giải', value: fmt(k.cup), hint: ph },
+          { label: 'Trận', value: m ? esc(m.label) : '—', hint: m ? `Đội ${m.a} vs Đội ${m.b}` : '' },
+          { label: 'Người trong đội', value: fmt(k.roster?.players), hint: `${(k.roster?.teams || []).map((t) => `Đ${t.id}: ${t.count}`).join(' · ')} · chờ ${fmt(k.roster?.queueCount)}` }
+        ];
+      },
+      dangerActions: [
+        { label: '🧹 Xoá hết người chơi', method: 'keoco.clearPlayers', confirm: 'Xoá toàn bộ người trong 4 đội và phòng chờ, về màn chờ?' }
+      ],
+      describe: (e) => {
+        const u = `<b>${esc(e.user || 'Người chơi')}</b>`;
+        if (e.type === 'kcGift') return { icon: esc(e.emoji || '🎁'), text: `${u} tặng ${esc(e.gift)} → ${esc(e.label)}` };
+        return { icon: '✨', text: `${u} tương tác` };
+      }
+    };
     const DEFAULT_MODE_UI = { pointsLabel: 'Điểm', actions: [], stats: () => [], dangerActions: [], describe: (e) => ({ icon: '✨', text: `<b>${esc(e.user || 'Người xem')}</b> tương tác` }) };
 
     // ======================================================================
@@ -831,6 +864,12 @@
               { id: 'settings', label: '⚙️ Cài đặt' },
               { id: 'lag', label: '📏 Độ trễ' },
               { id: 'play', label: '🎮 Chơi thử' }
+            ]
+          : room.mode === 'keoco'
+          ? [
+              { id: 'interact', label: '🕹 Điều khiển giải' },
+              { id: 'feed', label: '📡 Hoạt động' },
+              { id: 'settings', label: '⚙️ Cài đặt' }
             ]
           : [
               { id: 'interact', label: '🧪 Thử tương tác' },
@@ -1261,7 +1300,30 @@
         ${rlRange('queueLikes', 'Tim để tham gia', 'Lúc chờ: bình luận hoặc thả đủ tim là vào sân. Đang chơi: bình luận hoặc thả đủ tim là đứng hàng chờ, ván sau vào sân', 1, 300, 1, ' tim')}
         ${rlRange('stompMax', 'Kính râm: số người bị dẫm tối đa', 'Khổng lồ chạy đường ngẫu nhiên qua chỗ đông người; khiên đỡ được', 1, 15, 1, ' người')}
         ${rlRange('simCrowd', 'Số người ảo khi giả lập', '', 5, 200, 5, ' người')}`;
-      body.innerHTML = `${rlExtra}
+      const kcExtra = currentRoom()?.mode !== 'keoco' ? '' : `
+        <div class="setting">
+          <div><div class="setting-name">Ngôn ngữ phòng</div><div class="setting-desc">Chữ trên màn hình live, giọng đọc, tên người máy</div></div>
+          <select class="input" data-setting="lang">${[['vi', 'Tiếng Việt'], ['en', 'English']].map(([v, n]) => `<option value="${v}" ${v === (s.lang || 'vi') ? 'selected' : ''}>${n}</option>`).join('')}</select>
+        </div>
+        <div class="setting">
+          <div><div class="setting-name">Giọng đọc tiếng Anh</div><div class="setting-desc">Chỉ dùng khi chọn English</div></div>
+          <select class="input" data-setting="enVoice">${[['Samantha', 'Samantha (nữ, Mỹ)'], ['Daniel', 'Daniel (nam, Anh)'], ['Karen', 'Karen (nữ, Úc)'], ['Moira', 'Moira (nữ, Ireland)'], ['Tessa', 'Tessa (nữ, Nam Phi)'], ['Fred', 'Fred (nam, Mỹ, giọng máy)']].map(([v, n]) => `<option value="${v}" ${v === (s.enVoice || 'Samantha') ? 'selected' : ''}>${n}</option>`).join('')}</select>
+        </div>
+        <div class="setting">
+          <div><div class="setting-name">Tự chạy giải liên tục</div><div class="setting-desc">Hết giờ chờ tự bốc thăm; tắt thì bấm "Bắt đầu giải ngay"</div></div>
+          <label class="switch"><input type="checkbox" data-setting="autoLoop" ${s.autoLoop !== false ? 'checked' : ''} /><span></span></label>
+        </div>
+        <div class="setting">
+          <div><div class="setting-name">Nhạc chờ</div><div class="setting-desc">Nhạc nền lúc chờ vào đội và lúc vinh danh</div></div>
+          <label class="switch"><input type="checkbox" data-setting="bgMusicEnabled" ${s.bgMusicEnabled !== false ? 'checked' : ''} /><span></span></label>
+        </div>
+        ${rlRange('lobbySeconds', 'Thời gian chờ vào đội', 'Đủ người (mục dưới) thì rút còn 10 giây', 10, 300, 5, 's')}
+        ${rlRange('fastStartPlayers', 'Đủ người để bắt đầu sớm', 'Tổng người trong 4 đội đạt số này thì rút ngắn thời gian chờ', 2, 80, 1, ' người')}
+        ${rlRange('matchSeconds', 'Thời gian mỗi trận', 'Hết giờ: bên đang được lợi thắng; hoà sát vạch thì thêm 10 giây phút chót', 20, 180, 5, 's')}
+        ${rlRange('teamMax', 'Tối đa mỗi đội', 'Đội đầy thì người mới tự sang đội vắng nhất; cả 4 đội đầy thì vào phòng chờ giải sau', 5, 20, 1, ' người')}
+        ${rlRange('npcMin', 'Người máy lấp chỗ', 'Mỗi bên trên sân được lấp người máy (🤖, kéo yếu hơn) tới max(số người thật bên đông hơn, số này)', 0, 20, 1, ' người')}
+        ${rlRange('championSeconds', 'Thời gian vinh danh vô địch', '', 5, 60, 1, 's')}`;
+      body.innerHTML = `${rlExtra}${kcExtra}
         <div class="setting">
           <div><div class="setting-name">Giọng đọc</div><div class="setting-desc">Đọc tên & lời nhắn của người xem</div></div>
           <label class="switch"><input type="checkbox" data-setting="ttsEnabled" ${s.ttsEnabled !== false ? 'checked' : ''} /><span></span></label>

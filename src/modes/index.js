@@ -3,12 +3,14 @@
 const chanting = require('./chanting');
 const temple = require('./temple');
 const redlight = require('./redlight');
+const keoco = require('./keoco');
 
 // Chế độ đầu tiên là mặc định khi tạo phòng mới
 const MODES = {
   [chanting.id]: chanting,
   [temple.id]: temple,
-  [redlight.id]: redlight
+  [redlight.id]: redlight,
+  [keoco.id]: keoco
 };
 
 function listModes() {
