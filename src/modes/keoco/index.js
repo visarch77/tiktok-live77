@@ -216,25 +216,43 @@ function create(ctx, saved = {}) {
     return humans(t).reduce((s, p) => s + p.cupForce, 0) / Math.max(1, humans(t).length);
   }
 
+  // Giọng đọc: tổng hợp lần lượt từng câu (đúng thứ tự, không dồn). prio 2 = câu dẫn trận (luôn đọc),
+  // 1 = bình luận kỹ năng, 0 = bình luận tình huống; câu bình luận chờ quá lâu thì bỏ (đã lỡ lúc)
   let lastSayAt = 0;
-  function say(text) {
+  const sayQ = [];
+  let sayBusy = false;
+  function say(text, { prio = 2, ttl = 15000 } = {}) {
     if (S().ttsEnabled === false || !text) return;
     lastSayAt = Date.now();
-    const done = (res) => {
-      if (res && res.ok) ctx.broadcast('kc.say', { text, url: res.url });
-    };
-    if (isEn()) {
-      ttsEn.synthesize(text, S().enVoice).then(done).catch(() => {});
-      return;
-    }
-    if (!ctx.tts || !ctx.tts.ready) return;
-    ctx.tts.synthesize(text, S().ttsVoice).then(done).catch(() => {});
+    if (prio < 2 && sayQ.length) return; // đang có câu chờ: bỏ câu bình luận này
+    if (prio >= 2) for (let i = sayQ.length - 1; i >= 0; i--) if (sayQ[i].prio < 2) sayQ.splice(i, 1);
+    sayQ.push({ text, prio, deadline: Date.now() + ttl });
+    pumpSay();
+  }
+  function pumpSay() {
+    if (sayBusy) return;
+    const it = sayQ.shift();
+    if (!it) return;
+    if (Date.now() > it.deadline) return pumpSay();
+    const engine = isEn() ? ttsEn : ctx.tts;
+    if (!engine || (!isEn() && !engine.ready)) return pumpSay();
+    sayBusy = true;
+    const voice = isEn() ? S().enVoice : S().ttsVoice;
+    Promise.resolve(engine.synthesize(it.text, voice))
+      .then((res) => {
+        if (res && res.ok && Date.now() < it.deadline + 2000) ctx.broadcast('kc.say', { text: it.text, url: res.url, prio: it.prio, at: Date.now() });
+      })
+      .catch(() => {})
+      .finally(() => {
+        sayBusy = false;
+        pumpSay();
+      });
   }
   const fxMsg = (kind, data = {}) => ctx.broadcast('kc.fx', { kind, ...data });
   // Bình luận viên: câu kỹ năng cách nhau ≥ 1,8 s, câu bình luận tình huống ≥ 6 s (không dồn giọng đọc)
   function comment(text, prio = 1) {
     if (!text || Date.now() - lastSayAt < (prio >= 1 ? 1800 : 6000)) return false;
-    say(text);
+    say(text, { prio: Math.min(1, prio), ttl: prio >= 1 ? 4000 : 3000 });
     return true;
   }
   let cm = { danger: { a: false, b: false }, last10: false, exhaustAt: 0 };
@@ -1193,6 +1211,7 @@ module.exports = {
     fastStartPlayers: [2, 80],
     minTeamPlayers: [1, 20],
     aiShow: 'boolean',
+    pullMusic: { type: 'enum', values: ['epic', 'funny'] },
     autoLoop: 'boolean',
     lang: { type: 'enum', values: ['vi', 'en'] },
     enVoice: { type: 'enum', values: ttsEn.VOICES }
@@ -1206,6 +1225,7 @@ module.exports = {
     fastStartPlayers: 24,
     minTeamPlayers: 1, // đội có từ chừng này người thật trở lên mới tính là "có người"; cần ít nhất 2 đội như vậy để vào giải
     aiShow: true, // chưa đủ 2 đội: người máy tự kéo biểu diễn (không tính điểm)
+    pullMusic: 'epic', // nhạc lúc kéo: 'epic' kịch tính / 'funny' hành khúc hài
     autoLoop: true,
     lang: 'vi',
     enVoice: ttsEn.DEFAULT_VOICE,

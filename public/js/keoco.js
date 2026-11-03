@@ -842,6 +842,115 @@
   function slideWhistle(at, up) {
     audio.osc(up ? 700 : 1900, at, 0.55, { type: 'sine', vol: 0.09, slide: up ? 1200 : -1200, attack: 0.03, bus: 'music' });
   }
+  // ---- Nhạc kịch tính (mặc định): Rê thứ, trống taiko + dàn dây dồn dập (ostinato) + nền dây + kèn đồng ----
+  // Căng dần theo trận: dây sát mép vực / 10 giây cuối thì mở lọc, thêm trống, dây vĩ cầm rung, tim đập; 10 giây cuối nhanh hơn
+  const EPIC_ROOT = [38, 34, 36, 33, 38, 34, 31, 33]; // Rê thứ – Si giáng – Đô – La – Rê thứ – Si giáng – Son thứ – La
+  const EPIC_CHORD = [[50, 53, 57], [46, 50, 53], [48, 52, 55], [45, 49, 52], [50, 53, 57], [46, 50, 53], [43, 46, 50], [45, 49, 52]];
+  const EPIC_OSTI = [0, 0, 12, 0, 0, 0, 10, 0, 0, 0, 7, 0, 0, 12, 10, 7];
+  // kèn: [ô 16 phách, nốt, độ dài]
+  const EPIC_HORN = [
+    [[0, 62, 6], [6, 65, 2], [8, 69, 8]],
+    [[0, 70, 6], [6, 69, 2], [8, 65, 8]],
+    [[0, 67, 6], [6, 69, 2], [8, 72, 8]],
+    [[0, 69, 12], [12, 61, 4]],
+    [[0, 62, 4], [4, 65, 4], [8, 69, 4], [12, 74, 4]],
+    [[0, 74, 6], [6, 72, 2], [8, 70, 8]],
+    [[0, 70, 4], [4, 69, 4], [8, 67, 4], [12, 65, 4]],
+    [[0, 64, 8], [8, 61, 8]]
+  ];
+  // một giọng tổng hợp: răng cưa (2 dao động lệch nhẹ cho dày) → lọc thông thấp → bao âm
+  function synthNote(m, at, dur, { vol = 0.05, cutoff = 1200, attack = 0.01, release = 0.1, detune = 7, type = 'sawtooth', q = 0.8, vib = 0 } = {}) {
+    const c = audio.ensure();
+    if (!c) return;
+    const lp = c.createBiquadFilter();
+    const gn = c.createGain();
+    lp.type = 'lowpass';
+    lp.frequency.value = cutoff;
+    lp.Q.value = q;
+    gn.gain.setValueAtTime(0.0001, at);
+    gn.gain.exponentialRampToValueAtTime(vol, at + attack);
+    gn.gain.setValueAtTime(vol, at + Math.max(attack, dur - release));
+    gn.gain.exponentialRampToValueAtTime(0.0001, at + dur + release);
+    lp.connect(gn).connect(audio.musicBus);
+    const f = mfreq(m);
+    for (const d of detune ? [-detune, detune] : [0]) {
+      const o = c.createOscillator();
+      o.type = type;
+      o.frequency.value = f;
+      o.detune.value = d;
+      if (vib) {
+        const lfo = c.createOscillator();
+        const lg = c.createGain();
+        lfo.frequency.value = 5.5;
+        lg.gain.value = f * vib;
+        lfo.connect(lg).connect(o.frequency);
+        lfo.start(at);
+        lfo.stop(at + dur + release + 0.05);
+      }
+      o.connect(lp);
+      o.start(at);
+      o.stop(at + dur + release + 0.05);
+    }
+  }
+  function taiko(at, vol, low = 1) {
+    audio.osc(78 * low, at, 0.5, { type: 'sine', vol, slide: -40 * low, attack: 0.002, bus: 'music' });
+    audio.noise(at, 0.12, { vol: vol * 0.35, type: 'lowpass', freq: 320, bus: 'music' });
+  }
+  function tom(at, vol) {
+    audio.osc(150, at, 0.2, { type: 'sine', vol, slide: -60, attack: 0.002, bus: 'music' });
+  }
+  function epicMusic(c) {
+    const left = (ph.phaseEndsAt - now()) / 1000;
+    const hurry = left < 10;
+    const edge = Math.min(1, Math.max(0, (Math.abs(ropeX) - 0.3) / 0.5)); // 0 giữa sân → 1 sát vực
+    const inten = Math.max(edge, hurry ? 1 : 0, Math.min(0.5, music.step / 512)); // nhạc tự dâng dần theo thời gian
+    const bpm = hurry ? 150 : 132;
+    const sx = 60 / bpm / 4; // một móc kép
+    const cutoff = 650 + inten * 1900;
+    while (music.next < c.currentTime + 0.25) {
+      const at = music.next;
+      const st = music.step % 16;
+      const bar = Math.floor(music.step / 16) % 8;
+      const loop = Math.floor(music.step / 128);
+      const root = EPIC_ROOT[bar];
+      const barLen = sx * 16;
+      // trống taiko: nhịp hành quân; căng thì dày hơn
+      if (st === 0 || st === 8) taiko(at, 0.42, 1);
+      if (st === 6 || st === 14) taiko(at, 0.26, 1.15);
+      if (st === 11 && inten > 0.3) taiko(at, 0.2, 1.3);
+      if ((st === 4 || st === 12) && inten > 0.15) tom(at, 0.14);
+      if (inten > 0.65 && st % 2 === 1) tom(at, 0.06 + 0.05 * inten);
+      // hi-hat / vành trống: móc đơn, căng thì móc kép
+      if (st % 2 === 0 || inten > 0.6) audio.hat(at, st % 4 === 0 ? 0.035 : 0.02);
+      // dàn dây trầm dồn dập (ostinato) — xương sống của bản nhạc
+      synthNote(root + EPIC_OSTI[st], at, sx * 0.7, { vol: 0.07, cutoff, attack: 0.004, release: 0.03, detune: 5 });
+      if (st === 0) {
+        // nền dây kéo dài cả ô nhịp + bè trầm
+        for (const n of EPIC_CHORD[bar]) synthNote(n, at, barLen * 0.95, { vol: 0.016 + inten * 0.012, cutoff: 900 + inten * 1400, attack: 0.25, release: 0.3, detune: 9, vib: 0.003 });
+        synthNote(root - 12, at, barLen * 0.9, { vol: 0.06, cutoff: 220, attack: 0.05, release: 0.2, detune: 0, type: 'triangle' });
+        // kèn đồng "đập" đầu mỗi hai ô nhịp
+        if (bar % 2 === 0) for (const n of [root + 12, root + 19, root + 24]) synthNote(n, at, 0.22, { vol: 0.045, cutoff: 1700, attack: 0.012, release: 0.12, detune: 6 });
+      }
+      // giai điệu kèn: từ vòng thứ hai hoặc khi trận căng
+      if (loop >= 1 || inten > 0.55) {
+        for (const [s0, n, len] of EPIC_HORN[bar]) if (s0 === st) synthNote(n + (hurry ? 12 : 0), at, sx * len * 0.95, { vol: 0.05, cutoff: 1500 + inten * 900, attack: 0.04, release: 0.12, detune: 6, vib: 0.004 });
+      }
+      // sát vực / cuối trận: vĩ cầm rung tremolo ở cao + tim đập
+      if (inten > 0.6) {
+        const tn = EPIC_CHORD[bar][st % 3] + 24;
+        synthNote(tn, at, sx * 0.5, { vol: 0.014 + 0.012 * inten, cutoff: 3500, attack: 0.004, release: 0.02, detune: 4 });
+        if (st === 0 || st === 8) {
+          audio.osc(55, at, 0.12, { type: 'sine', vol: 0.3, slide: -15, attack: 0.003, bus: 'music' });
+          audio.osc(50, at + sx * 1.5, 0.14, { type: 'sine', vol: 0.22, slide: -12, attack: 0.003, bus: 'music' });
+        }
+      }
+      // 10 giây cuối: trống lăn dâng lên cuối mỗi ô nhịp + tiếng gió "vút" lên
+      if (hurry && st >= 12) audio.noise(at, sx * 0.8, { vol: 0.03 + (st - 12) * 0.02, type: 'bandpass', freq: 2000, q: 0.7, bus: 'music' });
+      if (hurry && st === 0 && bar % 2 === 0) audio.noise(at, barLen * 2, { vol: 0.035, type: 'bandpass', freq: 400, sweepTo: 5000, q: 3, bus: 'music' });
+      music.step++;
+      music.next += sx;
+    }
+  }
   function pullMusic() {
     const c = audio.ctx;
     const play = unlocked && !previewMuted && settings.bgMusicEnabled !== false && ph.phase === 'pull' && c;
@@ -849,11 +958,14 @@
       music.on = false;
       return;
     }
-    if (!music.on) {
+    const style = settings.pullMusic === 'funny' ? 'funny' : 'epic';
+    if (!music.on || music.style !== style) {
       music.on = true;
+      music.style = style;
       music.step = 0;
       music.next = c.currentTime + 0.08;
     }
+    if (style === 'epic') return epicMusic(c);
     const left = (ph.phaseEndsAt - now()) / 1000;
     const hurry = left < 10; // 10 giây cuối: nhanh hơn + lên giọng
     const bpm = hurry ? 156 : 128;
@@ -890,16 +1002,25 @@
   // giọng đọc
   const ttsQueue = [];
   let ttsPlaying = false;
-  function enqueueTts(url) {
+  // prio 2 = câu dẫn trận (giữ), thấp hơn = bình luận (đầy hàng thì bỏ câu bình luận trước; chờ > 5 s thì lỡ lúc, bỏ)
+  function enqueueTts(url, prio = 2) {
     if (settings.ttsEnabled === false || previewMuted || !unlocked) return;
-    if (ttsQueue.length >= 3) ttsQueue.shift();
-    ttsQueue.push(url);
+    if (ttsQueue.length >= 3) {
+      const i = ttsQueue.findIndex((q) => q.prio < 2);
+      if (i >= 0) ttsQueue.splice(i, 1);
+      else if (prio < 2) return;
+      else ttsQueue.shift();
+    }
+    ttsQueue.push({ url, prio, at: performance.now() });
     playNextTts();
   }
   function playNextTts() {
     if (ttsPlaying || !ttsQueue.length) return;
+    let item = ttsQueue.shift();
+    while (item && item.prio < 2 && performance.now() - item.at > 5000) item = ttsQueue.shift();
+    if (!item) return;
     ttsPlaying = true;
-    const url = ttsQueue.shift();
+    const url = item.url;
     const done = () => {
       ttsPlaying = false;
       playNextTts();
@@ -2095,7 +2216,7 @@
           onFx(p);
           break;
         case 'kc.say':
-          if (p.url) enqueueTts(p.url);
+          if (p.url) enqueueTts(p.url, p.prio ?? 2);
           break;
         default:
           break;
