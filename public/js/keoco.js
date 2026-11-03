@@ -981,7 +981,7 @@
   }
   function lineX(side, i) {
     const n = side === 'a' ? roster.lineA.length : roster.lineB.length;
-    return lineX0(side, i, n) - ropeX * SHIFT;
+    return lineX0(side, i, n) + ropeX * SHIFT; // x > 0: dây về phía đội phải → cả hai hàng dịch sang phải
   }
   // Hết trận: hàng bên thua bị kéo tuột về phía vực (px), dùng chung cho người và dây
   function endSlide(side, t) {
@@ -1084,6 +1084,9 @@
       const ph0 = (h % 628) / 100;
       if (winner) {
         const e = (t - endAnim.at) / 1000;
+        // ăn mừng trên mặt tháp của mình, không đứng lơ lửng trên vực
+        gx = side === 'a' ? Math.min(gx, EDGE_L - 34) : Math.max(gx, EDGE_R + 34);
+        gy = ropeYAt(gx, t);
         pose = e > 0.8 ? (h % 3 === 0 ? 'plank' : 'cheer') : 'pullB';
         if (pose === 'cheer') gy -= Math.abs(Math.sin(e * 6 + i)) * 14;
       } else if (loser) {
@@ -1357,7 +1360,7 @@
       g.lineWidth = 6;
       g.strokeStyle = '#c4935f';
       g.setLineDash([8, 6]);
-      g.lineDashOffset = -ropeX * SHIFT;
+      g.lineDashOffset = ropeX * SHIFT;
       g.stroke();
       g.setLineDash([]);
     };
