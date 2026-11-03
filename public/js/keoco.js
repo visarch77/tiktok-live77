@@ -26,17 +26,16 @@
   const g = canvas.getContext('2d');
   const FONT = "'Be Vietnam Pro', system-ui, sans-serif";
   const ASSET = '/assets/keoco/';
-  const AV = 1;
+  const AV = 2;
 
   // Sân (đo trên bg.webp): mặt tháp y 745–880, mép trong tháp trái x≈442, tháp phải x≈634 (ở độ cao dây)
   const ROPE_Y = 792;
   const EDGE_L = 442;
   const EDGE_R = 634;
   const GAP_C = (EDGE_L + EDGE_R) / 2;
-  const ROW_D = 9; // hàng sau cao hơn dây, hàng trước thấp hơn
   const SHIFT = 150; // |x| = 1 → hàng người dịch 150 px (người đầu dây bên thua qua mép vực)
   const FRONT_GAP = 26; // tay người đầu dây cách mép vực
-  const SPRITE_SCALE = 0.56;
+  const SPRITE_SCALE = 0.75; // ảnh atlas = 1/4 ảnh gốc
   const LINE_LEN = 410; // chiều dài hàng mỗi bên (px)
 
   let settings = {};
@@ -71,34 +70,18 @@
       ATLAS = j;
     })
     .catch(() => {});
-  // Ảnh lật ngang cho đội bên phải (vẽ sẵn một lần mỗi atlas)
-  const FLIP = {};
-  function flipped(team) {
-    const src = IMG[`t${team}`];
-    if (!ready(src)) return null;
-    if (!FLIP[team]) {
-      const c = document.createElement('canvas');
-      c.width = src.naturalWidth;
-      c.height = src.naturalHeight;
-      const cg = c.getContext('2d');
-      cg.translate(c.width, 0);
-      cg.scale(-1, 1);
-      cg.drawImage(src, 0, 0);
-      FLIP[team] = c;
-    }
-    return FLIP[team];
-  }
+  // Tư thế hài (vẽ thêm) → tư thế cơ bản khi nhân vật chưa có ảnh
+  const POSE_FALLBACK = { drag: 'slip', bite: 'strain', dig: 'slip', plank: 'pullB' };
   // Vẽ một tư thế: (gx, gy) = điểm nắm dây (hoặc giữa chân nếu tư thế không cầm dây); face = 1 nhìn phải, -1 nhìn trái
   function drawPose(team, variant, pose, gx, gy, face, { scale = SPRITE_SCALE, alpha = 1, rot = 0, footY = null } = {}) {
     if (!ATLAS) return null;
-    const fr = ATLAS.frames[`v${variant}_${pose}`] || ATLAS.frames[`v0_${pose}`];
+    const fb = POSE_FALLBACK[pose];
+    const fr = ATLAS.frames[`v${variant}_${pose}`] || (fb && ATLAS.frames[`v${variant}_${fb}`]) || ATLAS.frames[`v0_${pose}`] || (fb && ATLAS.frames[`v0_${fb}`]);
     if (!fr) return null;
     const [fx, fy, fw, fh, hx, hy] = fr;
-    const img = face === 1 ? IMG[`t${team}`] : flipped(team);
-    if (!ready(img) && !(img instanceof HTMLCanvasElement)) return null;
-    const AW = ATLAS.size[0];
-    const sx = face === 1 ? fx : AW - fx - fw;
-    // điểm neo trong khung (toạ độ khung chưa lật)
+    const img = IMG[`t${team}`];
+    if (!ready(img)) return null;
+    // điểm neo trong khung
     let ax;
     let ay;
     if (hx !== undefined && footY === null) {
@@ -108,14 +91,14 @@
       ax = fw / 2;
       ay = fh;
     }
-    if (face === -1) ax = fw - ax;
     const dw = fw * scale;
     const dh = fh * scale;
     g.save();
     g.globalAlpha = alpha;
     g.translate(gx, footY !== null ? footY : gy);
     if (rot) g.rotate(rot);
-    g.drawImage(img, sx, fy, fw, fh, -ax * scale, -ay * scale, dw, dh);
+    if (face === -1) g.scale(-1, 1); // đội bên phải: lật ngang lúc vẽ (không giữ bản sao ảnh lật)
+    g.drawImage(img, fx, fy, fw, fh, -ax * scale, -ay * scale, dw, dh);
     g.restore();
     return { top: (footY !== null ? footY : gy) - ay * scale, h: dh, footY: (footY !== null ? footY : gy) + (fh - ay) * scale };
   }
@@ -465,26 +448,78 @@
     const slide = Math.min(1, e / 2.4) ** 2 * 520;
     return side === 'a' ? slide : -slide;
   }
-  function poseFor(k, i, t) {
-    const s = pstate.get(k);
+  // Dây: một đường liền qua tay mọi người. Võng nhẹ trong vực, rung theo độ căng (cả hai đội cùng kéo mạnh)
+  let ropeVel = 0; // tốc độ dịch dây (đơn vị x / giây), dương = về phía đội phải
+  let lastRopeX = 0;
+  let tension = 0;
+  function ropeYAt(x, t) {
+    const xa = lineX('a', 0);
+    const xb = lineX('b', 0);
+    let y = ROPE_Y;
+    if (x > xa && x < xb) {
+      const u = (x - xa) / Math.max(1, xb - xa);
+      y += 4 * u * (1 - u) * (14 - tension * 9); // căng thì bớt võng
+    }
+    return y + Math.sin(x / 16 + t / 45) * tension * 1.8;
+  }
+  // Tư thế mỗi người: chọn theo trạng thái server + diễn biến dây + "tính cách" riêng; giữ tối thiểu ~0,5 s cho đỡ giật
+  const poseMem = new Map(); // khoá → { pose, until }
+  const hashK = (k) => {
+    let h = 7;
+    for (const ch of String(k)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    return h;
+  };
+  function choosePose(p, side, i, t) {
+    const s = pstate.get(p.k);
     const st = s ? s.st : 'idle';
     if (ph.phase === 'intro') return { pose: 'pullA', st: 'idle' };
+    const mem = poseMem.get(p.k);
+    const forced = st === 'slip' || st === 'tired' || st === 'tickle';
+    if (mem && t < mem.until && !forced && mem.st === st) return mem;
+    const h = hashK(p.k);
+    const losing = side === 'a' ? ropeVel > 0.015 : ropeVel < -0.015; // dây đang trôi về phía đối thủ
+    const winning = side === 'a' ? ropeVel < -0.015 : ropeVel > 0.015;
+    const danger = side === 'a' ? ropeX > 0.55 : ropeX < -0.55; // sát mép vực bên mình
+    const r = Math.random();
+    let pose = 'pullA';
     switch (st) {
-      case 'pull':
-        return { pose: Math.floor((t / 230 + i * 0.37) % 2) ? 'pullB' : 'pullA', st };
-      case 'strain':
-        return { pose: 'strain', st };
-      case 'tired':
       case 'slip':
-        return { pose: 'slip', st };
+        pose = 'slip';
+        break;
+      case 'tired':
+        pose = 'dig'; // kiệt sức: ngồi phịch, gót bấm xuống sàn
+        break;
       case 'tickle':
-        return { pose: 'cheer', st };
+        pose = 'cheer'; // cười lăn, buông tay
+        break;
       case 'dazed':
-        return { pose: 'strain', st };
+        pose = r < 0.5 ? 'strain' : 'drag';
+        break;
+      case 'strain':
+        pose = h % 3 === 0 ? 'bite' : r < 0.25 ? 'bite' : 'strain';
+        break;
+      case 'pull':
+        // vẫn kéo bình thường là chính, nhưng thỉnh thoảng "lên đồng": cắn dây, ngả tấm ván, ngồi bấm gót
+        if (losing && i < 6 && r < 0.5) pose = 'drag'; // đầu dây bị lôi đi
+        else if (danger) pose = r < 0.6 ? 'dig' : 'strain';
+        else if (winning && r < 0.35) pose = 'plank';
+        else if (r < 0.12) pose = 'bite';
+        else if (r < 0.2) pose = 'plank';
+        else if (r < 0.26) pose = 'dig';
+        else pose = r < 0.63 ? 'pullA' : 'pullB';
+        break;
       default:
-        return { pose: 'pullA', st };
+        // không thả tim: ngồi thở, hoặc bị lôi nếu dây đang trôi về phía đối thủ
+        pose = losing && i < 4 ? 'drag' : danger ? 'dig' : r < 0.3 ? 'dig' : 'pullA';
     }
+    const res = { pose, st, until: t + 450 + Math.random() * 700 };
+    poseMem.set(p.k, res);
+    return res;
   }
+  // Tiếng hét ngẫu nhiên kiểu truyện tranh của người đang gồng / bị lôi
+  const shouts = [];
+  const SHOUT_VI = ['Ư Ư Ư!', 'CỐ LÊNNN!', 'KÉOOO!', 'HỰ!', 'MẸ ƠI!', 'Á Á Á!', 'TUỘT TAY!', 'GIỮ CHẶT!', 'ĐAU LƯNG!', 'HÒ DÔ!'];
+  const SHOUT_EN = ['NGHHH!', 'PULLLL!', 'HEAVE!', 'MOMMY!', 'AAAH!', 'HOLD ON!', 'MY BACK!', 'NOOO!', 'HUP!', 'GRRR!'];
   function drawLine(side, team, list, t, layer) {
     const n = list.length;
     const face = side === 'a' ? 1 : -1;
@@ -496,20 +531,22 @@
       const row = i % 2 === 0 ? 'back' : 'front';
       if ((layer === 'back') !== (row === 'back')) continue;
       const p = list[i];
-      let gx = lineX(side, i);
-      let gy = ROPE_Y + (row === 'back' ? -ROW_D : ROW_D);
+      const h = hashK(p.k);
+      let gx = lineX(side, i) + (loser ? endSlide(side, t) : 0);
+      let gy = ropeYAt(gx, t); // tay luôn nằm trên dây
+      const scale = SPRITE_SCALE * (row === 'back' ? 0.9 : 1); // hàng sau xa hơn, nhỏ hơn
       let pose;
       let st = 'idle';
       let rot = 0;
       let alpha = 1;
+      const ph0 = (h % 628) / 100;
       if (winner) {
         const e = (t - endAnim.at) / 1000;
-        pose = e > 0.8 ? 'cheer' : 'pullB';
+        pose = e > 0.8 ? (h % 3 === 0 ? 'plank' : 'cheer') : 'pullB';
         if (pose === 'cheer') gy -= Math.abs(Math.sin(e * 6 + i)) * 14;
       } else if (loser) {
         // bị kéo tuột về phía vực, ai qua mép thì rơi xuống
-        gx += endSlide(side, t);
-        pose = 'slip';
+        pose = i % 3 === 0 ? 'drag' : 'slip';
         const past = side === 'a' ? gx - EDGE_L : EDGE_R - gx;
         if (past > 0) {
           const fallT = past / 220;
@@ -521,17 +558,58 @@
         pose = 'cheer';
         gy -= Math.abs(Math.sin(t / 260 + i)) * 8;
       } else {
-        const r = poseFor(p.k, i, t);
+        const r = choosePose(p, side, i, t);
         pose = r.pose;
         st = r.st;
-        if (st === 'strain') gx += Math.sin(t / 30 + i) * 1.6;
+        // lắc lư quanh điểm nắm dây (tay giữ nguyên trên dây): ngả ra sau rồi nhích lên theo nhịp riêng mỗi người
+        const effort = st === 'strain' ? 1 : st === 'pull' ? 0.75 : 0.25;
+        rot = -face * (Math.sin(t / (230 + (h % 90)) + ph0) * 0.07 * effort);
+        if (st === 'strain' || pose === 'bite') rot += Math.sin(t / 22 + i) * 0.025; // run bần bật
+        if (pose === 'drag') rot += -face * Math.sin(t / 90 + ph0) * 0.08; // giãy giụa
+        if (st === 'dazed') rot += Math.sin(t / 140 + ph0) * 0.12;
       }
       if (alpha <= 0) continue;
       const useFoot = pose === 'cheer';
-      const box = drawPose(team, p.v, pose, gx, gy, face, { rot, alpha, footY: useFoot ? gy + 40 : null });
-      out.push({ p, i, gx, gy, st, box, row });
+      const box = drawPose(team, p.v, pose, gx, gy, face, { rot, alpha, scale, footY: useFoot ? gy + 40 : null });
+      out.push({ p, i, gx, gy, st, box, row, pose });
     }
     return out;
+  }
+  // Bụi dưới chân khi bị lôi / bấm gót, mồ hôi văng, tiếng hét
+  function chaosFx(drawn, side, t, dt) {
+    const face = side === 'a' ? 1 : -1;
+    for (const d of drawn) {
+      if (!d.box) continue;
+      if ((d.pose === 'drag' || d.pose === 'dig') && Math.random() < dt * 6) {
+        particles.push({ kind: 'dust', x: d.gx - face * (10 + Math.random() * 30), y: d.box.footY - 4, vx: face * (20 + Math.random() * 40), vy: -10 - Math.random() * 20, life: 0.7, t: 0, r: 5 + Math.random() * 6 });
+      }
+      if ((d.pose === 'strain' || d.pose === 'bite' || d.pose === 'plank') && Math.random() < dt * 1.5) {
+        particles.push({ kind: 'sweat', x: d.gx - face * 18, y: d.box.top + 12, vx: -face * (40 + Math.random() * 60), vy: -60 - Math.random() * 40, life: 0.8, t: 0, r: 3 });
+      }
+      const loud = d.pose === 'strain' || d.pose === 'bite' || d.pose === 'drag' || d.pose === 'dig';
+      if (loud && ph.phase === 'pull' && shouts.length < 4 && Math.random() < dt * 0.25) {
+        const list = settings.lang === 'en' ? SHOUT_EN : SHOUT_VI;
+        shouts.push({ text: list[Math.floor(Math.random() * list.length)], x: d.gx - face * 12, y: d.box.top - 10, at: t, rot: (Math.random() - 0.5) * 0.4, side });
+      }
+    }
+  }
+  function drawShouts(t) {
+    for (let i = shouts.length - 1; i >= 0; i--) {
+      const s = shouts[i];
+      const e = (t - s.at) / 1000;
+      if (e > 1.2) {
+        shouts.splice(i, 1);
+        continue;
+      }
+      const sc = e < 0.15 ? 0.6 + (e / 0.15) * 0.5 : 1.1 - Math.min(0.1, (e - 0.15) * 0.2);
+      g.save();
+      g.globalAlpha = e > 0.9 ? (1.2 - e) / 0.3 : 1;
+      g.translate(s.x, s.y - e * 26);
+      g.rotate(s.rot);
+      g.scale(sc, sc);
+      text(s.text, 0, 0, { size: 22, weight: 900, color: '#fff', stroke: 6, strokeColor: '#e8590c' });
+      g.restore();
+    }
   }
   // Hiệu ứng trên đầu từng người (sau khi vẽ người)
   let labelBoxes = [];
@@ -612,41 +690,47 @@
     const nB = roster.lineB.length;
     const sa = endSlide('a', t);
     const sb = endSlide('b', t);
-    const xa0 = lineX('a', Math.max(0, nA - 1)) - 30 + sa;
-    const xa = Math.min(lineX('a', 0) + sa, EDGE_L + 40);
-    const xb = Math.max(lineX('b', 0) + sb, EDGE_R - 40);
-    const xb0 = lineX('b', Math.max(0, nB - 1)) + 30 + sb;
+    const xa0 = lineX('a', Math.max(0, nA - 1)) - 34 + sa;
+    const xb0 = lineX('b', Math.max(0, nB - 1)) + 34 + sb;
+    const xa = lineX('a', 0) + sa;
+    const xb = lineX('b', 0) + sb;
     g.save();
     g.lineCap = 'round';
-    const ropeLine = (x1, x2, sag) => {
+    g.lineJoin = 'round';
+    const path = (x1, x2, endDrop = 0) => {
       g.beginPath();
-      g.moveTo(x1, ROPE_Y);
-      g.quadraticCurveTo((x1 + x2) / 2, ROPE_Y + sag, x2, ROPE_Y);
-      g.lineWidth = 9;
-      g.strokeStyle = '#6b4a2b';
+      const steps = Math.max(2, Math.ceil(Math.abs(x2 - x1) / 10));
+      for (let k = 0; k <= steps; k++) {
+        const x = x1 + ((x2 - x1) * k) / steps;
+        let y = ropeYAt(x, t);
+        if (endDrop) y += endDrop * Math.max(0, (k / steps - 0.6) / 0.4) ** 2; // đầu dây đứt rủ xuống
+        if (k === 0) g.moveTo(x, y);
+        else g.lineTo(x, y);
+      }
+      g.lineWidth = 10;
+      g.strokeStyle = '#5c3d22';
       g.stroke();
-      g.lineWidth = 5;
-      g.strokeStyle = '#b8895a';
-      g.setLineDash([7, 6]);
+      g.lineWidth = 6;
+      g.strokeStyle = '#c4935f';
+      g.setLineDash([8, 6]);
       g.lineDashOffset = -ropeX * SHIFT;
       g.stroke();
       g.setLineDash([]);
     };
     if (broke) {
-      ropeLine(xa0, xa + 30, 4);
-      ropeLine(xb - 30, xb0, 4);
+      path(xa0, xa + 40, 40);
+      path(xb0, xb - 40, 40);
     } else {
-      ropeLine(xa0, xa, 2);
-      ropeLine(xa, xb, 10 + Math.sin(t / 300) * 2);
-      ropeLine(xb, xb0, 2);
+      path(xa0, xb0);
       // dải băng đỏ giữa dây
       const mx = (xa + xb) / 2;
+      const my = ropeYAt(mx, t);
       g.fillStyle = '#ff2d55';
       g.beginPath();
-      g.moveTo(mx - 9, ROPE_Y + 6);
-      g.lineTo(mx + 9, ROPE_Y + 6);
-      g.lineTo(mx + 4 + Math.sin(t / 200) * 3, ROPE_Y + 52);
-      g.lineTo(mx - 4 + Math.sin(t / 200) * 3, ROPE_Y + 44);
+      g.moveTo(mx - 9, my + 3);
+      g.lineTo(mx + 9, my + 3);
+      g.lineTo(mx + 4 + Math.sin(t / 200) * 3, my + 50);
+      g.lineTo(mx - 4 + Math.sin(t / 200) * 3, my + 42);
       g.closePath();
       g.fill();
     }
@@ -884,9 +968,9 @@
     }
     const a = Math.min(1, left / 300);
     g.globalAlpha = a;
-    const y = 505;
-    text(banner.text, W / 2, y, { size: banner.big ? 120 : 64, weight: 900, color: banner.color, stroke: 10 });
-    if (banner.sub) text(banner.sub, W / 2, y + (banner.big ? 80 : 56), { size: 30, weight: 800, color: '#fff', stroke: 6, maxW: W - 60 });
+    const y = 420;
+    text(banner.text, W / 2, y, { size: banner.big ? 110 : 60, weight: 900, color: banner.color, stroke: 10 });
+    if (banner.sub) text(banner.sub, W / 2, y + (banner.big ? 72 : 50), { size: 30, weight: 800, color: '#fff', stroke: 6, maxW: W - 60 });
     g.globalAlpha = 1;
   }
   function drawParticles(dt) {
@@ -907,6 +991,20 @@
         g.fillStyle = i % 2 ? '#d8f36a' : '#b5d33d';
         g.beginPath();
         g.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        g.fill();
+      } else if (p.kind === 'dust') {
+        p.r += dt * 14;
+        g.globalAlpha = 0.5 * k;
+        g.fillStyle = '#d9d2e9';
+        g.beginPath();
+        g.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        g.fill();
+      } else if (p.kind === 'sweat') {
+        p.vy += dt * 260;
+        g.globalAlpha = k;
+        g.fillStyle = '#74c0fc';
+        g.beginPath();
+        g.ellipse(p.x, p.y, 3, 4.5, 0, 0, Math.PI * 2);
         g.fill();
       } else if (p.kind === 'drip') {
         g.globalAlpha = k;
@@ -949,7 +1047,7 @@
     if (!te || !(te.strong > 0)) return;
     // đứng sau hàng người, ngay sau 3 người đầu dây (luôn thấy trên màn hình)
     const gx = lineX(side, 3) + (side === 'a' ? -10 : 10);
-    drawPose(team, 99, Math.floor(t / 260) % 2 ? 'pullB' : 'strain', gx, ROPE_Y - 14, side === 'a' ? 1 : -1, { scale: SPRITE_SCALE * 1.45 });
+    drawPose(team, 99, Math.floor(t / 600) % 2 ? 'plank' : 'strain', gx, ropeYAt(gx, t), side === 'a' ? 1 : -1, { scale: SPRITE_SCALE * 1.45 });
     text(L('LỰC SĨ', 'STRONGMAN'), gx, ROPE_Y - 118, { size: 16, weight: 900, color: '#ffe066', stroke: 4 });
   }
 
@@ -962,27 +1060,72 @@
     const fb = ph.phase === 'intro' ? 0 : live.fb || 0;
     const target = fa + fb > 0.01 ? fa / (fa + fb) : 0.5;
     shareA += (target - shareA) * Math.min(1, dt * 3);
-    const y = 548;
+    const y = 520;
+    const PW = 296;
     const side = (s, team, list, share, x, align) => {
       const humans = list.filter((p) => !p.npc).length;
       const bots = list.length - humans;
-      panel(x, y, 400, 118, { r: 16, fill: 'rgba(8,8,24,.72)', glow: teamColor(team) });
-      const ax = align === 'left' ? x + 18 : x + 382;
-      text(teamLabel(team), ax, y + 26, { size: 24, weight: 900, color: teamColor(team), align, stroke: 4 });
-      text(`💪 ${Math.round(share * 100)}%`, ax, y + 62, { size: 34, weight: 900, color: '#fff', align, stroke: 5 });
-      text(L(`${humans} người${bots ? ` + ${bots} 🤖` : ''}`, `${humans} players${bots ? ` + ${bots} 🤖` : ''}`), align === 'left' ? x + 382 : x + 18, y + 62, { size: 18, weight: 700, color: '#ccd', align: align === 'left' ? 'right' : 'left' });
+      panel(x, y, PW, 150, { r: 16, fill: 'rgba(8,8,24,.74)', glow: teamColor(team) });
+      const ax = align === 'left' ? x + 16 : x + PW - 16;
+      text(teamLabel(team), ax, y + 24, { size: 21, weight: 900, color: teamColor(team), align, stroke: 4, maxW: PW - 30 });
+      text(`💪 ${Math.round(share * 100)}%`, ax, y + 62, { size: 36, weight: 900, color: '#fff', align, stroke: 5 });
+      text(L(`${humans} người${bots ? ` + ${bots} 🤖` : ''}`, `${humans} players${bots ? ` + ${bots} 🤖` : ''}`), ax, y + 98, { size: 17, weight: 700, color: '#ccd', align });
       const best = list
         .filter((p) => !p.npc)
         .map((p) => ({ n: p.n, f: (pstate.get(p.k) || {}).force || 0 }))
         .sort((a, b) => b.f - a.f)[0];
-      if (best && best.f > 0) text(`👑 ${best.n}`, ax, y + 96, { size: 19, weight: 800, color: '#ffe066', align, maxW: 360 });
+      if (best && best.f > 0) text(`👑 ${best.n}`, ax, y + 126, { size: 18, weight: 800, color: '#ffe066', align, maxW: PW - 30 });
     };
-    side('a', m.a, roster.lineA, shareA, 40, 'left');
-    side('b', m.b, roster.lineB, 1 - shareA, W - 440, 'right');
-    // mũi tên: dây đang dịch về bên nào
-    const dir = Math.abs(fa - fb) < 0.05 ? 0 : fa > fb ? -1 : 1;
-    const ar = dir < 0 ? '⟵' : dir > 0 ? '⟶' : '⟷';
-    text(ar, W / 2, y + 58 + Math.sin(t / 150) * (dir ? 3 : 0), { size: 54, weight: 900, color: dir < 0 ? teamColor(m.a) : dir > 0 ? teamColor(m.b) : '#aaa', stroke: 6 });
+    side('a', m.a, roster.lineA, shareA, 20, 'left');
+    side('b', m.b, roster.lineB, 1 - shareA, W - 20 - PW, 'right');
+    drawCloseup(m, t, y - 26);
+  }
+  // Cận cảnh: hai người đầu dây phóng to, đối mặt nhau giữa màn hình — thấy rõ mặt gồng, cắn dây, bị lôi…
+  function drawCloseup(m, t, y) {
+    const pa = roster.lineA[0];
+    const pb = roster.lineB[0];
+    if (!pa || !pb) return;
+    const x0 = 20 + 296 + 12;
+    const x1 = W - 20 - 296 - 12;
+    const CH = 196;
+    panel(x0, y, x1 - x0, CH, { r: 16, fill: 'rgba(8,8,24,.55)', border: 'rgba(255,255,255,.18)' });
+    text(L('🎥 CẬN CẢNH ĐẦU DÂY', '🎥 FRONT LINE CLOSE-UP'), (x0 + x1) / 2, y + 16, { size: 13, weight: 800, color: '#ccd' });
+    g.save();
+    roundRect(x0, y, x1 - x0, CH, 16);
+    g.clip();
+    const cy = y + 118;
+    const shift = Math.max(-40, Math.min(40, -ropeX * 60)); // dây trôi về bên nào thì cả hai nghiêng theo
+    const ga = (x0 + x1) / 2 - 40 + shift;
+    const gb = (x0 + x1) / 2 + 40 + shift;
+    // dây
+    g.lineCap = 'round';
+    g.beginPath();
+    g.moveTo(x0 - 10, cy + Math.sin(t / 40) * tension * 2);
+    g.lineTo(x1 + 10, cy - Math.sin(t / 40) * tension * 2);
+    g.lineWidth = 14;
+    g.strokeStyle = '#5c3d22';
+    g.stroke();
+    g.lineWidth = 8;
+    g.strokeStyle = '#c4935f';
+    g.setLineDash([12, 9]);
+    g.lineDashOffset = -ropeX * SHIFT * 2;
+    g.stroke();
+    g.setLineDash([]);
+    const one = (p, side, team, gx) => {
+      const face = side === 'a' ? 1 : -1;
+      const mem = poseMem.get(p.k);
+      const pose = ph.phase === 'intro' ? 'pullA' : (mem && mem.pose) || 'pullA';
+      const st = (pstate.get(p.k) || {}).st || 'idle';
+      let rot = -face * Math.sin(t / 240 + side.length) * 0.06;
+      if (st === 'strain' || pose === 'bite') rot += Math.sin(t / 22) * 0.03;
+      if (pose === 'drag') rot += -face * Math.sin(t / 90) * 0.08;
+      drawPose(team, p.v, pose, gx, cy, face, { scale: SPRITE_SCALE * 1.7, rot, footY: pose === 'cheer' ? cy + 60 : null });
+    };
+    one(pa, 'a', m.a, ga);
+    one(pb, 'b', m.b, gb);
+    g.restore();
+    text(pa.n, x0 + 10, y + CH - 12, { size: 15, weight: 800, color: '#fff', align: 'left', stroke: 4, strokeColor: teamColor(m.a), maxW: (x1 - x0) / 2 - 16 });
+    text(pb.n, x1 - 10, y + CH - 12, { size: 15, weight: 800, color: '#fff', align: 'right', stroke: 4, strokeColor: teamColor(m.b), maxW: (x1 - x0) / 2 - 16 });
   }
 
   // Lúc chờ / bốc thăm / vô địch: các đội đứng cổ vũ trên hai tháp
@@ -1021,6 +1164,10 @@
     const dt = Math.min(0.05, (t - lastT) / 1000);
     lastT = t;
     ropeX += (ropeTarget - ropeX) * Math.min(1, dt * 6);
+    if (dt > 0) ropeVel += ((ropeX - lastRopeX) / dt - ropeVel) * Math.min(1, dt * 3);
+    lastRopeX = ropeX;
+    const fsum = (live.fa || 0) + (live.fb || 0);
+    tension += ((ph.phase === 'pull' ? Math.min(1, fsum / 2.6) : 0) - tension) * Math.min(1, dt * 2);
     musicTick(dt);
     g.save();
     if (shake > 0) {
@@ -1055,8 +1202,11 @@
       const frontA = drawLine('a', m.a, la, t, 'front');
       const frontB = drawLine('b', m.b, lb, t, 'front');
       drawStomp(t);
+      chaosFx(backA.concat(frontA), 'a', t, dt);
+      chaosFx(backB.concat(frontB), 'b', t, dt);
       drawOverheads(backA.concat(frontA), 'a', t);
       drawOverheads(backB.concat(frontB), 'b', t);
+      drawShouts(t);
       if (live.sleep > 0) text('😴 Zzz', GAP_C, 640, { size: 40, weight: 900, color: '#a5d8ff', stroke: 6 });
     } else drawCrowd(t);
     drawParticles(dt);
@@ -1071,7 +1221,7 @@
     drawLegend();
     if (ph.phase === 'intro') {
       const left = Math.ceil((ph.phaseEndsAt - now()) / 1000);
-      if (left > 0 && left <= 3) text(String(left), W / 2, 470, { size: 140, weight: 900, color: '#ffe066', stroke: 12 });
+      if (left > 0 && left <= 3) text(String(left), W / 2, 420, { size: 140, weight: 900, color: '#ffe066', stroke: 12 });
     }
     if (ph.phase === 'champion' && ph.champion) {
       const c = ph.champion;

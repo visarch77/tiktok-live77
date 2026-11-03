@@ -96,12 +96,19 @@ x = x − v·dt
   hiệu ứng đang có của từng đội (🧤 🥁 🏋️ … còn mấy giây).
 - **Giữa**: tường = chữ lớn (KÉO!, đếm ngược, đội thắng) + bảng trực tiếp mỗi đội (% lực, số người + 🤖, 👑 người kéo khoẻ nhất,
   mũi tên dây đang về phía nào); hai tháp = hai đội 2 hàng so le nắm một sợi dây thẳng, dải băng đỏ giữa dây, vạch giữa vực.
-- **Người chơi**: tư thế theo trạng thái — kéo A/B xen kẽ, gồng (đỏ mặt, run, 💦), kiệt sức / ngã (ngồi phịch), cù lét (cười, HAHA),
+- **Người chơi**: tay mọi người luôn nằm trên một sợi dây liền (dây võng trong vực, rung khi hai đội cùng kéo căng);
+  mỗi người lắc lư liên tục quanh điểm nắm dây (nhịp riêng), run bần bật khi gồng. Tư thế chọn theo trạng thái + diễn biến dây
+  + "tính cách" riêng, giữ 0,5–1,2 s cho đỡ giật: kéo A/B, gồng, **cắn dây**, **ngả tấm ván** (đang thắng), **bị lôi ngã ngửa**
+  (đầu dây khi dây trôi về phía đối thủ), **ngồi bấm gót** (sát mép vực / kiệt sức / nghỉ tay), ngã, cười (cù lét), choáng.
+  Kèm bụi dưới chân, mồ hôi văng, tiếng hét kiểu truyện tranh ("CỐ LÊNNN!", "MẸ ƠI!"…), thanh thể lực dưới chân người thật,
+  tên 3 người kéo khoẻ nhất mỗi bên, bong bóng bình luận, emoji kỹ năng vừa dùng.
+- **Cận cảnh đầu dây**: giữa hai bảng lực, hai người đầu dây phóng to đối mặt nhau (cùng tư thế với trên sân) — thấy rõ mặt.
   choáng (💫); thanh thể lực dưới chân người thật; tên 3 người kéo khoẻ nhất mỗi bên, bong bóng bình luận, emoji kỹ năng vừa dùng.
 - **Dưới**: lượt đấu ("ĐANG KÉO …", "Tiếp theo …", tin vào đội gần nhất) → 4 thẻ đội (số người/20, trạng thái CHỜ LƯỢT / ĐANG KÉO /
   VÀO CHUNG KẾT / BỊ LOẠI / VÔ ĐỊCH, "TRẬN TIẾP THEO — sẵn sàng!" hoặc "còn N trận nữa", top 5 người kéo, kỹ năng để dành, số cúp)
   → cách vào đội + phòng chờ → bảng 10 kỹ năng.
-- Ảnh: nền `assets/keoco/bg.webp`; 31 nhân vật + lực sĩ × 5 tư thế (vẽ bằng GPT Image qua Scenario), gộp thành 4 atlas
+- Ảnh: nền `assets/keoco/bg.webp`; 31 nhân vật + lực sĩ × 5 tư thế + 4 tư thế hài (bị lôi, cắn dây, bấm gót, tấm ván — 28 nhân vật; 3 nhân vật nhảy + lực sĩ
+  dùng tư thế gần nhất) vẽ bằng GPT Image qua Scenario, gộp thành 4 atlas
   `atlas_t1..4.webp` (băng đô đổi màu theo đội) + `atlas.json` (khung + điểm nắm dây).
 
 ## Trò của người điều phối (trang quản lý)
