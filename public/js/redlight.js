@@ -222,6 +222,41 @@
   }
   window.addEventListener('pointerdown', unlock);
   if (OBS) setTimeout(unlock, 300);
+  // Điện thoại: thẻ <audio> (câu hát búp bê, nhạc chờ) phải được play() một lần ngay trong cú chạm thì sau đó mới
+  // tự phát được (iPhone) → phát câm rồi dừng; songTick / lobbyMusicTick bật lại đúng lúc
+  if (FILL) {
+    window.addEventListener('pointerdown', () => {
+      for (const el of [songEl, ...lobbyTracks.map((tr) => tr.el)]) {
+        if (!el.paused) continue;
+        el.muted = true;
+        const p = el.play();
+        const back = () => {
+          el.pause();
+          el.muted = false;
+        };
+        if (p && p.then) p.then(back, () => (el.muted = false));
+        else back();
+      }
+    });
+  }
+  // Điện thoại chuyển qua app khác (mở TikTok để bắt đầu live) rồi quay lại: máy tạm ngắt tiếng trang → bật lại;
+  // máy không cho bật lại khi chưa chạm thì hiện lại nút "chạm để bật âm thanh"
+  function resumeAudio() {
+    if (!unlocked || document.hidden) return;
+    const c = audio.ensure();
+    syncMusic();
+    setTimeout(() => {
+      if (!c || c.state === 'running' || document.getElementById('unlock')) return;
+      unlocked = false;
+      const el = document.createElement('div');
+      el.id = 'unlock';
+      el.textContent = L('🔊 Chạm để bật lại âm thanh', '🔊 Tap to turn sound back on');
+      document.body.appendChild(el);
+    }, 1000);
+  }
+  document.addEventListener('visibilitychange', resumeAudio);
+  window.addEventListener('pageshow', resumeAudio);
+  window.addEventListener('focus', resumeAudio);
   // Điện thoại: chạm màn hình là vào chế độ toàn màn hình (Android Chrome, iPad; iPhone Safari không hỗ trợ —
   // dùng "Thêm vào MH chính"). Thoát toàn màn hình rồi chạm lại là vào lại.
   if (FILL) {
@@ -367,12 +402,31 @@
   function playNextTts() {
     if (ttsPlaying || !ttsQueue.length) return;
     ttsPlaying = true;
-    const a = new Audio(ttsQueue.shift());
-    a.volume = settings.ttsVolume ?? 1;
+    const url = ttsQueue.shift();
     const done = () => {
       ttsPlaying = false;
       playNextTts();
     };
+    // Điện thoại: iPhone chặn thẻ <audio> tạo mới khi không có cú chạm → phát qua bộ âm (đã mở khoá lúc chạm)
+    const c = FILL && audio.ensure();
+    if (c) {
+      fetch(url)
+        .then((r) => r.arrayBuffer())
+        .then((b) => c.decodeAudioData(b))
+        .then((buf) => {
+          const src = c.createBufferSource();
+          const gain = c.createGain();
+          gain.gain.value = settings.ttsVolume ?? 1;
+          src.buffer = buf;
+          src.connect(gain).connect(c.destination);
+          src.onended = done;
+          src.start();
+        })
+        .catch(done);
+      return;
+    }
+    const a = new Audio(url);
+    a.volume = settings.ttsVolume ?? 1;
     a.onended = done;
     a.onerror = done;
     a.play().catch(done);

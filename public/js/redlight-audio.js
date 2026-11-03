@@ -45,6 +45,10 @@
 
     ensure() {
       if (!this.ctx) {
+        // iPhone (Safari 17+): xếp tiếng trang vào loại "phát nhạc" để gạt công tắc im lặng vẫn có tiếng
+        try {
+          if (navigator.audioSession) navigator.audioSession.type = 'playback';
+        } catch (_) {}
         try {
           this.ctx = new (window.AudioContext || window.webkitAudioContext)();
         } catch (_) {
@@ -72,7 +76,8 @@
         this.applyVolumes();
         this.loadSamples();
       }
-      if (this.ctx.state === 'suspended' && !this.muted) this.ctx.resume().catch(() => {});
+      // 'interrupted': iPhone ngắt tiếng khi chuyển sang app khác (TikTok) rồi quay lại
+      if ((this.ctx.state === 'suspended' || this.ctx.state === 'interrupted') && !this.muted) this.ctx.resume().catch(() => {});
       return this.ctx;
     }
 
