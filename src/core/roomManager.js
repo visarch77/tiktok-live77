@@ -108,6 +108,8 @@ class RoomManager {
       this.rooms.delete(id);
       const next = this.addRoom(cfg);
       if (wasConnected || cfg.autoConnect) next.start();
+      // báo màn hình đang mở (OBS / điện thoại): phòng đã sang trò khác → màn hình tự tải lại đúng trò mới
+      next.broadcastState();
       return next.getSummary();
     }
 

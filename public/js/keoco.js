@@ -235,6 +235,7 @@
         break;
       case 'exhaust':
         marks.set(p.key, { kind: 'tired', until: t + 2000 });
+        vox('tired', { gap: 6000 });
         break;
       case 'ready':
         banner = { text: L('ĐỦ 2 ĐỘI!', 'TWO TEAMS READY!'), sub: L('Vào giải thật ngay sau trận này', 'The real cup starts right after this'), color: '#69db7c', until: Date.now() + 2600 };
@@ -414,8 +415,15 @@
     if (p.giverKey && SAY_GIVER[p.skill]) skillSays.set(p.giverKey, { text: pickLine(SAY_GIVER[p.skill]), until });
     if (SAY_HIT[p.skill]) (p.targets || []).slice(0, 2).forEach((k, i) => skillSays.set(k, { text: pickLine(SAY_HIT[p.skill]), until: until + i * 150 }));
   }
+  const VOX_HIT = { tickle: ['tickled', 0.5], grease: ['greased', 0.6], fart: ['farted', 0.75], banana: ['slip', 0.85] };
   function onSkill(p, t) {
     skillSfx(p.skill, p.blocked);
+    if (p.blocked) vox('blocked', { delay: 0.3, gap: 4000 });
+    else {
+      vox(p.skill, { gap: 2500 });
+      const hit = VOX_HIT[p.skill];
+      if (hit) vox(hit[0], { delay: hit[1], gap: 2500, force: true });
+    }
     skillSpeech(p, t);
     if (p.giverKey) marks.set(p.giverKey, { kind: p.skill, until: t + 2500 });
     for (const k of p.targets || []) marks.set(k, { kind: `hit_${p.skill}`, until: t + 2200 });
@@ -819,10 +827,12 @@
       ambient.breathAt = tn + Math.max(700, 1800 - tired * 80) * (0.7 + Math.random() * 0.6);
       const f = 900 + Math.random() * 700;
       audio.noise(T, 0.16, { vol: Math.min(0.05, 0.018 + tired * 0.003), type: 'bandpass', freq: f, q: 2.2, sweepTo: f * 0.75 });
-      if (Math.random() < 0.15) voice(T + 0.02, 0.14, 240 + Math.random() * 80, 200, 'a', 0.03, 0); // "hộc"
+      if (hasVox('tired')) vox('tired', { gap: 9000, vol: 0.6 });
+      else if (Math.random() < 0.15) voice(T + 0.02, 0.14, 240 + Math.random() * 80, 200, 'a', 0.03, 0); // "hộc"
     }
     // bị lôi đi: giày rít + chà sàn
     const sp = Math.abs(ropeVel);
+    if (sp > 0.06) vox('drag', { gap: 7000, vol: 0.75 });
     if (sp > 0.025 && tn > ambient.skidAt) {
       ambient.skidAt = tn + 220 + Math.random() * 180;
       audio.noise(T, 0.12, { vol: Math.min(0.07, sp * 1.2), type: 'highpass', freq: 2600 });
@@ -833,7 +843,10 @@
     // chỉ hô khi có kỹ năng Hò dô hoặc dây đang căng thật — không hô đều đều cả trận
     if (tn > ambient.chantAt && (heave || tension > 0.55)) {
       ambient.chantAt = tn + (heave ? 1400 : 5000 + Math.random() * 4000);
-      for (let k = 0; k < 3; k++) {
+      if (hasVox('heave')) {
+        vox('heave', { gap: 0, vol: 0.55, force: true });
+        vox('heave', { delay: 0.05, gap: 0, vol: 0.45, force: true, rate: 0.9 });
+      } else for (let k = 0; k < 3; k++) {
         const d = Math.random() * 0.04; // lệch nhẹ cho giống nhiều người hô
         voice(T + d, 0.28, 150 + k * 18, 135 + k * 15, 'o', 0.035, 5);
         voice(T + 0.36 + d, 0.32, 190 + k * 20, 175 + k * 18, 'o', 0.04, 5);
@@ -844,14 +857,87 @@
   function gruntSfx() {
     const c = audio.ctx;
     if (!c || !unlocked || previewMuted) return;
+    if (hasVox('effort')) {
+      vox('effort', { gap: 3500, vol: 0.7 });
+      return;
+    }
     const f = 180 + Math.random() * 120;
     voice(c.currentTime + 0.02, 0.18, f * 1.2, f * 0.8, Math.random() < 0.5 ? 'u' : 'a', 0.05, 0);
+  }
+  // ---- Câu kêu hoạt hình của nhân vật (thu sẵn bằng giọng tiếng Việt, nâng giọng): assets/keoco/voice ----
+  // Mỗi loại có vài câu, nhiều giọng; phát qua bus hiệu ứng, tốc độ lệch nhẹ mỗi lần cho đỡ giống nhau.
+  // Giới hạn: cách nhau ≥ 0,7 s, tối đa 2 câu cùng lúc, mỗi loại có khoảng nghỉ riêng → vui mà không ồn
+  const VOX_DIR = '/assets/keoco/voice/';
+  const VOX = { list: {}, buf: {}, lastAt: 0, lastCat: {}, lastFile: {}, playing: 0, loading: false };
+  fetch(`${VOX_DIR}voice.json?v=${AV}`)
+    .then((r) => (r.ok ? r.json() : null))
+    .then((m) => {
+      if (m) VOX.list = m;
+    })
+    .catch(() => {});
+  function voxLoadAll() {
+    const c = audio.ctx;
+    if (VOX.loading || !c) return;
+    VOX.loading = true;
+    for (const name of Object.values(VOX.list).flat()) {
+      fetch(`${VOX_DIR}${name}?v=${AV}`)
+        .then((r) => r.arrayBuffer())
+        .then((ab) => c.decodeAudioData(ab))
+        .then((b) => {
+          VOX.buf[name] = b;
+        })
+        .catch(() => {});
+    }
+  }
+  const hasVox = (cat) => Boolean(VOX.list[cat] && VOX.list[cat].length);
+  function vox(cat, { delay = 0, vol = 0.85, gap = 1500, force = false, rate = 1, glide = 0 } = {}) {
+    const c = audio.ctx;
+    if (!c || !unlocked || previewMuted || settings.sfxEnabled === false || !hasVox(cat)) return false;
+    if (!VOX.loading) voxLoadAll();
+    const tn = performance.now();
+    if (!force && (tn - VOX.lastAt < 700 || tn - (VOX.lastCat[cat] || 0) < gap || VOX.playing >= 2)) return false;
+    const files = VOX.list[cat].filter((f) => VOX.buf[f]);
+    if (!files.length) return false;
+    const pool = files.length > 1 ? files.filter((f) => f !== VOX.lastFile[cat]) : files;
+    const name = pool[Math.floor(Math.random() * pool.length)];
+    VOX.lastAt = tn;
+    VOX.lastCat[cat] = tn;
+    VOX.lastFile[cat] = name;
+    const src = c.createBufferSource();
+    const gn = c.createGain();
+    src.buffer = VOX.buf[name];
+    const r0 = rate * (0.95 + Math.random() * 0.12);
+    const at = c.currentTime + 0.02 + delay;
+    src.playbackRate.setValueAtTime(r0, at);
+    // glide: giọng tụt dần trong lúc phát (la thất thanh khi rơi)
+    if (glide) src.playbackRate.linearRampToValueAtTime(r0 * glide, at + src.buffer.duration / r0);
+    gn.gain.value = vol;
+    src.connect(gn).connect(audio.sfxBus);
+    VOX.playing++;
+    src.onended = () => {
+      VOX.playing = Math.max(0, VOX.playing - 1);
+    };
+    src.start(at);
+    return true;
   }
   // Hết trận: đội thua la thất thanh "Aaaaa…" rơi xuống vực rồi "bộp"; đội thắng hò "Yeee!"
   function fallSfx() {
     const c = audio.ctx;
     if (!c || !unlocked || previewMuted) return;
     const T = c.currentTime + 0.03;
+    if (hasVox('fall')) {
+      // đội thua la "Á á á…" (3 người lệch nhau, giọng tụt dần như đang rơi) rồi "bộp" dưới đáy; đội thắng hò reo
+      for (let k = 0; k < 3; k++) {
+        const d = 0.45 + k * 0.28;
+        vox('fall', { delay: d, force: true, vol: 0.75, glide: 0.55 });
+        audio.osc(55, T + d + 1.5, 0.25, { type: 'sine', vol: 0.16, slide: -20, attack: 0.002 });
+        audio.noise(T + d + 1.5, 0.18, { vol: 0.05, type: 'lowpass', freq: 500 });
+      }
+      audio.osc(1500, T + 0.45, 1.4, { type: 'sine', vol: 0.05, slide: -1250, attack: 0.03 });
+      vox('win', { delay: 0.25, force: true, vol: 0.8 });
+      vox('win', { delay: 0.5, force: true, vol: 0.6, rate: 1.08 });
+      return;
+    }
     for (let k = 0; k < 6; k++) {
       const at = T + 0.5 + k * 0.22 + Math.random() * 0.1;
       const f0 = 520 + Math.random() * 260;
@@ -2386,6 +2472,10 @@
       const p = msg.params || {};
       switch (msg.method) {
         case 'room.state':
+          if (p.room && p.room.mode && p.room.mode !== 'keoco') {
+            location.reload(); // phòng đã chuyển sang trò khác
+            return;
+          }
           applyState(p);
           break;
         case 'room.event':

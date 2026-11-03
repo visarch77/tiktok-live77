@@ -1831,6 +1831,10 @@
       const p = msg.params || {};
       switch (msg.method) {
         case 'room.state':
+          if (p.room && p.room.mode && p.room.mode !== 'redlight') {
+            location.reload(); // phòng đã chuyển sang trò khác
+            return;
+          }
           applyState(p);
           break;
         case 'room.event':

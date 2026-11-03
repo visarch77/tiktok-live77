@@ -1,0 +1,114 @@
+{
+ "gong": [
+  "gong_1.wav",
+  "gong_2.wav",
+  "gong_3.wav",
+  "gong_4.wav"
+ ],
+ "energy": [
+  "energy_1.wav",
+  "energy_2.wav",
+  "energy_3.wav"
+ ],
+ "tickle": [
+  "tickle_1.wav",
+  "tickle_2.wav"
+ ],
+ "tickled": [
+  "tickled_1.wav",
+  "tickled_2.wav",
+  "tickled_3.wav"
+ ],
+ "glue": [
+  "glue_1.wav",
+  "glue_2.wav"
+ ],
+ "blocked": [
+  "blocked_1.wav",
+  "blocked_2.wav"
+ ],
+ "cheer": [
+  "cheer_1.wav",
+  "cheer_2.wav"
+ ],
+ "grease": [
+  "grease_1.wav",
+  "grease_2.wav"
+ ],
+ "greased": [
+  "greased_1.wav",
+  "greased_2.wav",
+  "greased_3.wav"
+ ],
+ "strong": [
+  "strong_1.wav",
+  "strong_2.wav"
+ ],
+ "fart": [
+  "fart_1.wav",
+  "fart_2.wav"
+ ],
+ "farted": [
+  "farted_1.wav",
+  "farted_2.wav",
+  "farted_3.wav"
+ ],
+ "heave": [
+  "heave_1.wav",
+  "heave_2.wav",
+  "heave_3.wav",
+  "heave_4.wav"
+ ],
+ "banana": [
+  "banana_1.wav",
+  "banana_2.wav"
+ ],
+ "slip": [
+  "slip_1.wav",
+  "slip_2.wav",
+  "slip_3.wav",
+  "slip_4.wav",
+  "slip_5.wav",
+  "slip_6.wav"
+ ],
+ "tired": [
+  "tired_1.wav",
+  "tired_2.wav",
+  "tired_3.wav",
+  "tired_4.wav",
+  "tired_5.wav",
+  "tired_6.wav"
+ ],
+ "drag": [
+  "drag_1.wav",
+  "drag_2.wav",
+  "drag_3.wav",
+  "drag_4.wav",
+  "drag_5.wav",
+  "drag_6.wav"
+ ],
+ "effort": [
+  "effort_1.wav",
+  "effort_2.wav",
+  "effort_3.wav",
+  "effort_4.wav",
+  "effort_5.wav",
+  "effort_6.wav"
+ ],
+ "fall": [
+  "fall_1.wav",
+  "fall_2.wav",
+  "fall_3.wav",
+  "fall_4.wav",
+  "fall_5.wav",
+  "fall_6.wav"
+ ],
+ "win": [
+  "win_1.wav",
+  "win_2.wav",
+  "win_3.wav",
+  "win_4.wav",
+  "win_5.wav",
+  "win_6.wav"
+ ]
+}

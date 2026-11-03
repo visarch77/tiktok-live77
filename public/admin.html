@@ -180,6 +180,8 @@
     }
 
     /* ---------- Room header ---------- */
+    .mode-switch { display: inline-flex; align-items: center; gap: 6px; }
+    .mode-switch select { padding: 2px 8px; height: auto; width: auto; font-size: 13px; }
     .room-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
     .rh-title { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .rh-title h1 { font-size: 22px; font-weight: 700; letter-spacing: -.01em; }
@@ -1155,7 +1157,9 @@
       badge.innerHTML = `<span class="dot ${st.dot}"></span>${esc(st.text)}`;
       if ($('#pvDot')) $('#pvDot').className = `dot ${st.dot}`;
       $('#rhMeta').innerHTML = `
-        <span>🧩 ${esc(room.modeName)}</span>
+        <label class="mode-switch" title="Chuyển trò chơi của phòng (màn hình live tự chuyển theo)">🎮
+          <select class="input" id="rhModeSwitch">${modes.filter((m) => m.id !== 'temple' || m.id === room.mode).map((m) => `<option value="${esc(m.id)}" ${m.id === room.mode ? 'selected' : ''}>${esc(m.name)}</option>`).join('')}</select>
+        </label>
         <span>${room.tiktokUsername ? `🎵 @${esc(room.tiktokUsername)}` : '<span class="muted">🎵 Chưa gắn tài khoản TikTok</span>'}</span>
         <span class="muted">Mã: ${esc(room.id)}</span>`;
 
@@ -2310,7 +2314,27 @@
       rlHold(true);
     });
     document.addEventListener('keyup', (e) => { if (e.code === 'Space' && rl.holdTimer) rlHold(false); });
-    document.addEventListener('change', (e) => {
+    document.addEventListener('change', async (e) => {
+      if (e.target.id === 'rhModeSwitch') {
+        // chuyển trò chơi ngay tại phòng (giữ tên, tài khoản TikTok, bảng xếp hạng); màn hình live tự tải lại sang trò mới
+        const room = currentRoom();
+        const mode = e.target.value;
+        if (!room || mode === room.mode) return;
+        const name = modes.find((m) => m.id === mode)?.name || mode;
+        const live = roomState?.tiktok?.connected;
+        if (!(await confirmDialog({ title: `Chuyển sang "${name}"?`, text: `Ván / giải đang chạy sẽ dừng${live ? ', kết nối TikTok tự nối lại sau vài giây' : ''}. Màn hình live (OBS, điện thoại) tự chuyển sang trò mới. Bảng xếp hạng người xem được giữ.`, ok: 'Chuyển trò', danger: false }))) {
+          e.target.value = room.mode;
+          return;
+        }
+        try {
+          await rpc('rooms.update', { id: room.id, name: room.name, mode, tiktokUsername: room.tiktokUsername, autoConnect: room.autoConnect });
+          toast(`Đã chuyển sang ${name}`);
+          await refreshRooms({ forceShell: true });
+        } catch (err) {
+          e.target.value = room.mode;
+        }
+        return;
+      }
       if (e.target.id === 'rlName') lsSet('rl_test_name', e.target.value);
       if (e.target.id === 'rlMeasure') e.target.dataset.dirty = '1';
       if (e.target.id === 'rlLag') lsSet('rl_test_lag', e.target.value);

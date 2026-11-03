@@ -143,6 +143,12 @@ Bố cục chừa chỗ cho giao diện TikTok LIVE: hai lề 72 px; trên cùng
 **Nhạc lúc kéo** — mặc định nhẹ, nhịp vừa, đỡ mệt khi lặp cả buổi live. Cài đặt "Nhạc lúc kéo": Nhạc thật (mặc định) dùng MP3 trong `public/assets/keoco/music/` — `pull_main`, `pull_main_2`, `pull_main_3` (mỗi trận một bài), `pull_tense` (tuỳ chọn, dây sát mép vực), `pull_final` (10 giây cuối), `win` (~6 giây đầu khi hết trận); chuyển bài bằng mờ dần. Thiếu `pull_main` thì dùng bản **Vừa phải** tự tạo: 3 bản (La thứ 104 BPM pluck, Mi thứ 108 marimba, Rê 100 pizzicato) đổi theo trận, giai điệu biến tấu mỗi vòng, có ô nhịp nghỉ, 10 giây cuối chỉ thêm chút trống. Bản Kịch tính / Hài vẫn chọn được. Tạo nhạc bằng Suno/Udio: `design/keoco-music/HUONG-DAN.md`.
 Tiếng sân thưa và nhỏ: dây kêu thưa, thở/giày rít thưa hơn, đám đông chỉ hô khi có Hò dô hoặc dây căng thật, tiếng "hự" ≥ 3 giây một lần. Bình luận: kỹ năng cách ≥ 3 s, tình huống ≥ 12 s, im ắng 15 s mới chen, không lặp câu vừa đọc, một kỹ năng của cùng đội dùng liên tục chỉ bình luận lần đầu trong 15 s.
 
+## Tiếng nhân vật (thu sẵn) — `public/assets/keoco/voice/`
+72 câu kêu ngắn (2 MB) tạo bằng 8 giọng đọc tiếng Việt của ZeroTTS rồi nâng giọng ×1,3 kiểu hoạt hình (`tools/keoco-voices.py`, chạy lại khi muốn đổi câu). Theo loại: dùng từng kỹ năng, trúng cù lét / mỡ / xì hơi / vỏ chuối, bị chặn, mệt, bị lôi, gồng sức ("Hự!"), rơi vực ("Á á á", giọng tụt dần), thắng, "Hò dô". Phát lệch tốc độ nhẹ mỗi lần, cách nhau ≥ 0,7 s, tối đa 2 câu cùng lúc, mỗi loại có khoảng nghỉ riêng. Thiếu file thì quay về giọng tổng hợp cũ.
+
+## Chuyển trò trong phòng
+Trang quản lý: ô 🎮 dưới tên phòng chọn trò (Đèn Xanh – Đèn Đỏ / Kéo Co …). Phòng khởi động lại với trò mới (giữ tên, TikTok, bảng xếp hạng; nối lại TikTok nếu đang live); màn hình OBS / điện thoại đang mở tự tải lại sang trò mới.
+
 ## Hiệu ứng kỹ năng
 
 Mỗi lần dùng kỹ năng: **thẻ to** bên phía đội dùng (ảnh quà + tên kỹ năng + một câu nói rõ chuyện gì xảy ra, vd. "💨 THẢ BOOM! 5 người
