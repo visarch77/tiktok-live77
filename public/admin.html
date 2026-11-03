@@ -868,6 +868,7 @@
           : room.mode === 'keoco'
           ? [
               { id: 'interact', label: '🕹 Điều khiển giải' },
+              { id: 'kcplay', label: '🎮 Chơi thử' },
               { id: 'feed', label: '📡 Hoạt động' },
               { id: 'settings', label: '⚙️ Cài đặt' }
             ]
@@ -896,6 +897,7 @@
       }
       if (id === 'control') renderChantPanel();
       if (id === 'play') startRlPlay();
+      if (id === 'kcplay') startKcPlay();
       if (id === 'lag') startRlLag();
       if (id === 'interact' && $('[data-panel="comment"]:not(.hidden)')) $('#simComment')?.focus();
     }
@@ -1035,6 +1037,31 @@
                     <label class="help">Số lượng <select class="input" id="rlGiftCount" style="height:30px;width:70px;display:inline-block"><option>1</option><option>2</option><option>5</option><option>10</option></select></label>
                   </div>
                   <div class="rl-gifts" id="rlGifts"><div class="muted">Đang tải danh sách quà…</div></div>
+                </div></div>` : ''}
+
+                ${room.mode === 'keoco' ? `
+                <div class="spanel" data-spanel="kcplay"><div class="rlplay">
+                  <span class="help">Chỉ dùng khi <b>chưa live</b>. Chọn đội rồi thêm người, cho cả đội thả tim, hoặc bấm một quà để thấy kỹ năng chạy thế nào. Đội chưa ra sân thì kỹ năng được <b>để dành</b>, tự dùng khi đội ra sân.</span>
+                  <div class="rl-row" id="kcTeams">
+                    ${[[1, 'Đỏ', '#ff3b5c'], [2, 'Xanh', '#2f8cff'], [3, 'Vàng', '#ffc928'], [4, 'Tím', '#b45cff']].map(([id, n, c]) => `<button class="btn kc-team${id === kcTeam ? ' primary' : ''}" data-act="kc-team" data-team="${id}" style="border-color:${c};${id === kcTeam ? `background:${c};color:${id === 3 ? '#222' : '#fff'}` : ''}">Đội ${id} · ${n}</button>`).join('')}
+                  </div>
+                  <div class="rl-row">
+                    <button class="btn" data-act="kc-join" data-count="1">➕ Thêm 1 người</button>
+                    <button class="btn" data-act="kc-join" data-count="5">➕ Thêm 5 người</button>
+                    <button class="btn" data-act="kc-likes" data-sec="10">❤️ Cả đội thả tim mạnh 10 giây</button>
+                  </div>
+                  <div class="rl-row">
+                    <button class="btn primary" data-act="kc-rpc" data-method="keoco.startCup">▶️ Bắt đầu giải ngay</button>
+                    <button class="btn" data-act="kc-rpc" data-method="keoco.startShow">🤖 Trận AI biểu diễn</button>
+                    <button class="btn" data-act="kc-rpc" data-method="keoco.endMatch">🏁 Kết thúc trận</button>
+                    <button class="btn" data-act="kc-rpc" data-method="keoco.newLobby">🔄 Về phòng chờ</button>
+                  </div>
+                  <div class="rl-status" id="kcStatus"><div class="rl-stat"><b>—</b><span>Đang tải…</span></div></div>
+                  <div class="rl-row" style="justify-content:space-between">
+                    <b>Thử kỹ năng (tặng quà từ người thử của đội đang chọn)</b>
+                    <label class="help">Số lượng <select class="input" id="kcGiftCount" style="height:30px;width:70px;display:inline-block"><option>1</option><option>2</option><option>3</option></select></label>
+                  </div>
+                  <div class="rl-gifts" id="kcGifts"><div class="muted">Đang tải danh sách quà…</div></div>
                 </div></div>` : ''}
 
                 <div class="spanel" data-spanel="interact">
@@ -1320,7 +1347,12 @@
         ${rlRange('lobbySeconds', 'Thời gian chờ vào đội', 'Đủ người (mục dưới) thì rút còn 10 giây', 10, 300, 5, 's')}
         ${rlRange('fastStartPlayers', 'Đủ người để bắt đầu sớm', 'Tổng người trong 4 đội đạt số này thì rút ngắn thời gian chờ', 2, 80, 1, ' người')}
         ${rlRange('matchSeconds', 'Thời gian mỗi trận', 'Hết giờ: bên đang được lợi thắng; hoà sát vạch thì thêm 10 giây phút chót', 20, 180, 5, 's')}
-        ${rlRange('teamMax', 'Tối đa mỗi đội', 'Đội đầy thì người mới tự sang đội vắng nhất; cả 4 đội đầy thì vào phòng chờ giải sau', 5, 20, 1, ' người')}
+        ${rlRange('teamMax', 'Số người tối đa mỗi đội', 'Đội đầy thì người mới tự sang đội vắng nhất; cả 4 đội đầy thì vào phòng chờ giải sau', 1, 20, 1, ' người')}
+        ${rlRange('minTeamPlayers', 'Số người tối thiểu để một đội "có người"', 'Cần ít nhất 2 đội đạt số này mới vào giải; chưa đủ thì chờ thêm (hoặc AI biểu diễn)', 1, 20, 1, ' người')}
+        <div class="setting">
+          <div><div class="setting-name">AI tự đấu khi vắng</div><div class="setting-desc">Chưa đủ 2 đội có người: người máy kéo biểu diễn cho sinh động (không tính điểm); đủ người thì vào giải thật</div></div>
+          <label class="switch"><input type="checkbox" data-setting="aiShow" ${s.aiShow !== false ? 'checked' : ''} /><span></span></label>
+        </div>
         ${rlRange('npcMin', 'Người máy lấp chỗ', 'Mỗi bên trên sân được lấp người máy (🤖, kéo yếu hơn) tới max(số người thật bên đông hơn, số này)', 0, 20, 1, ' người')}
         ${rlRange('championSeconds', 'Thời gian vinh danh vô địch', '', 5, 60, 1, 's')}`;
       body.innerHTML = `${rlExtra}${kcExtra}
@@ -2206,6 +2238,48 @@
       }, 2000);
     }
 
+    let kcTeam = Number(lsGet('kc_test_team')) || 1;
+    let kcTimer = null;
+    const KC_GIFT_IMG = { gong: 'turbo', energy: 'clones', tickle: 'shove', glue: 'shield', cheer: 'revive', grease: 'wind', strong: 'giant', fart: 'fart', heave: 'teamShield', stomp: 'stomp' };
+    async function renderKcPlay() {
+      const room = currentRoom();
+      if (!room || room.mode !== 'keoco') return;
+      const st = await rpc('room.getState', { roomId: room.id }, { silent: true }).catch(() => null);
+      const kc = st?.kc;
+      if (!kc) return;
+      const gifts = $('#kcGifts');
+      if (gifts && !gifts.dataset.done) {
+        gifts.dataset.done = '1';
+        gifts.innerHTML = (kc.legend || []).map((it) => `
+          <button class="rl-gift" data-act="kc-skill" data-skill="${esc(it.skill)}" title="${esc(it.desc || '')}">
+            <img src="/assets/redlight/gift_${esc(KC_GIFT_IMG[it.skill] || 'turbo')}.webp" alt="" />
+            <span class="g-name">${esc(it.tiktok)} · ${esc(it.coins)}🪙</span>
+            <span class="g-skill">${esc(it.emoji)} ${esc(it.label)}</span>
+            <span class="g-desc">${esc(it.desc || '')}</span>
+          </button>`).join('');
+      }
+      const box = $('#kcStatus');
+      if (!box) return;
+      const phaseName = { lobby: 'Đang chờ vào đội', draw: 'Bốc thăm', intro: 'Giới thiệu trận', pull: 'Đang kéo', matchEnd: 'Hết trận', champion: 'Vinh danh' }[kc.phase] || kc.phase;
+      const m = kc.bracket && kc.matchIdx >= 0 ? kc.bracket[kc.matchIdx] : null;
+      const tm = (kc.roster?.teams || []).find((t) => t.id === kcTeam) || {};
+      const cell = (b, sp, cls = '') => `<div class="rl-stat ${cls}"><b>${b}</b><span>${sp}</span></div>`;
+      const stName = { wait: 'Chờ lượt', field: 'Đang kéo', final: 'Vào chung kết', out: 'Bị loại', champ: 'Vô địch' }[tm.status] || '—';
+      box.innerHTML =
+        cell(esc(phaseName), kc.exhibition ? '🤖 Trận biểu diễn AI (không tính điểm)' : m ? `${esc(m.label)}: Đội ${m.a} vs Đội ${m.b}` : 'Chưa có trận') +
+        cell(`${(kc.ready || []).length}/2`, `Đội đủ người (≥ ${kc.minTeamPlayers || 1} người): ${(kc.ready || []).map((t) => 'Đ' + t).join(', ') || 'chưa có'}`, (kc.ready || []).length >= 2 ? 'good' : '') +
+        cell(`Đội ${kcTeam}: ${tm.count ?? 0}/${tm.max ?? '—'}`, `${stName}${tm.bank ? ` · 🎒 ${tm.bank} kỹ năng để dành` : ''}`, tm.status === 'field' ? 'good' : tm.status === 'out' ? 'bad' : '');
+    }
+    function startKcPlay() {
+      clearInterval(kcTimer);
+      if (currentRoom()?.mode !== 'keoco') return;
+      renderKcPlay();
+      kcTimer = setInterval(() => {
+        if (studioTab !== 'kcplay' || !$('#kcStatus')) return clearInterval(kcTimer);
+        renderKcPlay();
+      }, 1500);
+    }
+
     function startRlPlay() {
       clearInterval(rl.statusTimer);
       if (currentRoom()?.mode !== 'redlight') return;
@@ -2348,6 +2422,43 @@
           break;
         case 'rl-join':
           await rlSend({ action: 'join' });
+          break;
+        case 'kc-team':
+          kcTeam = Number(btn.dataset.team) || 1;
+          lsSet('kc_test_team', kcTeam);
+          document.querySelectorAll('[data-act="kc-team"]').forEach((b) => {
+            const on = Number(b.dataset.team) === kcTeam;
+            b.classList.toggle('primary', on);
+            b.style.background = on ? b.style.borderColor : '';
+            b.style.color = on ? (kcTeam === 3 ? '#222' : '#fff') : '';
+          });
+          renderKcPlay();
+          break;
+        case 'kc-join':
+          try {
+            const r = await rpc('keoco.testJoin', { roomId: room.id, team: kcTeam, count: Number(btn.dataset.count) || 1 });
+            toast(`Đã thêm ${r.added} người vào Đội ${r.team}`);
+          } catch (_) {}
+          renderKcPlay();
+          break;
+        case 'kc-likes':
+          try {
+            const r = await rpc('keoco.testLikes', { roomId: room.id, team: kcTeam, seconds: Number(btn.dataset.sec) || 10 });
+            toast(`${r.players} người Đội ${r.team} thả tim mạnh`);
+          } catch (_) {}
+          break;
+        case 'kc-skill':
+          try {
+            const r = await rpc('keoco.testSkill', { roomId: room.id, team: kcTeam, skill: btn.dataset.skill, count: Number($('#kcGiftCount')?.value) || 1 });
+            toast(r.onField ? `Đội ${r.team} dùng kỹ năng` : `Đội ${r.team} chưa ra sân — kỹ năng để dành`);
+          } catch (_) {}
+          renderKcPlay();
+          break;
+        case 'kc-rpc':
+          try {
+            await rpc(btn.dataset.method, { roomId: room.id });
+          } catch (_) {}
+          renderKcPlay();
           break;
         case 'rl-measure': {
           const inp = $('#rlMeasure');

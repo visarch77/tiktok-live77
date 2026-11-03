@@ -121,6 +121,8 @@ function create(ctx, saved = {}) {
   let bracket = null;
   let matchIdx = -1;
   let champion = null; // { team, mvp: [{name, force}], at }
+  // Trận biểu diễn AI: chưa đủ 2 đội có người thì người máy tự kéo với nhau cho màn hình sinh động (không tính điểm)
+  let exhibition = false;
   let history = Array.isArray(saved.history) ? saved.history.slice(0, 10) : []; // các giải gần nhất
   const teamWins = saved.teamWins && typeof saved.teamWins === 'object' ? { ...saved.teamWins } : { 1: 0, 2: 0, 3: 0, 4: 0 };
 
@@ -187,8 +189,12 @@ function create(ctx, saved = {}) {
 
   // ---- đội nào còn nhận người ----
   function eliminated(team) {
-    if (!bracket) return false;
+    if (!bracket || exhibition) return false;
     return bracket.some((m) => m.winner && (m.a === team || m.b === team) && m.winner !== team);
+  }
+  // Đội đủ người để thi đấu (người thật, kể cả người thử khi chưa live)
+  function readyTeams() {
+    return TEAM_IDS.filter((t) => humans(t).length >= S().minTeamPlayers);
   }
   function eligibleTeams() {
     if (phase === 'champion') return [];
@@ -314,6 +320,7 @@ function create(ctx, saved = {}) {
   }
 
   function enterLobby() {
+    exhibition = false;
     champion = phase === 'champion' ? champion : null;
     bracket = null;
     matchIdx = -1;
@@ -355,6 +362,7 @@ function create(ctx, saved = {}) {
   }
 
   function startCup() {
+    exhibition = false;
     cup += 1;
     const order = shuffle(TEAM_IDS);
     bracket = [
@@ -368,6 +376,18 @@ function create(ctx, saved = {}) {
     setPhase('draw', 4500);
     say(`${pick(lines().draw)} ${L('Bán kết một', 'Semi final one')}: ${teamName(order[0])} ${L('gặp', 'versus')} ${teamName(order[1])}. ${L('Bán kết hai', 'Semi final two')}: ${teamName(order[2])} ${L('gặp', 'versus')} ${teamName(order[3])}.`);
     if (!humans().length) setTimeout(() => say(pick(lines().noOne)), 6000);
+  }
+
+  function startExhibition() {
+    exhibition = true;
+    // hai đội ngẫu nhiên, ưu tiên đội đã có người (cho họ kéo thử luôn)
+    const withPeople = shuffle(TEAM_IDS.filter((t) => humans(t).length));
+    const rest = shuffle(TEAM_IDS.filter((t) => !withPeople.includes(t)));
+    const pair = withPeople.concat(rest).slice(0, 2);
+    bracket = [{ id: 'x', label: L('Trận biểu diễn AI', 'AI show match'), a: pair[0], b: pair[1], winner: 0 }];
+    champion = null;
+    say(L('Chưa đủ hai đội, các bạn máy kéo biểu diễn trước nhé! Bình luận số đội để vào chơi thật.', 'Not enough teams yet, so the bots will put on a show! Comment a team number to play for real.'));
+    startMatch(0);
   }
 
   function startMatch(idx) {
@@ -422,8 +442,8 @@ function create(ctx, saved = {}) {
       .filter((p) => !p.npc)
       .sort((x, y) => y.matchForce - x.matchForce)[0];
     m.mvp = mvp ? { name: mvp.name, force: Math.round(mvp.matchForce) } : null;
-    // điểm cá nhân: lực đã kéo; đội thắng +20%
-    for (const side of ['a', 'b']) {
+    // điểm cá nhân: lực đã kéo; đội thắng +20% (trận biểu diễn không tính)
+    for (const side of exhibition ? [] : ['a', 'b']) {
       for (const p of lineOf(side)) {
         if (p.npc || p.sim) continue;
         const pts = Math.round(p.matchForce * (side === winSide ? 1.2 : 1));
@@ -433,7 +453,7 @@ function create(ctx, saved = {}) {
     setPhase('matchEnd', 6000);
     fxMsg('matchEnd', { winner, loser: winner === m.a ? m.b : m.a, x: rope.x, mvp: m.mvp, reason });
     say(
-      `${teamName(winner)} ${L('thắng', 'wins')}${m.id === 'f' ? L(' và vô địch', ' the cup') : L(', vào chung kết', ' and goes to the final')}! ` +
+      `${teamName(winner)} ${L('thắng', 'wins')}${m.id === 'x' ? '' : m.id === 'f' ? L(' và vô địch', ' the cup') : L(', vào chung kết', ' and goes to the final')}! ` +
         (m.mvp ? `${L('Kéo khoẻ nhất', 'Strongest puller')}: ${speakName(m.mvp.name)}.` : '')
     );
   }
@@ -643,12 +663,27 @@ function create(ctx, saved = {}) {
       // đủ người thì rút ngắn chờ
       const enough = humans().length >= S().fastStartPlayers;
       if (enough && phaseEndsAt - now > 10000) phaseEndsAt = now + 10000;
-      if (now >= phaseEndsAt && S().autoLoop !== false) startCup();
+      if (now >= phaseEndsAt && S().autoLoop !== false) {
+        if (readyTeams().length >= 2) startCup();
+        else if (S().aiShow !== false) startExhibition();
+        else {
+          // chưa đủ 2 đội: chờ thêm
+          phaseEndsAt = now + 15000;
+          broadcastPhase();
+        }
+      }
     } else if (phase === 'draw') {
       if (now >= phaseEndsAt) startMatch(0);
     } else if (phase === 'intro') {
       if (now >= phaseEndsAt) beginPull();
     } else if (phase === 'pull') {
+      // đang biểu diễn mà đã đủ 2 đội người thật: kết thúc sớm để vào giải thật
+      if (exhibition && readyTeams().length >= 2 && phaseEndsAt - now > 5000) {
+        phaseEndsAt = now + 5000;
+        broadcastPhase();
+        fxMsg('ready', {});
+        say(L('Đủ hai đội rồi! Chuẩn bị vào giải thật!', 'Two teams are ready! Get set for the real cup!'));
+      }
       pullTick(now);
       if (phase === 'pull') releaseBank(now);
       if (phase === 'pull' && now >= phaseEndsAt) {
@@ -662,7 +697,12 @@ function create(ctx, saved = {}) {
       }
     } else if (phase === 'matchEnd') {
       if (now >= phaseEndsAt) {
-        if (matchIdx < 2) startMatch(matchIdx + 1);
+        if (exhibition) {
+          exhibition = false;
+          enterLobby();
+          // đã đủ người thì chờ ngắn thôi
+          if (readyTeams().length >= 2) phaseEndsAt = Date.now() + 10000;
+        } else if (matchIdx < 2) startMatch(matchIdx + 1);
         else finishCup();
       }
     } else if (phase === 'champion') {
@@ -695,12 +735,12 @@ function create(ctx, saved = {}) {
       if (eliminated(t)) status = 'out';
       else if (champion && champion.team === t) status = 'champ';
       else if (onField(t)) status = 'field';
-      else if (bracket.some((x) => x.winner === t)) status = 'final';
+      else if (!exhibition && bracket.some((x) => x.winner === t)) status = 'final';
       else status = 'wait';
       // trận kế tiếp của đội (để người chơi biết khi nào tới lượt)
     }
     let nextIn = null;
-    if (bracket && status !== 'out' && status !== 'champ' && status !== 'field') {
+    if (bracket && !exhibition && status !== 'out' && status !== 'champ' && status !== 'field') {
       const idx = bracket.findIndex((x, i) => i > matchIdx && !x.winner && (x.a === t || x.b === t || (x.id === 'f' && status === 'final')));
       if (idx >= 0) nextIn = idx - Math.max(matchIdx, -1);
     }
@@ -775,6 +815,9 @@ function create(ctx, saved = {}) {
       bracket,
       matchIdx,
       champion,
+      exhibition,
+      ready: readyTeams(),
+      minTeamPlayers: S().minTeamPlayers,
       clientV: clientVersion()
     };
   }
@@ -887,7 +930,8 @@ function create(ctx, saved = {}) {
       const p = players.get(s.u.uniqueId);
       if (!p || phase !== 'pull' || !onField(p.team)) continue;
       // "spam": thả liên tục rồi kiệt; "steady": đều tay có nghỉ
-      const n = s.style === 'spam' ? Math.round(s.rate * 0.4 + 1) : Math.random() < 0.8 ? Math.round(s.rate * 0.4) : 0;
+      const boost = s.boostUntil && Date.now() < s.boostUntil;
+      const n = boost ? 3 : s.style === 'spam' ? Math.round(s.rate * 0.4 + 1) : Math.random() < 0.8 ? Math.round(s.rate * 0.4) : 0;
       if (n > 0) ctx.simulated(() => onEvent({ type: 'like', user: s.u, count: n }));
     }
   }
@@ -969,6 +1013,62 @@ function create(ctx, saved = {}) {
       ctx.simulated(() => onEvent({ type: 'gift', user: s.u, giftName: it.tiktok, coins: it.coins, count: 1 }));
       return { user: s.u.user, gift: it.tiktok };
     },
+    // Chơi thử theo đội (chỉ khi chưa live): thêm người vào đúng đội, cho cả đội thả tim, dùng kỹ năng của đội
+    testJoin: (params = {}) => {
+      notLive('thêm người thử');
+      const team = clamp(Number(params.team) || 1, 1, 4);
+      const n = clamp(Number(params.count) || 1, 1, 20);
+      let added = 0;
+      for (let i = 0; i < n; i++) {
+        const u = simUser();
+        ctx.simulated(() => onEvent({ type: 'chat', user: u, text: String(team) }));
+        const p = players.get(u.uniqueId);
+        if (p && p.team !== team && phase === 'lobby') p.team = team; // thử: vào đúng đội đã chọn
+        simPeople.push({ u, rate: rand(3, 5), style: 'steady', team });
+        if (p) added++;
+      }
+      if (!simTimer) simTimer = setInterval(simStep, 400);
+      refreshLineup();
+      rosterDirty = true;
+      return { added, team };
+    },
+    testLikes: (params = {}) => {
+      notLive('thả tim thử');
+      const team = clamp(Number(params.team) || 1, 1, 4);
+      const until = Date.now() + clamp(Number(params.seconds) || 10, 1, 60) * 1000;
+      let n = 0;
+      for (const sp of simPeople) {
+        const p = players.get(sp.u.uniqueId);
+        if (p && p.team === team) {
+          sp.boostUntil = until;
+          n++;
+        }
+      }
+      if (!n) throw new Error(`Đội ${team} chưa có người thử — bấm "Thêm người" trước`);
+      return { team, players: n };
+    },
+    testSkill: (params = {}) => {
+      notLive('dùng kỹ năng thử');
+      const team = clamp(Number(params.team) || 1, 1, 4);
+      const it = LEGEND.find((x) => x.skill === params.skill);
+      if (!it) throw new Error(`Không có kỹ năng: ${params.skill}`);
+      // người tặng thử của đội (tạo nếu chưa có)
+      const u = { user: L(`Thử Đội ${team}`, `Tester ${team}`), uniqueId: `test_t${team}`, avatar: '', sim: true };
+      let p = players.get(u.uniqueId);
+      if (!p) {
+        ctx.simulated(() => onEvent({ type: 'chat', user: u, text: String(team) }));
+        p = players.get(u.uniqueId);
+      }
+      if (p && p.team !== team && !eliminated(team)) p.team = team;
+      ctx.simulated(() => onEvent({ type: 'gift', user: u, giftName: it.tiktok, coins: it.coins, count: clamp(Number(params.count) || 1, 1, 3) }));
+      rosterDirty = true;
+      return { team, skill: it.skill, onField: onField(team), phase };
+    },
+    startShow: () => {
+      if (phase !== 'lobby' && phase !== 'champion') throw new Error('Chỉ bắt đầu trận biểu diễn lúc đang chờ');
+      startExhibition();
+      return phaseInfo();
+    },
     clearPlayers: () => {
       simClear();
       for (const p of [...players.values()]) players.delete(p.key);
@@ -1040,9 +1140,11 @@ module.exports = {
     lobbySeconds: [10, 300],
     matchSeconds: [20, 180],
     championSeconds: [5, 60],
-    teamMax: [5, 20],
+    teamMax: [1, 20],
     npcMin: [0, 20],
     fastStartPlayers: [2, 80],
+    minTeamPlayers: [1, 20],
+    aiShow: 'boolean',
     autoLoop: 'boolean',
     lang: { type: 'enum', values: ['vi', 'en'] },
     enVoice: { type: 'enum', values: ttsEn.VOICES }
@@ -1054,6 +1156,8 @@ module.exports = {
     teamMax: 20,
     npcMin: 8,
     fastStartPlayers: 24,
+    minTeamPlayers: 1, // đội có từ chừng này người thật trở lên mới tính là "có người"; cần ít nhất 2 đội như vậy để vào giải
+    aiShow: true, // chưa đủ 2 đội: người máy tự kéo biểu diễn (không tính điểm)
     autoLoop: true,
     lang: 'vi',
     enVoice: ttsEn.DEFAULT_VOICE,

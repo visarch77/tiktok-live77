@@ -19,6 +19,10 @@ Thua là bị kéo tuột xuống vực (hoạt hình, không máu me).
 
 Thứ tự: BK1 → BK2 → Chung kết (2 đội thắng bán kết) → vinh danh → phòng chờ giải mới.
 
+**Chờ đủ 2 đội**: hết giờ chờ chỉ bốc thăm khi có ít nhất 2 đội "có người" (≥ `minTeamPlayers` người thật, mặc định 1).
+Chưa đủ: nếu bật `aiShow` (mặc định) thì người máy **tự kéo biểu diễn** một trận (không tính điểm, người xem vẫn vào đội được);
+đang biểu diễn mà đủ 2 đội thì trận rút còn 5 giây ("ĐỦ 2 ĐỘI!"), về phòng chờ 10 giây rồi vào giải thật. Tắt `aiShow` thì cứ chờ thêm 15 giây.
+
 ## Vào đội & chia đội công bằng
 
 - Bình luận `1` `2` `3` `4`, "đội 2", "team 3", "đỏ" / "xanh" / "vàng" / "tím" (màu phải có dấu; "tim" không dấu là thả tim).
@@ -123,6 +127,22 @@ Bố cục chừa chỗ cho giao diện TikTok LIVE: hai lề 48 px; trên cùng
 - Ảnh: nền `assets/keoco/bg.webp`; 31 nhân vật + lực sĩ × 5 tư thế + 4 tư thế hài (bị lôi, cắn dây, bấm gót, tấm ván — 28 nhân vật; 3 nhân vật nhảy + lực sĩ
   dùng tư thế gần nhất) vẽ bằng GPT Image qua Scenario, gộp thành 4 atlas
   `atlas_t1..4.webp` (băng đô đổi màu theo đội) + `atlas.json` (khung + điểm nắm dây).
+
+## Hiệu ứng kỹ năng
+
+Mỗi lần dùng kỹ năng: **thẻ to** bên phía đội dùng (ảnh quà + tên kỹ năng + một câu nói rõ chuyện gì xảy ra, vd. "💨 THẢ BOOM! 5 người
+đầu dây ĐỘI 3 · VÀNG choáng váng 2 giây"), kèm hiệu ứng riêng: Gồng (vòng sáng dưới chân + "×2"), Tăng lực (⚡ trên đầu 4 người),
+Cù lét (🪶 + người đầu dây cười buông tay), Găng keo (keo xanh nhỏ giọt, vòng xanh quanh đội, 🧤), Cổ vũ (nốt nhạc, pháo giấy, 📣),
+Bôi mỡ (mỡ nhỏ giọt, đoạn dây bóng vàng nhấp nháy, "TRƠN TUỘT!"), Lực sĩ (khói + "LỰC SĨ ĐẾN!" + lực sĩ to đứng kéo),
+Thả boom (khói vàng bay sang + "BỦMMM", 💫), Hò dô ("HÒ!"/"DÔ!" luân phiên trên đội), Khổng lồ dẫm (bàn chân dẫm + "RẦM!" + rung màn hình).
+Đòn bị chặn: thẻ xanh "🧤 BỊ CHẶN!" + vòng khiên xanh quanh đội được bảo vệ.
+
+## Chơi thử (trang quản lý → 🎮 Chơi thử, chỉ khi chưa live)
+
+Chọn đội 1–4 → thêm 1 / 5 người vào đúng đội, cả đội thả tim mạnh 10 giây, bấm từng quà để thử kỹ năng (đội chưa ra sân thì để dành),
+bắt đầu giải ngay / trận AI biểu diễn / kết thúc trận / về phòng chờ; ô trạng thái cho biết pha, số đội đủ người, tình trạng đội đang chọn.
+Cài đặt chỉnh được: thời gian chờ, thời gian mỗi trận, số người tối đa mỗi đội (1–20), số người tối thiểu để đội "có người",
+AI tự đấu khi vắng, người máy lấp chỗ, tự chạy giải liên tục.
 
 ## Trò của người điều phối (trang quản lý)
 
