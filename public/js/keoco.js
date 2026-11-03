@@ -188,7 +188,7 @@
     const t = performance.now();
     switch (p.kind) {
       case 'say':
-        bubbles.set(p.key, { text: p.text, until: t + (ph.phase === 'pull' ? 1500 : 4000) });
+        bubbles.set(p.key, { text: p.text, at: t, until: t + (ph.phase === 'pull' ? 3500 : 4500) });
         break;
       case 'join':
         pushFeed(p.moved ? L(`${p.name}: Đội ${p.moved} đầy → vào Đội ${p.team}`, `${p.name}: Team ${p.moved} full → Team ${p.team}`) : L(`${p.name} vào Đội ${p.team}`, `${p.name} joined Team ${p.team}`), p.team);
@@ -646,24 +646,17 @@
       else if (d.st === 'tickle') text(L('HAHA', 'HAHA'), x, headY - 8, { size: 16, weight: 900, color: '#ffe066', stroke: 4 });
       else if (d.st === 'strain' && Math.floor(t / 300 + d.i) % 3 === 0) text('💦', x + 14 * (side === 'a' ? 1 : -1), headY + 10, { size: 16 });
       if (mk && mk.until > t && SKILL_EMOJI[mk.kind]) text(SKILL_EMOJI[mk.kind], x, headY - 30 - (1 - (mk.until - t) / 2500) * 20, { size: 30 });
-      if (bub && bub.until > t) {
-        g.font = `700 17px ${FONT}`;
-        const tw = Math.min(220, g.measureText(bub.text).width) + 18;
-        const bx = Math.max(6, Math.min(W - tw - 6, x - tw / 2));
-        const by = headY - 70 - (d.row === 'front' ? 0 : 26);
-        g.globalAlpha = 0.86;
-        roundRect(bx, by, tw, 30, 12);
-        g.fillStyle = '#fff';
-        g.fill();
-        g.globalAlpha = 1;
-        text(bub.text, bx + tw / 2, by + 15, { size: 17, color: '#111', maxW: 212 });
-      } else if (!d.p.npc && ((top.includes(d.p.k) && ph.phase === 'pull' && ((pstate.get(d.p.k) || {}).force || 0) > 0) || (mk && mk.until > t))) {
-        const crown = top[0] === d.p.k && ph.phase === 'pull' ? '👑 ' : '';
-        const label = `${crown}${d.p.n}`;
-        g.font = `800 16px ${FONT}`;
-        const lw = Math.min(150, g.measureText(label).width) + 8;
-        const ly = placeLabel(x, headY - (d.row === 'front' ? 10 : 34), lw, 20);
-        if (ly !== null) text(label, x, ly, { size: 16, weight: 800, color: '#fff', stroke: 4, strokeColor: teamColor(side === 'a' ? curMatch().a : curMatch().b), maxW: 150 });
+      // tên + bình luận: xếp vào dải nhãn phía trên sân (drawLabels), không vẽ đè lên đầu người khác
+      if (!d.p.npc && ph.phase !== 'matchEnd') {
+        const force = (pstate.get(d.p.k) || {}).force || 0;
+        let prio = 0;
+        let kind = 'name';
+        if (bub && bub.until > t) {
+          prio = 3 + bub.at / 1e9; // bình luận mới nhất trước
+          kind = 'chat';
+        } else if (mk && mk.until > t) prio = 2;
+        else if (top.includes(d.p.k) && ph.phase === 'pull' && force > 0) prio = 1 + (top[0] === d.p.k ? 0.5 : 0);
+        if (prio > 0) labelReqs.push({ side, k: d.p.k, name: d.p.n, kind, text: kind === 'chat' ? bub.text : '', crown: top[0] === d.p.k && ph.phase === 'pull', prio, hx: d.gx + (side === 'a' ? -10 : 10), hy: headY, baseX: lineX(side, d.i) + (side === 'a' ? -10 : 10) });
       } else if (d.p.npc && ph.phase === 'pull' && d.i % 4 === 0) {
         text('🤖', x, headY - 6, { size: 14 });
       }
@@ -681,6 +674,79 @@
         }
       }
     }
+  }
+  // Dải nhãn: 6 hàng ngay trên sân, mỗi bên xếp nhãn từ hàng thấp lên, không chồng nhau, có đường chỉ xuống đúng người.
+  // Giữ hàng cũ của mỗi người (đỡ nhảy chỗ); bình luận ưu tiên hơn tên; tối đa 7 nhãn mỗi bên.
+  let labelReqs = [];
+  const LANE_Y0 = 716;
+  const LANE_H = 30;
+  const LANES = 6;
+  const laneMem = new Map(); // khoá → hàng đã xếp lần trước
+  function drawLabels(m, t) {
+    const placed = [];
+    for (const side of ['a', 'b']) {
+      const team = side === 'a' ? m.a : m.b;
+      const col = teamColor(team);
+      const minX = side === 'a' ? 8 : GAP_C + 6;
+      const maxX = side === 'a' ? GAP_C - 6 : W - 8;
+      const reqs = labelReqs
+        .filter((r) => r.side === side)
+        .sort((x, y) => y.prio - x.prio)
+        .slice(0, 7);
+      for (const r of reqs) {
+        const nameTxt = `${r.crown ? '👑 ' : ''}${r.name}`;
+        g.font = `800 16px ${FONT}`;
+        const nw = Math.min(130, g.measureText(nameTxt).width);
+        let tw = 0;
+        let body = '';
+        if (r.kind === 'chat') {
+          g.font = `600 16px ${FONT}`;
+          body = r.text;
+          tw = Math.min(260 - nw, g.measureText(body).width);
+        }
+        const w = nw + (tw ? tw + 10 : 0) + 18;
+        const cx = Math.max(minX + w / 2, Math.min(maxX - w / 2, r.baseX));
+        const fits = (lane) => {
+          const y = LANE_Y0 - lane * LANE_H;
+          return !placed.some((q) => q.y === y && cx - w / 2 < q.x + q.w / 2 + 6 && cx + w / 2 > q.x - q.w / 2 - 6);
+        };
+        let lane = laneMem.get(r.k);
+        if (lane === undefined || !fits(lane)) {
+          lane = -1;
+          for (let k = 0; k < LANES; k++) {
+            if (fits(k)) {
+              lane = k;
+              break;
+            }
+          }
+        }
+        if (lane < 0) continue;
+        laneMem.set(r.k, lane);
+        const y = LANE_Y0 - lane * LANE_H;
+        placed.push({ x: cx, y, w });
+        // đường chỉ xuống đầu người
+        g.strokeStyle = col;
+        g.globalAlpha = 0.75;
+        g.lineWidth = 2;
+        g.beginPath();
+        g.moveTo(cx, y + 12);
+        g.lineTo(r.hx, Math.max(y + 14, r.hy - 2));
+        g.stroke();
+        g.globalAlpha = 1;
+        // nhãn
+        roundRect(cx - w / 2, y - 12, w, 25, 12);
+        g.fillStyle = r.kind === 'chat' ? 'rgba(255,255,255,.95)' : 'rgba(10,10,28,.82)';
+        g.fill();
+        g.lineWidth = 2;
+        g.strokeStyle = col;
+        g.stroke();
+        const x0 = cx - w / 2 + 9;
+        text(nameTxt, x0, y + 1, { size: 16, weight: 800, color: r.kind === 'chat' ? col : '#fff', align: 'left', maxW: 130, stroke: r.kind === 'chat' && team === 3 ? 3 : 0, strokeColor: '#333' });
+        if (body) text(body, x0 + nw + 10, y + 1, { size: 16, weight: 600, color: '#111', align: 'left', maxW: tw });
+      }
+    }
+    // ai không còn nhãn thì quên hàng cũ
+    if (laneMem.size > 80) laneMem.clear();
   }
   function drawRope(t) {
     const m = curMatch();
@@ -951,7 +1017,7 @@
     }
     if (!giftBanner) return;
     const b = giftBanner;
-    const y = 290;
+    const y = 266;
     const w = 860;
     const x = (W - w) / 2;
     panel(x, y, w, 64, { r: 16, fill: 'rgba(255,255,255,.95)', glow: teamColor(b.team) });
@@ -1060,7 +1126,7 @@
     const fb = ph.phase === 'intro' ? 0 : live.fb || 0;
     const target = fa + fb > 0.01 ? fa / (fa + fb) : 0.5;
     shareA += (target - shareA) * Math.min(1, dt * 3);
-    const y = 520;
+    const y = 362;
     const PW = 296;
     const side = (s, team, list, share, x, align) => {
       const humans = list.filter((p) => !p.npc).length;
@@ -1191,6 +1257,7 @@
     const m = curMatch();
     const fieldPhase = m && (ph.phase === 'intro' || ph.phase === 'pull' || ph.phase === 'matchEnd');
     labelBoxes = [];
+    labelReqs = [];
     if (fieldPhase) {
       const la = roster.lineA;
       const lb = roster.lineB;
@@ -1207,6 +1274,7 @@
       drawOverheads(backA.concat(frontA), 'a', t);
       drawOverheads(backB.concat(frontB), 'b', t);
       drawShouts(t);
+      drawLabels(m, t);
       if (live.sleep > 0) text('😴 Zzz', GAP_C, 640, { size: 40, weight: 900, color: '#a5d8ff', stroke: 6 });
     } else drawCrowd(t);
     drawParticles(dt);
