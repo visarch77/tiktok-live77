@@ -190,7 +190,8 @@
       banner = { text: m.label.toUpperCase(), sub: `${teamLabel(m.a)}  VS  ${teamLabel(m.b)}`, color: '#fff', until: ph.phaseEndsAt - clockOffset - 3000 };
     } else if (next === 'pull') {
       banner = { text: L('KÉO!', 'PULL!'), color: '#ffe066', until: Date.now() + 1100, big: true };
-      if (unlocked) audio.countdownGo();
+      lastCount = 0;
+      startWhistle();
     } else if (next === 'matchEnd') {
       // fx 'matchEnd' tới cùng lúc: vẽ trong onFx
     } else if (next === 'draw') {
@@ -716,12 +717,24 @@
     tr.el.volume = 1;
     tr.el.play().catch(() => {});
   }
+  // Nhạc "Bài chờ" (mặc định khi chưa có file nhạc kéo riêng): trận đấu dùng luôn 2 bài nhạc chờ, phòng chờ phát một bài,
+  // trận phát bài kia (đổi theo trận); 10 giây cuối bài chạy nhanh dần tới ×1,15 (giữ nguyên giọng) cho dồn dập
+  const tracksInMatch = () => !usePullFiles() && (!settings.pullMusic || settings.pullMusic === 'auto' || settings.pullMusic === 'tracks');
   function musicTick(dt) {
     const resting = ph.phase === 'lobby' || ph.phase === 'draw' || ph.phase === 'champion';
-    const want = unlocked && !previewMuted && settings.bgMusicEnabled !== false && resting;
-    const cur = (ph.cup || 0) % lobbyTracks.length;
+    const field = ph.phase === 'intro' || ph.phase === 'pull';
+    const inMatch = field && tracksInMatch();
+    const want = unlocked && !previewMuted && settings.bgMusicEnabled !== false && (resting || inMatch);
+    const cup = ph.cup || 0;
+    const cur = inMatch ? (cup + 1 + Math.max(0, ph.matchIdx)) % lobbyTracks.length : cup % lobbyTracks.length;
+    const left = (ph.phaseEndsAt - now()) / 1000;
+    const rate = ph.phase === 'pull' && inMatch && left < 10.5 ? 1 + 0.15 * Math.min(1, (10.5 - left) / 3) : 1;
     lobbyTracks.forEach((tr, i) => {
       const target = want && i === cur ? tr.gain : 0;
+      if (Math.abs(tr.el.playbackRate - (i === cur ? rate : 1)) > 0.005) {
+        tr.el.preservesPitch = true;
+        tr.el.playbackRate = i === cur ? rate : 1;
+      }
       tr.vol += (target - tr.vol) * Math.min(1, dt * (target > tr.vol ? 2.5 : 4.5));
       if (target === 0 && tr.vol < 0.01) {
         tr.vol = 0;
@@ -739,6 +752,9 @@
     if (usePullFiles()) {
       music.on = false;
       filePullMusic(dt, pulling);
+    } else if (tracksInMatch()) {
+      music.on = false;
+      if (pullFiles.pull_main) filePullMusic(dt, false);
     } else {
       if (pullFiles.pull_main) filePullMusic(dt, false);
       pullMusic();
@@ -2156,6 +2172,7 @@
     const m = curMatch();
     if (!m || (ph.phase !== 'pull' && ph.phase !== 'intro')) return;
     if (ph.phase === 'pull') drawBigTimer(t);
+    if (ph.phase === 'intro') drawIntroCount(t);
     const info = (list, team, x, align) => {
       const humans = list.filter((p) => !p.npc).length;
       const bots = list.length - humans;
@@ -2169,6 +2186,44 @@
     };
     info(roster.lineA, m.a, MX + 18, 'left');
     info(roster.lineB, m.b, W - MX - 18, 'right');
+  }
+  // Đếm ngược 3-2-1 trước khi kéo: số to nảy giữa màn hình + tiếng "píp" (số 1 cao hơn); vào trận thì còi trọng tài
+  let lastCount = 0;
+  function countBeep(n) {
+    if (!unlocked || previewMuted) return;
+    const c = audio.ensure();
+    if (!c) return;
+    const T = c.currentTime + 0.02;
+    const f = n === 1 ? 1320 : 880;
+    audio.osc(f, T, 0.16, { type: 'triangle', vol: 0.14, attack: 0.003 });
+    audio.osc(f * 2, T, 0.08, { type: 'sine', vol: 0.04, attack: 0.002 });
+  }
+  function startWhistle() {
+    if (!unlocked || previewMuted) return;
+    const c = audio.ensure();
+    if (!c) return;
+    const T = c.currentTime + 0.02;
+    // còi trọng tài "tuýt—": hai sóng sin gần nhau tạo tiếng rè của còi + rung nhanh
+    for (const f of [2750, 2890]) audio.osc(f, T, 0.55, { type: 'sine', vol: 0.06, attack: 0.01, slide: -60 });
+    audio.noise(T, 0.5, { vol: 0.03, type: 'bandpass', freq: 2800, q: 4 });
+    audio.noise(T + 0.1, 1, { vol: 0.05, type: 'bandpass', freq: 1400, q: 0.6 }); // khán giả ồ lên
+  }
+  function drawIntroCount(t) {
+    const ms = ph.phaseEndsAt - now();
+    const n = Math.ceil(ms / 1000);
+    if (n < 1 || n > 3) return;
+    if (n !== lastCount) {
+      lastCount = n;
+      countBeep(n);
+    }
+    const frac = n - ms / 1000;
+    const pop = 1 + Math.max(0, 0.25 - frac) / 0.25 * 0.4;
+    g.save();
+    g.translate(W / 2, Y_CLOSE + 72);
+    g.scale(pop, pop);
+    g.globalAlpha = Math.min(1, (1 - frac) * 3);
+    text(String(n), 0, 0, { size: 120, weight: 900, color: n === 1 ? '#ff6b6b' : '#ffe066', stroke: 10 });
+    g.restore();
   }
   // Đồng hồ đếm ngược số to giữa màn hình: mỗi giây số nảy lên; 10 giây cuối đỏ, rung + tích tắc; phút chót màu cam
   let lastTickSec = -1;
