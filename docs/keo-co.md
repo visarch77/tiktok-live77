@@ -128,6 +128,14 @@ Bố cục chừa chỗ cho giao diện TikTok LIVE: hai lề 48 px; trên cùng
   dùng tư thế gần nhất) vẽ bằng GPT Image qua Scenario, gộp thành 4 atlas
   `atlas_t1..4.webp` (băng đô đổi màu theo đội) + `atlas.json` (khung + điểm nắm dây).
 
+## Âm nhạc
+
+- **Chờ giải / bốc thăm / vinh danh**: 2 bản nhạc chờ của phòng Squid (`assets/redlight/lobby_1.m4a`, `lobby_2.m4a`), đổi bài theo số giải,
+  vào/ra nhỏ dần.
+- **Lúc kéo**: hành khúc "ùm-pa" tự tạo bằng WebAudio (không dùng file, không dính bản quyền) — Đô trưởng 8 ô nhịp lặp: tuba "ùm" phách 1–3,
+  hợp âm "pa" phách 2–4, kick + snare + hi-hat, giai điệu kiểu kèn kazoo (sawtooth có rung qua lọc dải), còi trượt hoạt hình cuối mỗi 4 ô.
+  10 giây cuối: 128 → 156 BPM và lên 2 cung; dây sát mép vực: thêm nốt trầm rung dồn dập. Âm lượng theo "Âm lượng nhạc nền", tắt theo "Nhạc chờ".
+
 ## Hiệu ứng kỹ năng
 
 Mỗi lần dùng kỹ năng: **thẻ to** bên phía đội dùng (ảnh quà + tên kỹ năng + một câu nói rõ chuyện gì xảy ra, vd. "💨 THẢ BOOM! 5 người

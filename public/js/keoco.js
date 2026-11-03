@@ -505,11 +505,15 @@
   let previewMuted = PREVIEW;
   let unlocked = false;
   audio.setMuted(previewMuted);
-  const lobbyEl = new Audio('/assets/redlight/lobby_2.m4a');
-  lobbyEl.loop = true;
-  lobbyEl.preload = 'auto';
-  let lobbyWired = false;
-  let lobbyVol = 0;
+  // Nhạc chờ: 2 bản nhạc chờ của phòng Squid (lobby_1 / lobby_2), đổi bài theo số giải; bản 1 to hơn ~3 dB nên hạ bớt
+  const lobbyTracks = [
+    { el: new Audio('/assets/redlight/lobby_1.m4a?v=26'), gain: 0.72, wired: false, vol: 0 },
+    { el: new Audio('/assets/redlight/lobby_2.m4a?v=26'), gain: 1, wired: false, vol: 0 }
+  ];
+  for (const tr of lobbyTracks) {
+    tr.el.loop = true;
+    tr.el.preload = 'auto';
+  }
   function unlock() {
     if (previewMuted) return;
     unlocked = true;
@@ -531,28 +535,139 @@
   function applyAudioSettings() {
     audio.configure({ musicOn: settings.bgMusicEnabled !== false, sfxOn: true, musicVolume: settings.musicVolume ?? 0.5 });
   }
-  // nhạc chờ (lúc chờ giải / vô địch) + trống "hò dô" lúc kéo (nhanh dần 10 giây cuối)
-  let beatAt = 0;
+  // Nhạc: chờ giải / vinh danh = nhạc chờ Squid; lúc kéo = hành khúc "ùm-pa" tự sáng tác (kèn tuba, kazoo, trống, còi trượt)
   function musicTick(dt) {
-    const tn = performance.now();
-    const want = unlocked && !previewMuted && settings.bgMusicEnabled !== false && (ph.phase === 'lobby' || ph.phase === 'draw' || ph.phase === 'champion');
-    lobbyVol += ((want ? 0.8 : 0) - lobbyVol) * Math.min(1, dt * 2.5);
-    if (lobbyVol > 0.01) {
-      if (!lobbyWired) lobbyWired = audio.connectMusic(lobbyEl);
-      lobbyEl.volume = Math.max(0, Math.min(1, lobbyVol));
-      if (lobbyEl.paused) lobbyEl.play().catch(() => {});
-    } else if (!lobbyEl.paused) lobbyEl.pause();
-    if (unlocked && ph.phase === 'pull' && !previewMuted) {
-      const left = (ph.phaseEndsAt - now()) / 1000;
-      const gap = left < 10 ? 330 : 520;
-      if (tn - beatAt > gap) {
-        beatAt = tn;
-        const c = audio.ensure();
-        if (c) {
-          audio.kick(c.currentTime, 0.32);
-          audio.hat(c.currentTime + gap / 2000, 0.05);
+    const resting = ph.phase === 'lobby' || ph.phase === 'draw' || ph.phase === 'champion';
+    const want = unlocked && !previewMuted && settings.bgMusicEnabled !== false && resting;
+    const cur = (ph.cup || 0) % lobbyTracks.length;
+    lobbyTracks.forEach((tr, i) => {
+      const target = want && i === cur ? tr.gain : 0;
+      tr.vol += (target - tr.vol) * Math.min(1, dt * (target > tr.vol ? 2.5 : 4.5));
+      if (target === 0 && tr.vol < 0.01) {
+        tr.vol = 0;
+        if (!tr.el.paused) {
+          tr.el.pause();
+          tr.el.currentTime = 0;
         }
+        return;
       }
+      if (!tr.wired) tr.wired = audio.connectMusic(tr.el);
+      tr.el.volume = Math.max(0, Math.min(1, tr.vol));
+      if (tr.el.paused) tr.el.play().catch(() => {});
+    });
+    pullMusic();
+  }
+
+  // ---- Hành khúc kéo co: Đô trưởng, 8 ô nhịp lặp lại, mỗi ô 8 móc đơn ----
+  // Giai điệu kiểu kèn kazoo (null = nghỉ), hợp âm cho tuba "ùm" (nốt gốc) + "pa" (hợp âm ngắn) xen kẽ
+  const MEL = [
+    [64, 67, 64, 67, 72, null, 67, null],
+    [71, null, 67, null, 62, null, null, null],
+    [64, 67, 64, 67, 72, null, 76, null],
+    [77, null, 76, null, 74, 72, 71, null],
+    [72, 72, 67, 67, 64, 64, 60, null],
+    [62, 64, 65, 67, 69, 71, 72, null],
+    [76, null, 72, null, 69, null, 65, null],
+    [67, null, 71, null, 74, null, 79, null]
+  ];
+  const CHORDS = [[48, 52, 55], [43, 47, 50], [48, 52, 55], [41, 45, 48], [48, 52, 55], [43, 47, 50], [45, 48, 52], [43, 47, 53]];
+  const mfreq = (m) => 440 * Math.pow(2, (m - 69) / 12);
+  const music = { on: false, next: 0, step: 0 };
+  function kazoo(m, at, dur, vol) {
+    const c = audio.ensure();
+    if (!c) return;
+    const f = mfreq(m);
+    const o = c.createOscillator();
+    const lfo = c.createOscillator();
+    const lg = c.createGain();
+    const bp = c.createBiquadFilter();
+    const gn = c.createGain();
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(f * 0.97, at); // trượt nhẹ vào nốt cho "kazoo"
+    o.frequency.exponentialRampToValueAtTime(f, at + 0.04);
+    lfo.frequency.value = 7;
+    lg.gain.value = f * 0.018;
+    lfo.connect(lg).connect(o.frequency);
+    bp.type = 'bandpass';
+    bp.frequency.value = Math.min(3000, f * 3);
+    bp.Q.value = 1.4;
+    gn.gain.setValueAtTime(0.0001, at);
+    gn.gain.exponentialRampToValueAtTime(vol, at + 0.02);
+    gn.gain.setValueAtTime(vol, at + Math.max(0.03, dur - 0.05));
+    gn.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+    o.connect(bp).connect(gn).connect(audio.musicBus);
+    o.start(at);
+    lfo.start(at);
+    o.stop(at + dur + 0.05);
+    lfo.stop(at + dur + 0.05);
+  }
+  function tuba(m, at, dur, vol) {
+    const c = audio.ensure();
+    if (!c) return;
+    const o = c.createOscillator();
+    const lp = c.createBiquadFilter();
+    const gn = c.createGain();
+    o.type = 'square';
+    o.frequency.value = mfreq(m);
+    lp.type = 'lowpass';
+    lp.frequency.value = 420;
+    gn.gain.setValueAtTime(0.0001, at);
+    gn.gain.exponentialRampToValueAtTime(vol, at + 0.015);
+    gn.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+    o.connect(lp).connect(gn).connect(audio.musicBus);
+    o.start(at);
+    o.stop(at + dur + 0.05);
+  }
+  function snare(at, vol) {
+    audio.noise(at, 0.12, { vol, type: 'bandpass', freq: 1800, q: 0.8, bus: 'music' });
+    audio.osc(190, at, 0.07, { type: 'triangle', vol: vol * 0.6, slide: -60, attack: 0.002, bus: 'music' });
+  }
+  function slideWhistle(at, up) {
+    audio.osc(up ? 700 : 1900, at, 0.55, { type: 'sine', vol: 0.09, slide: up ? 1200 : -1200, attack: 0.03, bus: 'music' });
+  }
+  function pullMusic() {
+    const c = audio.ctx;
+    const play = unlocked && !previewMuted && settings.bgMusicEnabled !== false && ph.phase === 'pull' && c;
+    if (!play) {
+      music.on = false;
+      return;
+    }
+    if (!music.on) {
+      music.on = true;
+      music.step = 0;
+      music.next = c.currentTime + 0.08;
+    }
+    const left = (ph.phaseEndsAt - now()) / 1000;
+    const hurry = left < 10; // 10 giây cuối: nhanh hơn + lên giọng
+    const bpm = hurry ? 156 : 128;
+    const eighth = 60 / bpm / 2;
+    const tr = hurry ? 2 : 0;
+    const danger = Math.abs(ropeX) > 0.6; // sát mép vực: thêm lớp căng thẳng
+    while (music.next < c.currentTime + 0.25) {
+      const at = music.next;
+      const bar = Math.floor(music.step / 8) % 8;
+      const e = music.step % 8;
+      const ch = CHORDS[bar];
+      // tuba "ùm" ở phách 1, 3 · "pa" (hợp âm ngắn) ở phách 2, 4
+      if (e === 0 || e === 4) tuba(ch[0] - 12 + tr, at, eighth * 1.6, 0.16);
+      if (e === 2 || e === 6) for (const n of ch) audio.osc(mfreq(n + 12 + tr), at, eighth * 0.7, { type: 'triangle', vol: 0.045, attack: 0.004, bus: 'music' });
+      // trống: kick phách 1, 3 · snare phách 2, 4 · hi-hat mỗi móc đơn
+      if (e === 0 || e === 4) audio.kick(at, 0.28);
+      if (e === 2 || e === 6) snare(at, 0.12);
+      audio.hat(at, e % 2 ? 0.025 : 0.04);
+      // giai điệu kazoo
+      const note = MEL[bar][e];
+      if (note) {
+        let len = 1;
+        while (e + len < 8 && MEL[bar][e + len] === null && len < 2) len++;
+        kazoo(note + tr, at, eighth * len * 0.92, 0.075);
+      }
+      // còi trượt hoạt hình: cuối mỗi 4 ô nhịp
+      if (e === 7 && bar % 4 === 3) slideWhistle(at, bar === 3);
+      // lớp căng thẳng: nốt trầm rung dồn dập
+      if (danger) audio.osc(mfreq(36 + tr), at, eighth * 0.45, { type: 'sawtooth', vol: 0.05, attack: 0.003, bus: 'music' });
+      music.step++;
+      music.next += eighth;
     }
   }
   // giọng đọc
