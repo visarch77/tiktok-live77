@@ -99,7 +99,7 @@ Bố cục chừa chỗ cho giao diện TikTok LIVE: hai lề 48 px; trên cùng
 | :--- | :--- |
 | 184–330 | Tên giải + đồng hồ, sơ đồ BK1 · BK2 · CK |
 | 338–398 | **Thông báo đội ở giữa**: "🔥 BÁN KẾT 1: ĐỘI … vs ĐỘI …" + trận tiếp theo / tin vào đội (băng quà đè lên 2,6 s) |
-| 406–476 | **Thanh đỏ–xanh gộp %**: % + tên đội trong thanh, nút dây 🪢 có lửa 3 lớp + quầng nóng + tàn lửa, thanh nảy theo độ căng, giật khi % đổi mạnh |
+| 406–476 | **Thanh đỏ–xanh gộp %**: hai màu đội đặc (không mờ), % + tên đội chữ trắng viền tối, vạch trắng + nút dây 🪢 ở chỗ giáp ranh, mũi tên » chạy trong phần đội đang bị kéo, % nhún nhẹ khi đổi mạnh |
 | 484–640 | Cận cảnh hai người đầu dây; hai góc: số người (+🤖), 👑 người kéo khoẻ nhất |
 | 640–720 | Dải bình luận (3 hàng) có đường chỉ xuống tên trên đầu |
 | 745–880 | Sân kéo |

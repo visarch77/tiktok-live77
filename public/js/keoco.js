@@ -881,7 +881,8 @@
     });
   }
 
-  // Thanh đỏ–xanh (vị trí dây) gộp % lực hai đội, lửa cháy dữ dội ở nút dây, nảy theo độ căng
+  // Thanh đỏ–xanh (vị trí dây) gộp % lực hai đội: màu đội đặc cho rõ, nút dây ở chỗ giáp ranh,
+  // mũi tên » chạy về phía đội đang bị kéo; khi % đổi mạnh thì số % nhún nhẹ
   let shareA = 0.5;
   let barKick = 0;
   let lastPct = 50;
@@ -889,10 +890,11 @@
     const m = curMatch();
     const x = MX;
     const w = CW;
+    const y = Y_BAR;
     const field = m && (ph.phase === 'intro' || ph.phase === 'pull' || ph.phase === 'matchEnd');
     if (!field) {
-      panel(x, Y_BAR, w, BAR_H, { r: 35, fill: 'rgba(0,0,0,.55)', border: '#ffe066' });
-      text(L('💬 Bình luận 1 · 2 · 3 · 4 để vào đội', '💬 Comment 1 · 2 · 3 · 4 to join a team'), W / 2, Y_BAR + BAR_H / 2, { size: 26, weight: 900, color: '#ffe066' });
+      panel(x, y, w, BAR_H, { r: 35, fill: 'rgba(0,0,0,.6)', border: '#ffe066' });
+      text(L('💬 Bình luận 1 · 2 · 3 · 4 để vào đội', '💬 Comment 1 · 2 · 3 · 4 to join a team'), W / 2, y + BAR_H / 2, { size: 26, weight: 900, color: '#ffe066' });
       return;
     }
     const fa = ph.phase === 'pull' ? live.fa || 0 : 0;
@@ -901,118 +903,74 @@
     shareA += (target - shareA) * Math.min(1, dt * 3);
     const pctA = Math.round(shareA * 100);
     if (Math.abs(pctA - lastPct) >= 3) {
-      barKick = Math.min(1, barKick + 0.5); // đổi lực mạnh → giật nảy
+      barKick = 1;
       lastPct = pctA;
     }
-    barKick = Math.max(0, barKick - dt * 2.5);
-    const heat = Math.min(1.6, 0.35 + tension * 0.7 + Math.abs(ropeVel) * 10 + barKick * 0.6); // độ "cháy"
-    const bounce = Math.sin(t / 55) * 2.5 * heat + Math.sin(t / 23) * barKick * 5;
-    const y = Y_BAR + bounce;
+    barKick = Math.max(0, barKick - dt * 3);
     const pos = 0.5 + ropeX / 2; // 0 = sát đội a
     const mk = x + w * (1 - pos);
-    // nền + hai nửa màu đội
-    g.save();
-    g.shadowColor = '#ff6a00';
-    g.shadowBlur = 18 + heat * 22;
-    roundRect(x, y, w, BAR_H, BAR_H / 2);
-    g.fillStyle = '#120a14';
+    // khung + hai nửa màu đội đặc
+    roundRect(x - 3, y - 3, w + 6, BAR_H + 6, (BAR_H + 6) / 2);
+    g.fillStyle = 'rgba(0,0,0,.75)';
     g.fill();
-    g.restore();
     g.save();
     roundRect(x, y, w, BAR_H, BAR_H / 2);
     g.clip();
-    const half = (x0, x1, col) => {
-      const gr = g.createLinearGradient(0, y, 0, y + BAR_H);
-      gr.addColorStop(0, '#ffffff55');
-      gr.addColorStop(0.35, col);
-      gr.addColorStop(1, '#00000066');
-      g.fillStyle = gr;
-      g.fillRect(x0, y, x1 - x0, BAR_H);
-      // sọc năng lượng chạy về phía nút dây
-      g.globalAlpha = 0.18;
-      g.fillStyle = '#fff';
-      const dir = x0 < mk ? 1 : -1;
-      const off = ((t / 6) % 40) * dir;
-      for (let sx = x0 - 40; sx < x1 + 40; sx += 40) {
+    g.fillStyle = teamColor(m.a);
+    g.fillRect(x, y, mk - x, BAR_H);
+    g.fillStyle = teamColor(m.b);
+    g.fillRect(mk, y, x + w - mk, BAR_H);
+    // bóng nhẹ phía dưới cho có khối (không làm mờ màu)
+    g.fillStyle = 'rgba(0,0,0,.18)';
+    g.fillRect(x, y + BAR_H * 0.62, w, BAR_H * 0.38);
+    // mũi tên » chạy về phía đội đang bị kéo (dây đang trôi về đâu)
+    const dir = Math.abs(ropeVel) < 0.01 ? 0 : ropeVel > 0 ? 1 : -1; // 1 = về phía đội b
+    if (dir) {
+      const step = 34;
+      const off = ((t / 12) % step) * dir;
+      const from = dir > 0 ? x : mk;
+      const to = dir > 0 ? mk : x + w;
+      for (let ax = from - step; ax < to + step; ax += step) {
+        const cx = ax + off;
+        if (cx < from + 8 || cx > to - 8) continue;
         g.beginPath();
-        g.moveTo(sx + off, y);
-        g.lineTo(sx + off + 16, y);
-        g.lineTo(sx + off - 8, y + BAR_H);
-        g.lineTo(sx + off - 24, y + BAR_H);
-        g.closePath();
-        g.fill();
-      }
-      g.globalAlpha = 1;
-    };
-    half(x, mk, teamColor(m.a));
-    half(mk, x + w, teamColor(m.b));
-    g.restore();
-    roundRect(x, y, w, BAR_H, BAR_H / 2);
-    g.lineWidth = 3;
-    g.strokeStyle = 'rgba(255,255,255,.55)';
-    g.stroke();
-    // lửa ở nút dây: 3 lớp (đỏ ngoài, cam giữa, vàng lõi), lưỡi lửa liếm lên, cao theo độ "cháy"
-    const tongue = (fx, base, fh, fw, col, sway) => {
-      g.fillStyle = col;
-      g.beginPath();
-      g.moveTo(fx - fw, base);
-      g.bezierCurveTo(fx - fw, base - fh * 0.45, fx - fw * 0.2 + sway * 0.5, base - fh * 0.7, fx + sway, base - fh);
-      g.bezierCurveTo(fx + fw * 0.3 + sway * 0.5, base - fh * 0.65, fx + fw, base - fh * 0.4, fx + fw, base);
-      g.closePath();
-      g.fill();
-    };
-    const base = y + BAR_H * 0.62;
-    // quầng sáng nóng quanh nút dây
-    const glow = g.createRadialGradient(mk, y + BAR_H / 2, 4, mk, y + BAR_H / 2, 70 + heat * 40);
-    glow.addColorStop(0, 'rgba(255,170,40,0.55)');
-    glow.addColorStop(1, 'rgba(255,60,0,0)');
-    g.fillStyle = glow;
-    g.fillRect(mk - 120, y - 60, 240, BAR_H + 90);
-    const layers = [
-      { n: 7, h: 1.0, w: 15, col: 'rgba(255,40,10,0.55)' },
-      { n: 6, h: 0.78, w: 11, col: 'rgba(255,120,0,0.75)' },
-      { n: 5, h: 0.52, w: 7, col: 'rgba(255,215,60,0.9)' }
-    ];
-    for (const ly of layers) {
-      for (let i = 0; i < ly.n; i++) {
-        const ph0 = i * 2.1 + ly.h * 3;
-        const fx = mk + (i - (ly.n - 1) / 2) * (11 + heat * 4) + Math.sin(t / 110 + ph0) * 5;
-        const fh = (48 + 52 * heat) * ly.h * (0.68 + 0.32 * Math.sin(t / 41 + ph0 * 1.7));
-        tongue(fx, base, fh, ly.w * (0.8 + heat * 0.25), ly.col, Math.sin(t / 65 + ph0) * 8 * heat);
+        g.moveTo(cx - 6 * dir, y + 16);
+        g.lineTo(cx + 6 * dir, y + BAR_H / 2);
+        g.lineTo(cx - 6 * dir, y + BAR_H - 16);
+        g.lineWidth = 5;
+        g.strokeStyle = 'rgba(255,255,255,.35)';
+        g.stroke();
       }
     }
-    // tàn lửa bay lên
-    if (Math.random() < dt * (6 + heat * 18)) particles.push({ kind: 'ember', x: mk + (Math.random() - 0.5) * 30, y: y + 10, vx: (Math.random() - 0.5) * 80, vy: -90 - Math.random() * 120 * heat, life: 0.6 + Math.random() * 0.6, t: 0, r: 2 + Math.random() * 2.5 });
-    // nút dây
-    g.save();
-    g.translate(mk, y + BAR_H / 2);
-    g.rotate(Math.sin(t / 80) * 0.15 * heat);
-    g.fillStyle = '#fff';
-    g.beginPath();
-    g.arc(0, 0, 22 + barKick * 6, 0, Math.PI * 2);
-    g.fill();
-    text('🪢', 0, 1, { size: 26 });
     g.restore();
-    // % + tên đội nằm trong thanh
-    const sc = 1 + barKick * 0.25;
-    g.font = `900 38px ${FONT}`;
+    // vạch giáp ranh + nút dây
+    g.fillStyle = '#fff';
+    g.fillRect(mk - 2, y - 6, 4, BAR_H + 12);
+    g.beginPath();
+    g.arc(mk, y + BAR_H / 2, 24, 0, Math.PI * 2);
+    g.fill();
+    g.lineWidth = 3;
+    g.strokeStyle = '#222';
+    g.stroke();
+    text('🪢', mk, y + BAR_H / 2 + 1, { size: 26 });
+    // % + tên đội trong thanh (chữ trắng viền tối, đọc rõ trên mọi màu đội)
+    const sc = 1 + barKick * 0.15;
+    g.font = `900 40px ${FONT}`;
     const pwA = g.measureText(`${pctA}%`).width;
     const pwB = g.measureText(`${100 - pctA}%`).width;
-    g.save();
-    g.translate(x + 26, y + BAR_H / 2);
-    g.scale(sc, sc);
-    text(`${pctA}%`, 0, 0, { size: 38, weight: 900, color: '#fff', align: 'left', stroke: 6 });
-    g.restore();
-    g.save();
-    g.translate(x + w - 26, y + BAR_H / 2);
-    g.scale(sc, sc);
-    text(`${100 - pctA}%`, 0, 0, { size: 38, weight: 900, color: '#fff', align: 'right', stroke: 6 });
-    g.restore();
-    // tên đội ngay sau số %, chỉ vẽ khi còn chỗ trước nút dây
-    const nax = x + 26 + pwA + 16;
-    const nbx = x + w - 26 - pwB - 16;
-    if (mk - 40 - nax > 70) text(teamLabel(m.a), nax, y + BAR_H / 2, { size: 17, weight: 900, color: '#fff', align: 'left', stroke: 4, maxW: mk - 40 - nax });
-    if (nbx - (mk + 40) > 70) text(teamLabel(m.b), nbx, y + BAR_H / 2, { size: 17, weight: 900, color: '#fff', align: 'right', stroke: 4, maxW: nbx - mk - 40 });
+    const pct = (val, px, align) => {
+      g.save();
+      g.translate(px, y + BAR_H / 2);
+      g.scale(sc, sc);
+      text(`${val}%`, 0, 0, { size: 40, weight: 900, color: '#fff', align, stroke: 7, strokeColor: 'rgba(0,0,0,.8)' });
+      g.restore();
+    };
+    pct(pctA, x + 28, 'left');
+    pct(100 - pctA, x + w - 28, 'right');
+    const nax = x + 28 + pwA + 14;
+    const nbx = x + w - 28 - pwB - 14;
+    if (mk - 36 - nax > 70) text(teamLabel(m.a), nax, y + BAR_H / 2, { size: 18, weight: 900, color: '#fff', align: 'left', stroke: 5, strokeColor: 'rgba(0,0,0,.8)', maxW: mk - 36 - nax });
+    if (nbx - (mk + 36) > 70) text(teamLabel(m.b), nbx, y + BAR_H / 2, { size: 18, weight: 900, color: '#fff', align: 'right', stroke: 5, strokeColor: 'rgba(0,0,0,.8)', maxW: nbx - mk - 36 });
     // hiệu ứng kỹ năng đang có của mỗi đội (ngay dưới thanh)
     const effs = (te, ex, align) => {
       if (!te) return;
@@ -1186,13 +1144,6 @@
         g.fillStyle = i % 2 ? '#d8f36a' : '#b5d33d';
         g.beginPath();
         g.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        g.fill();
-      } else if (p.kind === 'ember') {
-        p.vx *= 0.96;
-        g.globalAlpha = k;
-        g.fillStyle = k > 0.5 ? '#ffd43b' : '#ff6a00';
-        g.beginPath();
-        g.arc(p.x, p.y, p.r * k + 0.5, 0, Math.PI * 2);
         g.fill();
       } else if (p.kind === 'dust') {
         p.r += dt * 14;
