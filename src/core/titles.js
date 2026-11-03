@@ -4,7 +4,8 @@
  * Cấp độ (màu + hiệu ứng tên): kinh nghiệm XP = ván đã chơi ×10 + thắng ×30 + lên bục ×20 + MVP ×30 + vô địch ×80
  *   + xu quà đã tặng ×5. Tặng quà nhiều thì lên cấp nhanh, chơi đều đặn cũng lên được.
  * Danh hiệu: theo việc làm nhiều nhất (dùng kỹ năng nào, bị trúng gì...), 3 bậc ★ / ★★ / ★★★.
- * Hiển thị danh hiệu cao nhất (bậc cao hơn trước, cùng bậc thì cái vượt ngưỡng xa hơn).
+ * Hiển thị danh hiệu cao nhất: bậc cao hơn trước; cùng bậc thì danh hiệu vui (theo kỹ năng / tình huống) hơn danh hiệu chung
+ * (ván, thắng, cúp); cuối cùng là cái vượt ngưỡng xa hơn.
  */
 const LEVELS = [
   { lv: 1, vi: 'Tân binh', en: 'Rookie', xp: 0 },
@@ -20,10 +21,12 @@ const STD = [10, 50, 200];
 // stat → danh hiệu. Đèn Xanh – Đèn Đỏ: it_<loại quà>, rl_shot · Kéo Co: sk_<kỹ năng>, kc_<bị trúng> · chung: rounds, wins, coins...
 const TITLES = [
   { stat: 'coins', emoji: '💎', vi: 'Đại gia', en: 'Big Spender', at: [100, 1000, 10000] },
-  { stat: 'cups', emoji: '🏆', vi: 'Nhà vô địch', en: 'Champion', at: [1, 5, 20] },
-  { stat: 'wins', emoji: '🏅', vi: 'Chiến thần', en: 'War God', at: [5, 25, 100] },
+  // chung (generic): chỉ đeo khi chưa có danh hiệu vui cùng bậc. Nhà vô địch tính theo giải Kéo Co đội mình vô địch
+  // (một đội tới 20 người nên mốc phải cao, không thì ai cũng có)
+  { stat: 'cups', emoji: '🏆', vi: 'Nhà vô địch', en: 'Champion', at: [3, 10, 30], generic: true },
+  { stat: 'wins', emoji: '🏅', vi: 'Chiến thần', en: 'War God', at: [10, 50, 200], generic: true },
   { stat: 'mvp', emoji: '🪢', vi: 'Vua kéo co', en: 'Tug King', at: [3, 15, 50] },
-  { stat: 'rounds', emoji: '🎖️', vi: 'Lão làng', en: 'Veteran', at: [20, 100, 400] },
+  { stat: 'rounds', emoji: '🎖️', vi: 'Lão làng', en: 'Veteran', at: [20, 100, 400], generic: true },
   // Đèn Xanh – Đèn Đỏ
   { stat: 'it_turbo', emoji: '👟', vi: 'Vua tốc độ', en: 'Speed King', at: STD },
   { stat: 'it_clones', emoji: '👥', vi: 'Ảo thuật gia', en: 'Magician', at: STD },
@@ -76,7 +79,7 @@ function bestTitle(s = {}) {
   for (const def of TITLES) {
     const tier = tierOf(def, s);
     if (!tier) continue;
-    const score = tier * 1000 + Math.min(999, ((s[def.stat] || 0) / def.at[tier - 1]) * 100);
+    const score = tier * 1000 + (def.generic ? 0 : 500) + Math.min(499, ((s[def.stat] || 0) / def.at[tier - 1]) * 100);
     if (!best || score > best.score) best = { def, tier, score };
   }
   return best;
