@@ -346,9 +346,17 @@
     }
     if (!songWired) songWired = audio.connectVoice(songEl);
     if (Math.abs(songEl.playbackRate - st.rate) > 0.005) songEl.playbackRate = st.rate;
-    if (Math.abs(songEl.currentTime - st.pos) > 0.15) songEl.currentTime = st.pos;
+    // Điện thoại: currentTime cập nhật thưa và nhảy chỗ (seek) chậm → lệch 0,15 s là nhảy liên tục, tiếng hát giật;
+    // nới ngưỡng và giãn cách mỗi lần nhảy. Máy tính / OBS giữ như cũ.
+    const off = Math.abs(songEl.currentTime - st.pos);
+    const tn = performance.now();
+    if (songEl.paused || !FILL ? off > 0.15 : off > 0.6 && tn - songSeekAt > 2000) {
+      songEl.currentTime = st.pos;
+      songSeekAt = tn;
+    }
     if (songEl.paused) songEl.play().catch(() => {});
   }
+  let songSeekAt = 0;
 
   // Nhạc nền lúc nghỉ chờ ván mới (sau nhạc kết quả 2,5 giây → hết lúc chờ): hai bản thay phiên theo số ván,
   // lặp lại nếu thời gian chờ dài hơn bản nhạc; vào ván thì nhỏ dần rồi dừng.
