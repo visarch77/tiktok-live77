@@ -222,6 +222,19 @@
   }
   window.addEventListener('pointerdown', unlock);
   if (OBS) setTimeout(unlock, 300);
+  // Điện thoại: chạm màn hình là vào chế độ toàn màn hình (Android Chrome, iPad; iPhone Safari không hỗ trợ —
+  // dùng "Thêm vào MH chính"). Thoát toàn màn hình rồi chạm lại là vào lại.
+  if (FILL) {
+    window.addEventListener('pointerdown', () => {
+      const el = document.documentElement;
+      const req = el.requestFullscreen || el.webkitRequestFullscreen;
+      if (!req || document.fullscreenElement || document.webkitFullscreenElement) return;
+      try {
+        const p = req.call(el, { navigationUI: 'hide' });
+        if (p && p.catch) p.catch(() => {});
+      } catch (_) {}
+    });
+  }
   addEventListener('message', (e) => {
     if (e.origin !== location.origin || !e.data || e.data.type !== 'preview-audio') return;
     previewMuted = !e.data.on;
