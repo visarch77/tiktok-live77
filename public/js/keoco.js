@@ -881,20 +881,25 @@
     });
   }
 
-  // Thanh đỏ–xanh (vị trí dây) gộp % lực hai đội: màu đội đặc cho rõ, nút dây ở chỗ giáp ranh,
-  // mũi tên » chạy về phía đội đang bị kéo; khi % đổi mạnh thì số % nhún nhẹ
+  // Thanh tiến độ kiểu thanh máu game đối kháng: hai nửa màu đội đặc (dải bóng mảnh phía trên cho có khối),
+  // vệt "vừa mất" sáng nhạt bám theo khi dây trôi, tia điện ở chỗ giáp ranh, sóng năng lượng từ đội đang mạnh hơn,
+  // vạch mốc 25/50/75%, đội sát mép vực thì đầu thanh nháy đỏ "NGUY HIỂM"; % + tên đội nằm trong thanh
   let shareA = 0.5;
   let barKick = 0;
   let lastPct = 50;
+  let ghostPos = 0.5; // vị trí giáp ranh trễ (vệt "vừa mất")
+  let waveAt = 0;
+  const sparks = [];
   function drawPowerBar(t, dt) {
     const m = curMatch();
     const x = MX;
     const w = CW;
     const y = Y_BAR;
+    const H = BAR_H;
     const field = m && (ph.phase === 'intro' || ph.phase === 'pull' || ph.phase === 'matchEnd');
     if (!field) {
-      panel(x, y, w, BAR_H, { r: 35, fill: 'rgba(0,0,0,.6)', border: '#ffe066' });
-      text(L('💬 Bình luận 1 · 2 · 3 · 4 để vào đội', '💬 Comment 1 · 2 · 3 · 4 to join a team'), W / 2, y + BAR_H / 2, { size: 26, weight: 900, color: '#ffe066' });
+      panel(x, y, w, H, { r: 18, fill: 'rgba(0,0,0,.6)', border: '#ffe066' });
+      text(L('💬 Bình luận 1 · 2 · 3 · 4 để vào đội', '💬 Comment 1 · 2 · 3 · 4 to join a team'), W / 2, y + H / 2, { size: 26, weight: 900, color: '#ffe066' });
       return;
     }
     const fa = ph.phase === 'pull' ? live.fa || 0 : 0;
@@ -907,70 +912,156 @@
       lastPct = pctA;
     }
     barKick = Math.max(0, barKick - dt * 3);
-    const pos = 0.5 + ropeX / 2; // 0 = sát đội a
-    const mk = x + w * (1 - pos);
-    // khung + hai nửa màu đội đặc
-    roundRect(x - 3, y - 3, w + 6, BAR_H + 6, (BAR_H + 6) / 2);
-    g.fillStyle = 'rgba(0,0,0,.75)';
-    g.fill();
+    const pos = 0.5 + ropeX / 2; // 0 = dây sát đội a
+    const split = 1 - pos; // tỉ lệ thanh của đội a
+    // vệt trễ: bám theo chậm (nửa giây) để thấy đà
+    ghostPos += (split - ghostPos) * Math.min(1, dt * 1.6);
+    const ix = x + 6;
+    const iw = w - 12;
+    const iy = y + 6;
+    const ih = H - 12;
+    const mk = ix + iw * split;
+    const gk = ix + iw * ghostPos;
+    const colA = teamColor(m.a);
+    const colB = teamColor(m.b);
+    // khung ngoài: nền tối + viền neon hồng mảnh
     g.save();
-    roundRect(x, y, w, BAR_H, BAR_H / 2);
+    g.shadowColor = '#ff4fa3';
+    g.shadowBlur = 12;
+    roundRect(x, y, w, H, 16);
+    g.fillStyle = '#0b0a18';
+    g.fill();
+    g.restore();
+    roundRect(x, y, w, H, 16);
+    g.lineWidth = 3;
+    g.strokeStyle = '#ff4fa3';
+    g.stroke();
+    // lòng thanh
+    g.save();
+    roundRect(ix, iy, iw, ih, 11);
     g.clip();
-    g.fillStyle = teamColor(m.a);
-    g.fillRect(x, y, mk - x, BAR_H);
-    g.fillStyle = teamColor(m.b);
-    g.fillRect(mk, y, x + w - mk, BAR_H);
-    // bóng nhẹ phía dưới cho có khối (không làm mờ màu)
-    g.fillStyle = 'rgba(0,0,0,.18)';
-    g.fillRect(x, y + BAR_H * 0.62, w, BAR_H * 0.38);
-    // mũi tên » chạy về phía đội đang bị kéo (dây đang trôi về đâu)
-    const dir = Math.abs(ropeVel) < 0.01 ? 0 : ropeVel > 0 ? 1 : -1; // 1 = về phía đội b
-    if (dir) {
-      const step = 34;
-      const off = ((t / 12) % step) * dir;
-      const from = dir > 0 ? x : mk;
-      const to = dir > 0 ? mk : x + w;
-      for (let ax = from - step; ax < to + step; ax += step) {
-        const cx = ax + off;
-        if (cx < from + 8 || cx > to - 8) continue;
-        g.beginPath();
-        g.moveTo(cx - 6 * dir, y + 16);
-        g.lineTo(cx + 6 * dir, y + BAR_H / 2);
-        g.lineTo(cx - 6 * dir, y + BAR_H - 16);
-        g.lineWidth = 5;
-        g.strokeStyle = 'rgba(255,255,255,.35)';
-        g.stroke();
-      }
+    g.fillStyle = '#1a1830';
+    g.fillRect(ix, iy, iw, ih);
+    g.fillStyle = colA;
+    g.fillRect(ix, iy, mk - ix, ih);
+    g.fillStyle = colB;
+    g.fillRect(mk, iy, ix + iw - mk, ih);
+    // vệt "vừa mất": phần giáp ranh vừa trôi qua, màu trắng nhạt
+    if (Math.abs(gk - mk) > 1) {
+      g.fillStyle = 'rgba(255,255,255,.45)';
+      g.fillRect(Math.min(gk, mk), iy, Math.abs(gk - mk), ih);
+    }
+    // dải bóng mảnh phía trên + bóng tối mảnh phía dưới (không phủ chữ / màu chính)
+    g.fillStyle = 'rgba(255,255,255,.22)';
+    g.fillRect(ix, iy + 3, iw, ih * 0.16);
+    g.fillStyle = 'rgba(0,0,0,.22)';
+    g.fillRect(ix, iy + ih * 0.82, iw, ih * 0.18);
+    // sóng năng lượng: từ đầu thanh của đội đang mạnh hơn quét vào chỗ giáp ranh (mỗi ~1,1 giây)
+    const lead = fa > fb * 1.08 ? 'a' : fb > fa * 1.08 ? 'b' : null;
+    if (lead && t - waveAt > 1100) waveAt = t;
+    const we = (t - waveAt) / 650;
+    if (lead && we <= 1) {
+      const from = lead === 'a' ? ix : ix + iw;
+      const wx = from + (mk - from) * we;
+      const gr = g.createLinearGradient(wx - 40, 0, wx + 40, 0);
+      gr.addColorStop(0, 'rgba(255,255,255,0)');
+      gr.addColorStop(0.5, `rgba(255,255,255,${0.35 * (1 - we * 0.6)})`);
+      gr.addColorStop(1, 'rgba(255,255,255,0)');
+      g.fillStyle = gr;
+      g.fillRect(wx - 40, iy, 80, ih);
+    }
+    // vạch mốc 25 / 50 / 75 %
+    g.fillStyle = 'rgba(0,0,0,.35)';
+    for (const q of [0.25, 0.75]) g.fillRect(ix + iw * q - 1, iy + ih * 0.7, 2, ih * 0.3);
+    g.fillStyle = 'rgba(255,255,255,.75)';
+    g.fillRect(ix + iw * 0.5 - 1.5, iy, 3, ih * 0.22);
+    g.fillRect(ix + iw * 0.5 - 1.5, iy + ih * 0.78, 3, ih * 0.22);
+    // đội sát mép vực: đầu thanh nháy đỏ
+    const dangerA = ropeX > 0.6 && ph.phase === 'pull';
+    const dangerB = ropeX < -0.6 && ph.phase === 'pull';
+    const blink = 0.35 + 0.35 * Math.sin(t / 90);
+    if (dangerA) {
+      g.fillStyle = `rgba(255,0,40,${blink})`;
+      g.fillRect(ix, iy, 120, ih);
+    }
+    if (dangerB) {
+      g.fillStyle = `rgba(255,0,40,${blink})`;
+      g.fillRect(ix + iw - 120, iy, 120, ih);
     }
     g.restore();
-    // vạch giáp ranh + nút dây
+    // tia điện ở chỗ giáp ranh: vạch trắng sáng + tia nhỏ bắn ra (nhiều hơn khi căng)
     g.fillStyle = '#fff';
-    g.fillRect(mk - 2, y - 6, 4, BAR_H + 12);
+    g.fillRect(mk - 2, iy - 2, 4, ih + 4);
+    const rate = 10 + tension * 40 + Math.abs(ropeVel) * 300;
+    if (ph.phase === 'pull' && Math.random() < dt * rate) {
+      const ang = (Math.random() - 0.5) * Math.PI * 0.9 + (Math.random() < 0.5 ? -Math.PI / 2 : Math.PI / 2);
+      sparks.push({ x: mk, y: y + H / 2 + (Math.random() - 0.5) * ih, vx: Math.cos(ang) * (80 + Math.random() * 120), vy: Math.sin(ang) * (80 + Math.random() * 120), life: 0.25 + Math.random() * 0.2, t: 0 });
+    }
+    g.lineCap = 'round';
+    for (let i = sparks.length - 1; i >= 0; i--) {
+      const sp = sparks[i];
+      sp.t += dt;
+      if (sp.t > sp.life) {
+        sparks.splice(i, 1);
+        continue;
+      }
+      const k = 1 - sp.t / sp.life;
+      const nx = sp.x + sp.vx * dt;
+      const ny = sp.y + sp.vy * dt;
+      g.strokeStyle = `rgba(255,${200 + Math.floor(55 * k)},${120 + Math.floor(135 * k)},${k})`;
+      g.lineWidth = 2.5;
+      g.beginPath();
+      g.moveTo(sp.x, sp.y);
+      g.lineTo(nx - sp.vx * 0.03, ny - sp.vy * 0.03);
+      g.stroke();
+      sp.x = nx;
+      sp.y = ny;
+    }
+    // nút dây: vòng tròn chia đôi màu hai đội, lắc nhẹ theo độ căng
+    g.save();
+    g.translate(mk, y + H / 2);
+    g.rotate(Math.sin(t / 70) * 0.12 * tension);
     g.beginPath();
-    g.arc(mk, y + BAR_H / 2, 24, 0, Math.PI * 2);
+    g.arc(0, 0, 27, Math.PI / 2, (Math.PI * 3) / 2);
+    g.fillStyle = colA;
+    g.fill();
+    g.beginPath();
+    g.arc(0, 0, 27, -Math.PI / 2, Math.PI / 2);
+    g.fillStyle = colB;
+    g.fill();
+    g.beginPath();
+    g.arc(0, 0, 20, 0, Math.PI * 2);
+    g.fillStyle = '#fff';
     g.fill();
     g.lineWidth = 3;
-    g.strokeStyle = '#222';
+    g.strokeStyle = '#111';
+    g.beginPath();
+    g.arc(0, 0, 27, 0, Math.PI * 2);
     g.stroke();
-    text('🪢', mk, y + BAR_H / 2 + 1, { size: 26 });
-    // % + tên đội trong thanh (chữ trắng viền tối, đọc rõ trên mọi màu đội)
-    const sc = 1 + barKick * 0.15;
+    text('🪢', 0, 1, { size: 24 });
+    g.restore();
+    // % + tên đội trong thanh: chữ trắng viền tối; % nhún khi đổi mạnh
+    const sc = 1 + barKick * 0.18;
     g.font = `900 40px ${FONT}`;
     const pwA = g.measureText(`${pctA}%`).width;
     const pwB = g.measureText(`${100 - pctA}%`).width;
-    const pct = (val, px, align) => {
+    const pct = (val, px, align, hot) => {
       g.save();
-      g.translate(px, y + BAR_H / 2);
+      g.translate(px, y + H / 2 + 1);
       g.scale(sc, sc);
-      text(`${val}%`, 0, 0, { size: 40, weight: 900, color: '#fff', align, stroke: 7, strokeColor: 'rgba(0,0,0,.8)' });
+      text(`${val}%`, 0, 0, { size: 40, weight: 900, color: hot ? '#ffe066' : '#fff', align, stroke: 7, strokeColor: 'rgba(0,0,0,.85)' });
       g.restore();
     };
-    pct(pctA, x + 28, 'left');
-    pct(100 - pctA, x + w - 28, 'right');
-    const nax = x + 28 + pwA + 14;
-    const nbx = x + w - 28 - pwB - 14;
-    if (mk - 36 - nax > 70) text(teamLabel(m.a), nax, y + BAR_H / 2, { size: 18, weight: 900, color: '#fff', align: 'left', stroke: 5, strokeColor: 'rgba(0,0,0,.8)', maxW: mk - 36 - nax });
-    if (nbx - (mk + 36) > 70) text(teamLabel(m.b), nbx, y + BAR_H / 2, { size: 18, weight: 900, color: '#fff', align: 'right', stroke: 5, strokeColor: 'rgba(0,0,0,.8)', maxW: nbx - mk - 36 });
+    pct(pctA, ix + 18, 'left', lead === 'a');
+    pct(100 - pctA, ix + iw - 18, 'right', lead === 'b');
+    const nax = ix + 18 + pwA * 1.18 + 16; // chừa chỗ cho số % lúc nhún to
+    const nbx = ix + iw - 18 - pwB * 1.18 - 16;
+    const lbl = (txt, px, align, room, danger) => {
+      if (room < 70) return;
+      text(danger ? L('⚠ NGUY HIỂM', '⚠ DANGER') : txt, px, y + H / 2 + 1, { size: 18, weight: 900, color: danger ? '#fff' : '#fff', align, stroke: 5, strokeColor: danger ? '#c00020' : 'rgba(0,0,0,.85)', maxW: room });
+    };
+    lbl(teamLabel(m.a), nax, 'left', mk - 40 - nax, dangerA);
+    lbl(teamLabel(m.b), nbx, 'right', nbx - mk - 40, dangerB);
     // hiệu ứng kỹ năng đang có của mỗi đội (ngay dưới thanh)
     const effs = (te, ex, align) => {
       if (!te) return;
