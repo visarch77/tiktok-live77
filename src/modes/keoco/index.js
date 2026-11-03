@@ -41,7 +41,7 @@ const COMEBACK_FROM = 0.6;
 const COMEBACK_MAX = 0.6;
 const NPC_POWER = 0.55;
 const COMMENT_LIKES = 2; // bình luận lúc kéo = 2 tim, tối đa 1 lần / 1,5 giây
-const KEEP_ACTIVE_MS = 150000; // hết giải: ai im lặng quá lâu thì rời đội
+const KEEP_ACTIVE_MS = 360000; // hết giải: ai im lặng quá 6 phút (hơn một giải) thì rời đội
 const QUEUE_MAX = 200;
 
 const LINES = {

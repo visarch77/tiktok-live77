@@ -37,6 +37,21 @@
   const FRONT_GAP = 26; // tay người đầu dây cách mép vực
   const SPRITE_SCALE = 0.75; // ảnh atlas = 1/4 ảnh gốc
   const LINE_LEN = 410; // chiều dài hàng mỗi bên (px)
+  // Bố cục chừa chỗ cho giao diện TikTok LIVE: trên cùng ~170 px (tên chủ phòng, số người xem), từ ~1340 trở xuống
+  // (khung bình luận, nút quà) dễ bị che → thông tin quan trọng nằm trong 180…1335; hai lề cách 48 px
+  const MX = 48;
+  const CW = W - MX * 2;
+  const Y_HUD = 184;
+  const Y_STATUS = 338;
+  const Y_BAR = 406;
+  const BAR_H = 70;
+  const Y_CLOSE = 484;
+  const CLOSE_H = 156;
+  const Y_GIFTS = 896;
+  const Y_TEAMS = 1002;
+  const Y_JOIN = 1346;
+  // ảnh quà TikTok (dùng chung ảnh của phòng Đèn Đỏ) cho từng kỹ năng
+  const GIFT_IMG = { gong: 'turbo', energy: 'clones', tickle: 'shove', glue: 'shield', cheer: 'revive', grease: 'wind', strong: 'giant', fart: 'fart', heave: 'teamShield', stomp: 'stomp' };
 
   let settings = {};
   const L = (vi, en) => (settings.lang === 'en' ? en : vi);
@@ -63,6 +78,9 @@
   loadImg('bg', `${ASSET}bg.webp?v=${AV}`);
   for (const t of [1, 2, 3, 4]) loadImg(`t${t}`, `${ASSET}atlas_t${t}.webp?v=${AV}`);
   loadImg('giant', `/assets/redlight/giant_run1.webp`);
+  for (const [sk, kind] of Object.entries({ gong: 'turbo', energy: 'clones', tickle: 'shove', glue: 'shield', cheer: 'revive', grease: 'wind', strong: 'giant', fart: 'fart', heave: 'teamShield', stomp: 'stomp' })) {
+    loadImg(`gift_${sk}`, `/assets/redlight/gift_${kind}.webp?v=26`);
+  }
   let ATLAS = null;
   fetch(`${ASSET}atlas.json?v=${AV}`)
     .then((r) => r.json())
@@ -683,17 +701,17 @@
   // Dải nhãn: 6 hàng ngay trên sân, mỗi bên xếp nhãn từ hàng thấp lên, không chồng nhau, có đường chỉ xuống đúng người.
   // Giữ hàng cũ của mỗi người (đỡ nhảy chỗ); bình luận ưu tiên hơn tên; tối đa 7 nhãn mỗi bên.
   let labelReqs = [];
-  const LANE_Y0 = 660;
+  const LANE_Y0 = 708;
   const LANE_H = 30;
-  const LANES = 5;
+  const LANES = 3;
   const laneMem = new Map(); // khoá → hàng đã xếp lần trước
   function drawLabels(m, t) {
     const placed = [];
     for (const side of ['a', 'b']) {
       const team = side === 'a' ? m.a : m.b;
       const col = teamColor(team);
-      const minX = side === 'a' ? 8 : GAP_C + 6;
-      const maxX = side === 'a' ? GAP_C - 6 : W - 8;
+      const minX = side === 'a' ? MX : GAP_C + 6;
+      const maxX = side === 'a' ? GAP_C - 6 : W - MX;
       const reqs = labelReqs
         .filter((r) => r.side === side)
         .sort((x, y) => y.prio - x.prio)
@@ -713,7 +731,9 @@
         const cx = Math.max(minX + w / 2, Math.min(maxX - w / 2, r.baseX));
         const fits = (lane) => {
           const y = LANE_Y0 - lane * LANE_H;
-          return !placed.some((q) => q.y === y && cx - w / 2 < q.x + q.w / 2 + 6 && cx + w / 2 > q.x - q.w / 2 - 6);
+          if (placed.some((q) => q.y === y && cx - w / 2 < q.x + q.w / 2 + 6 && cx + w / 2 > q.x - q.w / 2 - 6)) return false;
+          // không đè tên trên đầu người chơi
+          return !labelBoxes.some((bx) => cx - w / 2 < bx.x + bx.w / 2 && cx + w / 2 > bx.x - bx.w / 2 && y - 12 < bx.y + bx.h / 2 && y + 13 > bx.y - bx.h / 2);
         };
         let lane = laneMem.get(r.k);
         if (lane === undefined || !fits(lane)) {
@@ -812,9 +832,8 @@
   // Khung trên: sơ đồ giải, đồng hồ, thanh lực
   // --------------------------------------------------------------------------
   function drawTop(t) {
-    panel(28, 22, W - 56, 236, { glow: '#ff4fa3', fill: 'rgba(12,10,28,.82)' });
-    text(L(`KÉO CO 4 ĐỘI · GIẢI #${Math.max(1, ph.cup || 0)}`, `TUG OF WAR CUP #${Math.max(1, ph.cup || 0)}`), 56, 56, { size: 26, weight: 900, color: '#ff8fc7', align: 'left' });
-    // đồng hồ
+    panel(MX, Y_HUD, CW, 146, { glow: '#ff4fa3', fill: 'rgba(12,10,28,.82)' });
+    text(L(`KÉO CO 4 ĐỘI · GIẢI #${Math.max(1, ph.cup || 0)}`, `TUG OF WAR CUP #${Math.max(1, ph.cup || 0)}`), MX + 22, Y_HUD + 28, { size: 24, weight: 900, color: '#ff8fc7', align: 'left' });
     const left = ph.phaseEndsAt ? ph.phaseEndsAt - now() : 0;
     const label = {
       lobby: L('BẮT ĐẦU SAU', 'STARTS IN'),
@@ -824,78 +843,184 @@
       matchEnd: L('TRẬN SAU', 'NEXT'),
       champion: L('GIẢI MỚI SAU', 'NEW CUP IN')
     }[ph.phase] || '';
-    text(label, W - 56, 50, { size: 18, weight: 700, color: '#ccc', align: 'right' });
-    text(ph.paused ? '⏸' : fmtTime(left), W - 56, 84, { size: 40, weight: 900, color: ph.phase === 'pull' && left < 10000 ? '#ff6b6b' : '#fff', align: 'right' });
+    text(`${label}  ${ph.paused ? '⏸' : fmtTime(left)}`, W - MX - 22, Y_HUD + 28, { size: 26, weight: 900, color: ph.phase === 'pull' && left < 10000 ? '#ff6b6b' : '#fff', align: 'right' });
     // sơ đồ giải: BK1 · BK2 · CK
     const b = ph.bracket;
+    const bw = (CW - 44 - 20) / 3;
     const boxes = [
-      { x: 56, label: L('BÁN KẾT 1', 'SEMI 1'), m: b && b[0] },
-      { x: 56 + 330, label: L('BÁN KẾT 2', 'SEMI 2'), m: b && b[1] },
-      { x: 56 + 660, label: L('CHUNG KẾT', 'FINAL'), m: b && b[2] }
+      { label: L('BÁN KẾT 1', 'SEMI 1'), m: b && b[0] },
+      { label: L('BÁN KẾT 2', 'SEMI 2'), m: b && b[1] },
+      { label: L('CHUNG KẾT', 'FINAL'), m: b && b[2] }
     ];
     boxes.forEach((bx, i) => {
+      const x = MX + 22 + i * (bw + 10);
+      const y = Y_HUD + 54;
       const active = ph.matchIdx === i && (ph.phase === 'intro' || ph.phase === 'pull' || ph.phase === 'matchEnd');
-      panel(bx.x, 106, 312, 70, { r: 14, fill: active ? 'rgba(255,79,163,.22)' : 'rgba(255,255,255,.05)', glow: active ? '#ff4fa3' : null });
-      text(bx.label, bx.x + 156, 122, { size: 15, weight: 800, color: active ? '#ffd1e8' : '#9aa' });
+      panel(x, y, bw, 76, { r: 14, fill: active ? 'rgba(255,79,163,.22)' : 'rgba(255,255,255,.05)', glow: active ? '#ff4fa3' : null });
+      text(bx.label, x + bw / 2, y + 16, { size: 14, weight: 800, color: active ? '#ffd1e8' : '#9aa' });
       const m = bx.m;
       const chip = (team, cx) => {
         if (!team) {
-          text('?', cx, 152, { size: 24, weight: 900, color: '#666' });
+          text('?', cx, y + 50, { size: 22, weight: 900, color: '#666' });
           return;
         }
         const lost = m.winner && m.winner !== team;
         g.globalAlpha = lost ? 0.35 : 1;
-        roundRect(cx - 58, 138, 116, 30, 10);
+        roundRect(cx - 54, y + 35, 108, 30, 10);
         g.fillStyle = teamColor(team);
         g.fill();
-        text(`${team} ${(roster.teams.find((x) => x.id === team) || {}).name || ''}`, cx, 153, { size: 17, weight: 900, color: team === 3 ? '#222' : '#fff', maxW: 108 });
+        text(`${team} ${(roster.teams.find((x2) => x2.id === team) || {}).name || ''}`, cx, y + 50, { size: 16, weight: 900, color: team === 3 ? '#222' : '#fff', maxW: 100 });
         g.globalAlpha = 1;
-        if (m.winner === team) text('✔', cx + 50, 140, { size: 18, color: '#69db7c', stroke: 3 });
+        if (m.winner === team) text('✔', cx + 48, y + 36, { size: 18, color: '#69db7c', stroke: 3 });
       };
       if (m) {
-        chip(m.a, bx.x + 78);
-        text('vs', bx.x + 156, 153, { size: 15, weight: 700, color: '#aaa' });
-        chip(m.b, bx.x + 234);
-      } else text(i < 2 ? L('chờ bốc thăm', 'awaiting draw') : L('2 đội thắng', 'two winners'), bx.x + 156, 152, { size: 17, color: '#888' });
+        chip(m.a, x + bw / 2 - 66);
+        text('vs', x + bw / 2, y + 50, { size: 14, weight: 700, color: '#aaa' });
+        chip(m.b, x + bw / 2 + 66);
+      } else text(i < 2 ? L('chờ bốc thăm', 'awaiting draw') : L('2 đội thắng', 'two winners'), x + bw / 2, y + 50, { size: 16, color: '#888' });
     });
-    // thanh lực (vị trí dây)
+  }
+
+  // Thanh đỏ–xanh (vị trí dây) gộp % lực hai đội, lửa cháy dữ dội ở nút dây, nảy theo độ căng
+  let shareA = 0.5;
+  let barKick = 0;
+  let lastPct = 50;
+  function drawPowerBar(t, dt) {
     const m = curMatch();
-    const bx = 56;
-    const bw = W - 112;
-    const by = 196;
-    roundRect(bx, by, bw, 40, 20);
-    g.fillStyle = 'rgba(0,0,0,.5)';
-    g.fill();
-    if (m && (ph.phase === 'intro' || ph.phase === 'pull' || ph.phase === 'matchEnd')) {
-      const pos = 0.5 + ropeX / 2; // 0 = sát đội a
-      g.save();
-      roundRect(bx, by, bw, 40, 20);
-      g.clip();
-      g.fillStyle = teamColor(m.a);
-      g.fillRect(bx, by, bw * (1 - pos), 40);
-      g.fillStyle = teamColor(m.b);
-      g.fillRect(bx + bw * (1 - pos), by, bw * pos, 40);
-      g.restore();
-      // vạch thắng hai đầu
-      const mk = bx + bw * (1 - pos);
-      g.fillStyle = '#fff';
-      g.beginPath();
-      g.arc(mk, by + 20, 15, 0, Math.PI * 2);
-      g.fill();
-      text('🪢', mk, by + 21, { size: 18 });
-      text(teamLabel(m.a), bx + 16, by + 20, { size: 17, weight: 900, align: 'left', stroke: 4, maxW: 300 });
-      text(teamLabel(m.b), bx + bw - 16, by + 20, { size: 17, weight: 900, align: 'right', stroke: 4, maxW: 300 });
-      // hiệu ứng đội đang có
-      const effs = (te, x, align) => {
-        if (!te) return;
-        const list = [['glue', '🧤'], ['cheer', '📣'], ['grease', '🧈'], ['heave', '🥁'], ['strong', '🏋️']].filter(([k]) => te[k] > 0).map(([k, e]) => `${e}${Math.ceil(te[k] / 1000)}s`);
-        if (list.length) text(list.join(' '), x, by + 54, { size: 18, weight: 800, align, stroke: 4 });
-      };
-      effs(live.ta, bx + 8, 'left');
-      effs(live.tb, bx + bw - 8, 'right');
-    } else {
-      text(L('Bình luận 1 · 2 · 3 · 4 để vào đội', 'Comment 1 · 2 · 3 · 4 to join a team'), W / 2, by + 20, { size: 20, weight: 800, color: '#ffe066' });
+    const x = MX;
+    const w = CW;
+    const field = m && (ph.phase === 'intro' || ph.phase === 'pull' || ph.phase === 'matchEnd');
+    if (!field) {
+      panel(x, Y_BAR, w, BAR_H, { r: 35, fill: 'rgba(0,0,0,.55)', border: '#ffe066' });
+      text(L('💬 Bình luận 1 · 2 · 3 · 4 để vào đội', '💬 Comment 1 · 2 · 3 · 4 to join a team'), W / 2, Y_BAR + BAR_H / 2, { size: 26, weight: 900, color: '#ffe066' });
+      return;
     }
+    const fa = ph.phase === 'pull' ? live.fa || 0 : 0;
+    const fb = ph.phase === 'pull' ? live.fb || 0 : 0;
+    const target = fa + fb > 0.01 ? fa / (fa + fb) : 0.5;
+    shareA += (target - shareA) * Math.min(1, dt * 3);
+    const pctA = Math.round(shareA * 100);
+    if (Math.abs(pctA - lastPct) >= 3) {
+      barKick = Math.min(1, barKick + 0.5); // đổi lực mạnh → giật nảy
+      lastPct = pctA;
+    }
+    barKick = Math.max(0, barKick - dt * 2.5);
+    const heat = Math.min(1.6, 0.35 + tension * 0.7 + Math.abs(ropeVel) * 10 + barKick * 0.6); // độ "cháy"
+    const bounce = Math.sin(t / 55) * 2.5 * heat + Math.sin(t / 23) * barKick * 5;
+    const y = Y_BAR + bounce;
+    const pos = 0.5 + ropeX / 2; // 0 = sát đội a
+    const mk = x + w * (1 - pos);
+    // nền + hai nửa màu đội
+    g.save();
+    g.shadowColor = '#ff6a00';
+    g.shadowBlur = 18 + heat * 22;
+    roundRect(x, y, w, BAR_H, BAR_H / 2);
+    g.fillStyle = '#120a14';
+    g.fill();
+    g.restore();
+    g.save();
+    roundRect(x, y, w, BAR_H, BAR_H / 2);
+    g.clip();
+    const half = (x0, x1, col) => {
+      const gr = g.createLinearGradient(0, y, 0, y + BAR_H);
+      gr.addColorStop(0, '#ffffff55');
+      gr.addColorStop(0.35, col);
+      gr.addColorStop(1, '#00000066');
+      g.fillStyle = gr;
+      g.fillRect(x0, y, x1 - x0, BAR_H);
+      // sọc năng lượng chạy về phía nút dây
+      g.globalAlpha = 0.18;
+      g.fillStyle = '#fff';
+      const dir = x0 < mk ? 1 : -1;
+      const off = ((t / 6) % 40) * dir;
+      for (let sx = x0 - 40; sx < x1 + 40; sx += 40) {
+        g.beginPath();
+        g.moveTo(sx + off, y);
+        g.lineTo(sx + off + 16, y);
+        g.lineTo(sx + off - 8, y + BAR_H);
+        g.lineTo(sx + off - 24, y + BAR_H);
+        g.closePath();
+        g.fill();
+      }
+      g.globalAlpha = 1;
+    };
+    half(x, mk, teamColor(m.a));
+    half(mk, x + w, teamColor(m.b));
+    g.restore();
+    roundRect(x, y, w, BAR_H, BAR_H / 2);
+    g.lineWidth = 3;
+    g.strokeStyle = 'rgba(255,255,255,.55)';
+    g.stroke();
+    // lửa ở nút dây: 3 lớp (đỏ ngoài, cam giữa, vàng lõi), lưỡi lửa liếm lên, cao theo độ "cháy"
+    const tongue = (fx, base, fh, fw, col, sway) => {
+      g.fillStyle = col;
+      g.beginPath();
+      g.moveTo(fx - fw, base);
+      g.bezierCurveTo(fx - fw, base - fh * 0.45, fx - fw * 0.2 + sway * 0.5, base - fh * 0.7, fx + sway, base - fh);
+      g.bezierCurveTo(fx + fw * 0.3 + sway * 0.5, base - fh * 0.65, fx + fw, base - fh * 0.4, fx + fw, base);
+      g.closePath();
+      g.fill();
+    };
+    const base = y + BAR_H * 0.62;
+    // quầng sáng nóng quanh nút dây
+    const glow = g.createRadialGradient(mk, y + BAR_H / 2, 4, mk, y + BAR_H / 2, 70 + heat * 40);
+    glow.addColorStop(0, 'rgba(255,170,40,0.55)');
+    glow.addColorStop(1, 'rgba(255,60,0,0)');
+    g.fillStyle = glow;
+    g.fillRect(mk - 120, y - 60, 240, BAR_H + 90);
+    const layers = [
+      { n: 7, h: 1.0, w: 15, col: 'rgba(255,40,10,0.55)' },
+      { n: 6, h: 0.78, w: 11, col: 'rgba(255,120,0,0.75)' },
+      { n: 5, h: 0.52, w: 7, col: 'rgba(255,215,60,0.9)' }
+    ];
+    for (const ly of layers) {
+      for (let i = 0; i < ly.n; i++) {
+        const ph0 = i * 2.1 + ly.h * 3;
+        const fx = mk + (i - (ly.n - 1) / 2) * (11 + heat * 4) + Math.sin(t / 110 + ph0) * 5;
+        const fh = (48 + 52 * heat) * ly.h * (0.68 + 0.32 * Math.sin(t / 41 + ph0 * 1.7));
+        tongue(fx, base, fh, ly.w * (0.8 + heat * 0.25), ly.col, Math.sin(t / 65 + ph0) * 8 * heat);
+      }
+    }
+    // tàn lửa bay lên
+    if (Math.random() < dt * (6 + heat * 18)) particles.push({ kind: 'ember', x: mk + (Math.random() - 0.5) * 30, y: y + 10, vx: (Math.random() - 0.5) * 80, vy: -90 - Math.random() * 120 * heat, life: 0.6 + Math.random() * 0.6, t: 0, r: 2 + Math.random() * 2.5 });
+    // nút dây
+    g.save();
+    g.translate(mk, y + BAR_H / 2);
+    g.rotate(Math.sin(t / 80) * 0.15 * heat);
+    g.fillStyle = '#fff';
+    g.beginPath();
+    g.arc(0, 0, 22 + barKick * 6, 0, Math.PI * 2);
+    g.fill();
+    text('🪢', 0, 1, { size: 26 });
+    g.restore();
+    // % + tên đội nằm trong thanh
+    const sc = 1 + barKick * 0.25;
+    g.font = `900 38px ${FONT}`;
+    const pwA = g.measureText(`${pctA}%`).width;
+    const pwB = g.measureText(`${100 - pctA}%`).width;
+    g.save();
+    g.translate(x + 26, y + BAR_H / 2);
+    g.scale(sc, sc);
+    text(`${pctA}%`, 0, 0, { size: 38, weight: 900, color: '#fff', align: 'left', stroke: 6 });
+    g.restore();
+    g.save();
+    g.translate(x + w - 26, y + BAR_H / 2);
+    g.scale(sc, sc);
+    text(`${100 - pctA}%`, 0, 0, { size: 38, weight: 900, color: '#fff', align: 'right', stroke: 6 });
+    g.restore();
+    // tên đội ngay sau số %, chỉ vẽ khi còn chỗ trước nút dây
+    const nax = x + 26 + pwA + 16;
+    const nbx = x + w - 26 - pwB - 16;
+    if (mk - 40 - nax > 70) text(teamLabel(m.a), nax, y + BAR_H / 2, { size: 17, weight: 900, color: '#fff', align: 'left', stroke: 4, maxW: mk - 40 - nax });
+    if (nbx - (mk + 40) > 70) text(teamLabel(m.b), nbx, y + BAR_H / 2, { size: 17, weight: 900, color: '#fff', align: 'right', stroke: 4, maxW: nbx - mk - 40 });
+    // hiệu ứng kỹ năng đang có của mỗi đội (ngay dưới thanh)
+    const effs = (te, ex, align) => {
+      if (!te) return;
+      const list = [['glue', '🧤'], ['cheer', '📣'], ['grease', '🧈'], ['heave', '🥁'], ['strong', '🏋️']].filter(([k]) => te[k] > 0).map(([k, e]) => `${e}${Math.ceil(te[k] / 1000)}s`);
+      if (list.length) text(list.join(' '), ex, Y_BAR + BAR_H + 4, { size: 17, weight: 800, align, stroke: 4 });
+    };
+    effs(live.ta, x + 30, 'left');
+    effs(live.tb, x + w - 30, 'right');
   }
 
   // --------------------------------------------------------------------------
@@ -914,30 +1039,29 @@
     return `${L('Tiếp theo', 'Next')}: ${m.label} — ${nm(a)} vs ${nm(bb)}`;
   }
   function drawStatus(t) {
-    const y = 905;
-    panel(28, y, W - 56, 110, { r: 16 });
     const m = curMatch();
     let main = '';
     let color = '#fff';
     if (ph.phase === 'lobby') {
       main = L(`⏳ PHÒNG CHỜ · ${roster.players} người đã vào đội`, `⏳ LOBBY · ${roster.players} players in teams`);
       color = '#ffe066';
-    } else if (ph.phase === 'draw') main = L('🎲 Đang bốc thăm cặp đấu…', '🎲 Drawing the matches…');
+    } else if (ph.phase === 'draw') main = L('🎲 ĐANG BỐC THĂM CẶP ĐẤU', '🎲 DRAWING THE MATCHES');
     else if (m && (ph.phase === 'intro' || ph.phase === 'pull')) {
-      main = `🔥 ${L('ĐANG KÉO', 'PULLING')}: ${teamLabel(m.a)} vs ${teamLabel(m.b)}`;
+      main = `🔥 ${m.label.toUpperCase()}: ${teamLabel(m.a)}  vs  ${teamLabel(m.b)}`;
       color = '#ff8fc7';
-    } else if (ph.phase === 'matchEnd' && m) main = `🏁 ${m.label}: ${teamLabel(m.winner)} ${L('thắng', 'wins')}`;
+    } else if (ph.phase === 'matchEnd' && m) main = `🏁 ${m.label}: ${teamLabel(m.winner)} ${L('THẮNG', 'WINS')}`;
     else if (ph.phase === 'champion' && ph.champion) {
       main = `🏆 ${teamLabel(ph.champion.team)} ${L('VÔ ĐỊCH!', 'CHAMPIONS!')}`;
       color = teamColor(ph.champion.team);
     }
-    text(main, 52, y + 30, { size: 25, weight: 900, color, align: 'left', maxW: W - 110 });
     const nx = nextMatchText() || (ph.bracket && ph.matchIdx === 2 && ph.phase !== 'champion' ? L('Chung kết — đội thắng là VÔ ĐỊCH!', 'The final — the winner takes the cup!') : '');
-    const sub = ph.phase === 'lobby' ? L('Bình luận số đội để vào · đổi đội được trong lúc chờ · đội đầy tự sang đội vắng nhất', 'Comment a team number · switch while waiting · full teams overflow to the emptiest') : nx;
-    text(sub, 52, y + 62, { size: 18, weight: 600, color: '#cfd', align: 'left', maxW: W - 110 });
-    // tin vào đội gần nhất
-    const fl = feed.filter((f) => t - f.at < 9000).slice(-1)[0];
-    if (fl) text(`➕ ${fl.text}`, 52, y + 90, { size: 17, weight: 700, color: fl.team ? teamColor(fl.team) : '#ddd', align: 'left', maxW: W - 110 });
+    const fl = feed.filter((f) => t - f.at < 6000).slice(-1)[0];
+    const sub = fl ? `➕ ${fl.text}` : ph.phase === 'lobby' ? L('Đổi đội được trong lúc chờ · đội đầy tự sang đội vắng nhất', 'Switch while waiting · full teams overflow to the emptiest') : nx;
+    g.font = `900 26px ${FONT}`;
+    const w = Math.min(CW, Math.max(520, g.measureText(main).width + 60));
+    panel((W - w) / 2, Y_STATUS, w, 60, { r: 30, fill: 'rgba(10,8,26,.85)', glow: color });
+    text(main, W / 2, Y_STATUS + 22, { size: 24, weight: 900, color, maxW: w - 40 });
+    if (sub) text(sub, W / 2, Y_STATUS + 46, { size: 15, weight: 700, color: fl && fl.team ? teamColor(fl.team) : '#cfd', maxW: w - 40 });
   }
   const STATUS = {
     wait: () => ['⏳', L('CHỜ LƯỢT', 'WAITING'), '#ffe066'],
@@ -947,67 +1071,67 @@
     champ: () => ['🏆', L('VÔ ĐỊCH', 'CHAMPIONS'), '#ffd43b']
   };
   function drawTeams(t) {
-    const x0 = 28;
-    const y0 = 1030;
-    const cw = (W - 56 - 16) / 2;
-    const ch = 270;
+    const gap = 12;
+    const cw = (CW - gap) / 2;
+    const ch = 159;
     (roster.teams.length ? roster.teams : [1, 2, 3, 4].map((id) => ({ id, name: '', count: 0, max: 20, status: 'wait', top: [] }))).forEach((tm, i) => {
-      const x = x0 + (i % 2) * (cw + 16);
-      const y = y0 + Math.floor(i / 2) * (ch + 14);
+      const x = MX + (i % 2) * (cw + gap);
+      const y = Y_TEAMS + Math.floor(i / 2) * (ch + gap);
       const st = (STATUS[tm.status] || STATUS.wait)();
       const onField = tm.status === 'field';
-      panel(x, y, cw, ch, { r: 18, fill: tm.status === 'out' ? 'rgba(20,20,26,.8)' : 'rgba(12,12,30,.82)', glow: onField || tm.status === 'champ' ? tm.color : null, border: tm.color });
+      panel(x, y, cw, ch, { r: 16, fill: tm.status === 'out' ? 'rgba(20,20,26,.82)' : 'rgba(12,12,30,.84)', glow: onField || tm.status === 'champ' ? tm.color : null, border: tm.color });
       g.globalAlpha = tm.status === 'out' ? 0.5 : 1;
-      // đầu thẻ
-      roundRect(x + 10, y + 10, cw - 20, 46, 12);
+      roundRect(x + 8, y + 8, cw - 16, 36, 10);
       g.fillStyle = tm.color;
       g.fill();
-      text(`${tm.id}`, x + 38, y + 33, { size: 32, weight: 900, color: tm.id === 3 ? '#222' : '#fff' });
-      text(L(`ĐỘI ${(tm.name || '').toUpperCase()}`, `TEAM ${(tm.name || '').toUpperCase()}`), x + 66, y + 33, { size: 22, weight: 900, color: tm.id === 3 ? '#222' : '#fff', align: 'left' });
-      text(`${tm.count}/${tm.max}`, x + cw - 22, y + 33, { size: 20, weight: 800, color: tm.id === 3 ? '#222' : '#fff', align: 'right' });
-      // trạng thái + khi nào tới lượt
+      const ink = tm.id === 3 ? '#222' : '#fff';
+      text(`${tm.id} · ${L('ĐỘI', 'TEAM')} ${(tm.name || '').toUpperCase()}`, x + 20, y + 26, { size: 19, weight: 900, color: ink, align: 'left' });
+      text(`${tm.count}/${tm.max}${tm.wins ? `  🏆${tm.wins}` : ''}`, x + cw - 18, y + 26, { size: 17, weight: 800, color: ink, align: 'right' });
       let when = '';
       if (tm.status === 'wait' || tm.status === 'final') {
         if (!ph.bracket) when = L('bốc thăm khi hết giờ chờ', 'drawn when the lobby ends');
-        else if (tm.nextIn === 1) when = L('TRẬN TIẾP THEO — sẵn sàng!', 'NEXT MATCH — get ready!');
-        else if (tm.nextIn > 1) when = L(`còn ${tm.nextIn - 1} trận nữa`, `${tm.nextIn - 1} match(es) to go`);
+        else if (tm.nextIn === 1) when = L('TRẬN TIẾP THEO!', 'NEXT MATCH!');
+        else if (tm.nextIn > 1) when = L(`còn ${tm.nextIn - 1} trận`, `${tm.nextIn - 1} to go`);
       } else if (tm.status === 'field') when = L('thả tim đều tay!', 'tap steadily!');
-      else if (tm.status === 'out') when = L('tặng quà để tiếp sức đội đang thua', 'gift to help the losing team');
-      text(`${st[0]} ${st[1]}`, x + 16, y + 76, { size: 19, weight: 900, color: st[2], align: 'left' });
-      if (when) text(when, x + 16, y + 100, { size: 16, weight: 600, color: tm.nextIn === 1 ? '#ffe066' : '#bbb', align: 'left', maxW: cw - 32 });
-      // top người kéo
+      else if (tm.status === 'out') when = L('tặng quà tiếp sức đội thua', 'gift to help the losers');
+      text(`${st[0]} ${st[1]}`, x + 16, y + 60, { size: 17, weight: 900, color: st[2], align: 'left' });
+      if (when) text(when, x + cw - 16, y + 60, { size: 15, weight: 800, color: tm.nextIn === 1 ? '#ffe066' : '#bbb', align: 'right', maxW: cw / 2 });
       const list = tm.top || [];
-      if (!list.length) text(L('Chưa có ai · bình luận ', 'Empty · comment ') + tm.id, x + cw / 2, y + 170, { size: 17, color: '#888' });
-      list.slice(0, 5).forEach((p, j) => {
-        const ly = y + 128 + j * 27;
-        text(j === 0 && p.force > 0 ? '👑' : `${j + 1}.`, x + 26, ly, { size: 16, weight: 800, color: '#ddd' });
-        text(p.name, x + 48, ly, { size: 17, weight: 700, color: '#fff', align: 'left', maxW: cw - 130 });
-        if (p.force > 0) text(`${p.force}`, x + cw - 18, ly, { size: 16, weight: 800, color: tm.color, align: 'right' });
+      if (!list.length) text(L('Chưa có ai · bình luận ', 'Empty · comment ') + tm.id, x + cw / 2, y + 112, { size: 16, color: '#888' });
+      list.slice(0, 3).forEach((p, j) => {
+        const ly = y + 86 + j * 23;
+        text(j === 0 && p.force > 0 ? '👑' : `${j + 1}.`, x + 26, ly, { size: 15, weight: 800, color: '#ddd' });
+        text(p.name, x + 46, ly, { size: 16, weight: 700, color: '#fff', align: 'left', maxW: cw - 120 });
+        if (p.force > 0) text(`${p.force}`, x + cw - 16, ly, { size: 15, weight: 800, color: tm.color, align: 'right' });
       });
-      if (tm.bank) text(L(`🎒 ${tm.bank} kỹ năng để dành`, `🎒 ${tm.bank} saved skill(s)`), x + cw - 16, y + 76, { size: 15, weight: 800, color: '#ffd43b', align: 'right' });
-      if (tm.wins) text(`🏆×${tm.wins}`, x + cw - 16, y + 100, { size: 15, weight: 800, color: '#ffd43b', align: 'right' });
+      if (tm.bank) text(L(`🎒${tm.bank} để dành`, `🎒${tm.bank} saved`), x + cw - 16, y + 146, { size: 14, weight: 800, color: '#ffd43b', align: 'right' });
       g.globalAlpha = 1;
     });
   }
   function drawJoinBar() {
-    const y = 1612;
-    panel(28, y, W - 56, 58, { r: 14, fill: 'rgba(255,224,102,.12)', border: '#ffe066' });
-    text(L('💬 Bình luận 1 · 2 · 3 · 4 để vào đội  ·  ❤️ thả tim đều tay để kéo (liên tục quá sẽ hụt hơi)', '💬 Comment 1 · 2 · 3 · 4 to join  ·  ❤️ tap steadily to pull (nonstop wears you out)'), W / 2, y + 22, { size: 18, weight: 800, color: '#ffe066', maxW: W - 90 });
-    text(roster.queueCount ? L(`🪑 Phòng chờ giải sau: ${roster.queueCount} người`, `🪑 Waiting room for next cup: ${roster.queueCount}`) : L('Đội đầy sẽ tự chuyển sang đội vắng nhất · tối đa 20 người/đội', 'Full teams overflow to the emptiest · max 20 per team'), W / 2, y + 44, { size: 15, weight: 600, color: '#ddd', maxW: W - 90 });
+    text(L('💬 Bình luận 1 · 2 · 3 · 4 để vào đội · ❤️ thả tim đều tay để kéo', '💬 Comment 1 · 2 · 3 · 4 to join · ❤️ tap steadily to pull'), W / 2, Y_JOIN, { size: 18, weight: 800, color: '#ffe066', stroke: 4, maxW: CW });
+    text(roster.queueCount ? L(`🪑 Phòng chờ giải sau: ${roster.queueCount} người`, `🪑 Waiting for next cup: ${roster.queueCount}`) : L('Đội đầy tự sang đội vắng nhất · tối đa 20 người/đội', 'Full teams overflow to the emptiest · max 20 per team'), W / 2, Y_JOIN + 26, { size: 15, weight: 600, color: '#ddd', stroke: 3, maxW: CW });
   }
-  function drawLegend() {
-    const y = 1680;
-    panel(28, y, W - 56, 214, { r: 16 });
-    text(L('🎁 QUÀ = KỸ NĂNG (chỉ khi đội bạn đang kéo; đội chưa ra sân thì để dành)', '🎁 GIFT = SKILL (used when your team pulls; saved until then)'), W / 2, y + 22, { size: 16, weight: 800, color: '#ffd43b', maxW: W - 90 });
+  // Hàng ảnh quà TikTok ngay dưới sân: ảnh quà ở trên, tên kỹ năng ở dưới
+  function drawGiftRow() {
     const items = legend.length ? legend : [];
-    const cols = 5;
-    const cw = (W - 76) / cols;
-    items.slice(0, 10).forEach((it, i) => {
-      const cx = 38 + (i % cols) * cw + cw / 2;
-      const cy = y + 54 + Math.floor(i / cols) * 82;
-      text(it.emoji, cx, cy, { size: 28 });
-      text(it.label, cx, cy + 28, { size: 16, weight: 900, color: '#fff', maxW: cw - 8 });
-      text(`${it.gift} · ${it.coins}🪙`, cx, cy + 48, { size: 13, weight: 600, color: '#ffd8a8', maxW: cw - 8 });
+    if (!items.length) return;
+    panel(MX, Y_GIFTS, CW, 94, { r: 18, fill: 'rgba(0,0,0,.62)' });
+    const cw = CW / items.length;
+    items.forEach((it, i) => {
+      const cx = MX + i * cw + cw / 2;
+      if (i > 0) {
+        g.fillStyle = 'rgba(255,255,255,.10)';
+        g.fillRect(MX + i * cw, Y_GIFTS + 12, 1, 70);
+      }
+      const im = IMG[`gift_${it.skill}`];
+      if (ready(im)) {
+        const sc = 52 / Math.max(im.naturalWidth, im.naturalHeight);
+        g.drawImage(im, cx - (im.naturalWidth * sc) / 2, Y_GIFTS + 36 - (im.naturalHeight * sc) / 2, im.naturalWidth * sc, im.naturalHeight * sc);
+      } else text(it.emoji, cx, Y_GIFTS + 36, { size: 36 });
+      g.font = `900 15px ${FONT}`;
+      const fsz = Math.max(10, Math.min(15, Math.floor((15 * (cw - 6)) / g.measureText(it.label).width)));
+      text(it.label.toUpperCase(), cx, Y_GIFTS + 78, { size: fsz, weight: 900, color: '#ffe066', stroke: 3 });
     });
   }
 
@@ -1022,13 +1146,13 @@
     }
     if (!giftBanner) return;
     const b = giftBanner;
-    const y = 266;
-    const w = 860;
+    const y = Y_STATUS;
+    const w = CW;
     const x = (W - w) / 2;
-    panel(x, y, w, 64, { r: 16, fill: 'rgba(255,255,255,.95)', glow: teamColor(b.team) });
+    panel(x, y, w, 60, { r: 30, fill: 'rgba(255,255,255,.96)', glow: teamColor(b.team) });
     const mode = b.mode === 'bank' ? L(' (để dành cho đội)', ' (saved for the team)') : b.mode === 'support' ? L(' (tiếp sức đội đang thua)', ' (helping the losing team)') : '';
     const lb = (legend.find((l) => l.skill === b.skill) || {}).label || b.skill;
-    text(`${SKILL_EMOJI[b.skill] || '🎁'} ${b.name} ${L('tặng', 'sent')} ${b.gift}${b.count > 1 ? ` ×${b.count}` : ''} → ${lb}${mode}`, W / 2, y + 32, { size: 22, weight: 900, color: '#222', maxW: w - 30 });
+    text(`${SKILL_EMOJI[b.skill] || '🎁'} ${b.name} ${L('tặng', 'sent')} ${b.gift}${b.count > 1 ? ` ×${b.count}` : ''} → ${lb}${mode}`, W / 2, y + 30, { size: 22, weight: 900, color: '#222', maxW: w - 40 });
   }
   function drawBanner() {
     if (!banner) return;
@@ -1039,7 +1163,7 @@
     }
     const a = Math.min(1, left / 300);
     g.globalAlpha = a;
-    const y = 420;
+    const y = Y_CLOSE + 62;
     text(banner.text, W / 2, y, { size: banner.big ? 110 : 60, weight: 900, color: banner.color, stroke: 10 });
     if (banner.sub) text(banner.sub, W / 2, y + (banner.big ? 72 : 50), { size: 30, weight: 800, color: '#fff', stroke: 6, maxW: W - 60 });
     g.globalAlpha = 1;
@@ -1062,6 +1186,13 @@
         g.fillStyle = i % 2 ? '#d8f36a' : '#b5d33d';
         g.beginPath();
         g.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        g.fill();
+      } else if (p.kind === 'ember') {
+        p.vx *= 0.96;
+        g.globalAlpha = k;
+        g.fillStyle = k > 0.5 ? '#ffd43b' : '#ff6a00';
+        g.beginPath();
+        g.arc(p.x, p.y, p.r * k + 0.5, 0, Math.PI * 2);
         g.fill();
       } else if (p.kind === 'dust') {
         p.r += dt * 14;
@@ -1122,49 +1253,38 @@
     text(L('LỰC SĨ', 'STRONGMAN'), gx, ROPE_Y - 118, { size: 16, weight: 900, color: '#ffe066', stroke: 4 });
   }
 
-  // Bảng trực tiếp trên tường lúc kéo: % lực mỗi đội, số người (người máy), người kéo khoẻ nhất, dây đang về phía nào
-  let shareA = 0.5;
+  // Cận cảnh đầu dây (giữa) + số người, người kéo khoẻ nhất mỗi đội (hai góc)
   function drawArena(t, dt) {
     const m = curMatch();
     if (!m || (ph.phase !== 'pull' && ph.phase !== 'intro')) return;
-    const fa = ph.phase === 'intro' ? 0 : live.fa || 0;
-    const fb = ph.phase === 'intro' ? 0 : live.fb || 0;
-    const target = fa + fb > 0.01 ? fa / (fa + fb) : 0.5;
-    shareA += (target - shareA) * Math.min(1, dt * 3);
-    const y = 362;
-    const PW = 296;
-    const side = (s, team, list, share, x, align) => {
+    drawCloseup(m, t, Y_CLOSE);
+    const info = (list, team, x, align) => {
       const humans = list.filter((p) => !p.npc).length;
       const bots = list.length - humans;
-      panel(x, y, PW, 150, { r: 16, fill: 'rgba(8,8,24,.74)', glow: teamColor(team) });
-      const ax = align === 'left' ? x + 16 : x + PW - 16;
-      text(teamLabel(team), ax, y + 24, { size: 21, weight: 900, color: teamColor(team), align, stroke: 4, maxW: PW - 30 });
-      text(`💪 ${Math.round(share * 100)}%`, ax, y + 62, { size: 36, weight: 900, color: '#fff', align, stroke: 5 });
-      text(L(`${humans} người${bots ? ` + ${bots} 🤖` : ''}`, `${humans} players${bots ? ` + ${bots} 🤖` : ''}`), ax, y + 98, { size: 17, weight: 700, color: '#ccd', align });
+      text(L(`${humans} người${bots ? ` + ${bots}🤖` : ''}`, `${humans} players${bots ? ` + ${bots}🤖` : ''}`), x, Y_CLOSE + 24, { size: 16, weight: 800, color: teamColor(team), align, stroke: 4 });
       const best = list
         .filter((p) => !p.npc)
         .map((p) => ({ n: p.n, f: (pstate.get(p.k) || {}).force || 0 }))
         .sort((a, b) => b.f - a.f)[0];
-      if (best && best.f > 0) text(`👑 ${best.n}`, ax, y + 126, { size: 18, weight: 800, color: '#ffe066', align, maxW: PW - 30 });
+      if (best && best.f > 0) text(`👑 ${best.n}`, x, Y_CLOSE + 48, { size: 17, weight: 800, color: '#ffe066', align, stroke: 4, maxW: 250 });
     };
-    side('a', m.a, roster.lineA, shareA, 20, 'left');
-    side('b', m.b, roster.lineB, 1 - shareA, W - 20 - PW, 'right');
-    drawCloseup(m, t, y - 26);
+    info(roster.lineA, m.a, MX + 18, 'left');
+    info(roster.lineB, m.b, W - MX - 18, 'right');
   }
   // Cận cảnh: hai người đầu dây phóng to, đối mặt nhau giữa màn hình — thấy rõ mặt gồng, cắn dây, bị lôi…
   function drawCloseup(m, t, y) {
     const pa = roster.lineA[0];
     const pb = roster.lineB[0];
     if (!pa || !pb) return;
-    const x0 = 20 + 296 + 12;
-    const x1 = W - 20 - 296 - 12;
-    const CH = 196;
+    const x0 = MX;
+    const x1 = W - MX;
+    const CH = CLOSE_H;
     panel(x0, y, x1 - x0, CH, { r: 16, fill: 'rgba(8,8,24,.55)', border: 'rgba(255,255,255,.18)' });
-    text(L('🎥 CẬN CẢNH ĐẦU DÂY', '🎥 FRONT LINE CLOSE-UP'), (x0 + x1) / 2, y + 16, { size: 13, weight: 800, color: '#ccd' });
+    text(L('🎥 CẬN CẢNH ĐẦU DÂY', '🎥 FRONT LINE CLOSE-UP'), (x0 + x1) / 2, y + 14, { size: 13, weight: 800, color: '#ccd' });
     g.save();
     roundRect(x0, y, x1 - x0, CH, 16);
     g.clip();
-    const cy = y + 118;
+    const cy = y + 96;
     const shift = Math.max(-40, Math.min(40, -ropeX * 60)); // dây trôi về bên nào thì cả hai nghiêng theo
     const ga = (x0 + x1) / 2 - 40 + shift;
     const gb = (x0 + x1) / 2 + 40 + shift;
@@ -1190,13 +1310,13 @@
       let rot = -face * Math.sin(t / 240 + side.length) * 0.06;
       if (st === 'strain' || pose === 'bite') rot += Math.sin(t / 22) * 0.03;
       if (pose === 'drag') rot += -face * Math.sin(t / 90) * 0.08;
-      drawPose(team, p.v, pose, gx, cy, face, { scale: SPRITE_SCALE * 1.7, rot, footY: pose === 'cheer' ? cy + 60 : null });
+      drawPose(team, p.v, pose, gx, cy, face, { scale: SPRITE_SCALE * 1.45, rot, footY: pose === 'cheer' ? cy + 52 : null });
     };
     one(pa, 'a', m.a, ga);
     one(pb, 'b', m.b, gb);
     g.restore();
-    text(pa.n, x0 + 10, y + CH - 12, { size: 15, weight: 800, color: '#fff', align: 'left', stroke: 4, strokeColor: teamColor(m.a), maxW: (x1 - x0) / 2 - 16 });
-    text(pb.n, x1 - 10, y + CH - 12, { size: 15, weight: 800, color: '#fff', align: 'right', stroke: 4, strokeColor: teamColor(m.b), maxW: (x1 - x0) / 2 - 16 });
+    text(pa.n, (x0 + x1) / 2 - 60, y + CH - 12, { size: 15, weight: 800, color: '#fff', align: 'right', stroke: 4, strokeColor: teamColor(m.a), maxW: 220 });
+    text(pb.n, (x0 + x1) / 2 + 60, y + CH - 12, { size: 15, weight: 800, color: '#fff', align: 'left', stroke: 4, strokeColor: teamColor(m.b), maxW: 220 });
   }
 
   // Lúc chờ / bốc thăm / vô địch: các đội đứng cổ vũ trên hai tháp
@@ -1286,26 +1406,27 @@
     g.restore();
     drawArena(t, dt);
     drawTop(t);
-    drawGiftBanner(t);
-    drawBanner();
     drawStatus(t);
+    drawGiftBanner(t);
+    drawPowerBar(t, dt);
+    drawGiftRow();
     drawTeams(t);
     drawJoinBar();
-    drawLegend();
+    drawBanner();
     if (ph.phase === 'intro') {
       const left = Math.ceil((ph.phaseEndsAt - now()) / 1000);
-      if (left > 0 && left <= 3) text(String(left), W / 2, 420, { size: 140, weight: 900, color: '#ffe066', stroke: 12 });
+      if (left > 0 && left <= 3) text(String(left), W / 2, Y_CLOSE + 70, { size: 130, weight: 900, color: '#ffe066', stroke: 12 });
     }
     if (ph.phase === 'champion' && ph.champion) {
       const c = ph.champion;
-      text('🏆', W / 2, 520, { size: 120 });
-      text(L(`${teamLabel(c.team)} VÔ ĐỊCH!`, `${teamLabel(c.team)} ARE CHAMPIONS!`), W / 2, 625, { size: 52, weight: 900, color: teamColor(c.team), stroke: 10 });
-      if (c.mvp && c.mvp[0]) text(`💪 ${L('Lực sĩ của giải', 'Cup MVP')}: ${c.mvp.map((x) => x.name).join(' · ')}`, W / 2, 690, { size: 26, weight: 800, stroke: 6, maxW: W - 60 });
+      text('🏆', W / 2, 540, { size: 100 });
+      text(L(`${teamLabel(c.team)} VÔ ĐỊCH!`, `${teamLabel(c.team)} ARE CHAMPIONS!`), W / 2, 618, { size: 48, weight: 900, color: teamColor(c.team), stroke: 10, maxW: CW });
+      if (c.mvp && c.mvp[0]) text(`💪 ${L('Lực sĩ của giải', 'Cup MVP')}: ${c.mvp.map((x) => x.name).join(' · ')}`, W / 2, 666, { size: 24, weight: 800, stroke: 6, maxW: CW });
     }
     if (ph.phase === 'lobby' && !banner) {
-      text(L('KÉO CO 4 ĐỘI', 'TUG OF WAR'), W / 2, 470, { size: 84, weight: 900, color: '#ff8fc7', stroke: 10 });
-      text(L('Bình luận số đội 1 · 2 · 3 · 4 để tham gia', 'Comment 1 · 2 · 3 · 4 to join a team'), W / 2, 550, { size: 32, weight: 800, stroke: 7 });
-      text(L(`Bắt đầu sau ${fmtTime(ph.phaseEndsAt - now())}`, `Starts in ${fmtTime(ph.phaseEndsAt - now())}`), W / 2, 600, { size: 28, weight: 800, color: '#ffe066', stroke: 6 });
+      text(L('KÉO CO 4 ĐỘI', 'TUG OF WAR'), W / 2, 540, { size: 78, weight: 900, color: '#ff8fc7', stroke: 10 });
+      text(L('Bình luận số đội 1 · 2 · 3 · 4 để tham gia', 'Comment 1 · 2 · 3 · 4 to join a team'), W / 2, 608, { size: 30, weight: 800, stroke: 7, maxW: CW });
+      text(L(`Bắt đầu sau ${fmtTime(ph.phaseEndsAt - now())}`, `Starts in ${fmtTime(ph.phaseEndsAt - now())}`), W / 2, 652, { size: 26, weight: 800, color: '#ffe066', stroke: 6 });
     }
     requestAnimationFrame(frame);
   }

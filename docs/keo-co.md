@@ -27,7 +27,7 @@ Thứ tự: BK1 → BK2 → Chung kết (2 đội thắng bán kết) → vinh d
   không thì tự sang đội vắng nhất (bằng nhau: đội có lực trung bình thấp hơn, để chia đều người kéo khoẻ) — màn hình báo
   "Đội 1 đầy → vào Đội 3".
 - Đổi đội chỉ lúc chờ giải. Đang giải: người mới vào được các đội **chưa bị loại** (kể cả đội đang kéo — "viện binh" vào cuối hàng);
-  hết chỗ thì vào **phòng chờ giải sau** (hiện số người chờ). Hết giải, phòng chờ vào đội; ai im lặng quá 150 s thì rời đội.
+  hết chỗ thì vào **phòng chờ giải sau** (hiện số người chờ). Hết giải, phòng chờ vào đội; ai im lặng quá 6 phút thì rời đội.
 - Hai đội lệch quá 4 người thật lúc vào phòng chờ: người vào sau cùng của đội đông được chuyển sang đội vắng (có báo).
 - **Người máy 🤖** lấp mỗi bên trên sân tới `max(số người thật bên đông hơn, npcMin)`; kéo bằng 55% người chơi thật, có 🤖 trên đầu.
   Nên đông hơn không thắng chắc — kéo đều tay mới quyết định.
@@ -92,8 +92,21 @@ x = x − v·dt
 
 ## Màn hình
 
-- **Trên**: tên giải, đồng hồ, sơ đồ BK1 · BK2 · CK (trận đang đấu sáng lên, đội thắng ✔, đội thua mờ), thanh vị trí dây,
-  hiệu ứng đang có của từng đội (🧤 🥁 🏋️ … còn mấy giây).
+Bố cục chừa chỗ cho giao diện TikTok LIVE: hai lề 48 px; trên cùng ~180 px (tên chủ phòng, người xem) và từ ~1340 trở xuống
+(khung bình luận, nút quà) để trống / chỉ đặt chữ phụ.
+
+| Vùng (y) | Nội dung |
+| :--- | :--- |
+| 184–330 | Tên giải + đồng hồ, sơ đồ BK1 · BK2 · CK |
+| 338–398 | **Thông báo đội ở giữa**: "🔥 BÁN KẾT 1: ĐỘI … vs ĐỘI …" + trận tiếp theo / tin vào đội (băng quà đè lên 2,6 s) |
+| 406–476 | **Thanh đỏ–xanh gộp %**: % + tên đội trong thanh, nút dây 🪢 có lửa 3 lớp + quầng nóng + tàn lửa, thanh nảy theo độ căng, giật khi % đổi mạnh |
+| 484–640 | Cận cảnh hai người đầu dây; hai góc: số người (+🤖), 👑 người kéo khoẻ nhất |
+| 640–720 | Dải bình luận (3 hàng) có đường chỉ xuống tên trên đầu |
+| 745–880 | Sân kéo |
+| 896–990 | **Hàng ảnh quà TikTok** ngay dưới sân (ảnh quà trên, tên kỹ năng dưới) |
+| 1002–1332 | 4 thẻ đội |
+| 1346+ | Cách vào đội, phòng chờ (chữ phụ, có thể bị khung bình luận che) |
+
 - **Giữa**: tường = chữ lớn (KÉO!, đếm ngược, đội thắng) + bảng trực tiếp mỗi đội (% lực, số người + 🤖, 👑 người kéo khoẻ nhất,
   mũi tên dây đang về phía nào); hai tháp = hai đội 2 hàng so le nắm một sợi dây thẳng, dải băng đỏ giữa dây, vạch giữa vực.
 - **Người chơi**: tay mọi người luôn nằm trên một sợi dây liền (dây võng trong vực, rung khi hai đội cùng kéo căng);
