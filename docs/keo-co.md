@@ -87,7 +87,7 @@ x = x − v·dt
 | Hat & Mustache | 99 | 🏋️ Lực sĩ | Lực sĩ vào kéo 8 s (≈ 4 người) | — |
 | Hand Hearts | 100 | 💨 Thả boom | 5 người đầu phe kia choáng 2 s | Găng keo |
 | Confetti | 100 | 🥁 Hò dô | Cả đội ×1,5, không tốn thể lực 6 s | — |
-| Sunglasses | 199 | 🦶 Khổng lồ dẫm | Giật dây 0,15 về phía mình + 3 người phe kia ngã 1,5 s | Găng keo chặn phần ngã |
+| Sunglasses | 199 | 🍌 Vỏ chuối | Giật dây 0,15 về phía mình + 3 người đầu phe kia trượt ngã 1,5 s | Găng keo chặn phần ngã |
 
 - Cùng loại không cộng dồn: gia hạn, tối đa 2 lần thời lượng. Giật dây tối đa 0,3 / 10 s mỗi đội. Một gói quà tối đa 3 lần dùng.
 - **Để dành**: tặng khi đội mình chưa ra sân → cất vào túi đội (tối đa 6), tự dùng lần lượt mỗi 3 s khi đội ra sân.
@@ -146,13 +146,19 @@ Mỗi lần dùng kỹ năng: **thẻ to** bên phía đội dùng (ảnh quà +
 đầu dây ĐỘI 3 · VÀNG choáng váng 2 giây"), kèm hiệu ứng riêng: Gồng (vòng sáng dưới chân + "×2"), Tăng lực (⚡ trên đầu 4 người),
 Cù lét (🪶 + người đầu dây cười buông tay), Găng keo (keo xanh nhỏ giọt, vòng xanh quanh đội, 🧤), Cổ vũ (nốt nhạc, pháo giấy, 📣),
 Bôi mỡ (mỡ nhỏ giọt, đoạn dây bóng vàng nhấp nháy, "TRƠN TUỘT!"), Lực sĩ (khói + "LỰC SĨ ĐẾN!" + lực sĩ to đứng kéo),
-Thả boom (khói vàng bay sang + "BỦMMM", 💫), Hò dô ("HÒ!"/"DÔ!" luân phiên trên đội), Khổng lồ dẫm (bàn chân dẫm + "RẦM!" + rung màn hình).
+Thả boom (khói vàng bay sang + "BỦMMM", 💫), Hò dô ("HÒ!"/"DÔ!" luân phiên trên đội), Vỏ chuối (3 vỏ chuối bay vòng cung sang chân 3 người đầu phe kia, "vút – víuuu – oạch!", người trúng trượt ngã).
 Đòn bị chặn: thẻ xanh "🧤 BỊ CHẶN!" + vòng khiên xanh quanh đội được bảo vệ.
 
 Mỗi kỹ năng còn có **tiếng hiệu ứng riêng** (WebAudio tự tạo): gồng "ting-ting-boing", tăng lực "ực ực + lấp lánh", cù lét tiếng cười,
 găng keo "nhóp nhép", cổ vũ kèn + đám đông, bôi mỡ "víuuu – bẹp", lực sĩ "BÙM + ta-da", thả boom xì hơi, hò dô hai tiếng trống lớn,
 khổng lồ "ẦMMM", bị chặn "keng". Và **bong bóng thoại trên đầu nhân vật**: người dùng kỹ năng la lên ("GỒNGGG!! 💪", "Xin lỗi... 😳💨"),
 người trúng đòn kêu ("Thối quá!! 🤢", "Ha ha ha nhột quá!", "Ai bôi mỡ vậy trời?!"), đội được găng keo bảo vệ đáp "Hụt rồi nhé! 😎".
+
+## Bình luận viên — `src/modes/keoco/commentary.js`
+Giọng đọc của phòng bình luận hài theo diễn biến (vi/en, nhiều câu chọn ngẫu nhiên, có tên người chơi):
+- **Mỗi kỹ năng**: ai dùng, trúng ai. Ví dụ "Bủm! A xì hơi thật to, gió bay sang Đội 2, năm người choáng váng!", "B ném mỡ khiến cho Đội 1 tuột tay, trơn như lươn!", "C bị cù lét, cười sặc sụa…", "Đội 3 được lực sĩ đi ngang qua tiện tay kéo dùm!", "A đã đầu tư găng tay keo, Đội 1 kéo cứng ngắc!", "A gồng ẻ, gân cổ nổi lên như dây điện!". Bị găng keo chặn, quà để dành cũng có câu riêng.
+- **Tình huống**: người chơi thật hết hơi, đội bị lôi sát mép vực (|x| > 0,65), lội ngược dòng (về lại |x| < 0,15), 10 giây cuối, lúc im ắng > 7 s thì khen người kéo khoẻ nhất / chọc đội kéo yếu / "giằng co", hết trận "Đội X rơi tõm xuống vực!".
+- **Không dồn giọng**: câu kỹ năng cách nhau ≥ 1,8 s, câu tình huống ≥ 6 s; dư thì bỏ (nhiều quà cùng lúc chỉ đọc câu đầu).
 
 ## Chơi thử (trang quản lý → 🎮 Chơi thử, chỉ khi chưa live)
 

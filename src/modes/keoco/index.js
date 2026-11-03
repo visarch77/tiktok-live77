@@ -2,6 +2,7 @@ const { sanitizeUserName, isBlockedSpamOrToxic } = require('../../util/sanitize'
 const { BY_GIFT_ID } = require('../redlight/items');
 const ttsEn = require('../redlight/tts-en');
 const { SKILLS, LEGEND, skillForGift } = require('./skills');
+const { skillComment, eventComment } = require('./commentary');
 const fs = require('fs');
 const path = require('path');
 const config = require('../../config');
@@ -215,8 +216,10 @@ function create(ctx, saved = {}) {
     return humans(t).reduce((s, p) => s + p.cupForce, 0) / Math.max(1, humans(t).length);
   }
 
+  let lastSayAt = 0;
   function say(text) {
     if (S().ttsEnabled === false || !text) return;
+    lastSayAt = Date.now();
     const done = (res) => {
       if (res && res.ok) ctx.broadcast('kc.say', { text, url: res.url });
     };
@@ -228,6 +231,13 @@ function create(ctx, saved = {}) {
     ctx.tts.synthesize(text, S().ttsVoice).then(done).catch(() => {});
   }
   const fxMsg = (kind, data = {}) => ctx.broadcast('kc.fx', { kind, ...data });
+  // Bình luận viên: câu kỹ năng cách nhau ≥ 1,8 s, câu bình luận tình huống ≥ 6 s (không dồn giọng đọc)
+  function comment(text, prio = 1) {
+    if (!text || Date.now() - lastSayAt < (prio >= 1 ? 1800 : 6000)) return false;
+    say(text);
+    return true;
+  }
+  let cm = { danger: { a: false, b: false }, last10: false, exhaustAt: 0 };
 
   // ---- vào đội ----
   function joinTeam(u, want, { quiet = false } = {}) {
@@ -421,6 +431,7 @@ function create(ctx, saved = {}) {
   function beginPull() {
     setPhase('pull', S().matchSeconds * 1000);
     bankNextAt = Date.now() + 1500;
+    cm = { danger: { a: false, b: false }, last10: false, exhaustAt: 0 };
     say(pick(lines().pullGo));
   }
 
@@ -453,6 +464,7 @@ function create(ctx, saved = {}) {
     setPhase('matchEnd', 6000);
     fxMsg('matchEnd', { winner, loser: winner === m.a ? m.b : m.a, x: rope.x, mvp: m.mvp, reason });
     say(
+      `${eventComment('fall', { o: teamName(winner === m.a ? m.b : m.a) }, isEn())} ` +
       `${teamName(winner)} ${L('thắng', 'wins')}${m.id === 'x' ? '' : m.id === 'f' ? L(' và vô địch', ' the cup') : L(', vào chung kết', ' and goes to the final')}! ` +
         (m.mvp ? `${L('Kéo khoẻ nhất', 'Strongest puller')}: ${speakName(m.mvp.name)}.` : '')
     );
@@ -492,7 +504,7 @@ function create(ctx, saved = {}) {
     return Math.min(base + ms, now + ms * cap);
   }
   // Áp dụng kỹ năng cho đội đang trên sân. giver: người tặng (có thể null nếu là khán giả tiếp sức)
-  function applySkill(team, skill, giver) {
+  function applySkill(team, skill, giver, name = '') {
     const now = Date.now();
     const s = SKILLS[skill];
     const opp = otherTeam(team);
@@ -547,7 +559,7 @@ function create(ctx, saved = {}) {
       case 'heave':
         fx[team].heave = extend(fx[team].heave, 6000, now);
         break;
-      case 'stomp': {
+      case 'banana': {
         // giật dây về phía mình: tối đa 0,3 mỗi 10 giây cho mỗi đội
         const log = fx[team].jerkLog.filter((j) => now - j.at < 10000);
         const used = log.reduce((s, j) => s + j.amt, 0);
@@ -570,12 +582,12 @@ function create(ctx, saved = {}) {
         break;
     }
     fxMsg('skill', info);
+    const victim = (info.targets || []).map((k) => players.get(k)).find((p) => p && !p.npc) || (info.targets || []).map((k) => players.get(k)).find(Boolean);
+    comment(skillComment(skill, { n: speakName(name || (giver && giver.name)) || L('Khán giả', 'A viewer'), t: teamName(team), o: teamName(opp), v: victim ? speakName(victim.name) : '' }, isEn(), { blocked }));
   }
-  function sayGift(name, skill, team, banked) {
+  function sayBanked(name, skill, team) {
     const s = SKILLS[skill];
-    const line = isEn() ? s.sayEn : s.say;
-    const who = speakName(name);
-    say(banked ? L(`${who} để dành ${s.vi} cho ${teamName(team)}!`, `${who} saved ${s.en} for ${teamName(team)}!`) : line(who, teamName(team)));
+    comment(skillComment(skill, { n: speakName(name), t: teamName(team), s: isEn() ? s.en : s.vi }, isEn(), { banked: true }));
   }
 
   // ---- nhịp game ----
@@ -609,6 +621,7 @@ function create(ctx, saved = {}) {
             p.stamina = 0.3;
             p.exhaustedUntil = now + EXHAUST_MS;
             fxMsg('exhaust', { key: p.key });
+            if (!p.npc && now - cm.exhaustAt > 12000 && comment(eventComment('exhaust', { v: speakName(p.name) }, isEn()), 0)) cm.exhaustAt = now;
           }
         } else if (!out || now < p.exhaustedUntil) {
           p.stamina = Math.min(1, p.stamina + STAMINA_REGEN * (now < f.cheer ? 2 : 1));
@@ -644,6 +657,36 @@ function create(ctx, saved = {}) {
     if (Math.abs(rope.x) >= 1) endMatch('ko');
   }
 
+  // Bình luận tình huống: sát mép vực, lội ngược dòng, 10 giây cuối, lúc trận im ắng thì khen / chọc người kéo
+  function commentTick(now) {
+    const m = curMatch();
+    const en = isEn();
+    for (const side of ['a', 'b']) {
+      // dây về phía b (x > 0) → a bị lôi ra mép vực
+      const pulledOff = side === 'a' ? rope.x > 0.65 : rope.x < -0.65;
+      if (pulledOff && !cm.danger[side]) {
+        cm.danger[side] = true;
+        comment(eventComment('danger', { o: teamName(m[side]) }, en), 1);
+      } else if (cm.danger[side] && Math.abs(rope.x) < 0.15) {
+        cm.danger[side] = false;
+        comment(eventComment('comeback', { t: teamName(m[side]) }, en), 1);
+      }
+    }
+    if (!cm.last10 && phaseEndsAt - now < 10500 && phaseEndsAt - now > 8000) {
+      cm.last10 = true;
+      comment(eventComment('last10', {}, en), 1);
+      return;
+    }
+    if (now - lastSayAt < 7000) return;
+    const all = [...lineOf('a'), ...lineOf('b')].filter((p) => !p.npc && p.matchForce > 0);
+    const star = all.sort((x, y) => y.matchForce - x.matchForce)[0];
+    const r = Math.random();
+    if (Math.abs(rope.x) < 0.15 && r < 0.4) comment(eventComment('even', {}, en), 0);
+    else if (star && r < 0.75) comment(eventComment('star', { v: speakName(star.name) }, en), 0);
+    else if (Math.abs(rope.x) > 0.25) comment(eventComment('lazy', { t: teamName(rope.x > 0 ? m.a : m.b) }, en), 0);
+    else lastSayAt = now - 3000; // không có gì để nói: thử lại sau ít giây
+  }
+
   function releaseBank(now) {
     if (now < bankNextAt) return;
     bankNextAt = now + 3000;
@@ -652,7 +695,7 @@ function create(ctx, saved = {}) {
       const b = bank[team];
       if (!b.length) continue;
       const it = b.shift();
-      applySkill(team, it.skill, players.get(it.giverKey) || null);
+      applySkill(team, it.skill, players.get(it.giverKey) || null, it.name);
     }
   }
 
@@ -686,6 +729,7 @@ function create(ctx, saved = {}) {
       }
       pullTick(now);
       if (phase === 'pull') releaseBank(now);
+      if (phase === 'pull') commentTick(now);
       if (phase === 'pull' && now >= phaseEndsAt) {
         if (Math.abs(rope.x) < 0.05 && !rope.overtime) {
           rope.overtime = true;
@@ -884,7 +928,7 @@ function create(ctx, saved = {}) {
         }
         if (!team) return p;
         if (phase === 'pull' && onField(team)) {
-          for (let i = 0; i < count; i++) applySkill(team, skill, p && p.team === team ? p : null);
+          for (let i = 0; i < count; i++) applySkill(team, skill, p && p.team === team ? p : null, name);
         } else if (!eliminated(team) && phase !== 'champion') {
           // đội chưa ra sân: để dành, tự dùng khi đội ra sân (mỗi 3 giây một kỹ năng)
           for (let i = 0; i < count && bank[team].length < 6; i++) bank[team].push({ skill, giverKey: p ? p.key : '', name });
@@ -893,7 +937,7 @@ function create(ctx, saved = {}) {
         } else return p;
         const giftLabel = isEn() ? (BY_GIFT_ID[String(evt.giftId || '')] ? String(BY_GIFT_ID[String(evt.giftId)]).replace(/\b\w/g, (c) => c.toUpperCase()) : evt.giftName) : evt.giftName;
         fxMsg('gift', { key: p ? p.key : '', name, team, gift: giftLabel, count, skill, mode });
-        sayGift(name, skill, team, mode === 'bank');
+        if (mode === 'bank') sayBanked(name, skill, team);
         ctx.emitEvent({ type: 'kcGift', user: name, gift: evt.giftName, label: SKILLS[skill].vi, emoji: SKILLS[skill].emoji });
         return p;
       }

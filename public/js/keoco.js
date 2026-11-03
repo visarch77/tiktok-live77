@@ -51,7 +51,7 @@
   const Y_TEAMS = 1002;
   const Y_JOIN = 1346;
   // ảnh quà TikTok (dùng chung ảnh của phòng Đèn Đỏ) cho từng kỹ năng
-  const GIFT_IMG = { gong: 'turbo', energy: 'clones', tickle: 'shove', glue: 'shield', cheer: 'revive', grease: 'wind', strong: 'giant', fart: 'fart', heave: 'teamShield', stomp: 'stomp' };
+  const GIFT_IMG = { gong: 'turbo', energy: 'clones', tickle: 'shove', glue: 'shield', cheer: 'revive', grease: 'wind', strong: 'giant', fart: 'fart', heave: 'teamShield', banana: 'stomp' };
 
   let settings = {};
   const L = (vi, en) => (settings.lang === 'en' ? en : vi);
@@ -78,7 +78,7 @@
   loadImg('bg', `${ASSET}bg.webp?v=${AV}`);
   for (const t of [1, 2, 3, 4]) loadImg(`t${t}`, `${ASSET}atlas_t${t}.webp?v=${AV}`);
   loadImg('giant', `/assets/redlight/giant_run1.webp`);
-  for (const [sk, kind] of Object.entries({ gong: 'turbo', energy: 'clones', tickle: 'shove', glue: 'shield', cheer: 'revive', grease: 'wind', strong: 'giant', fart: 'fart', heave: 'teamShield', stomp: 'stomp' })) {
+  for (const [sk, kind] of Object.entries({ gong: 'turbo', energy: 'clones', tickle: 'shove', glue: 'shield', cheer: 'revive', grease: 'wind', strong: 'giant', fart: 'fart', heave: 'teamShield', banana: 'stomp' })) {
     loadImg(`gift_${sk}`, `/assets/redlight/gift_${kind}.webp?v=26`);
   }
   let ATLAS = null;
@@ -276,7 +276,7 @@
     feed.push({ text, team, at: performance.now() });
     if (feed.length > 5) feed.shift();
   }
-  const SKILL_EMOJI = { gong: '💪', energy: '🧃', tickle: '🤭', glue: '🧤', cheer: '📣', grease: '🧈', strong: '🏋️', fart: '💨', heave: '🥁', stomp: '🦶' };
+  const SKILL_EMOJI = { gong: '💪', energy: '🧃', tickle: '🤭', glue: '🧤', cheer: '📣', grease: '🧈', strong: '🏋️', fart: '💨', heave: '🥁', banana: '🍌' };
   // Thẻ kỹ năng: ảnh quà to + tên kỹ năng + một câu nói rõ chuyện gì vừa xảy ra, hiện bên phía đội dùng kỹ năng
   const skillCards = []; // { skill, side, title, line, color, at, blocked }
   const SKILL_TITLE = {
@@ -289,7 +289,7 @@
     strong: ['🏋️ LỰC SĨ!', '🏋️ STRONGMAN!'],
     fart: ['💨 THẢ BOOM!', '💨 FART BOMB!'],
     heave: ['🥁 HÒ DÔ!', '🥁 HEAVE HO!'],
-    stomp: ['🦶 KHỔNG LỒ DẪM!', '🦶 GIANT STOMP!']
+    banana: ['🍌 VỎ CHUỐI!', '🍌 BANANA PEEL!']
   };
   function skillLine(p, team, opp) {
     const n = p.giver || L('Khán giả', 'A viewer');
@@ -305,7 +305,7 @@
       case 'strong': return L(`Lực sĩ vào kéo cùng ${T} 8 giây`, `A strongman pulls for ${T} for 8s`);
       case 'fart': return L(`5 người đầu dây ${O} choáng váng 2 giây`, `${O}'s front 5 are dizzy for 2s`);
       case 'heave': return L(`${T} kéo ×1,5, không mệt 6 giây`, `${T} pulls ×1.5 with no fatigue for 6s`);
-      case 'stomp': return L(`Giật dây về ${T} + 3 người ${O} ngã`, `Yanks the rope to ${T} + 3 of ${O} fall`);
+      case 'banana': return L(`3 người ${O} trượt vỏ chuối, dây giật về ${T}`, `3 of ${O} slip on a peel, rope jerks to ${T}`);
       default: return '';
     }
   }
@@ -362,9 +362,12 @@
           nz(k * 0.32, 0.15, { vol: 0.1, type: 'lowpass', freq: 800 });
         }
         break;
-      case 'stomp': // ẦMMM khổng lồ dẫm + rung
-        o(70, 0.3, 0.7, { type: 'sine', vol: 0.4, slide: -35, attack: 0.002 });
-        nz(0.3, 0.6, { vol: 0.16, type: 'lowpass', freq: 300, sweepTo: 80 });
+      case 'banana': // "vút" ném vỏ chuối → còi trượt lên "víuuu" → "oạch!" ngã
+        nz(0, 0.3, { vol: 0.08, type: 'bandpass', freq: 1800, q: 1.5, sweepTo: 600 });
+        o(500, 0.35, 0.4, { type: 'sine', vol: 0.1, slide: 1100, attack: 0.01 });
+        audio.kick(T + 0.8, 0.35);
+        nz(0.8, 0.18, { vol: 0.16, type: 'lowpass', freq: 500 });
+        o(180, 0.85, 0.18, { type: 'triangle', vol: 0.1, slide: -90, attack: 0.003 });
         break;
       default:
         break;
@@ -381,13 +384,13 @@
     strong: [['LỰC SĨ ĐÂY! 🏋️', 'Tránh ra để anh kéo!'], ['STRONGMAN HERE! 🏋️', 'Step aside!']],
     fart: [['Xin lỗi... 😳💨', 'BỦMMM! 💨', 'Ăn hơi nhiều đậu...'], ['Oops... 😳💨', 'PFFFRT! 💨', 'Too many beans...']],
     heave: [['HÒ DÔ!! 🥁', 'Cả đội kéo nào!'], ['HEAVE HO!! 🥁', 'All together now!']],
-    stomp: [['Khổng lồ ơi dẫm đi! 🦶', 'RẦM cho tui!'], ['Giant, STOMP! 🦶', 'Crush them!']]
+    banana: [['Ăn chuối không? 🍌', 'Vỏ chuối nè hehe!', 'Trượt đi cưng! 🍌'], ['Banana? 🍌', 'Oops, dropped a peel!', 'Slip-slip! 🍌']]
   };
   const SAY_HIT = {
     tickle: [['Ha ha ha nhột quá! 🤣', 'Đừng cù mà!'], ['Ha ha ha stop! 🤣', 'Not the tickles!']],
     grease: [['Ai bôi mỡ vậy trời?!', 'Trơn tuột tay! 😱'], ['Who greased this?!', 'So slippery! 😱']],
     fart: [['Thối quá!! 🤢', 'Ặc ặc… choáng!', 'Mùi gì kinh vậy?!'], ['It stinks!! 🤢', 'I\'m dizzy…', 'What is that smell?!']],
-    stomp: [['Á Á Á!! 😵', 'Cứu với!'], ['AAAH!! 😵', 'Help!']],
+    banana: [['OẠCH!! 😵', 'Ai vứt vỏ chuối?!', 'Chổng vó rồi!'], ['WHOA!! 😵', 'Who dropped that?!', 'My butt!']],
     energy: [['Sảng khoái! ⚡', 'Hồi sức rồi!'], ['Refreshed! ⚡', 'Full power!']]
   };
   const SAY_BLOCK = [['Hụt rồi nhé! 😎', 'Găng keo đó cưng!'], ['Missed me! 😎', 'Sticky gloves, baby!']];
@@ -439,10 +442,11 @@
       const gx = lineX(side, 2);
       for (let i = 0; i < 46; i++) particles.push({ kind: 'gas', x: gx, y: ROPE_Y - 20, vx: dir * (120 + Math.random() * 240), vy: -20 - Math.random() * 60, life: 1.6 + Math.random() * 0.6, t: 0, r: 12 + Math.random() * 18 });
       popText(L('BỦMMM 💨', 'PFFFRRT 💨'), gx, ROPE_Y - 90, '#c3e66b', t);
-    } else if (p.skill === 'stomp') {
-      stomp = { at: t, side: oside };
-      shake = 18;
-      popText(L('RẦM!', 'BOOM!'), lineX(oside, 1), ROPE_Y - 120, '#ff922b', t + 300);
+    } else if (p.skill === 'banana') {
+      // 3 vỏ chuối bay vòng cung từ người ném sang chân 3 người đầu phe kia, rơi xuống là trượt
+      for (let i = 0; i < 3; i++) bananas.push({ at: t + i * 120, x0: lineX(side, 2), x1: lineX(oside, i), side: oside });
+      shake = 8;
+      popText(L('OẠCH!', 'WHOOPS!'), lineX(oside, 1), ROPE_Y - 120, '#ffe066', t + 800);
     } else if (p.skill === 'grease') {
       for (let i = 0; i < 30; i++) particles.push({ kind: 'drip', x: lineX(oside, Math.floor(Math.random() * 10)), y: ROPE_Y, vx: 0, vy: 40 + Math.random() * 60, life: 1.2, t: 0, r: 5 });
       popText(L('TRƠN TUỘT!', 'SLIPPERY!'), lineX(oside, 2), ROPE_Y - 90, '#ffe9a3', t);
@@ -605,7 +609,7 @@
       }
     }
   }
-  let stomp = null;
+  const bananas = []; // { at, x0, x1, side }
   function confetti() {
     return { kind: 'conf', x: Math.random() * W, y: -20 - Math.random() * 400, vx: (Math.random() - 0.5) * 80, vy: 120 + Math.random() * 160, life: 6, t: 0, r: 6 + Math.random() * 6, c: ['#ff3b5c', '#2f8cff', '#ffc928', '#b45cff', '#69db7c', '#fff'][Math.floor(Math.random() * 6)], rot: Math.random() * 6 };
   }
@@ -1218,7 +1222,7 @@
         text(say.text, bx + tw / 2, by + 1, { size: 16, weight: 800, color: '#1a1030', maxW: tw - 14 });
         g.restore();
       } else if (say) skillSays.delete(d.p.k);
-      const HIT = { hit_energy: '⚡', hit_tickle: '🪶', hit_fart: '💫', hit_stomp: '💥', hit_grease: '🧈' };
+      const HIT = { hit_energy: '⚡', hit_tickle: '🪶', hit_fart: '💫', hit_banana: '🍌', hit_grease: '🧈' };
       if (mk && mk.until > t && HIT[mk.kind]) text(HIT[mk.kind], x + Math.sin(t / 70) * 6, headY - 22, { size: 26 });
       // tên ngay trên đầu người chơi thật: chữ nhỏ, so le 3 tầng theo vị trí (người cạnh nhau ở tầng khác nhau),
       // vẫn đè thì bỏ tên đó; bình luận (câu dài) xếp vào dải phía trên sân có đường chỉ xuống (drawLabels)
@@ -1861,21 +1865,27 @@
       g.globalAlpha = 1;
     }
   }
-  function drawStomp(t) {
-    if (!stomp) return;
-    const e = (t - stomp.at) / 1000;
-    if (e > 1.4) {
-      stomp = null;
-      return;
+  function drawBananas(t) {
+    for (let i = bananas.length - 1; i >= 0; i--) {
+      const b = bananas[i];
+      const e = (t - b.at) / 1000;
+      if (e < 0) continue;
+      if (e > 2.2) {
+        bananas.splice(i, 1);
+        continue;
+      }
+      // 0–0,7 s bay vòng cung, rồi nằm dưới chân, vỏ bị đá văng ra sau
+      const u = Math.min(1, e / 0.7);
+      const kick = e > 0.8 ? (e - 0.8) * (b.side === 'a' ? -160 : 160) : 0;
+      const x = b.x0 + (b.x1 - b.x0) * u + kick;
+      const y = ROPE_Y + 34 - Math.sin(u * Math.PI) * 170 - (e > 0.8 ? Math.sin(Math.min(1, (e - 0.8) / 0.5) * Math.PI) * 30 : 0);
+      g.save();
+      g.globalAlpha = e > 1.8 ? (2.2 - e) / 0.4 : 1;
+      g.translate(x, y);
+      g.rotate(e * 9);
+      text('🍌', 0, 0, { size: 34 });
+      g.restore();
     }
-    const im = IMG.giant;
-    if (!ready(im)) return;
-    const x = lineX(stomp.side, 1);
-    const drop = e < 0.35 ? -300 + (e / 0.35) * 300 : 0;
-    const sc = 0.9;
-    g.globalAlpha = e > 1.1 ? (1.4 - e) / 0.3 : 1;
-    g.drawImage(im, x - (im.naturalWidth * sc) / 2, ROPE_Y + 40 - im.naturalHeight * sc + drop, im.naturalWidth * sc, im.naturalHeight * sc);
-    g.globalAlpha = 1;
   }
   // Lực sĩ đứng cuối hàng khi có kỹ năng Lực sĩ
   function drawStrongman(side, team, t) {
@@ -2010,7 +2020,7 @@
       drawRope(t);
       const frontA = drawLine('a', m.a, la, t, 'front');
       const frontB = drawLine('b', m.b, lb, t, 'front');
-      drawStomp(t);
+      drawBananas(t);
       chaosFx(backA.concat(frontA), 'a', t, dt);
       chaosFx(backB.concat(frontB), 'b', t, dt);
       drawOverheads(backA.concat(frontA), 'a', t);

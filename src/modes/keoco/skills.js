@@ -51,10 +51,10 @@ const SKILLS = {
     desc: 'cả đội kéo ×1,5, không mất thể lực 6 giây', descEn: 'team pull ×1.5, no stamina cost 6s',
     say: (n, t) => `${n} hô hò dô cho ${t}!`, sayEn: (n, t) => `${n} leads a heave ho for ${t}!`
   },
-  stomp: {
-    emoji: '🦶', vi: 'Khổng lồ dẫm', en: 'Giant Stomp', attack: true,
-    desc: 'giật dây về phía mình + 3 người phe kia ngã', descEn: 'yank the rope + 3 rivals fall',
-    say: (n) => `${n} gọi khổng lồ dẫm dây!`, sayEn: (n) => `${n} calls the giant to stomp the rope!`
+  banana: {
+    emoji: '🍌', vi: 'Vỏ chuối', en: 'Banana Peel', attack: true,
+    desc: 'ném vỏ chuối: 3 người đầu phe kia trượt ngã + dây giật về phía mình', descEn: '3 rival front pullers slip + the rope jerks your way',
+    say: (n) => `${n} ném vỏ chuối!`, sayEn: (n) => `${n} throws a banana peel!`
   }
 };
 
@@ -74,7 +74,7 @@ const GIFT_SKILL = {
   'hand hearts': 'fart',
   confetti: 'heave',
   fireworks: 'heave',
-  sunglasses: 'stomp',
+  sunglasses: 'banana',
   'gift box': 'energy',
   'teddy bear': 'cheer'
 };
@@ -90,7 +90,7 @@ const LEGEND = [
   { gift: 'Mũ & ria', tiktok: 'Hat and Mustache', coins: 99, skill: 'strong' },
   { gift: 'Hand Hearts', tiktok: 'Hand Hearts', coins: 100, skill: 'fart' },
   { gift: 'Confetti', tiktok: 'Confetti', coins: 100, skill: 'heave' },
-  { gift: 'Kính râm', tiktok: 'Sunglasses', coins: 199, skill: 'stomp' }
+  { gift: 'Kính râm', tiktok: 'Sunglasses', coins: 199, skill: 'banana' }
 ];
 
 function skillForGift(giftName, coins, giftId) {
