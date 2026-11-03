@@ -1,52 +1,51 @@
 # Tạo nhạc trận Kéo Co bằng AI làm nhạc (Suno / Udio)
 
-Game cần **4 file MP3**, mỗi file là một bài riêng. Ba bài lúc kéo phải **cùng nhịp 140 BPM, cùng giọng Rê thứ (D minor)** để khi game chuyển qua lại nghe liền mạch:
+Hướng nhạc: **vui, nhẹ, nhịp vừa phải, nghe lâu không mệt** — làm nền cho tiếng bình luận và tiếng sân, không lấn át. Mỗi trận chỉ ~45 giây và lặp liên tục cả buổi live, nên cần **nhiều bài nền thay phiên** để đỡ nhàm.
 
-| Tên file | Phát khi nào | Cảm giác |
+| Tên file | Phát khi nào | Bắt buộc? |
 |---|---|---|
-| `pull_main.mp3` | Suốt trận kéo | Căng, dồn dập, đều nhịp, chưa bung hết |
-| `pull_tense.mp3` | Dây bị kéo sát mép vực | Gấp hơn, nguy hiểm, tim đập |
-| `pull_final.mp3` | 10 giây cuối trận | Cao trào, bung hết cỡ |
-| `win.mp3` | Hết trận (game chỉ dùng ~6 giây đầu) | Kèn chiến thắng |
+| `pull_main.mp3` | Nền trận kéo (bài 1) | Có |
+| `pull_main_2.mp3` | Nền trận kéo (bài 2) — mỗi trận game đổi bài | Nên có |
+| `pull_main_3.mp3` | Nền trận kéo (bài 3) | Nên có |
+| `pull_final.mp3` | 10 giây cuối — nhỉnh hơn một chút, không dồn dập | Tuỳ chọn |
+| `win.mp3` | Hết trận (game chỉ dùng ~6 giây đầu) | Tuỳ chọn |
+
+Ba bài nền nên **khác nhau rõ** (khác nhạc cụ chính) nhưng cùng tâm trạng. Thiếu file nào game dùng nhạc tự tạo thay vào, nên có thể làm dần.
 
 ## Cách làm trên Suno
-1. Vào suno.com → **Create** → bật **Custom** và bật **Instrumental** (không lời).
-2. Ô **Style of Music**: dán nguyên văn đoạn tiếng Anh bên dưới. Ô **Title**: đặt tên file tương ứng.
-3. Mỗi lần Suno ra 2 bản: nghe, chọn bản **vào nhạc ngay (không có đoạn mở đầu nhẹ nhàng)**, nhịp đều, không có giọng hát.
-4. Bấm ⋯ → **Download → MP3**. Đổi tên file đúng như bảng trên.
-5. Gửi 4 file cho mình (kéo thả vào khung chat, hoặc để chung một thư mục rồi báo đường dẫn).
+1. suno.com → **Create** → bật **Custom** và **Instrumental** (không lời).
+2. Ô **Style of Music**: dán nguyên văn đoạn tiếng Anh bên dưới. Ô **Title**: tên file tương ứng.
+3. Suno ra 2 bản mỗi lần: chọn bản **vào nhạc ngay**, nhịp đều, **không có đoạn bùng nổ hay đổi nhịp đột ngột** (vì nhạc lặp liên tục).
+4. ⋯ → **Download → MP3**, đổi tên đúng bảng trên, gửi cho mình.
 
-> Lưu ý bản quyền: dùng gói Suno **trả phí (Pro/Premier)** thì bạn có quyền dùng nhạc cho mục đích kiếm tiền (live có quà). Gói miễn phí không cho dùng thương mại.
-
----
-
-### 1. `pull_main.mp3` — nền suốt trận
-```
-epic tense game show battle music, 140 BPM, D minor, instrumental, no vocals, starts immediately with no intro, driving taiko drums, staccato cello ostinato, pulsing dark synth bass, ticking clock percussion, suspenseful brass stabs, steady relentless energy, tug of war competition, loop friendly
-```
-
-### 2. `pull_tense.mp3` — sát mép vực
-```
-high tension danger music, 140 BPM, D minor, instrumental, no vocals, starts immediately with no intro, pounding heartbeat kick drum, fast tremolo strings, frantic taiko rolls, alarm-like brass hits, rising synth risers, fast hi-hats, desperate struggle, edge of a cliff, loop friendly
-```
-
-### 3. `pull_final.mp3` — 10 giây cuối
-```
-massive climax finale, 140 BPM double time feel, D minor, instrumental, no vocals, starts immediately at full intensity, huge epic drums, choir hits without words, soaring brass, fast string runs, ticking countdown, cymbal swells, all instruments at maximum, last seconds of a battle
-```
-
-### 4. `win.mp3` — thắng trận
-```
-short triumphant victory fanfare, brass and timpani, cymbal crash, bright D major, instrumental, no vocals, starts immediately, celebratory game show winner sting
-```
+> Bản quyền: dùng gói Suno **trả phí** thì được dùng nhạc khi live có nhận quà. Gói miễn phí không cho dùng thương mại.
 
 ---
 
-### Muốn màu Squid Game hơn (tuỳ chọn, thay cho bài 1 và 2)
-Cảnh kéo co trong phim dùng nhạc điện tử đập đều như nhịp tim, ít nhạc cụ, rất lạnh:
+### `pull_main.mp3` — bài 1: nhẹ nhàng nghịch ngợm
 ```
-dark minimal electronic thriller, 140 BPM, D minor, instrumental, no vocals, starts immediately, pulsing heartbeat sub bass, cold analog synth arpeggio, sparse metallic percussion, building dread, deadly game, loop friendly
+light playful game show background music, 105 BPM, instrumental, no vocals, starts immediately, plucky pizzicato strings, soft marimba, gentle bouncy bass, light shaker and soft claps, cheerful but slightly suspenseful, relaxed, not intense, steady groove, background music for commentary, loop friendly
 ```
 
-## Trên Udio (nếu không dùng Suno)
-Dán cùng đoạn mô tả, bật **Instrumental**, độ dài 2 phút trở lên. Udio cho tải MP3 tương tự.
+### `pull_main_2.mp3` — bài 2: vui tươi kiểu hoạt hình
+```
+cheerful cartoon sports background music, 108 BPM, instrumental, no vocals, starts immediately, ukulele and glockenspiel, whistle accents, soft kick drum, warm upright bass, friendly competition, lighthearted, not dramatic, easy to listen to for a long time, loop friendly
+```
+
+### `pull_main_3.mp3` — bài 3: lo-fi thư giãn có chút hồi hộp
+```
+chill lo-fi game background music, 100 BPM, instrumental, no vocals, starts immediately, mellow electric piano, soft vinyl drums, round synth bass, light ticking percussion, calm curiosity, gentle tension, unobtrusive, loop friendly
+```
+
+### `pull_final.mp3` — 10 giây cuối (tuỳ chọn)
+```
+light upbeat game show countdown music, 110 BPM, instrumental, no vocals, starts immediately, pizzicato strings and marimba, ticking clock, a little more energy, playful anticipation, not aggressive, no heavy drums
+```
+
+### `win.mp3` — thắng trận (tuỳ chọn)
+```
+short cheerful victory jingle, xylophone and brass, light cymbal, happy, instrumental, no vocals, starts immediately, cartoon game show win sound
+```
+
+## Trên Udio
+Dán cùng đoạn mô tả, bật **Instrumental**, độ dài 2 phút trở lên, tải MP3.

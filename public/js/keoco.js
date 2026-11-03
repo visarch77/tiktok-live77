@@ -654,11 +654,13 @@
   }
   // Nhạc: chờ giải / vinh danh = nhạc chờ Squid; lúc kéo = hành khúc "ùm-pa" tự sáng tác (kèn tuba, kazoo, trống, còi trượt)
   // Nhạc lúc kéo bằng file thật (tạo bằng AI nhạc), đặt ở /assets/keoco/music/: có file nào dùng file đó, thiếu thì dùng nhạc tự tạo.
-  //   pull_main  — nền suốt trận · pull_tense — khi dây sát mép vực · pull_final — 10 giây cuối · win — đoạn ngắn khi hết trận
+  //   pull_main (+ pull_main_2, pull_main_3: mỗi trận một bài, đỡ lặp) — nền suốt trận · pull_tense — khi dây sát mép vực
+  //   pull_final — 10 giây cuối · win — đoạn ngắn khi hết trận
   // Các bản kéo chạy lặp, chuyển qua lại bằng cách mờ dần (crossfade) theo diễn biến trận.
   const MUSIC_DIR = '/assets/keoco/music/';
   const pullFiles = {};
-  for (const key of ['pull_main', 'pull_tense', 'pull_final', 'win']) {
+  const PULL_KEYS = ['pull_main', 'pull_main_2', 'pull_main_3', 'pull_tense', 'pull_final'];
+  for (const key of [...PULL_KEYS, 'win']) {
     fetch(`${MUSIC_DIR}${key}.mp3`, { method: 'HEAD' })
       .then((r) => {
         if (!r.ok) return;
@@ -669,14 +671,15 @@
       })
       .catch(() => {});
   }
-  const usePullFiles = () => settings.pullMusic !== 'epic' && settings.pullMusic !== 'funny' && Boolean(pullFiles.pull_main);
+  const usePullFiles = () => (!settings.pullMusic || settings.pullMusic === 'auto') && Boolean(pullFiles.pull_main);
   function filePullMusic(dt, want) {
     const left = (ph.phaseEndsAt - now()) / 1000;
     const edge = Math.abs(ropeX) > 0.55;
-    let cur = 'pull_main';
+    const mains = ['pull_main', 'pull_main_2', 'pull_main_3'].filter((k) => pullFiles[k]);
+    let cur = mains[((ph.cup || 0) * 3 + Math.max(0, ph.matchIdx)) % mains.length];
     if (left < 10.5 && pullFiles.pull_final) cur = 'pull_final';
     else if (edge && pullFiles.pull_tense) cur = 'pull_tense';
-    for (const key of ['pull_main', 'pull_tense', 'pull_final']) {
+    for (const key of PULL_KEYS) {
       const tr = pullFiles[key];
       if (!tr) continue;
       const target = want && key === cur ? 1 : 0;
@@ -789,30 +792,31 @@
     const tn = performance.now();
     // dây cót két: căng càng mạnh càng dày
     if (tn > ambient.creakAt) {
-      ambient.creakAt = tn + 1000 / (0.6 + 2.6 * tension) * (0.6 + Math.random() * 0.8);
+      ambient.creakAt = tn + 1000 / (0.35 + 1.2 * tension) * (0.6 + Math.random() * 0.8); // thưa, chỉ dày lên khi căng thật
       const f = 260 + Math.random() * 160;
-      audio.noise(T, 0.22 + Math.random() * 0.12, { vol: 0.05 + tension * 0.05, type: 'bandpass', freq: f, q: 14, sweepTo: f * 0.6 });
+      audio.noise(T, 0.22 + Math.random() * 0.12, { vol: 0.03 + tension * 0.035, type: 'bandpass', freq: f, q: 14, sweepTo: f * 0.6 });
     }
     // thở hộc hộc: theo số người đang gồng / kiệt sức trên sân
     let tired = 0;
     for (const v of pstate.values()) if (v.st === 'strain' || v.st === 'tired') tired++;
     if (tired && tn > ambient.breathAt) {
-      ambient.breathAt = tn + Math.max(180, 900 - tired * 60) * (0.7 + Math.random() * 0.6);
+      ambient.breathAt = tn + Math.max(700, 1800 - tired * 80) * (0.7 + Math.random() * 0.6);
       const f = 900 + Math.random() * 700;
-      audio.noise(T, 0.16, { vol: Math.min(0.08, 0.025 + tired * 0.004), type: 'bandpass', freq: f, q: 2.2, sweepTo: f * 0.75 });
-      if (Math.random() < 0.35) voice(T + 0.02, 0.14, 240 + Math.random() * 80, 200, 'a', 0.03, 0); // "hộc"
+      audio.noise(T, 0.16, { vol: Math.min(0.05, 0.018 + tired * 0.003), type: 'bandpass', freq: f, q: 2.2, sweepTo: f * 0.75 });
+      if (Math.random() < 0.15) voice(T + 0.02, 0.14, 240 + Math.random() * 80, 200, 'a', 0.03, 0); // "hộc"
     }
     // bị lôi đi: giày rít + chà sàn
     const sp = Math.abs(ropeVel);
     if (sp > 0.025 && tn > ambient.skidAt) {
-      ambient.skidAt = tn + 110 + Math.random() * 90;
+      ambient.skidAt = tn + 220 + Math.random() * 180;
       audio.noise(T, 0.12, { vol: Math.min(0.07, sp * 1.2), type: 'highpass', freq: 2600 });
       if (Math.random() < 0.3) audio.osc(1700 + Math.random() * 500, T, 0.09, { type: 'sine', vol: 0.03, slide: 400, attack: 0.004 });
     }
     // đám đông hô "HÒ… DÔ!" (dày hơn khi có Hò dô / căng)
     const heave = (live.ta && live.ta.heave > 0) || (live.tb && live.tb.heave > 0);
-    if (tn > ambient.chantAt) {
-      ambient.chantAt = tn + (heave ? 900 : 2600 - tension * 900) * (0.85 + Math.random() * 0.3);
+    // chỉ hô khi có kỹ năng Hò dô hoặc dây đang căng thật — không hô đều đều cả trận
+    if (tn > ambient.chantAt && (heave || tension > 0.55)) {
+      ambient.chantAt = tn + (heave ? 1400 : 5000 + Math.random() * 4000);
       for (let k = 0; k < 3; k++) {
         const d = Math.random() * 0.04; // lệch nhẹ cho giống nhiều người hô
         voice(T + d, 0.28, 150 + k * 18, 135 + k * 15, 'o', 0.035, 5);
@@ -1020,6 +1024,61 @@
       music.next += sx;
     }
   }
+  // ---- Nhạc vừa phải (mặc định): nhẹ, vui, nhịp vừa — 3 bản thay phiên theo trận cho đỡ lặp ----
+  // Giai điệu sinh từ hợp âm theo "hạt giống" của trận + vòng lặp nên mỗi vòng một khác; 10 giây cuối chỉ thêm chút trống, không tăng tốc
+  const CALM = [
+    { bpm: 104, roots: [45, 41, 48, 43], chords: [[57, 60, 64], [53, 57, 60], [55, 60, 64], [55, 59, 62]], scale: [69, 72, 74, 76, 79, 81], lead: 'pluck' }, // La thứ: Am F C G
+    { bpm: 108, roots: [40, 36, 43, 38], chords: [[55, 59, 64], [55, 60, 64], [55, 59, 62], [54, 57, 62]], scale: [64, 67, 69, 71, 74, 76], lead: 'marimba' }, // Mi thứ: Em C G D
+    { bpm: 100, roots: [38, 43, 38, 45], chords: [[57, 60, 65], [55, 59, 62], [57, 62, 65], [57, 61, 64]], scale: [62, 65, 67, 69, 72, 74], lead: 'pizz' } // Rê: Dm G Dm A
+  ];
+  const RHY = [[0, 3, 4, 6], [0, 2, 4], [0, 4, 5, 6], [2, 4, 6], [0, 6], [0, 1, 2, 4]]; // nhịp giai điệu (ô móc đơn trong ô nhịp)
+  function seeded(n) {
+    const x = Math.sin(n * 12.9898) * 43758.5453;
+    return x - Math.floor(x);
+  }
+  function leadNote(kind, m, at, dur, vol) {
+    if (kind === 'marimba') {
+      audio.osc(mfreq(m), at, Math.min(0.5, dur), { type: 'sine', vol, attack: 0.003, bus: 'music' });
+      audio.osc(mfreq(m) * 4, at, 0.08, { type: 'sine', vol: vol * 0.25, attack: 0.002, bus: 'music' });
+    } else if (kind === 'pizz') synthNote(m, at, Math.min(0.18, dur), { vol: vol * 0.9, cutoff: 1400, attack: 0.004, release: 0.12, detune: 4 });
+    else synthNote(m, at, Math.min(0.3, dur), { vol, cutoff: 2600, attack: 0.004, release: 0.18, detune: 0, type: 'triangle' });
+  }
+  function calmMusic(c) {
+    const matchNo = (ph.cup || 0) * 3 + Math.max(0, ph.matchIdx);
+    const V = CALM[matchNo % CALM.length];
+    const left = (ph.phaseEndsAt - now()) / 1000;
+    const hurry = left < 10;
+    const edge = Math.abs(ropeX) > 0.6;
+    const eighth = 60 / V.bpm / 2;
+    while (music.next < c.currentTime + 0.25) {
+      const at = music.next;
+      const st = music.step % 8;
+      const barN = Math.floor(music.step / 8);
+      const ci = Math.floor(barN / 2) % 4; // mỗi hợp âm 2 ô nhịp
+      const loop = Math.floor(barN / 8);
+      const root = V.roots[ci];
+      // trống nhẹ: kick phách 1 · vỗ tay khẽ phách 3 · lắc nhẹ móc đơn (10 giây cuối mới dày hơn chút)
+      if (st === 0) audio.kick(at, 0.2);
+      if (st === 4) audio.noise(at, 0.09, { vol: 0.045, type: 'bandpass', freq: 1500, q: 1, bus: 'music' });
+      if (st % 2 === 1 || hurry) audio.noise(at, 0.035, { vol: hurry ? 0.02 : 0.012, type: 'highpass', freq: 6500, bus: 'music' });
+      if (hurry && st === 6) audio.kick(at, 0.12);
+      // bè trầm: nốt gốc / quãng năm, nảy nhẹ
+      if (st === 0 || st === 3 || st === 6) synthNote(st === 3 ? root + 7 : root, at, eighth * 1.4, { vol: 0.07, cutoff: 380, attack: 0.008, release: 0.08, detune: 0, type: 'triangle' });
+      // nền hợp âm rất khẽ, đầu mỗi hợp âm
+      if (st === 0 && barN % 2 === 0) for (const n of V.chords[ci]) synthNote(n, at, eighth * 15, { vol: 0.009 + (edge ? 0.006 : 0), cutoff: 1100, attack: 0.4, release: 0.5, detune: 8 });
+      // giai điệu: nhịp và nốt lấy theo hạt giống (trận, ô nhịp, vòng) — mỗi vòng biến tấu, có ô nhịp để trống cho thở
+      const seed = matchNo * 101 + (barN % 8) * 7 + loop * 13;
+      const rest = seeded(seed + 0.5) < 0.25;
+      const rhy = RHY[Math.floor(seeded(seed) * RHY.length)];
+      if (!rest && rhy.includes(st)) {
+        const tones = V.chords[ci].map((n) => n + 12).concat(V.scale);
+        const n = tones[Math.floor(seeded(seed + st * 3.1) * tones.length)];
+        leadNote(V.lead, n, at, eighth * 2, 0.06);
+      }
+      music.step++;
+      music.next += eighth;
+    }
+  }
   function pullMusic() {
     const c = audio.ctx;
     const play = unlocked && !previewMuted && settings.bgMusicEnabled !== false && ph.phase === 'pull' && c;
@@ -1027,7 +1086,7 @@
       music.on = false;
       return;
     }
-    const style = settings.pullMusic === 'funny' ? 'funny' : 'epic';
+    const style = settings.pullMusic === 'funny' ? 'funny' : settings.pullMusic === 'epic' ? 'epic' : 'calm';
     if (!music.on || music.style !== style) {
       music.on = true;
       music.style = style;
@@ -1035,6 +1094,7 @@
       music.next = c.currentTime + 0.08;
     }
     if (style === 'epic') return epicMusic(c);
+    if (style === 'calm') return calmMusic(c);
     const left = (ph.phaseEndsAt - now()) / 1000;
     const hurry = left < 10; // 10 giây cuối: nhanh hơn + lên giọng
     const bpm = hurry ? 156 : 128;
@@ -1329,7 +1389,11 @@
       if (loud && ph.phase === 'pull' && shouts.length < 4 && Math.random() < dt * 0.25) {
         const list = settings.lang === 'en' ? SHOUT_EN : SHOUT_VI;
         shouts.push({ text: list[Math.floor(Math.random() * list.length)], x: d.gx - face * 12, y: d.box.top - 10, at: t, rot: (Math.random() - 0.5) * 0.4, side });
-        gruntSfx();
+        // tiếng "hự" thưa thôi (≥ 3 giây một lần), chữ vẫn hiện
+        if (t > (ambient.gruntAt || 0)) {
+          ambient.gruntAt = t + 3000 + Math.random() * 2000;
+          gruntSfx();
+        }
       }
     }
   }

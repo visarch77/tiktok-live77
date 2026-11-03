@@ -249,13 +249,14 @@ function create(ctx, saved = {}) {
       });
   }
   const fxMsg = (kind, data = {}) => ctx.broadcast('kc.fx', { kind, ...data });
-  // Bình luận viên: câu kỹ năng cách nhau ≥ 1,8 s, câu bình luận tình huống ≥ 6 s (không dồn giọng đọc)
+  // Bình luận viên: câu kỹ năng cách nhau ≥ 3 s, câu bình luận tình huống ≥ 12 s (thưa cho người xem đỡ mệt)
   function comment(text, prio = 1) {
-    if (!text || Date.now() - lastSayAt < (prio >= 1 ? 1800 : 6000)) return false;
+    if (!text || Date.now() - lastSayAt < (prio >= 1 ? 3000 : 12000)) return false;
     say(text, { prio: Math.min(1, prio), ttl: prio >= 1 ? 4000 : 3000 });
     return true;
   }
   let cm = { danger: { a: false, b: false }, last10: false, exhaustAt: 0 };
+  const lastSkillSay = {};
 
   // ---- vào đội ----
   function joinTeam(u, want, { quiet = false } = {}) {
@@ -600,6 +601,10 @@ function create(ctx, saved = {}) {
         break;
     }
     fxMsg('skill', info);
+    // cùng một kỹ năng của cùng đội dùng liên tục: chỉ bình luận lần đầu trong 15 giây
+    const sk = `${team}:${skill}`;
+    if (now - (lastSkillSay[sk] || 0) < 15000) return;
+    lastSkillSay[sk] = now;
     const victim = (info.targets || []).map((k) => players.get(k)).find((p) => p && !p.npc) || (info.targets || []).map((k) => players.get(k)).find(Boolean);
     comment(skillComment(skill, { n: speakName(name || (giver && giver.name)) || L('Khán giả', 'A viewer'), t: teamName(team), o: teamName(opp), v: victim ? speakName(victim.name) : '' }, isEn(), { blocked }));
   }
@@ -695,7 +700,7 @@ function create(ctx, saved = {}) {
       comment(eventComment('last10', {}, en), 1);
       return;
     }
-    if (now - lastSayAt < 7000) return;
+    if (now - lastSayAt < 15000) return;
     const all = [...lineOf('a'), ...lineOf('b')].filter((p) => !p.npc && p.matchForce > 0);
     const star = all.sort((x, y) => y.matchForce - x.matchForce)[0];
     const r = Math.random();
@@ -1211,7 +1216,7 @@ module.exports = {
     fastStartPlayers: [2, 80],
     minTeamPlayers: [1, 20],
     aiShow: 'boolean',
-    pullMusic: { type: 'enum', values: ['auto', 'epic', 'funny'] },
+    pullMusic: { type: 'enum', values: ['auto', 'calm', 'epic', 'funny'] },
     autoLoop: 'boolean',
     lang: { type: 'enum', values: ['vi', 'en'] },
     enVoice: { type: 'enum', values: ttsEn.VOICES }
@@ -1225,7 +1230,7 @@ module.exports = {
     fastStartPlayers: 24,
     minTeamPlayers: 1, // đội có từ chừng này người thật trở lên mới tính là "có người"; cần ít nhất 2 đội như vậy để vào giải
     aiShow: true, // chưa đủ 2 đội: người máy tự kéo biểu diễn (không tính điểm)
-    pullMusic: 'auto', // nhạc lúc kéo: 'auto' file nhạc thật nếu có (assets/keoco/music), không thì kịch tính tự tạo · 'epic' · 'funny'
+    pullMusic: 'auto', // nhạc lúc kéo: 'auto' file nhạc thật nếu có (assets/keoco/music), không thì 'calm' (vừa phải, 3 bản thay phiên) · 'epic' kịch tính · 'funny' hài
     autoLoop: true,
     lang: 'vi',
     enVoice: ttsEn.DEFAULT_VOICE,

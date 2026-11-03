@@ -1345,8 +1345,8 @@
           <label class="switch"><input type="checkbox" data-setting="bgMusicEnabled" ${s.bgMusicEnabled !== false ? 'checked' : ''} /><span></span></label>
         </div>
         <div class="setting">
-          <div><div class="setting-name">Nhạc lúc kéo</div><div class="setting-desc">Nhạc thật: file trong assets/keoco/music (nền / sát vực / 10 giây cuối / thắng), thiếu file thì dùng nhạc tự tạo kịch tính · Tự tạo: trống taiko, dây, kèn · Hài: hành khúc ùm-pa</div></div>
-          <select class="input" data-setting="pullMusic">${[['auto', 'Nhạc thật (file)'], ['epic', 'Tự tạo kịch tính'], ['funny', 'Tự tạo hài hước']].map(([v, n]) => `<option value="${v}" ${v === (s.pullMusic || 'auto') ? 'selected' : ''}>${n}</option>`).join('')}</select>
+          <div><div class="setting-name">Nhạc lúc kéo</div><div class="setting-desc">Nhạc thật: file trong assets/keoco/music (nền, có thể 3 bài thay phiên / sát vực / 10 giây cuối / thắng), thiếu file thì dùng bản vừa phải · Vừa phải: nhẹ, 3 bản đổi theo trận · Kịch tính: taiko, dây, kèn · Hài: ùm-pa</div></div>
+          <select class="input" data-setting="pullMusic">${[['auto', 'Nhạc thật (file)'], ['calm', 'Tự tạo vừa phải'], ['epic', 'Tự tạo kịch tính'], ['funny', 'Tự tạo hài hước']].map(([v, n]) => `<option value="${v}" ${v === (s.pullMusic || 'auto') ? 'selected' : ''}>${n}</option>`).join('')}</select>
         </div>
         ${rlRange('lobbySeconds', 'Thời gian chờ vào đội', 'Đủ người (mục dưới) thì rút còn 10 giây', 10, 300, 5, 's')}
         ${rlRange('fastStartPlayers', 'Đủ người để bắt đầu sớm', 'Tổng người trong 4 đội đạt số này thì rút ngắn thời gian chờ', 2, 80, 1, ' người')}

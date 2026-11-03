@@ -97,7 +97,15 @@ const EVENT_EN = {
   fall: ['{o} falls into the abyss!', '{o} flies off the edge screaming!']
 };
 
-const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+// chọn câu không trùng các câu vừa đọc gần đây (đỡ nghe lặp đi lặp lại)
+const recent = [];
+function pick(arr) {
+  const fresh = arr.filter((x) => !recent.includes(x));
+  const s = (fresh.length ? fresh : arr)[Math.floor(Math.random() * (fresh.length || arr.length))];
+  recent.push(s);
+  if (recent.length > 24) recent.shift();
+  return s;
+}
 const fill = (s, vars) => s.replace(/\{(\w)\}/g, (_, k) => (vars[k] !== undefined && vars[k] !== '' ? vars[k] : k === 'v' ? vars.o || '' : ''));
 
 function skillComment(skill, vars, en, { blocked = false, banked = false } = {}) {

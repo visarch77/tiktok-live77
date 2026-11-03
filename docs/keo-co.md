@@ -140,7 +140,8 @@ Bố cục chừa chỗ cho giao diện TikTok LIVE: hai lề 72 px; trên cùng
   người đang gồng / kiệt sức, giày rít + chà sàn khi một đội bị lôi, đám đông hô "HÒ… DÔ!" (dày hơn khi có Hò dô), "hự!" mỗi khi
   bong bóng hét bật lên. **Hết trận**: đội thua la thất thanh "Aaaaa…" rơi xuống vực rồi "bộp", còi trượt xuống; đội thắng hò "Yeee!".
 
-**Nhạc lúc kéo bằng file thật** (cài đặt "Nhạc lúc kéo" = Nhạc thật, mặc định): đặt MP3 vào `public/assets/keoco/music/` — `pull_main` (nền suốt trận), `pull_tense` (dây sát mép vực, |x| > 0,55), `pull_final` (10 giây cuối, luôn vào từ đầu bài), `win` (hết trận, dùng ~6 giây đầu rồi mờ). Ba bản kéo cùng 140 BPM, Rê thứ, chạy lặp, chuyển bằng mờ dần. Thiếu `pull_main` thì dùng nhạc tự tạo. Cách tạo bằng Suno/Udio: `design/keoco-music/HUONG-DAN.md`.
+**Nhạc lúc kéo** — mặc định nhẹ, nhịp vừa, đỡ mệt khi lặp cả buổi live. Cài đặt "Nhạc lúc kéo": Nhạc thật (mặc định) dùng MP3 trong `public/assets/keoco/music/` — `pull_main`, `pull_main_2`, `pull_main_3` (mỗi trận một bài), `pull_tense` (tuỳ chọn, dây sát mép vực), `pull_final` (10 giây cuối), `win` (~6 giây đầu khi hết trận); chuyển bài bằng mờ dần. Thiếu `pull_main` thì dùng bản **Vừa phải** tự tạo: 3 bản (La thứ 104 BPM pluck, Mi thứ 108 marimba, Rê 100 pizzicato) đổi theo trận, giai điệu biến tấu mỗi vòng, có ô nhịp nghỉ, 10 giây cuối chỉ thêm chút trống. Bản Kịch tính / Hài vẫn chọn được. Tạo nhạc bằng Suno/Udio: `design/keoco-music/HUONG-DAN.md`.
+Tiếng sân thưa và nhỏ: dây kêu thưa, thở/giày rít thưa hơn, đám đông chỉ hô khi có Hò dô hoặc dây căng thật, tiếng "hự" ≥ 3 giây một lần. Bình luận: kỹ năng cách ≥ 3 s, tình huống ≥ 12 s, im ắng 15 s mới chen, không lặp câu vừa đọc, một kỹ năng của cùng đội dùng liên tục chỉ bình luận lần đầu trong 15 s.
 
 ## Hiệu ứng kỹ năng
 
@@ -160,7 +161,7 @@ người trúng đòn kêu ("Thối quá!! 🤢", "Ha ha ha nhột quá!", "Ai b
 Giọng đọc của phòng bình luận hài theo diễn biến (vi/en, nhiều câu chọn ngẫu nhiên, có tên người chơi):
 - **Mỗi kỹ năng**: ai dùng, trúng ai. Ví dụ "Bủm! A xì hơi thật to, gió bay sang Đội 2, năm người choáng váng!", "B ném mỡ khiến cho Đội 1 tuột tay, trơn như lươn!", "C bị cù lét, cười sặc sụa…", "Đội 3 được lực sĩ đi ngang qua tiện tay kéo dùm!", "A đã đầu tư găng tay keo, Đội 1 kéo cứng ngắc!", "A gồng ẻ, gân cổ nổi lên như dây điện!". Bị găng keo chặn, quà để dành cũng có câu riêng.
 - **Tình huống**: người chơi thật hết hơi, đội bị lôi sát mép vực (|x| > 0,65), lội ngược dòng (về lại |x| < 0,15), 10 giây cuối, lúc im ắng > 7 s thì khen người kéo khoẻ nhất / chọc đội kéo yếu / "giằng co", hết trận "Đội X rơi tõm xuống vực!".
-- **Không dồn giọng**: câu kỹ năng cách nhau ≥ 1,8 s, câu tình huống ≥ 6 s; dư thì bỏ (nhiều quà cùng lúc chỉ đọc câu đầu).
+- **Không dồn giọng**: câu kỹ năng cách nhau ≥ 3 s, câu tình huống ≥ 12 s; dư thì bỏ (nhiều quà cùng lúc chỉ đọc câu đầu).
 
 ## Chơi thử (trang quản lý → 🎮 Chơi thử, chỉ khi chưa live)
 
