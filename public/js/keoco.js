@@ -646,17 +646,22 @@
       else if (d.st === 'tickle') text(L('HAHA', 'HAHA'), x, headY - 8, { size: 16, weight: 900, color: '#ffe066', stroke: 4 });
       else if (d.st === 'strain' && Math.floor(t / 300 + d.i) % 3 === 0) text('💦', x + 14 * (side === 'a' ? 1 : -1), headY + 10, { size: 16 });
       if (mk && mk.until > t && SKILL_EMOJI[mk.kind]) text(SKILL_EMOJI[mk.kind], x, headY - 30 - (1 - (mk.until - t) / 2500) * 20, { size: 30 });
-      // tên + bình luận: xếp vào dải nhãn phía trên sân (drawLabels), không vẽ đè lên đầu người khác
+      // tên ngay trên đầu người chơi thật: chữ nhỏ, so le 3 tầng theo vị trí (người cạnh nhau ở tầng khác nhau),
+      // vẫn đè thì bỏ tên đó; bình luận (câu dài) xếp vào dải phía trên sân có đường chỉ xuống (drawLabels)
       if (!d.p.npc && ph.phase !== 'matchEnd') {
-        const force = (pstate.get(d.p.k) || {}).force || 0;
-        let prio = 0;
-        let kind = 'name';
-        if (bub && bub.until > t) {
-          prio = 3 + bub.at / 1e9; // bình luận mới nhất trước
-          kind = 'chat';
-        } else if (mk && mk.until > t) prio = 2;
-        else if (top.includes(d.p.k) && ph.phase === 'pull' && force > 0) prio = 1 + (top[0] === d.p.k ? 0.5 : 0);
-        if (prio > 0) labelReqs.push({ side, k: d.p.k, name: d.p.n, kind, text: kind === 'chat' ? bub.text : '', crown: top[0] === d.p.k && ph.phase === 'pull', prio, hx: d.gx + (side === 'a' ? -10 : 10), hy: headY, baseX: lineX(side, d.i) + (side === 'a' ? -10 : 10) });
+        const tier = d.i % 3;
+        const sp = spacing(list.length);
+        const crown = top[0] === d.p.k && ph.phase === 'pull' ? '👑' : '';
+        const chatting = bub && bub.until > t;
+        const nm = `${crown}${d.p.n}`;
+        const maxW = Math.max(40, Math.min(96, sp * 3 - 6));
+        g.font = `800 13px ${FONT}`;
+        const lw = Math.min(maxW, g.measureText(nm).width) + 6;
+        const ly = placeLabel(x, headY - 8 - tier * 16, lw, 15);
+        if (ly !== null) {
+          text(nm, x, ly, { size: 13, weight: 800, color: chatting ? '#ffe066' : '#fff', stroke: 3.5, strokeColor: teamColor(side === 'a' ? curMatch().a : curMatch().b), maxW });
+        }
+        if (chatting) labelReqs.push({ side, k: d.p.k, name: d.p.n, kind: 'chat', text: bub.text, crown: false, prio: 3 + bub.at / 1e9, hx: x, hy: (ly ?? headY) - 8, baseX: lineX(side, d.i) + (side === 'a' ? -10 : 10) });
       } else if (d.p.npc && ph.phase === 'pull' && d.i % 4 === 0) {
         text('🤖', x, headY - 6, { size: 14 });
       }
@@ -678,9 +683,9 @@
   // Dải nhãn: 6 hàng ngay trên sân, mỗi bên xếp nhãn từ hàng thấp lên, không chồng nhau, có đường chỉ xuống đúng người.
   // Giữ hàng cũ của mỗi người (đỡ nhảy chỗ); bình luận ưu tiên hơn tên; tối đa 7 nhãn mỗi bên.
   let labelReqs = [];
-  const LANE_Y0 = 716;
+  const LANE_Y0 = 660;
   const LANE_H = 30;
-  const LANES = 6;
+  const LANES = 5;
   const laneMem = new Map(); // khoá → hàng đã xếp lần trước
   function drawLabels(m, t) {
     const placed = [];
