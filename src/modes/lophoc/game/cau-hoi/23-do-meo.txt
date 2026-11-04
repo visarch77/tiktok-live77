@@ -1,0 +1,105 @@
+# Đố mẹo
+# Câu đố mẹo: chỉ hỏi ở câu 7 và câu 13 của mỗi tiết (GAME.roundPlan 'meo'), không lẫn vào câu chữ thường.
+# Mỗi dòng: ĐÁP ÁN | câu đố | độ khó (để 2) | cách trả lời khác cũng tính đúng (cách nhau dấu phẩy)
+> Câu đố mẹo nè, cẩn thận bị cô lừa nha.
+QUẦN ĐẢO | Quần gì rộng nhất thế giới? | 2
+XÃ HỘI | Xã gì đông dân nhất? | 2
+KÉO CO | Môn thể thao gì muốn thắng thì phải đi lùi? | 2
+TÊN | Cái gì của mình mà người khác gọi nhiều hơn mình? | 2 | CÁI TÊN
+ĐƯỜNG ĐỜI | Con đường nào dài nhất? | 2
+THÁNG HAI | Tháng nào trong năm ngắn nhất? | 2 | THÁNG 2
+THAN | Lúc mua thì đen, lúc dùng thì đỏ, bỏ đi thì xám là cái gì? | 2 | CỤC THAN
+CÁI BÓNG | Cái gì lúc nào cũng đi theo mình mà không bao giờ bắt được? | 2 | BÓNG
+CÁI LỖ | Cái gì càng lấy bớt đi thì càng to ra? | 2 | LỖ
+TUỔI | Cái gì chỉ tăng mà không bao giờ giảm? | 2 | TUỔI TÁC
+BÍ MẬT | Cái gì nói ra một cái là mất ngay? | 2
+ĐỒNG HỒ | Cái gì có mặt, có kim mà không biết khâu vá? | 2
+CÁI LƯỢC | Cái gì có răng mà không bao giờ cắn ai? | 2 | LƯỢC
+QUẢ TRỨNG | Cái gì phải đập vỡ ra rồi mới dùng được? | 2 | TRỨNG
+CÁI KHĂN | Cái gì càng lau càng ướt? | 2 | KHĂN, KHĂN TẮM
+CON CUA | Con gì lúc nào cũng đi ngang mà không bị ai phạt? | 2 | CUA
+CÁI GHẾ | Cái gì có bốn chân, có lưng mà không đi được? | 2 | GHẾ
+CÁI CHAI | Cái gì có cổ mà không có đầu? | 2 | CHAI, ÁO, CÁI ÁO
+CÂY KIM | Cái gì có một mắt mà không nhìn thấy gì? | 2 | KIM, KIM KHÂU
+NGÀY MAI | Cái gì luôn ở phía trước mà không bao giờ tới? | 2
+RĂNG | Cái gì ngày nào cũng bị đánh mà không kêu đau? | 2 | HÀM RĂNG
+CÁI GỐI | Cái gì đêm nào cũng nằm dưới đầu mình? | 2 | GỐI
+TIẾNG VỌNG | Cái gì nhại lại lời mình mà không có miệng? | 2 | TIẾNG VANG
+CẦU THANG | Cái gì có lên có xuống mà không nhúc nhích? | 2
+CÁI GƯƠNG | Cái gì nhìn vào là thấy mình mà không phải ảnh chụp? | 2 | GƯƠNG
+CƠN MƯA | Cái gì rơi từ trên cao xuống mà không bao giờ bị đau? | 2 | MƯA
+CHÌA KHÓA | Cái gì có răng mà mở được cửa? | 2
+SỐ CHÍN | Số nào lộn ngược lại thì thành số sáu? | 2 | CHÍN, 9
+ĐÔI GIÀY | Cái gì có lưỡi mà không biết nói? | 2 | GIÀY, CÁI GIÀY
+NƯỚC | Cái gì càng rửa càng bẩn? | 2
+HÔM QUA | Ngày nào không bao giờ quay trở lại? | 2
+CÂY NẾN | Cái gì càng cháy càng ngắn lại? | 2 | NẾN
+ĐÔI MẮT | Cái gì nhắm lại thì không thấy gì? | 2 | MẮT
+LỜI HỨA | Cái gì đã cho người khác rồi mà mình vẫn phải giữ? | 2
+TRÁI TIM | Cái gì đập suốt ngày đêm mà không ai la? | 2 | TIM
+TỜ LỊCH | Cái gì mỗi ngày bị xé đi một tờ? | 2 | LỊCH
+CON ỐC | Con gì đi đâu cũng cõng nhà theo? | 2 | ỐC, ỐC SÊN, CON ỐC SÊN, RÙA, CON RÙA
+QUẢ DỨA | Quả gì có cả trăm mắt mà không nhìn thấy gì? | 2 | DỨA, THƠM, QUẢ THƠM, TRÁI THƠM, KHÓM
+BẮP NGÔ | Cây gì có râu, mặc áo nhiều lớp, bên trong toàn hạt vàng? | 2 | NGÔ, BẮP, TRÁI BẮP
+QUẢ CHUỐI | Quả gì mặc áo vàng, ăn xong thì vứt áo đi? | 2 | CHUỐI, TRÁI CHUỐI
+CON GÀ | Con gì báo thức mỗi sáng mà không cần pin? | 2 | GÀ, GÀ TRỐNG, CON GÀ TRỐNG
+CÁI Ô | Cái gì trời mưa thì mở, trời tạnh thì gấp? | 2 | Ô, DÙ, CÁI DÙ, CÂY DÙ
+CỦ HÀNH | Cái gì làm người ta rơi nước mắt mà không đánh ai? | 2 | HÀNH, HÀNH TÂY
+VIÊN PHẤN | Cái gì càng viết càng ngắn lại? | 2 | PHẤN, BÚT CHÌ, CÂY BÚT CHÌ
+BẢN ĐỒ | Cái gì có sông mà không có nước, có núi mà không có đá? | 2
+ĐÁM MÂY | Cái gì bay lơ lửng trên trời mà không có cánh? | 2 | MÂY, BÓNG BAY
+CON ĐƯỜNG | Cái gì đi khắp nơi mà vẫn nằm yên một chỗ? | 2 | ĐƯỜNG
+CÁI KÉO | Cái gì có hai lưỡi mà không biết nói, chỉ biết cắt? | 2 | KÉO
+BONG BÓNG | Cái gì càng thổi càng to? | 2 | BÓNG BAY, QUẢ BÓNG BAY
+CƠN GIÓ | Cái gì thổi bay mũ mà không ai nhìn thấy? | 2 | GIÓ
+CÁI CÂN | Cái gì biết mình nặng bao nhiêu ký? | 2 | CÂN
+NHIỆT KẾ | Cái gì biết mình bị sốt mà không phải bác sĩ? | 2 | CẶP NHIỆT ĐỘ, CẶP NHIỆT
+MẶT TRỜI | Ông gì sáng nào cũng dậy sớm hơn cả lớp? | 2 | ÔNG MẶT TRỜI
+MẶT TRĂNG | Cái gì chỉ sáng vào ban đêm, có lúc tròn có lúc khuyết? | 2 | TRĂNG, ÔNG TRĂNG
+HEO ĐẤT | Con gì không ăn cơm mà chỉ ăn tiền? | 2 | LỢN ĐẤT, CON HEO ĐẤT
+CÂY CẦU | Cái gì bắc ngang sông cho người đi qua mà không phải con đò? | 2 | CẦU
+ĐIỆN THOẠI | Cái gì nhỏ xíu mà nói chuyện được với người ở rất xa? | 2 | DI ĐỘNG
+TI VI | Cái hộp gì có người nói chuyện ở bên trong? | 2 | TV
+TỦ LẠNH | Cái tủ gì mùa hè ai cũng thích mở ra? | 2
+CÁI QUẠT | Cái gì quay vù vù cả ngày mà không chóng mặt? | 2 | QUẠT, QUẠT MÁY
+XE ĐẠP | Xe gì không cần xăng, chỉ cần đôi chân? | 2
+MÁY BAY | Cái gì bay trên trời mà chở được cả trăm người? | 2 | PHI CƠ
+CON CHÓ | Con gì giữ nhà mà không cần chìa khóa? | 2 | CHÓ
+CON MÈO | Con gì rửa mặt mà không cần nước? | 2 | MÈO
+CON VOI | Con gì có vòi mà không phải cái ấm? | 2 | VOI
+CÁI ẤM | Cái gì có vòi mà không phải con voi? | 2 | ẤM, ẤM NƯỚC, ẤM TRÀ
+CON NHỆN | Con gì không có máy mà dệt được lưới? | 2 | NHỆN
+CON ONG | Con gì làm ra mật mà không cần nhà máy? | 2 | ONG
+CON CÚ | Con gì thức suốt đêm mà không phải học bài? | 2 | CÚ, CÚ MÈO
+CON CHUỘT | Con gì sợ mèo mà ngày nào cũng nằm cạnh máy tính? | 2 | CHUỘT
+CON TÔM | Con gì càng nấu càng đỏ? | 2 | TÔM, CUA, CON CUA
+BÚP BÊ | Em bé gì không bao giờ khóc đòi ăn? | 2
+ÔNG GIÀ NOEL | Ông gì mỗi năm chỉ đi làm đúng một đêm? | 2 | ÔNG GIÀ NÔ EN, ÔNG GIÀ NOEN
+CỘT ĐIỆN | Cái gì đứng suốt ngày ngoài đường mà không mỏi chân? | 2
+BÙ NHÌN | Ông gì đứng ngoài đồng đuổi chim mà không biết đi? | 2 | THẰNG BÙ NHÌN
+CÁI MŨI | Cái gì có hai lỗ mà không phải ổ cắm điện? | 2 | MŨI, LỖ MŨI
+CÁI TAI | Cái gì nghe hết mọi chuyện mà không bao giờ nói? | 2 | TAI, LỖ TAI
+CÁI LƯỠI | Cái gì ở trong miệng, nếm được mọi món mà không phải răng? | 2 | LƯỠI
+MÁI TÓC | Cái gì càng cắt càng mọc dài ra? | 2 | TÓC, MÓNG TAY
+CHIẾC LÁ | Cái gì mùa thu rơi đầy sân mà không ai ném? | 2 | LÁ, LÁ CÂY
+CỤC TẨY | Cái gì càng dùng càng nhỏ, chuyên đi xoá lỗi sai? | 2 | TẨY, GÔM, CỤC GÔM
+RA CHƠI | Giờ gì cả lớp mong nhất? | 2 | GIỜ RA CHƠI
+QUẢ ỚT | Quả gì nhỏ xíu mà ăn vào nóng ran cả miệng? | 2 | ỚT, TRÁI ỚT
+SỐ KHÔNG | Số gì nhân với số nào cũng ra chính nó? | 2 | KHÔNG, 0, SỐ 0
+SỐ MỘT | Số gì nhân với số nào cũng ra đúng số kia? | 2 | MỘT, 1, SỐ 1
+CẦU VỒNG | Cây cầu gì có bảy màu mà không ai đi qua được? | 2 | CẦU VÒNG
+CON DIỀU | Con gì bay được nhờ một sợi dây? | 2 | DIỀU, CÁNH DIỀU
+CÁI BÁT | Cái gì ngày nào cũng đựng cơm mà không ăn miếng nào? | 2 | BÁT, CHÉN, CÁI CHÉN
+ĐÔI ĐŨA | Hai anh em gì ngày nào cũng gắp đồ ăn cho mình? | 2 | ĐŨA
+BÓNG ĐÈN | Quả gì bật lên thì sáng mà không ăn được? | 2 | ĐÈN, QUẢ BÓNG ĐÈN
+BÀN CHẢI | Cái gì có lông mà sáng nào cũng chà lên răng? | 2 | BÀN CHẢI ĐÁNH RĂNG
+CÁI CẶP | Cái gì ngày nào cũng đi học mà không biết chữ? | 2 | CẶP, CẶP SÁCH, BA LÔ
+BẢNG ĐEN | Cái gì cô viết lên suốt mà không bao giờ đầy? | 2 | BẢNG
+CÁI THƯỚC | Cái gì không biết đếm mà đo được mọi thứ? | 2 | THƯỚC, THƯỚC KẺ
+QUYỂN SÁCH | Cái gì có lá mà không phải cây, có gáy mà không phải người? | 2 | SÁCH, CUỐN SÁCH, VỞ, QUYỂN VỞ
+CON MUỖI | Con gì hát vo ve bên tai mà không ai muốn nghe? | 2 | MUỖI
+GIẤC NGỦ | Cái gì đêm nào cũng tới mà không gõ cửa? | 2 | GIẤC MƠ
+BÓNG ĐÁ | Môn gì hai mươi hai người tranh nhau một quả bóng? | 2 | ĐÁ BÓNG
+NHÀ VỆ SINH | Phòng gì ai cũng phải vào mà chẳng ai muốn ở lâu? | 2 | PHÒNG VỆ SINH, TOILET, WC
+CHỮ O | Chữ cái gì tròn như quả trứng? | 2 | O
+TRÁI ĐẤT | Quả gì to nhất mà không ai ăn được? | 2 | QUẢ ĐẤT

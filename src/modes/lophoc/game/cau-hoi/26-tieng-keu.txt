@@ -1,0 +1,37 @@
+# Tiếng kêu
+# Đoán con vật / đồ vật / âm thanh qua tiếng kêu. Hợp với các bạn nhỏ.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách viết khác cũng tính đúng
+> Đây là con vật có tiếng kêu như vậy.
+CON GÀ TRỐNG | Ò ó o, sáng nào cũng gáy. | 1 | GÀ TRỐNG, CON GÀ, GÀ
+CON MÈO | Meo meo meo, thích bắt chuột. | 1 | MÈO
+CON CHÓ | Gâu gâu gâu, giữ nhà cho chủ. | 1 | CHÓ, CON CÚN, CÚN
+CON VỊT | Cạp cạp cạp, bơi dưới ao. | 1 | VỊT
+CON HEO | Ụt ịt ụt ịt, ăn no lại ngủ. | 1 | HEO, CON LỢN, LỢN
+CON BÒ | Kêu ọ ọ, cho sữa tươi. | 1 | BÒ
+CON DÊ | Be be be, có chòm râu dưới cằm. | 1 | DÊ
+CON ẾCH | Ộp ộp ộp, ngồi bên bờ ao. | 1 | ẾCH, CON NHÁI, NHÁI
+CON CHUỘT | Chít chít chít, sợ mèo lắm. | 1 | CHUỘT
+CON GÀ CON | Chíp chíp chíp, lon ton theo mẹ. | 1 | GÀ CON
+CON CHIM | Líu lo líu lo trên cành cây. | 1 | CHIM
+CON ONG | Vo ve quanh bông hoa, làm ra mật. | 1 | ONG
+CON MUỖI | Vo ve bên tai lúc đi ngủ, hay chích người. | 1 | MUỖI
+CON NGỰA | Hí hí, phi nước đại. | 2 | NGỰA
+CON HỔ | Gầm gừ, là chúa sơn lâm. | 2 | HỔ, CON CỌP, CỌP
+CON SƯ TỬ | Gầm vang cả khu rừng, con đực có bờm. | 2 | SƯ TỬ
+CON VOI | Rống vang, có cái vòi dài. | 2 | VOI
+CON KHỈ | Khọt khẹt, chuyền cành thoăn thoắt. | 2 | KHỈ
+CON CHIM SẺ | Chích chích, nhỏ xíu hay đậu mái nhà. | 2 | CHIM SẺ, SẺ
+CON VE SẦU | Kêu ra rả suốt mùa hè. | 2 | VE SẦU, CON VE, VE
+CON SÓI | Hú thật dài dưới ánh trăng. | 2 | SÓI, CHÓ SÓI
+> Đây là đồ vật có tiếng kêu như vậy.
+ĐỒNG HỒ | Tích tắc tích tắc, chạy cả ngày. | 1 | CÁI ĐỒNG HỒ
+CÁI TRỐNG | Tùng tùng tùng, báo giờ vào lớp. | 1 | TRỐNG, TRỐNG TRƯỜNG
+CÁI CHUÔNG | Reng reng reng, có khách tới nhà. | 1 | CHUÔNG, CHUÔNG CỬA
+TÀU HỎA | Xình xịch xình xịch trên đường ray. | 1 | TÀU LỬA, XE LỬA
+CÁI CÒI | Tuýt tuýt, chú cảnh sát giao thông thổi. | 2 | CÒI
+XE CỨU THƯƠNG | Tò te tò te chạy thật nhanh tới bệnh viện. | 2 | XE CẤP CỨU
+> Đây là âm thanh của thiên nhiên.
+SẤM | Ầm ầm vang trên trời lúc sắp mưa to. | 2 | TIẾNG SẤM, SẤM SÉT
+MƯA | Lộp độp trên mái tôn. | 1 | CƠN MƯA, TIẾNG MƯA
+GIÓ | Vi vu thổi qua rặng tre. | 2 | CƠN GIÓ, TIẾNG GIÓ
+SÓNG BIỂN | Rì rào vỗ vào bờ cát. | 2 | SÓNG, TIẾNG SÓNG

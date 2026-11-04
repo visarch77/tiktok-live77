@@ -1,0 +1,91 @@
+# Từ trái nghĩa
+# Gợi ý viết "Ngược nghĩa với từ: ..." (không dùng chữ "trái" để khỏi lộ đáp án TRÁI). Từ có 2 cách nói thì ghi cả 2.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách viết khác cũng tính đúng
+> Đây là từ trái nghĩa.
+LẠNH | Ngược nghĩa với từ: nóng. | 1
+NÓNG | Ngược nghĩa với từ: lạnh. | 1
+NHỎ | Ngược nghĩa với từ: to. | 1 | BÉ
+TO | Ngược nghĩa với từ: nhỏ. | 1 | LỚN
+THẤP | Ngược nghĩa với từ: cao. | 1
+CAO | Ngược nghĩa với từ: thấp. | 1
+NGẮN | Ngược nghĩa với từ: dài. | 1
+DÀI | Ngược nghĩa với từ: ngắn. | 1
+GẦY | Ngược nghĩa với từ: béo. | 1 | ỐM
+BÉO | Ngược nghĩa với từ: gầy. | 1 | MẬP
+CHẬM | Ngược nghĩa với từ: nhanh. | 1
+NHANH | Ngược nghĩa với từ: chậm. | 1
+BUỒN | Ngược nghĩa với từ: vui. | 1
+VUI | Ngược nghĩa với từ: buồn. | 1
+ĐÊM | Ngược nghĩa với từ: ngày. | 1
+NGÀY | Ngược nghĩa với từ: đêm. | 1
+TỐI | Ngược nghĩa với từ: sáng. | 1
+SÁNG | Ngược nghĩa với từ: tối. | 1
+DƯỚI | Ngược nghĩa với từ: trên. | 1
+TRÊN | Ngược nghĩa với từ: dưới. | 1
+SAU | Ngược nghĩa với từ: trước. | 1
+TRƯỚC | Ngược nghĩa với từ: sau. | 1
+NGOÀI | Ngược nghĩa với từ: trong. | 1
+TRONG | Ngược nghĩa với từ: ngoài. | 1
+ĐÓNG | Ngược nghĩa với từ: mở. | 1
+MỞ | Ngược nghĩa với từ: đóng. | 1
+XUỐNG | Ngược nghĩa với từ: lên. | 1
+LÊN | Ngược nghĩa với từ: xuống. | 1
+RA | Ngược nghĩa với từ: vào. | 1
+VÀO | Ngược nghĩa với từ: ra. | 1
+CƯỜI | Ngược nghĩa với từ: khóc. | 1
+KHÓC | Ngược nghĩa với từ: cười. | 1
+THỨC | Ngược nghĩa với từ: ngủ. | 1
+CŨ | Ngược nghĩa với từ: mới. | 1
+MỚI | Ngược nghĩa với từ: cũ. | 1
+BẨN | Ngược nghĩa với từ: sạch. | 1 | DƠ
+SẠCH | Ngược nghĩa với từ: bẩn. | 1
+NHẸ | Ngược nghĩa với từ: nặng. | 1
+NẶNG | Ngược nghĩa với từ: nhẹ. | 1
+MỀM | Ngược nghĩa với từ: cứng. | 1
+CỨNG | Ngược nghĩa với từ: mềm. | 1
+YẾU | Ngược nghĩa với từ: khỏe. | 1
+NGHÈO | Ngược nghĩa với từ: giàu. | 2
+SAI | Ngược nghĩa với từ: đúng. | 1
+ĐÚNG | Ngược nghĩa với từ: sai. | 1
+THUA | Ngược nghĩa với từ: thắng. | 1
+THẮNG | Ngược nghĩa với từ: thua. | 1
+GIÀ | Ngược nghĩa với từ: trẻ. | 1
+TRẺ | Ngược nghĩa với từ: già. | 1
+GẦN | Ngược nghĩa với từ: xa. | 1
+XA | Ngược nghĩa với từ: gần. | 1
+HẸP | Ngược nghĩa với từ: rộng. | 2
+RỘNG | Ngược nghĩa với từ: hẹp. | 2
+MỎNG | Ngược nghĩa với từ: dày. | 2
+DÀY | Ngược nghĩa với từ: mỏng. | 2
+MUỘN | Ngược nghĩa với từ: sớm. | 2 | TRỄ
+SỚM | Ngược nghĩa với từ: muộn. | 2
+NHIỀU | Ngược nghĩa với từ: ít. | 1
+ÍT | Ngược nghĩa với từ: nhiều. | 1
+XẤU | Ngược nghĩa với từ: đẹp. | 1
+ĐẸP | Ngược nghĩa với từ: xấu. | 1
+ƯỚT | Ngược nghĩa với từ: khô. | 1
+KHÔ | Ngược nghĩa với từ: ướt. | 1
+NÔNG | Ngược nghĩa với từ: sâu. | 2 | CẠN
+SÂU | Ngược nghĩa với từ: nông. | 2
+YÊN TĨNH | Ngược nghĩa với từ: ồn ào. | 3 | IM LẶNG, YÊN LẶNG
+LƯỜI BIẾNG | Ngược nghĩa với từ: chăm chỉ. | 3 | LƯỜI, LƯỜI NHÁC
+CHĂM CHỈ | Ngược nghĩa với từ: lười biếng. | 3 | SIÊNG NĂNG, CHĂM
+DỮ | Ngược nghĩa với từ: hiền. | 2 | HUNG DỮ, DỮ TỢN
+HIỀN | Ngược nghĩa với từ: dữ. | 2 | HIỀN LÀNH
+ĐEN | Ngược nghĩa với từ: trắng. | 1
+TRẮNG | Ngược nghĩa với từ: đen. | 1
+BÁN | Ngược nghĩa với từ: mua. | 1
+MUA | Ngược nghĩa với từ: bán. | 1
+NHẬN | Ngược nghĩa với từ: cho. | 2
+GHÉT | Ngược nghĩa với từ: yêu. | 2
+NGỒI | Ngược nghĩa với từ: đứng. | 1
+ĐỨNG | Ngược nghĩa với từ: ngồi. | 1
+ĐẨY | Ngược nghĩa với từ: kéo. | 1
+KÉO | Ngược nghĩa với từ: đẩy. | 1
+GIẢ | Ngược nghĩa với từ: thật. | 2
+KẾT THÚC | Ngược nghĩa với từ: bắt đầu. | 2
+BẮT ĐẦU | Ngược nghĩa với từ: kết thúc. | 2
+TRÁI | Ngược nghĩa với từ: phải (bên phải). | 1
+PHẢI | Ngược nghĩa với bên tay trái. | 1
+CON GÁI | Ngược nghĩa với từ: con trai. | 1 | GÁI
+TRẢ LỜI | Ngược nghĩa với từ: hỏi. | 2 | ĐÁP

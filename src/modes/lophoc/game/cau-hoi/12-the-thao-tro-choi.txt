@@ -1,0 +1,76 @@
+# Thể thao, trò chơi
+> Đây là một môn thể thao.
+BÓNG ĐÁ | Môn vua, hai mươi hai người tranh một quả bóng. | 1
+BÓNG CHUYỀN | Đánh bóng qua lưới cao bằng tay. | 2
+BÓNG RỔ | Ném bóng vào rổ treo cao. | 2
+CẦU LÔNG | Đánh quả cầu có lông vũ bằng vợt. | 2
+BÓNG BÀN | Đánh bóng nhỏ trên bàn có lưới. | 2
+QUẦN VỢT | Môn có giải Wimbledon. | 3 | TENNIS
+BƠI LỘI | Môn thể thao dưới nước. | 2 | BƠI
+CỜ VUA | Có vua, hậu, xe, mã, tượng, tốt. | 2
+CỜ TƯỚNG | Có tướng, sĩ, tượng, xe, pháo, mã, tốt. | 2
+CỜ CÁ NGỰA | Đổ xúc xắc đi vòng, về chuồng. | 3
+CỜ CARO | Ai năm ô liền hàng trước là thắng. | 2
+VÕ THUẬT | Vovinam, karate, taekwondo đều là. | 2
+ĐUA XE | Chạy nhanh nhất về đích. | 2
+ĐẠP XE | Môn thể thao bằng xe hai bánh. | 2
+CHẠY MARATHON | Chạy bốn mươi hai cây số. | 3 | MARATHON
+NHẢY XA | Chạy đà rồi bật vào hố cát. | 2
+NHẢY CAO | Bật qua xà cao. | 2
+ĐẨY TẠ | Ném quả cầu sắt nặng. | 3
+CỬ TẠ | Nâng thanh sắt nặng qua đầu. | 3
+BẮN CUNG | Giương cung nhắm hồng tâm. | 3
+TRƯỢT BĂNG | Đi giày lưỡi dao lướt trên băng. | 3
+LƯỚT SÓNG | Đứng trên ván cưỡi sóng biển. | 3
+LEO NÚI | Chinh phục đỉnh cao. | 2
+YOGA | Bài tập dẻo dai, thở sâu, ngồi thiền. | 2
+GYM | Phòng tập tạ cho cơ bắp to. | 1
+SEA GAMES | Đại hội thể thao Đông Nam Á. | 3
+WORLD CUP | Giải bóng đá lớn nhất hành tinh. | 2
+OLYMPIC | Thế vận hội năm vòng tròn. | 2 | THẾ VẬN HỘI
+HUY CHƯƠNG VÀNG | Phần thưởng cho người về nhất. | 3
+THỦ MÔN | Người duy nhất được bắt bóng bằng tay. | 2
+TIỀN ĐẠO | Cầu thủ ghi bàn chính. | 2
+PHẠT ĐỀN | Sút từ chấm mười một mét. | 2 | PENALTY
+VIỆT VỊ | Lỗi đứng sau hậu vệ cuối cùng khi nhận bóng. | 3
+THẺ ĐỎ | Bị rút là phải rời sân. | 2
+HIỆP PHỤ | Hòa sau chín mươi phút thì đá thêm. | 3
+BÀN THẮNG | Bóng vào lưới. | 1 | GOAL
+> Đây là một trò chơi.
+NHẢY DÂY | Quay dây và nhảy qua. | 1
+ĐÁ CẦU | Tâng quả cầu lông gà bằng chân. | 2
+NHẢY LÒ CÒ | Kẻ ô dưới đất, nhảy một chân. | 3 | LÒ CÒ
+KÉO CO | Hai đội nắm dây kéo về phía mình. | 2
+BỊT MẮT BẮT DÊ | Bị bịt mắt đi tìm bạn. | 3
+TRỐN TÌM | Một người đếm, cả bọn đi núp. | 1
+Ô ĂN QUAN | Bốc sỏi rải vào các ô, có quan. | 3
+CHƠI CHUYỀN | Tung quả và nhặt que, bé gái hay chơi. | 3 | CHUYỀN
+BẮN BI | Búng viên bi thủy tinh vào lỗ. | 2
+ĐÁNH KHĂNG | Dùng que dài đánh que ngắn bay xa. | 3
+THẢ DIỀU | Chạy trên đồng cho con diều bay lên. | 2
+NÉM LON | Ném dép cho đổ chồng lon. | 3
+RỒNG RẮN LÊN MÂY | Cả bọn nối đuôi, hát "có cây núc nác". | 3
+MÈO ĐUỔI CHUỘT | Cả vòng nắm tay, một đứa chạy đuổi một đứa. | 3
+OẲN TÙ TÌ | Búa, kéo, bao. | 2
+NU NA NU NỐNG | Ngồi duỗi chân, đọc đồng dao, chân ai bị chỉ cuối thì co lại. | 3
+ĐÁNH ĐÁO | Ném đồng xu vào lỗ đáo. | 3
+BẬP BÊNH | Hai người ngồi hai đầu, lên xuống. | 2
+CẦU TRƯỢT | Leo lên rồi trượt xuống ở sân chơi. | 2
+XÍCH ĐU | Ngồi đung đưa, có người đẩy. | 2
+ĐU DÂY | Treo trên dây đu qua đu lại. | 2
+XẾP HÌNH | Ráp các mảnh thành bức tranh. | 2 | PUZZLE
+RUBIK | Khối vuông xoay sáu mặt sáu màu. | 2
+ĐÔ MI NÔ | Xếp thẳng hàng, đẩy một cái đổ cả dãy. | 3 | DOMINO
+BÀI TÂY | Năm mươi hai lá, có cơ rô chuồn bích. | 3 | BỘ BÀI
+GAME ONLINE | Ngồi máy tính chơi với người khắp nơi. | 2
+LIÊN QUÂN | Game di động năm đánh năm của Việt Nam hay chơi. | 2
+FREE FIRE | Game bắn súng sinh tồn rơi dù từ máy bay. | 3
+MINECRAFT | Game xây dựng bằng khối vuông. | 3
+TETRIS | Game xếp gạch rơi từ trên xuống. | 2 | XẾP GẠCH
+RẮN SĂN MỒI | Game trên điện thoại cục gạch, ăn càng dài. | 3
+MARIO | Ông thợ sửa ống nước nhảy đập nấm. | 2
+POKEMON | Thu phục quái thú vào quả bóng đỏ trắng. | 2
+TRƯỢT PATIN | Đi giày có bánh xe. | 3 | PATIN
+ĐUA THUYỀN | Cả đội cùng chèo về đích. | 3
+BOXING | Đấm bốc đeo găng. | 2 | ĐẤM BỐC, QUYỀN ANH
+PICKLEBALL | Môn vợt đang hot, sân nhỏ, bóng nhựa có lỗ. | 3

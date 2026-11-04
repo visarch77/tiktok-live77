@@ -3,7 +3,7 @@
  * mà mọi chế độ chơi đều hiểu. Chế độ chơi KHÔNG đọc trực tiếp dữ liệu TikTok.
  *
  * Các loại sự kiện chuẩn (event.type):
- *   chat    { user, text }
+ *   chat    { user, text, createTime }       — createTime: giờ TikTok gắn lúc gửi (ms), có thể thiếu khi giả lập
  *   like    { user, count }                  — đã gộp theo người mỗi ~1,2s
  *   gift    { user, giftName, giftId, coins, count }  — đã tính phần chênh lệch combo
  *   follow  { user }

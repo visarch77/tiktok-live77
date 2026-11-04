@@ -1,0 +1,76 @@
+# Gen Z, mạng xã hội
+> Đây là từ của giới trẻ, dân mạng.
+TIKTOK | Ứng dụng video ngắn mình đang xem live. | 1
+FACEBOOK | Mạng xã hội màu xanh, có nút like ngón cái. | 1
+ZALO | Ứng dụng nhắn tin của Việt Nam, bố mẹ hay dùng. | 1
+INSTAGRAM | Mạng đăng ảnh sống ảo, có story. | 2
+YOUTUBE | Trang xem video có nút play đỏ. | 1
+LIVESTREAM | Phát trực tiếp như kênh mình đang làm. | 2 | LIVE
+THẢ TIM | Bấm liên tục vào màn hình live. | 1
+FOLLOW | Bấm theo dõi kênh. | 1 | THEO DÕI
+SHARE | Chia sẻ cho bạn bè cùng xem. | 1 | CHIA SẺ
+HASHTAG | Dấu thăng đứng trước từ khóa. | 2
+XU HƯỚNG | Thứ ai cũng làm theo trên mạng, còn gọi trend. | 2 | TREND
+VIRAL | Video lan truyền chóng mặt. | 2
+SỐNG ẢO | Đăng ảnh đẹp lung linh khác ngoài đời. | 2
+SELFIE | Tự chụp ảnh mình. | 1 | TỰ SƯỚNG
+FILTER | Hiệu ứng làm đẹp khi chụp ảnh. | 2 | BỘ LỌC
+STORY | Đăng hai mươi bốn giờ là mất. | 2 | TIN
+EMOJI | Biểu tượng mặt cười. | 1 | ICON
+MEME | Ảnh chế hài hước lan truyền. | 2
+IDOL | Thần tượng được fan hâm mộ. | 1 | THẦN TƯỢNG
+FAN | Người hâm mộ. | 1
+ANTI FAN | Người chuyên đi ghét thần tượng. | 2
+KPOP | Nhạc Hàn Quốc có BTS, Blackpink. | 2
+CRUSH | Người mình thầm thương trộm nhớ. | 1
+THẢ THÍNH | Nói ngọt để làm quen. | 1
+ĐỘC THÂN | Chưa có người yêu, ế. | 1 | Ế
+NGƯỜI YÊU CŨ | Người từng yêu, giờ là quá khứ. | 2 | NYC
+FRIENDZONE | Thích người ta mà người ta chỉ coi là bạn. | 3
+TOXIC | Mối quan hệ độc hại. | 2
+FLEX | Khoe khoang của cải. | 2
+CHILL | Thư giãn, thoải mái. | 1
+SLAY | Đỉnh, xuất sắc, cực cháy. | 2
+GHOST | Đang nói chuyện thì biến mất, không trả lời. | 2 | SEEN KHÔNG REP
+SEEN | Đã xem mà không trả lời. | 1
+TRÀ XANH | Cô gái chen vào chuyện tình người khác. | 2
+SỐNG CHẬM | Lối sống không vội vàng, healing. | 2
+HEALING | Đi đâu đó chữa lành tâm hồn. | 2 | CHỮA LÀNH
+CHECK IN | Chụp ảnh đánh dấu nơi mình tới. | 2
+OOTD | Bộ đồ hôm nay mặc. | 3
+SKINCARE | Chăm sóc da mỗi tối, mười bước. | 2
+MAKEUP | Trang điểm. | 1 | TRANG ĐIỂM
+NAIL | Sơn vẽ móng tay. | 1
+BUBBLE TEA | Tên tiếng Anh của trà sữa trân châu. | 3
+MÌ CAY BẢY CẤP ĐỘ | Thử thách ăn cay nổi tiếng. | 3
+GAME THỦ | Người chơi game chuyên nghiệp. | 2
+GANK | Rình phục kích đánh lén trong game. | 2
+FEED | Chết liên tục cho đối thủ ăn mạng. | 2
+CARRY | Gánh team một mình. | 2 | GÁNH TEAM
+NOOB | Gà mờ, chơi dở. | 1 | GÀ
+PRO | Cao thủ. | 1 | CAO THỦ
+AFK | Treo máy, bỏ đi giữa trận. | 2
+LAG | Mạng chậm, giật hình. | 1
+WIFI | Mạng không dây, câu đầu tiên hỏi khi vào quán. | 1
+PASS WIFI | Thứ đầu tiên hỏi khi vào quán cà phê. | 2 | MẬT KHẨU WIFI
+SẠC DỰ PHÒNG | Cục pin mang theo cứu điện thoại. | 3 | PIN DỰ PHÒNG
+ẢNH ĐẠI DIỆN | Hình hiện cạnh tên tài khoản. | 2 | AVATAR
+BÌNH LUẬN | Gõ chữ vào khung chat dưới video. | 1 | COMMENT
+NHẮN TIN | Gửi chữ qua điện thoại. | 1 | CHAT
+GỌI VIDEO | Gọi điện mà nhìn thấy mặt nhau. | 2 | VIDEO CALL
+BẠN GÁI | Người yêu là nữ. | 1 | NGƯỜI YÊU
+FOMO | Sợ bị bỏ lỡ, thấy ai cũng đi thì cũng muốn đi. | 3
+OVERTHINKING | Nghĩ quá nhiều đến mất ngủ. | 3 | NGHĨ NHIỀU
+DEADLINE | Hạn chót nộp bài. | 1
+CÀY PHIM | Xem liền mấy tập phim thâu đêm. | 2
+CHỐT ĐƠN | Người bán hàng online hay nói. | 2
+SĂN SALE | Canh giờ mua hàng giảm giá. | 2
+FREESHIP | Miễn phí vận chuyển. | 2
+GIỎ HÀNG | Nơi để đồ định mua mà chưa mua. | 2
+ĐẶT ĐỒ ĂN | Bấm điện thoại là shipper mang tới. | 2
+CHỤP ẢNH THẺ | Chụp kiểu photobooth bốn tấm dọc. | 3 | PHOTOBOOTH
+MBTI | Bài test tính cách mười sáu nhóm. | 3
+CUNG HOÀNG ĐẠO | Bạch Dương, Kim Ngưu, Song Tử... | 2
+TAROT | Bói bài vẽ hình phương Tây. | 2
+FAN CỨNG | Người theo dõi lâu năm, trung thành. | 2
+GEN Z | Thế hệ sinh khoảng năm 1997 tới 2012. | 2

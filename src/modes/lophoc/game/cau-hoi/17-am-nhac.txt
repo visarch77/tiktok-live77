@@ -1,0 +1,75 @@
+# Âm nhạc, nghệ thuật
+> Đây là thứ thuộc về âm nhạc, nghệ thuật.
+ĐÀN GHI TA | Nhạc cụ sáu dây ôm ngang đùi. | 2 | GUITAR, ĐÀN GUITAR, GHI TA
+ĐÀN PIANO | Phím đen phím trắng. | 2 | PIANO, DƯƠNG CẦM
+ĐÀN BẦU | Nhạc cụ một dây của Việt Nam. | 2
+ĐÀN TRANH | Đàn có mười sáu dây, gảy bằng móng. | 3
+ĐÀN NHỊ | Hai dây, kéo bằng vĩ. | 3 | ĐÀN CÒ
+ĐÀN T'RƯNG | Ống tre gõ của Tây Nguyên. | 3 | TRƯNG
+SÁO TRÚC | Thổi bằng miệng, làm từ ống tre. | 2 | SÁO
+KÈN | Thổi vào kêu to, có loại bằng đồng trong đám rước. | 1
+TRỐNG | Gõ tùng tùng. | 1
+CỒNG CHIÊNG | Nhạc cụ đồng của đồng bào Tây Nguyên. | 3
+VĨ CẦM | Nhạc cụ kẹp dưới cằm, kéo vĩ. | 3 | VIOLIN
+MICRO | Cầm hát karaoke. | 1 | MIC
+LOA | Phát ra âm thanh to. | 1
+KARAOKE | Hát theo lời chạy trên màn hình. | 1
+BOLERO | Dòng nhạc trữ tình các cô chú mê. | 2
+NHẠC RAP | Đọc nhanh có vần, có beat. | 2 | RAP
+NHẠC VÀNG | Nhạc trữ tình xưa. | 2
+QUAN HỌ | Dân ca Bắc Ninh, liền anh liền chị. | 2
+CẢI LƯƠNG | Nghệ thuật sân khấu Nam Bộ, có vọng cổ. | 3
+CHÈO | Sân khấu dân gian Bắc Bộ, có vai hề. | 2
+CA TRÙ | Hát có đàn đáy, phách, trống chầu. | 3
+HÁT XẨM | Hát rong ngày xưa của người khiếm thị. | 3
+VỌNG CỔ | Bài bản nổi tiếng của cải lương. | 3
+ĐỜN CA TÀI TỬ | Nghệ thuật âm nhạc miền Tây được UNESCO công nhận. | 3
+RU CON | Mẹ hát à ơi cho bé ngủ. | 2 | HÁT RU
+NỐT NHẠC | Đồ, rê, mi, pha, son, la, si. | 2
+CA SĨ | Người đi hát. | 1
+BAN NHẠC | Nhóm chơi nhạc cùng nhau. | 2
+DÀN HỢP XƯỚNG | Rất nhiều người cùng hát nhiều bè. | 3
+NHẠC TRƯỞNG | Người cầm đũa chỉ huy dàn nhạc. | 3
+SÂN KHẤU | Nơi ca sĩ đứng biểu diễn. | 1
+BUỔI HÒA NHẠC | Đêm nhạc lớn có nhiều nghệ sĩ. | 3 | CONCERT
+MV | Video ca nhạc. | 1 | MUSIC VIDEO
+TRIỆU VIEW | Video có lượt xem khủng. | 2
+BẢN HIT | Bài hát ai cũng thuộc. | 2 | HIT
+LỜI BÀI HÁT | Chữ chạy trên màn hình karaoke. | 2
+ĐIỆP KHÚC | Đoạn lặp lại nhiều lần trong bài hát. | 2
+NHẢY HIP HOP | Điệu nhảy đường phố. | 3 | HIPHOP
+BA LÊ | Múa nhón chân, váy xòe. | 2 | BALLET
+MÚA | Biểu diễn bằng động tác cơ thể. | 1
+VẼ TRANH | Dùng cọ và màu. | 1
+CỌ VẼ | Cây bút có lông chấm màu. | 2
+GIÁ VẼ | Khung ba chân đặt tranh. | 3
+TRANH ĐÔNG HỒ | Tranh dân gian in trên giấy dó, có đám cưới chuột. | 3
+GIẤY DÓ | Giấy truyền thống làm từ vỏ cây. | 3
+SƠN MÀI | Tranh phủ nhiều lớp nhựa cây rồi mài bóng. | 3
+ĐIÊU KHẮC | Nghệ thuật tạc tượng. | 3
+TƯỢNG | Hình người làm bằng đá hay đồng. | 1 | BỨC TƯỢNG
+GỐM SỨ | Bát Tràng nổi tiếng nghề này. | 2
+THÊU | Dùng kim chỉ tạo hình trên vải. | 2
+ĐAN LEN | Đan áo mùa đông bằng hai que. | 2
+ORIGAMI | Nghệ thuật gấp giấy Nhật Bản. | 3 | GẤP GIẤY
+CHỤP ẢNH | Bấm máy ghi lại khoảnh khắc. | 1
+QUAY PHIM | Ghi hình động. | 1
+> Đây là thứ thuộc về phim ảnh, sách truyện.
+RẠP CHIẾU PHIM | Mua vé bắp nước ngồi xem màn hình lớn. | 3 | RẠP PHIM
+PHIM HOẠT HÌNH | Phim vẽ cho trẻ em. | 2 | HOẠT HÌNH
+PHIM KINH DỊ | Xem mà sợ, che mắt. | 2
+PHIM HÀI | Xem cười đau bụng. | 1
+DIỄN VIÊN CHÍNH | Người đóng vai quan trọng nhất phim. | 3
+ĐẠO DIỄN | Người hô "diễn" và "cắt". | 2
+KỊCH BẢN | Văn bản ghi lời thoại cho diễn viên. | 2
+TRUYỆN TRANH | Sách có hình vẽ, khung thoại. | 2 | MANGA
+TIỂU THUYẾT | Truyện dài nhiều chương. | 2
+THƠ | Có vần có điệu, lục bát. | 1
+LỤC BÁT | Thể thơ câu sáu câu tám. | 2
+TRUYỆN KIỀU | Tác phẩm nổi tiếng của Nguyễn Du. | 3 | KIỀU
+DẾ MÈN | Nhân vật phiêu lưu ký của Tô Hoài. | 3
+TẤM CÁM | Truyện cổ tích có con gà, chiếc hài, quả thị. | 2
+SỌ DỪA | Chàng trai hình quả dừa trong cổ tích. | 3
+THÁNH GIÓNG | Cậu bé vươn vai thành tráng sĩ cưỡi ngựa sắt. | 3
+SƠN TINH | Thần núi đánh nhau với Thủy Tinh. | 3
+CÂY KHẾ | Truyện ăn một quả trả cục vàng. | 2

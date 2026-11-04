@@ -1,0 +1,78 @@
+# Màu sắc, hình học, con số
+> Đây là một màu sắc.
+MÀU ĐỎ | Màu quả ớt chín, lá cờ. | 1 | ĐỎ
+MÀU XANH | Màu lá cây, bầu trời. | 1 | XANH
+MÀU VÀNG | Màu quả chuối chín, ngôi sao trên cờ. | 1 | VÀNG
+MÀU TÍM | Màu hoa sim, mực tím. | 1 | TÍM
+MÀU HỒNG | Màu kẹo bông, màu con gái hay thích. | 1 | HỒNG
+MÀU CAM | Màu quả cam, áo shipper. | 1 | CAM
+MÀU NÂU | Màu cà phê, đất. | 1 | NÂU
+MÀU ĐEN | Màu bảng lớp mình. | 1 | ĐEN
+MÀU TRẮNG | Màu áo dài của cô. | 1 | TRẮNG
+MÀU XÁM | Màu tro, mây u ám. | 2 | XÁM, MÀU GHI
+MÀU BẠC | Màu nhẫn bạc, tóc già. | 2 | BẠC
+CẦU VỒNG BẢY SẮC | Đỏ, cam, vàng, lục, lam, chàm, tím. | 3
+> Đây là kiến thức hình học.
+HÌNH TRÒN | Hình không có góc nào. | 1
+HÌNH VUÔNG | Bốn cạnh bằng nhau, bốn góc vuông. | 1
+HÌNH TAM GIÁC | Có ba cạnh ba góc. | 2
+HÌNH CHỮ NHẬT | Hai cạnh dài, hai cạnh ngắn, như cái bảng. | 3
+HÌNH THOI | Bốn cạnh bằng nhau nhưng nghiêng. | 2
+HÌNH THANG | Có hai cạnh đáy song song. | 2
+NGÔI SAO NĂM CÁNH | Hình trên lá cờ Việt Nam. | 3
+HÌNH TRÁI TIM | Hình biểu tượng tình yêu. | 2
+KHỐI LẬP PHƯƠNG | Hình hộp sáu mặt vuông như con xúc xắc. | 3
+HÌNH CẦU | Hình tròn như quả bóng. | 2 | KHỐI CẦU
+HÌNH NÓN | Giống cái nón lá, đáy tròn đỉnh nhọn. | 3 | KHỐI NÓN
+ĐƯỜNG THẲNG | Kẻ bằng thước không cong. | 2
+ĐƯỜNG CONG | Uốn lượn, không thẳng. | 2
+GÓC VUÔNG | Chín mươi độ, như góc bảng. | 2
+ĐƯỜNG KÍNH | Đoạn qua tâm hình tròn. | 3
+BÁN KÍNH | Từ tâm tới đường tròn. | 3
+CHU VI | Tổng độ dài các cạnh. | 2
+DIỆN TÍCH | Tính bằng mét vuông. | 2
+> Đây là con số hoặc phép tính.
+SỐ KHÔNG | Số trước số một. | 1 | KHÔNG
+SỐ MỘT | Số đứng đầu, hạng nhất. | 1 | MỘT
+MƯỜI | Số ngón tay của hai bàn tay. | 1 | SỐ MƯỜI
+MỘT TRĂM | Mười lần mười. | 2 | TRĂM
+MỘT NGHÌN | Mười lần một trăm. | 2 | NGHÌN, MỘT NGÀN
+MỘT TRIỆU | Một nghìn lần một nghìn. | 2 | TRIỆU
+MỘT TỶ | Ước mơ của nhiều người khi mua vé số. | 2 | TỶ, TỈ
+PHÉP CỘNG | Một với một thành hai. | 2
+PHÉP TRỪ | Lấy đi bớt. | 2
+PHÉP NHÂN | Bảng cửu chương. | 2
+PHÉP CHIA | Chia đều cho mọi người. | 2
+BẢNG CỬU CHƯƠNG | Học thuộc từ hai nhân một tới chín nhân mười. | 3
+SỐ CHẴN | Số chia hết cho hai. | 2
+SỐ LẺ | Số không chia hết cho hai. | 2
+PHÂN SỐ | Một phần hai, ba phần tư. | 2
+PHẦN TRĂM | Kí hiệu %. | 2
+SỐ PI | Ba phẩy mười bốn. | 2 | PI
+TÁ | Mười hai cái. | 2
+CHỤC | Mười cái. | 1
+CẶP | Hai cái đi với nhau. | 1 | ĐÔI
+> Đây là đơn vị đo.
+GIÂY | Đơn vị thời gian nhỏ nhất trên đồng hồ. | 1
+PHÚT | Sáu mươi giây. | 1
+GIỜ | Sáu mươi phút. | 1
+NGÀY | Hai mươi bốn giờ. | 1
+TUẦN | Bảy ngày. | 1
+THÁNG | Khoảng ba mươi ngày. | 1
+NĂM | Mười hai tháng. | 1
+THẾ KỶ | Một trăm năm. | 2 | THẾ KỈ
+NĂM NHUẬN | Năm tháng hai có hai mươi chín ngày. | 3
+KÍ LÔ GAM | Đơn vị đo cân nặng. | 3 | KILOGAM, CÂN, KÝ
+MÉT | Đơn vị đo chiều dài. | 1
+CÂY SỐ | Một nghìn mét. | 2 | KI LÔ MÉT, KM
+LÍT | Đơn vị đo chai nước. | 1
+ĐỘ C | Đơn vị đo nhiệt độ. | 2
+> Đây là thứ trong giờ toán, giờ địa.
+LA BÀN | Kim luôn chỉ hướng bắc. | 2
+HƯỚNG ĐÔNG | Nơi mặt trời mọc. | 2 | ĐÔNG
+HƯỚNG TÂY | Nơi mặt trời lặn. | 2 | TÂY
+BÊN TRÁI | Ngược với bên phải. | 1 | TRÁI
+TRÊN DƯỚI | Hai hướng đối nhau theo chiều đứng. | 2
+SỐ LA MÃ | Kiểu chữ số I, V, X trên đồng hồ cổ. | 3
+MÁY TÍNH BỎ TÚI | Cầm tay bấm cộng trừ nhân chia. | 3
+THƯỚC ĐO GÓC | Hình bán nguyệt có độ. | 3

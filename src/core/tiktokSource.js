@@ -236,7 +236,9 @@ class TikTokSource extends EventEmitter {
     on(WebcastEvent.MEMBER, (data) => emitEvent({ type: 'join', user: extractUser(data) }));
 
     on(WebcastEvent.CHAT, (data) => {
-      emitEvent({ type: 'chat', user: extractUser(data), text: String(data?.content || data?.comment || '') });
+      // createTime: giờ TikTok gắn lúc người xem gửi (ms) — để xếp ai trả lời nhanh nhất đúng thứ tự, không theo lúc bot nhận
+      const createTime = Number(data?.common?.createTime) || Date.now();
+      emitEvent({ type: 'chat', user: extractUser(data), text: String(data?.content || data?.comment || ''), createTime });
     });
 
     on(WebcastEvent.LIKE, (data) => {

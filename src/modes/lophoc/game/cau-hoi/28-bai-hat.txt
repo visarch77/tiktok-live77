@@ -1,0 +1,24 @@
+# Bài hát thiếu nhi
+# KHÔNG chép lời bài hát (lời có bản quyền): gợi ý chỉ tả nội dung bài, người xem đoán TÊN bài.
+# Chỉ dùng bài quen thuộc, tên bài tối đa 14 chữ cái.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách viết khác cũng tính đúng
+> Đây là tên một bài hát thiếu nhi.
+CHÚ ẾCH CON | Bài hát về một chú ếch nhỏ có đôi mắt tròn xoe. | 2 | ẾCH CON
+MỘT CON VỊT | Bài hát vui về con vật có hai cái cánh, hay kêu cạp cạp. | 1
+RỬA MẶT NHƯ MÈO | Bài hát nhắc các bạn nhỏ rửa mặt cho sạch, đừng làm qua loa như con mèo. | 2
+EM YÊU TRƯỜNG EM | Bài hát về tình yêu mái trường, thầy cô và bạn bè. | 2
+CHIẾC ĐÈN ÔNG SAO | Bài hát về chiếc đèn năm cánh các bạn nhỏ rước đêm Trung thu. | 2 | ĐÈN ÔNG SAO
+CHÁU YÊU BÀ | Bài hát về tình thương của bạn nhỏ dành cho bà. | 2
+TÌM BẠN THÂN | Bài hát về các bạn nhỏ đi tìm người bạn thân để cùng vui chơi. | 2
+ĐI HỌC | Bài hát về con đường nhỏ dẫn bạn nhỏ tới trường mỗi sáng. | 2
+BÉ LÊN BA | Bài hát về em bé ba tuổi bắt đầu đi học mẫu giáo. | 2
+CÔ VÀ MẸ | Bài hát nói ở trường có cô giáo, ở nhà có mẹ hiền. | 2
+MẸ YÊU KHÔNG NÀO | Bài hát bạn nhỏ hỏi mẹ có yêu con không. | 2
+ĐỘI KÈN TÍ HON | Bài hát về đội kèn của các bạn nhỏ thổi vang vui nhộn. | 3
+THẬT LÀ HAY | Bài hát về chim vành khuyên và chim họa mi cùng hót. | 3
+ONG VÀ BƯỚM | Bài hát về chú ong chăm làm và bạn bướm mải chơi. | 3
+> Đây là tên một bài dân ca, đồng dao.
+BẮC KIM THANG | Bài đồng dao miền Nam có cây bí, con cá rô và con cò. | 2
+LÝ CÂY XANH | Bài dân ca Nam Bộ hát về một cái cây xanh. | 2
+TRỐNG CƠM | Bài dân ca quan họ Bắc Ninh vui nhộn, nhắc tới cái trống. | 3
+INH LẢ ƠI | Bài dân ca của đồng bào Thái ở Tây Bắc. | 3

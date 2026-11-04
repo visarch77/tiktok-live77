@@ -1,0 +1,73 @@
+# Nghề nghiệp
+> Đây là một nghề.
+BÁC SĨ | Mặc áo blouse trắng, khám bệnh. | 1
+Y TÁ | Tiêm thuốc, chăm bệnh nhân cùng bác sĩ. | 1 | ĐIỀU DƯỠNG
+GIÁO VIÊN | Người đứng lớp dạy học trò. | 1
+PHI CÔNG | Người lái máy bay. | 2
+TIẾP VIÊN | Phát nước, hướng dẫn thắt dây an toàn trên máy bay. | 2 | TIẾP VIÊN HÀNG KHÔNG
+NÔNG DÂN | Người trồng lúa, làm ruộng. | 1
+NGƯ DÂN | Người ra khơi đánh cá. | 2
+THỢ MAY | Người đo người, cắt vải, may áo quần. | 2
+THỢ CẮT TÓC | Người cầm kéo tông đơ cho bạn đẹp trai. | 3
+ĐẦU BẾP | Người nấu ăn trong nhà hàng. | 1
+CÔNG AN | Giữ gìn trật tự, bắt kẻ gian. | 1
+LÍNH CỨU HỎA | Chữa cháy, cứu người, gọi số một trăm mười bốn. | 3 | CỨU HỎA
+BỘ ĐỘI | Mặc quân phục xanh, bảo vệ Tổ quốc. | 1
+KỸ SƯ | Người thiết kế, xây cầu, làm máy móc. | 2 | KĨ SƯ
+KIẾN TRÚC SƯ | Người vẽ bản thiết kế ngôi nhà. | 3
+THỢ XÂY | Người trộn hồ, xây tường gạch. | 2
+THỢ ĐIỆN | Sửa dây điện, lắp bóng đèn. | 2
+THỢ SỬA XE | Vá lốp, thay nhớt ở tiệm ven đường. | 3
+TÀI XẾ | Người lái xe chở khách. | 2 | LÁI XE
+XE ÔM | Chở khách bằng xe máy, giờ đặt qua ứng dụng. | 2
+SHIPPER | Người giao hàng tận nhà. | 2 | NGƯỜI GIAO HÀNG
+BƯU TÁ | Người đưa thư ngày xưa. | 3
+NHÀ BÁO | Người viết tin tức, đưa tin. | 2 | PHÓNG VIÊN
+CA SĨ | Người đi hát chuyên nghiệp. | 1
+DIỄN VIÊN | Người đóng phim. | 1
+NGƯỜI MẪU | Người trình diễn thời trang trên sàn catwalk. | 2
+HỌA SĨ | Người vẽ tranh. | 2
+NHẠC SĨ | Người sáng tác bài hát. | 2
+NHÀ THƠ | Người làm thơ. | 2
+NHIẾP ẢNH GIA | Người chụp ảnh chuyên nghiệp. | 3
+LUẬT SƯ | Người bào chữa ở tòa án. | 2
+THẨM PHÁN | Người gõ búa tuyên án ở tòa. | 3
+KẾ TOÁN | Người tính toán sổ sách tiền bạc của công ty. | 2
+GIAO DỊCH VIÊN | Nhân viên ngồi quầy ngân hàng nhận tiền gửi. | 3
+THU NGÂN | Người đứng quầy tính tiền ở siêu thị. | 2
+BÁN HÀNG | Người đứng quầy mời khách mua đồ. | 1
+DƯỢC SĨ | Người bán thuốc ở nhà thuốc. | 2
+NHA SĨ | Bác sĩ chữa răng. | 2
+BÁC SĨ THÚ Y | Người chữa bệnh cho chó mèo. | 3 | THÚ Y
+LẬP TRÌNH VIÊN | Người viết code cho máy tính. | 3 | DEV
+STREAMER | Người phát trực tiếp chơi game. | 2
+YOUTUBER | Người làm video đăng lên kênh có nút đỏ. | 2
+TIKTOKER | Người làm video ngắn trên ứng dụng có nốt nhạc. | 2
+THỢ MỘC | Người làm đồ gỗ: bàn ghế, tủ. | 2
+THỢ RÈN | Người đập sắt nung đỏ thành dao. | 3
+THỢ GỐM | Người nặn đất sét thành bình, nung trong lò. | 3
+THỢ KIM HOÀN | Người làm nhẫn, dây chuyền vàng bạc. | 3
+THỢ SĂN | Người vào rừng bắt thú. | 2
+LAO CÔNG | Người quét dọn đường phố, trường học. | 2 | CÔNG NHÂN VỆ SINH
+CÔNG NHÂN | Người làm việc trong nhà máy. | 1
+BẢO MẪU | Người trông trẻ thuê. | 2
+GIÚP VIỆC | Người làm việc nhà cho gia đình khác. | 2 | OSIN
+THUYỀN TRƯỞNG | Người chỉ huy con tàu. | 3
+PHI HÀNH GIA | Người bay vào vũ trụ. | 3
+NHÀ KHOA HỌC | Người làm thí nghiệm, nghiên cứu. | 3
+BÁC SĨ PHẪU THUẬT | Bác sĩ cầm dao mổ trong phòng mổ. | 3
+THỢ ẢNH | Người chụp ảnh cưới, ảnh kỷ yếu. | 2
+MC | Người dẫn chương trình. | 1 | NGƯỜI DẪN CHƯƠNG TRÌNH
+DJ | Người chơi nhạc ở quán bar. | 1
+VẬN ĐỘNG VIÊN | Người thi đấu thể thao chuyên nghiệp. | 3
+HUẤN LUYỆN VIÊN | Người chỉ đạo đội bóng ngoài đường biên. | 3
+TRỌNG TÀI | Người thổi còi, rút thẻ vàng thẻ đỏ. | 2
+ẢO THUẬT GIA | Người biến ra con thỏ từ chiếc mũ. | 3
+CHÚ HỀ | Mũi đỏ, làm trò cho trẻ con cười. | 2 | HỀ
+THẦY BÓI | Người xem chỉ tay đoán tương lai. | 3
+THỢ LẶN | Người mặc đồ bơi, đeo bình dưỡng khí xuống biển. | 3
+GIÁM ĐỐC | Người đứng đầu công ty. | 2 | SẾP
+KIỂM LÂM | Người bảo vệ rừng. | 3
+THỢ NAIL | Người sơn móng tay. | 2 | LÀM NAIL
+THỢ TRANG ĐIỂM | Người make up cho cô dâu. | 3 | MAKEUP
+HƯỚNG DẪN VIÊN | Người dẫn khách du lịch tham quan. | 3

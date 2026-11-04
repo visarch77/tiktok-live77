@@ -1,0 +1,76 @@
+# Đồ vật trong nhà
+> Đây là một đồ vật.
+TIVI | Mở lên xem thời sự bảy giờ tối. | 1
+TỦ LẠNH | Giữ đồ ăn lạnh, mở ra có đèn. | 1
+MÁY GIẶT | Bỏ quần áo vào, nó quay ầm ầm. | 2
+QUẠT MÁY | Chạy vù vù mùa hè, có nút số một hai ba. | 2 | CÁI QUẠT
+ĐIỀU HÒA | Bật mười tám độ ngủ cho sướng. | 2 | MÁY LẠNH
+NỒI CƠM ĐIỆN | Bấm nút là có cơm chín. | 3
+BẾP GA | Vặn núm là lửa xanh bật lên. | 2
+LÒ VI SÓNG | Hâm nóng đồ ăn, kêu "ting" một cái. | 3
+ẤM ĐUN NƯỚC | Sôi xong tự tắt, pha mì. | 3 | ẤM SIÊU TỐC
+CÁI CHỔI | Dùng để quét nhà. | 1 | CHỔI
+CÂY LAU NHÀ | Vắt khô rồi lau sàn. | 3
+CÁI XÔ | Đựng nước, có quai xách. | 2 | XÔ
+CÁI CHẬU | Giặt đồ, rửa rau. | 2 | CHẬU
+CÁI GHẾ | Đồ để ngồi. | 1 | GHẾ
+CÁI BÀN | Đặt mâm cơm hoặc ngồi học. | 1 | BÀN
+GIƯỜNG | Nằm ngủ mỗi tối. | 1
+CÁI GỐI | Kê đầu khi ngủ. | 1 | GỐI
+CHĂN | Đắp cho ấm mùa đông. | 1 | MỀN
+MÀN | Mắc lên chống muỗi. | 2 | MÙNG
+CÁI TỦ | Đựng quần áo, có cánh cửa. | 1 | TỦ
+GƯƠNG | Soi vào thấy mặt mình. | 1 | KIẾNG
+LƯỢC | Dùng để chải tóc. | 1
+BÀN CHẢI | Đánh răng mỗi sáng. | 1 | BÀN CHẢI ĐÁNH RĂNG
+KEM ĐÁNH RĂNG | Bóp lên bàn chải, mùi bạc hà. | 3
+XÀ PHÒNG | Chà tay ra bọt, rửa sạch vi khuẩn. | 2 | XÀ BÔNG
+DẦU GỘI | Gội đầu cho tóc thơm. | 2
+KHĂN TẮM | Lau người sau khi tắm. | 2
+BÀN LÀ | Là phẳng quần áo nhăn. | 2 | BÀN ỦI
+MÁY SẤY TÓC | Thổi gió nóng cho tóc khô. | 3
+ĐỒNG HỒ | Có kim giờ, kim phút, kim giây. | 2
+ĐỒNG HỒ BÁO THỨC | Reng reng mỗi sáng gọi dậy đi học. | 3
+ĐIỆN THOẠI | Ai cũng cầm trên tay, đang xem live bằng nó. | 1
+MÁY TÍNH | Gõ phím, lướt web, chơi game. | 2 | LAPTOP
+CHUỘT MÁY TÍNH | Cầm di di trên bàn để trỏ trên màn hình. | 3
+BÀN PHÍM | Có chữ QWERTY. | 2
+TAI NGHE | Đeo vào nghe nhạc không phiền ai. | 2
+SẠC ĐIỆN THOẠI | Pin còn một phần trăm thì cắm cái này vào. | 3 | CỤC SẠC
+Ổ ĐIỆN | Cắm phích vào đây. | 2
+BÓNG ĐÈN | Bật công tắc là sáng. | 1
+CÔNG TẮC | Bấm tách một cái là đèn tắt. | 2
+CHÌA KHÓA | Mở ổ khóa cửa. | 2
+Ổ KHÓA | Treo ở cổng, cần chìa mới mở. | 2
+CÁI KÉO | Cắt giấy, có hai lưỡi. | 1 | KÉO
+CON DAO | Thái rau, thái thịt. | 1 | DAO
+CÁI THỚT | Tấm gỗ kê để thái đồ ăn. | 2 | THỚT
+ĐÔI ĐŨA | Hai que dùng để gắp thức ăn. | 1 | ĐŨA
+CÁI THÌA | Múc canh, còn gọi muỗng. | 1 | THÌA, MUỖNG, CÁI MUỖNG
+CÁI BÁT | Đựng cơm, còn gọi là chén. | 1 | BÁT, CHÉN, CÁI CHÉN
+CÁI ĐĨA | Đựng thức ăn, mặt phẳng tròn. | 1 | ĐĨA, DĨA
+CÁI CỐC | Đựng nước uống, còn gọi là ly. | 1 | CỐC, LY, CÁI LY
+CÁI NỒI | Nấu canh, luộc rau. | 1 | NỒI
+CÁI CHẢO | Chiên trứng, xào rau. | 1 | CHẢO
+CÁI MUÔI | Múc canh từ nồi ra. | 2 | MUÔI, VÁ
+CÁI RỔ | Đựng rau cho ráo nước, có nhiều lỗ. | 2 | RỔ
+CÁI LÀN | Xách đi chợ ngày xưa, đan bằng cói. | 3 | LÀN, GIỎ
+CÁI Ô | Trời mưa thì bung ra che. | 1 | CÂY DÙ, Ô, DÙ
+ÁO MƯA | Mặc vào khi đi xe máy trời mưa. | 2
+DÉP LÀO | Dép tông quai kẹp ngón. | 2 | DÉP TÔNG, DÉP KẸP
+DÉP TỔ ONG | Dép nhựa nhiều lỗ huyền thoại. | 3
+GIÀY THỂ THAO | Mang đi chạy bộ, đá bóng. | 3
+MŨ BẢO HIỂM | Đội khi đi xe máy để bảo vệ đầu. | 3 | NÓN BẢO HIỂM
+KÍNH RÂM | Đeo chống nắng, nhìn cho ngầu. | 2 | KÍNH MÁT
+VÍ TIỀN | Cất tiền, thẻ, bỏ túi quần. | 2 | CÁI VÍ, BÓP
+BALO | Túi đeo hai quai sau lưng. | 2 | BA LÔ
+VALI | Kéo đi du lịch, có bánh xe. | 2
+CÁI LƯỚI | Đánh cá, giăng chắn bóng. | 2
+CÁI THANG | Leo lên chỗ cao. | 2 | THANG
+CÁI BÚA | Đóng đinh. | 1 | BÚA
+CÁI KÌM | Kẹp, bẻ dây thép. | 2 | KÌM
+TUA VÍT | Vặn ốc vít. | 2 | TUỐC NƠ VÍT
+BÌNH HOA | Cắm hoa trang trí bàn khách. | 2 | LỌ HOA
+RÈM CỬA | Kéo che nắng ở cửa sổ. | 2
+THẢM | Trải dưới sàn cho êm chân. | 2
+CỬA SỔ | Mở ra cho gió vào. | 1

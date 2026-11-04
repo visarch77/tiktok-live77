@@ -1,0 +1,77 @@
+# Gia đình, cảm xúc
+> Đây là người trong gia đình, họ hàng.
+BỐ | Người đàn ông nuôi lớn mình, còn gọi ba. | 1 | BA, CHA
+MẸ | Người sinh ra mình, còn gọi má. | 1 | MÁ
+ÔNG NỘI | Bố của bố. | 2
+BÀ NỘI | Mẹ của bố. | 2
+ÔNG NGOẠI | Bố của mẹ. | 2
+BÀ NGOẠI | Mẹ của mẹ. | 2
+ANH TRAI | Con trai lớn hơn mình cùng bố mẹ. | 2
+CHỊ GÁI | Con gái lớn hơn mình cùng bố mẹ. | 2
+EM BÉ | Mới sinh, khóc oe oe. | 1
+CÔ RUỘT | Em gái của bố. | 3 | CÔ
+CHÚ | Em trai của bố. | 1
+BÁC | Anh hoặc chị của bố mẹ. | 1
+DÌ | Em gái của mẹ. | 1
+CẬU | Anh em trai của mẹ. | 1
+MỢ | Vợ của cậu. | 2
+THÍM | Vợ của chú. | 2
+DƯỢNG | Chồng của dì. | 2
+CHÁU | Con của anh chị em mình. | 1
+CHẮT | Con của cháu. | 2
+ANH HỌ | Con trai của bác, lớn hơn mình. | 3
+SINH ĐÔI | Hai anh em sinh cùng lúc, giống nhau như đúc. | 2
+CON ĐẦU LÒNG | Đứa con sinh ra đầu tiên. | 3
+CON ÚT | Đứa nhỏ nhất nhà, hay được cưng. | 2 | ÚT
+CON MỘT | Không có anh chị em. | 2
+GIA ĐÌNH | Bố mẹ và các con. | 1
+HỌ HÀNG | Bà con nội ngoại. | 2
+> Đây là người quen quanh mình.
+HÀNG XÓM | Người sống sát vách nhà mình. | 1
+> Đây là người trong gia đình, họ hàng.
+MẸ CHỒNG | Mẹ của chồng, hay bị kể trong phim. | 2
+CON DÂU | Vợ của con trai. | 2
+CON RỂ | Chồng của con gái. | 2
+BỐ VỢ | Bố của vợ. | 2 | NHẠC PHỤ
+VỢ CHỒNG | Hai người đã cưới nhau. | 2
+> Đây là một cảm xúc.
+VUI VẺ | Cảm giác khi được điểm mười. | 1 | VUI
+BUỒN | Cảm giác khi bị điểm kém. | 1 | BUỒN BÃ
+GIẬN DỮ | Mặt đỏ phừng phừng, muốn hét lên. | 2 | GIẬN, TỨC GIẬN
+SỢ HÃI | Gặp ma thì cảm thấy vậy. | 2 | SỢ
+NGẠI NGÙNG | Đỏ mặt khi gặp crush. | 2 | NGẠI
+TỰ HÀO | Cảm giác khi con đạt giải. | 2
+GHEN TỊ | Thấy bạn có đồ mới mình không có. | 2 | GHEN
+CÔ ĐƠN | Một mình không ai bên cạnh. | 2
+HẠNH PHÚC | Cảm giác khi ở bên người mình thương. | 2
+BẤT NGỜ | Không đoán trước được. | 2
+CHÁN | Không có gì làm, ngồi ngáp. | 1 | CHÁN NẢN
+LO LẮNG | Mai thi mà chưa học bài. | 2 | LO
+HỒI HỘP | Tim đập nhanh chờ công bố kết quả. | 2
+NHỚ NHÀ | Đi xa lâu ngày cảm thấy vậy. | 2
+BIẾT ƠN | Cảm giác với thầy cô dạy dỗ. | 2
+XẤU HỔ | Bị bắt quả tang quay cóp. | 2 | MẮC CỠ
+TỨC CƯỜI | Thấy buồn cười không nhịn được. | 2
+THẤT VỌNG | Mong nhiều mà không được. | 2
+YÊU THƯƠNG | Cảm giác dành cho gia đình. | 2
+> Đây là một tính cách.
+HIỀN | Tính tình dễ chịu, không nóng nảy. | 1 | HIỀN LÀNH
+NGOAN | Biết vâng lời bố mẹ. | 1 | NGOAN NGOÃN
+LƯỜI | Không thích làm gì cả. | 1 | LƯỜI BIẾNG
+CHĂM CHỈ | Học hành siêng năng. | 2 | SIÊNG NĂNG
+DŨNG CẢM | Không sợ nguy hiểm. | 2 | GAN DẠ
+THẬT THÀ | Không nói dối. | 2 | TRUNG THỰC
+NÓI DỐI | Nói không đúng sự thật, mũi Pinocchio dài ra. | 2
+HÀI HƯỚC | Hay pha trò làm người khác cười. | 2 | VUI TÍNH
+KEO KIỆT | Giữ tiền khư khư, không chịu chi. | 2 | KẸT XỈ
+HÀO PHÓNG | Rộng rãi, hay cho người khác. | 3
+NHÚT NHÁT | Không dám nói chuyện với người lạ. | 2
+TỰ TIN | Dám đứng lên phát biểu trước lớp. | 2
+NÓNG TÍNH | Hay nổi cáu. | 2
+LẠC QUAN | Luôn nghĩ tích cực. | 3
+KIÊN NHẪN | Chờ đợi không vội vàng. | 3
+TÒ MÒ | Thích biết chuyện của người khác. | 2
+ĐÃNG TRÍ | Hay quên trước quên sau. | 2 | HAY QUÊN
+HAY KHÓC | Khóc nhè suốt ngày. | 2 | MÍT ƯỚT
+LÉM LỈNH | Nhanh nhảu, tinh nghịch. | 3
+ĐỎNG ĐẢNH | Hay làm nũng, thất thường. | 3

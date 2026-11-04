@@ -1,0 +1,77 @@
+# Cơ thể, sức khỏe
+> Đây là bộ phận cơ thể.
+MẮT | Dùng để nhìn. | 1 | CON MẮT
+MŨI | Dùng để ngửi. | 1 | CÁI MŨI
+MIỆNG | Dùng để ăn và nói. | 1 | CÁI MIỆNG
+TAI | Dùng để nghe. | 1 | CÁI TAI
+RĂNG | Đánh mỗi sáng tối cho trắng. | 1 | CÁI RĂNG
+LƯỠI | Nếm vị chua cay mặn ngọt. | 1 | CÁI LƯỠI
+TÓC | Mọc trên đầu, đi cắt mỗi tháng. | 1 | MÁI TÓC
+LÔNG MÀY | Hai vệt trên mắt. | 2
+LÔNG MI | Sợi cong ở mí mắt, chị em hay chuốt mascara. | 2
+MÁ | Hai bên mặt, cười thì có lúm đồng tiền. | 1 | GÒ MÁ
+CẰM | Phía dưới miệng, ông già có râu ở đây. | 1
+CỔ | Nối đầu với thân. | 1
+VAI | Đeo cặp sách lên đây. | 1 | BỜ VAI
+TAY | Dùng để cầm nắm. | 1 | BÀN TAY
+NGÓN TAY | Mỗi bàn tay có năm cái. | 1
+MÓNG TAY | Cắt ngắn cho sạch, thợ nail sơn. | 2
+KHUỶU TAY | Chỗ gập giữa cánh tay. | 3 | CÙI CHỎ, KHUỶU
+CHÂN | Dùng để đi. | 1 | BÀN CHÂN
+ĐẦU GỐI | Chỗ gập giữa chân, ngã hay bị trầy. | 2
+GÓT CHÂN | Phần sau bàn chân. | 2
+BỤNG | Ăn no thì căng tròn. | 1 | CÁI BỤNG
+RỐN | Cái lỗ nhỏ giữa bụng. | 1
+LƯNG | Phía sau thân, hay bị đau khi ngồi lâu. | 1
+TIM | Đập thình thịch trong lồng ngực. | 1 | TRÁI TIM
+PHỔI | Hít thở không khí. | 1
+GAN | Lọc độc trong máu, uống rượu nhiều thì hại. | 2
+DẠ DÀY | Nơi tiêu hóa thức ăn, còn gọi bao tử. | 2 | BAO TỬ
+RUỘT | Ống dài trong bụng, có loại non và loại già. | 2
+THẬN | Lọc máu tạo nước tiểu, có hai quả. | 2
+NÃO | Bộ phận suy nghĩ trong đầu. | 1 | BỘ NÃO
+XƯƠNG | Khung cứng của cơ thể, uống sữa cho chắc. | 1
+MÁU | Màu đỏ, chảy trong mạch. | 1
+DA | Lớp ngoài cùng của cơ thể. | 1 | LÀN DA
+MỒ HÔI | Chảy ra khi nóng hay chạy nhiều. | 2
+NƯỚC MẮT | Chảy ra khi khóc. | 1
+> Đây là chuyện cơ thể, sức khỏe.
+NỤ CƯỜI | Thứ đẹp nhất trên gương mặt. | 1
+LÚM ĐỒNG TIỀN | Vết lõm xinh trên má khi cười. | 3
+NỐT RUỒI | Chấm nhỏ trên da, người ta bảo có duyên. | 2
+TÀN NHANG | Đốm nâu nhỏ trên mặt. | 3
+MỤN | Nổi trên mặt tuổi dậy thì. | 1 | MỤN TRỨNG CÁ
+SỐT | Người nóng, đo nhiệt kế ba mươi chín độ. | 1 | BỊ SỐT
+CẢM CÚM | Hắt xì, sổ mũi, đau đầu. | 2 | CẢM, CÚM
+HO | Khụ khụ. | 1
+ĐAU BỤNG | Ăn bậy là bị cái này. | 1
+ĐAU RĂNG | Ăn kẹo nhiều quá thì bị. | 1
+SÂU RĂNG | Ăn ngọt không đánh răng thì răng bị. | 2
+CẬN THỊ | Nhìn xa không rõ, phải đeo kính. | 2
+NHIỆT KẾ | Kẹp nách để đo nhiệt độ. | 2
+KHẨU TRANG | Đeo che miệng mũi tránh bụi. | 2
+THUỐC | Uống khi ốm, có viên, có siro. | 1
+BỆNH VIỆN | Nơi khám chữa bệnh, có xe cứu thương. | 1
+TIÊM PHÒNG | Chích vắc xin để không bị bệnh. | 2 | TIÊM CHỦNG
+BĂNG CÁ NHÂN | Dán lên vết đứt tay. | 3 | URGO
+VITAMIN | Chất cần thiết có nhiều trong rau quả. | 2
+CHIỀU CAO | Đo bằng thước, uống sữa để tăng. | 2
+CÂN NẶNG | Đứng lên cân để đo. | 2
+ĂN SÁNG | Bữa đầu tiên trong ngày. | 1
+NGỦ TRƯA | Chợp mắt sau bữa trưa. | 1
+TẬP THỂ DỤC | Vận động mỗi sáng cho khỏe. | 2
+CHẠY BỘ | Môn thể thao chỉ cần đôi giày. | 2
+ĐÁNH RĂNG | Việc làm mỗi sáng và trước khi ngủ. | 1
+RỬA TAY | Làm trước khi ăn để sạch vi khuẩn. | 1
+TẮM | Làm mỗi tối cho sạch sẽ. | 1
+NGÁP | Há miệng to khi buồn ngủ. | 1
+HẮT HƠI | Hắt xì một cái. | 2 | HẮT XÌ
+NẤC CỤT | Ăn vội bị cái này, hức hức. | 2 | NẤC
+CHUỘT RÚT | Bơi lâu bị co cứng bắp chân. | 3
+TÊ CHÂN | Ngồi xổm lâu đứng dậy bị kiến bò. | 2
+VÂN TAY | Đường nét riêng trên đầu ngón, mở khóa điện thoại. | 2
+NHÓM MÁU | A, B, AB hoặc O. | 3
+TẾ BÀO | Đơn vị nhỏ nhất của cơ thể sống. | 3
+CƠ BẮP | Tập gym cho to lên. | 2
+SIX PACK | Cơ bụng sáu múi. | 3 | CƠ BỤNG
+HUYẾT ÁP | Đo bằng máy bó tay. | 3

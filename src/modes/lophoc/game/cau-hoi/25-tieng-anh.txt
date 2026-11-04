@@ -1,0 +1,182 @@
+# Tiếng Anh
+# Câu tiếng Anh: chỉ hỏi ở câu 3 và câu 12 của mỗi tiết (GAME.roundPlan 'anh'), không lẫn vào câu chữ thường.
+# Cô đọc gợi ý tiếng Việt, người xem gõ từ tiếng Anh (không cần dấu). Lúc hiện đáp án cô đọc từ đó bằng giọng tiếng Anh.
+# Từ vựng tiểu học. Nghĩa nào có nhiều từ tiếng Anh đúng thì ghi thêm ở cột cách viết khác.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách trả lời khác cũng tính đúng
+> Câu tiếng Anh nè.
+CAT | Con mèo tiếng Anh là gì? | 1 | KITTY, KITTEN
+DOG | Con chó tiếng Anh là gì? | 1 | PUPPY
+FISH | Con cá tiếng Anh là gì? | 1
+BIRD | Con chim tiếng Anh là gì? | 1
+PIG | Con heo tiếng Anh là gì? | 1
+COW | Con bò tiếng Anh là gì? | 1
+DUCK | Con vịt tiếng Anh là gì? | 1
+CHICKEN | Con gà tiếng Anh là gì? | 1 | HEN, ROOSTER
+HORSE | Con ngựa tiếng Anh là gì? | 1
+RABBIT | Con thỏ tiếng Anh là gì? | 1 | BUNNY
+MOUSE | Con chuột tiếng Anh là gì? | 1 | RAT
+TIGER | Con hổ tiếng Anh là gì? | 1
+LION | Con sư tử tiếng Anh là gì? | 1
+MONKEY | Con khỉ tiếng Anh là gì? | 1
+ELEPHANT | Con voi tiếng Anh là gì? | 2
+BEAR | Con gấu tiếng Anh là gì? | 1
+FROG | Con ếch tiếng Anh là gì? | 1
+SNAKE | Con rắn tiếng Anh là gì? | 2
+BEE | Con ong tiếng Anh là gì? | 1
+ANT | Con kiến tiếng Anh là gì? | 1
+BUTTERFLY | Con bươm bướm tiếng Anh là gì? | 2
+TURTLE | Con rùa tiếng Anh là gì? | 2 | TORTOISE
+GIRAFFE | Con hươu cao cổ tiếng Anh là gì? | 3
+PENGUIN | Con chim cánh cụt tiếng Anh là gì? | 2
+DOLPHIN | Con cá heo tiếng Anh là gì? | 3
+SHARK | Con cá mập tiếng Anh là gì? | 2
+CRAB | Con cua tiếng Anh là gì? | 2
+SHEEP | Con cừu tiếng Anh là gì? | 2 | LAMB
+GOAT | Con dê tiếng Anh là gì? | 2
+ZEBRA | Con ngựa vằn tiếng Anh là gì? | 2
+KANGAROO | Con chuột túi tiếng Anh là gì? | 3
+OWL | Con cú mèo tiếng Anh là gì? | 2
+SPIDER | Con nhện tiếng Anh là gì? | 2
+RED | Màu đỏ tiếng Anh là gì? | 1
+BLUE | Màu xanh dương tiếng Anh là gì? | 1
+GREEN | Màu xanh lá cây tiếng Anh là gì? | 1
+YELLOW | Màu vàng tiếng Anh là gì? | 1
+BLACK | Màu đen tiếng Anh là gì? | 1
+WHITE | Màu trắng tiếng Anh là gì? | 1
+PINK | Màu hồng tiếng Anh là gì? | 1
+ORANGE | Màu cam tiếng Anh là gì? | 2
+PURPLE | Màu tím tiếng Anh là gì? | 2 | VIOLET
+BROWN | Màu nâu tiếng Anh là gì? | 2
+GRAY | Màu xám tiếng Anh là gì? | 2 | GREY
+ONE | Số một tiếng Anh là gì? | 1
+TWO | Số hai tiếng Anh là gì? | 1
+THREE | Số ba tiếng Anh là gì? | 1
+FOUR | Số bốn tiếng Anh là gì? | 1
+FIVE | Số năm tiếng Anh là gì? | 1
+SIX | Số sáu tiếng Anh là gì? | 1
+SEVEN | Số bảy tiếng Anh là gì? | 1
+EIGHT | Số tám tiếng Anh là gì? | 1
+NINE | Số chín tiếng Anh là gì? | 1
+TEN | Số mười tiếng Anh là gì? | 1
+TWENTY | Số hai mươi tiếng Anh là gì? | 2
+ONE HUNDRED | Số một trăm tiếng Anh là gì? | 3 | HUNDRED, A HUNDRED
+APPLE | Quả táo tiếng Anh là gì? | 1
+BANANA | Quả chuối tiếng Anh là gì? | 1
+MANGO | Quả xoài tiếng Anh là gì? | 2
+GRAPE | Quả nho tiếng Anh là gì? | 2 | GRAPES
+WATERMELON | Quả dưa hấu tiếng Anh là gì? | 3
+LEMON | Quả chanh tiếng Anh là gì? | 2 | LIME
+MILK | Sữa tiếng Anh là gì? | 1
+WATER | Nước uống tiếng Anh là gì? | 1
+RICE | Cơm, gạo tiếng Anh là gì? | 1
+BREAD | Bánh mì tiếng Anh là gì? | 1
+EGG | Quả trứng tiếng Anh là gì? | 1
+CAKE | Bánh ngọt, bánh kem tiếng Anh là gì? | 2
+CANDY | Viên kẹo tiếng Anh là gì? | 1 | SWEET, SWEETS
+ICE CREAM | Que kem tiếng Anh là gì? | 2
+NOODLES | Món mì sợi tiếng Anh là gì? | 2 | NOODLE
+JUICE | Nước ép trái cây tiếng Anh là gì? | 2
+TEA | Trà tiếng Anh là gì? | 2
+MOTHER | Mẹ tiếng Anh là gì? | 1 | MOM, MUM, MOMMY, MUMMY
+FATHER | Bố tiếng Anh là gì? | 1 | DAD, DADDY
+SISTER | Chị gái, em gái tiếng Anh là gì? | 1
+BROTHER | Anh trai, em trai tiếng Anh là gì? | 1
+BABY | Em bé tiếng Anh là gì? | 1
+GRANDMOTHER | Bà tiếng Anh là gì? | 2 | GRANDMA, GRANNY
+GRANDFATHER | Ông tiếng Anh là gì? | 2 | GRANDPA
+FAMILY | Gia đình tiếng Anh là gì? | 2
+FRIEND | Người bạn tiếng Anh là gì? | 2
+TEACHER | Cô giáo, thầy giáo tiếng Anh là gì? | 1
+STUDENT | Học sinh tiếng Anh là gì? | 2 | PUPIL
+HEAD | Cái đầu tiếng Anh là gì? | 1
+EYE | Con mắt tiếng Anh là gì? | 1 | EYES
+EAR | Cái tai tiếng Anh là gì? | 1 | EARS
+NOSE | Cái mũi tiếng Anh là gì? | 1
+MOUTH | Cái miệng tiếng Anh là gì? | 1
+HAND | Bàn tay tiếng Anh là gì? | 1 | HANDS
+FOOT | Bàn chân tiếng Anh là gì? | 2 | FEET
+HAIR | Mái tóc tiếng Anh là gì? | 1
+TOOTH | Cái răng tiếng Anh là gì? | 2 | TEETH
+ARM | Cánh tay tiếng Anh là gì? | 2
+FINGER | Ngón tay tiếng Anh là gì? | 2
+FACE | Khuôn mặt tiếng Anh là gì? | 2
+BOOK | Quyển sách tiếng Anh là gì? | 1
+PEN | Cây bút bi tiếng Anh là gì? | 1
+PENCIL | Bút chì tiếng Anh là gì? | 1
+RULER | Cây thước kẻ tiếng Anh là gì? | 2
+ERASER | Cục tẩy tiếng Anh là gì? | 2 | RUBBER
+SCHOOLBAG | Cặp sách tiếng Anh là gì? | 2 | BAG, BACKPACK
+DESK | Bàn học tiếng Anh là gì? | 2
+CHAIR | Cái ghế tiếng Anh là gì? | 1
+SCHOOL | Trường học tiếng Anh là gì? | 1
+CLASSROOM | Lớp học tiếng Anh là gì? | 2 | CLASS
+BOARD | Cái bảng trên lớp tiếng Anh là gì? | 2 | BLACKBOARD
+NOTEBOOK | Quyển vở tiếng Anh là gì? | 2
+HOUSE | Ngôi nhà tiếng Anh là gì? | 1 | HOME
+DOOR | Cửa ra vào tiếng Anh là gì? | 1
+WINDOW | Cửa sổ tiếng Anh là gì? | 1
+BED | Cái giường tiếng Anh là gì? | 1
+TABLE | Cái bàn ăn tiếng Anh là gì? | 1
+LAMP | Cái đèn bàn tiếng Anh là gì? | 2 | LIGHT
+CLOCK | Đồng hồ treo tường tiếng Anh là gì? | 2
+PHONE | Điện thoại tiếng Anh là gì? | 1 | TELEPHONE, MOBILE
+TELEVISION | Cái ti vi tiếng Anh là gì? | 2 | TV
+BALL | Quả bóng tiếng Anh là gì? | 1
+DOLL | Búp bê tiếng Anh là gì? | 2
+KITE | Con diều tiếng Anh là gì? | 2
+CAR | Xe ô tô tiếng Anh là gì? | 1
+BUS | Xe buýt tiếng Anh là gì? | 1
+BIKE | Xe đạp tiếng Anh là gì? | 1 | BICYCLE
+TRAIN | Tàu hỏa tiếng Anh là gì? | 2
+PLANE | Máy bay tiếng Anh là gì? | 1 | AIRPLANE, AEROPLANE
+BOAT | Con thuyền tiếng Anh là gì? | 1 | SHIP
+SUN | Mặt trời tiếng Anh là gì? | 1
+MOON | Mặt trăng tiếng Anh là gì? | 1
+STAR | Ngôi sao tiếng Anh là gì? | 1
+SKY | Bầu trời tiếng Anh là gì? | 1
+RAIN | Cơn mưa tiếng Anh là gì? | 1
+TREE | Cái cây tiếng Anh là gì? | 1
+FLOWER | Bông hoa tiếng Anh là gì? | 1
+SEA | Biển tiếng Anh là gì? | 1 | OCEAN
+RIVER | Dòng sông tiếng Anh là gì? | 2
+MOUNTAIN | Ngọn núi tiếng Anh là gì? | 2
+CLOUD | Đám mây tiếng Anh là gì? | 2
+SNOW | Tuyết tiếng Anh là gì? | 2
+WIND | Cơn gió tiếng Anh là gì? | 2
+RAINBOW | Cầu vồng tiếng Anh là gì? | 3
+HELLO | Xin chào tiếng Anh là gì? | 1 | HI
+THANK YOU | Cảm ơn tiếng Anh là gì? | 1 | THANKS
+SORRY | Xin lỗi tiếng Anh là gì? | 1
+GOODBYE | Tạm biệt tiếng Anh là gì? | 1 | BYE, BYE BYE
+YES | Vâng, có tiếng Anh là gì? | 1
+NO | Không tiếng Anh là gì? | 1
+LOVE | Yêu thương tiếng Anh là gì? | 1
+HAPPY | Vui vẻ tiếng Anh là gì? | 2
+SAD | Buồn tiếng Anh là gì? | 2
+BIG | To, lớn tiếng Anh là gì? | 1 | LARGE
+SMALL | Nhỏ, bé tiếng Anh là gì? | 1 | LITTLE
+HOT | Nóng tiếng Anh là gì? | 1
+COLD | Lạnh tiếng Anh là gì? | 1
+BEAUTIFUL | Xinh đẹp tiếng Anh là gì? | 3 | PRETTY
+RUN | Chạy tiếng Anh là gì? | 1
+JUMP | Nhảy lên cao tiếng Anh là gì? | 1
+SWIM | Bơi tiếng Anh là gì? | 1
+EAT | Ăn tiếng Anh là gì? | 1
+DRINK | Uống tiếng Anh là gì? | 1
+SLEEP | Ngủ tiếng Anh là gì? | 1
+READ | Đọc tiếng Anh là gì? | 1
+WRITE | Viết tiếng Anh là gì? | 1
+SING | Hát tiếng Anh là gì? | 1
+DANCE | Nhảy múa tiếng Anh là gì? | 2
+PLAY | Chơi tiếng Anh là gì? | 1
+CRY | Khóc tiếng Anh là gì? | 2
+SMILE | Mỉm cười tiếng Anh là gì? | 2
+WALK | Đi bộ tiếng Anh là gì? | 2
+FLY | Bay tiếng Anh là gì? | 2
+COOK | Nấu ăn tiếng Anh là gì? | 2
+MONDAY | Thứ hai tiếng Anh là gì? | 3
+SUNDAY | Chủ nhật tiếng Anh là gì? | 3
+MORNING | Buổi sáng tiếng Anh là gì? | 2
+NIGHT | Ban đêm tiếng Anh là gì? | 2
+TODAY | Hôm nay tiếng Anh là gì? | 3
+BIRTHDAY | Sinh nhật tiếng Anh là gì? | 2
