@@ -27,8 +27,12 @@ npm run test:lophoc    # đóng gói + chạy quiz.check.ts và bank.check.ts c�
 npm run build:lophoc   # đóng gói lõi + màn hình (thêm --core: chỉ lõi)
 ```
 
-RPC (`lophoc.<tên>`): `newRound`, `skip`, `ban`, `birthday {name}`, `recess {game: rps|callup|pick|roll|heart}`,
-`sayText {text}`, `setName {name}`, `getView`; thử khi chưa live: `testChat`, `testCrowd {count}`, `testGift`, `testLike {count}`.
+RPC (`lophoc.<tên>`): `newRound`, `skip`, `ban`, `unban {id}`, `birthday {name}`, `recess {game: rps|callup|pick|roll|heart}`,
+`sayText {text}`, `setName {name}`, `getView`, `report {day?}`; thử khi chưa live: `testChat`, `testCrowd {count}`, `testGift`, `testLike {count}`.
+
+Trang quản lý (`public/admin.html`, `MODE_UI.lophoc`): thẻ **🍎 Điều khiển lớp** (trạng thái câu đang hỏi, qua phần tiếp, tiết mới,
+bỏ câu, ra chơi, chúc sinh nhật, cô nói ngay, tên lớp), thẻ **🧪 Thử tương tác** (bạn ảo, quà, tim).
+Trang báo cáo: `/lophoc-bao-cao.html?room=<id>&ngay=YYYY-MM-DD` (câu không ai đúng, câu quá dễ, điểm cao, chuyên cần, câu đã bỏ + nút Hỏi lại).
 
 Màn hình phát: `lophoc.view` (ảnh chụp lớp, tối đa 4 lần/giây) và `lophoc.speak` `{ url, text, who, durMs }`.
 
@@ -39,7 +43,6 @@ Màn hình phát: `lophoc.view` (ảnh chụp lớp, tối đa 4 lần/giây) v�
 
 ## Còn làm
 
-- Giai đoạn 3: nút trong trang quản lý, trang báo cáo.
 - Giai đoạn 4: giọng tiếng Anh cho đoạn `E:` (ZeroTTS chỉ có Mai Chi), tạo giọng nhanh hơn.
 
 ## Kéo bản cập nhật từ repo gốc

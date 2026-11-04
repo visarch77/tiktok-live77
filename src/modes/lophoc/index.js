@@ -483,8 +483,58 @@ function create(ctx, saved = {}) {
     else ctx.simulated(fire);
   }
 
+  /** Báo cáo buổi live một ngày (giống trang /bao-cao của bản gốc) + danh sách ngày có báo cáo */
+  function buildReport(day) {
+    flushLogs();
+    const dir = path.dirname(reportFile(dayKey()));
+    let days = [];
+    try {
+      days = fs.readdirSync(dir).filter((f) => /^\d{4}-\d{2}-\d{2}\.json$/.test(f)).map((f) => f.slice(0, 10)).sort().reverse();
+    } catch (_) {}
+    let rows = [];
+    try {
+      rows = JSON.parse(fs.readFileSync(reportFile(day), 'utf8'));
+    } catch (_) {}
+    if (!Array.isArray(rows)) rows = [];
+    const words = rows.filter((r) => r.category !== 'Toán nhẩm');
+    // ít nhất 3 bạn thử mà không ai đúng (câu bị bấm qua, không ai gõ thì không tính)
+    const hard = words.filter((r) => r.correct === 0 && r.attempts >= 3).sort((a, b) => b.attempts - a.attempts);
+    const easy = words.filter((r) => r.attempts >= 5 && r.correct / r.attempts >= 0.9);
+    const attended = Object.values(book.attend).filter((a) => a && a.last === day);
+    const top = day === todayKeyOfBook() ? topOf(todayBook(), 15) : [];
+    return {
+      day,
+      today: dayKey(),
+      days,
+      channelName: book.channelName,
+      asked: rows.length,
+      attended: attended.length,
+      hard,
+      easy,
+      top,
+      loyal: attended.sort((a, b) => b.streak - a.streak).slice(0, 15),
+      banned: Object.entries(book.banned)
+        .map(([id, b]) => ({ id, ...b }))
+        .sort((a, b) => b.at - a.at)
+    };
+  }
+  const todayKeyOfBook = () => (todayBook(), book.today.date);
+
   const rpc = {
     getView: () => buildView(),
+    report: (params = {}) => {
+      const day = /^\d{4}-\d{2}-\d{2}$/.test(String(params.day || '')) ? params.day : dayKey();
+      return buildReport(day);
+    },
+    /** bỏ chặn một câu (sửa nhầm): câu được hỏi lại ở các tiết sau */
+    unban: (params = {}) => {
+      const id = String(params.id || '');
+      if (!safeKey(id) || !Object.prototype.hasOwnProperty.call(book.banned, id)) throw new Error('Không thấy câu này trong danh sách bỏ');
+      delete book.banned[id];
+      if (room.banned instanceof Set) room.banned.delete(id); // trường private của lõi TS (JS vẫn đọc được)
+      ctx.save();
+      return { ok: true };
+    },
     newRound: () => {
       speaker.stop();
       chatter = [];
@@ -551,7 +601,7 @@ function create(ctx, saved = {}) {
     },
     testLike: (params = {}) => {
       requireOffline();
-      ctx.simulated(() => onLike({ type: 'like', user: simUser(), count: Math.max(1, Math.min(50, Number(params.count) || 15)) }));
+      ctx.simulated(() => onLike({ type: 'like', user: simUser(), count: Math.max(1, Math.min(100, Number(params.count) || 15)) }));
       return { ok: true };
     }
   };
