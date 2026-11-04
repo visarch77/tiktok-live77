@@ -1105,9 +1105,9 @@ function create(ctx, saved = {}) {
     money: { emoji: '💵', stun: 1500, lucky: false, stat: 'ev_money',
       vi: ['{n} thấy tiền rơi là quên cả chạy!', '{n} cúi nhặt tiền, tham quá!'], en: ['{n} found money and forgot to run!'] },
     poo: { emoji: '💩', bee: 2600, lucky: true, stat: 'ev_poo',
-      vi: ['{n} bật chế độ mắc ẻ, chạy như bay!', '{n} đau bụng quá, chạy như bay đi tìm nhà vệ sinh!', 'Ối ối, {n} mắc ẻ rồi, tránh đường cho {n} chạy!'], en: ['{n} really needs the toilet, running like the wind!'] },
+      vi: ['{n} bật chế độ mắc ẻ chạy như bay!'], en: ['{n} really needs the toilet, running like the wind!'] },
     dog: { emoji: '🐕', bee: 3000, lucky: true, stat: 'ev_dog',
-      vi: ['{n} bị chó dí, chạy như bay!', 'Gâu gâu! Chó dí {n} chạy bán sống bán chết!', 'Chó đuổi kìa, {n} chạy nhanh lên!'], en: ['A dog is chasing {n}, running like crazy!'] },
+      vi: ['{n} bị chó dí chạy như bay!'], en: ['A dog is chasing {n}, running like crazy!'] },
     sneeze: { emoji: '🤧', back: 3, lucky: false, stat: 'ev_sneeze',
       vi: ['Hắt xììì! {n} văng ra sau!', '{n} hắt xì một cái bay luôn mấy bước!'], en: ['Achoo! {n} sneezed backwards!'] }
   };
