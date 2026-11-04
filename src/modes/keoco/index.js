@@ -50,12 +50,15 @@ const COMEBACK_FROM = 0.6;
 const COMEBACK_MAX = 0.6;
 const NPC_POWER = 0.55;
 const COMMENT_LIKES = 2; // bình luận lúc kéo = 2 tim, tối đa 1 lần / 1,5 giây
+const CHAT_GONG_MS = 3000; // bình luận "kéo" lúc đội mình đang kéo = Gồng miễn phí (kéo ×2) chừng này
+const CHAT_GONG_COOLDOWN = 10000; // mỗi người tối đa 1 lần / 10 giây
+const isPullWord = (text) => /(^|[^\p{L}])(kéo+|keo+|pull+)([^\p{L}]|$)/iu.test(String(text || '').normalize('NFC')); // "kéo", "kéooo", "keo", "pull"
 const KEEP_ACTIVE_MS = 360000; // hết giải: ai im lặng quá 6 phút (hơn một giải) thì rời đội
 const QUEUE_MAX = 200;
 
 const LINES = {
   lobby: [
-    'Kéo co bốn đội! Bình luận số đội một, hai, ba hoặc bốn để vào đội. Lúc đội mình ra sân, thả tim liên tục suốt trận để kéo. Càng thả liên tục, combo càng cao, kéo càng khoẻ!',
+    'Kéo co bốn đội! Bình luận số đội một, hai, ba hoặc bốn để vào đội. Lúc đội mình ra sân, thả tim liên tục suốt trận để kéo. Càng thả liên tục, combo càng cao, kéo càng khoẻ! Bình luận chữ kéo để được gồng!',
     'Giải kéo co sắp bắt đầu! Bình luận số đội để tham gia. Hai trận bán kết, đội thắng vào chung kết. Tặng quà để dùng kỹ năng!'
   ],
   draw: ['Bốc thăm cặp đấu!'],
@@ -64,7 +67,7 @@ const LINES = {
 };
 const LINES_EN = {
   lobby: [
-    'Four team tug of war! Comment team number one, two, three or four to join. When your team is on the field, keep tapping hearts the whole match. The longer you keep tapping, the higher your combo and the harder you pull!',
+    'Four team tug of war! Comment team number one, two, three or four to join. When your team is on the field, keep tapping hearts the whole match. The longer you keep tapping, the higher your combo and the harder you pull! Comment pull to power up!',
     'The tug of war cup is about to start! Comment a team number to join. Two semi finals, winners meet in the final. Send gifts to use skills!'
   ],
   draw: ['Drawing the matches!'],
@@ -984,6 +987,16 @@ function create(ctx, saved = {}) {
         if (phase === 'pull' && onField(p.team) && now - p.lastChatPullAt > 1500) {
           p.lastChatPullAt = now;
           p.buffer = Math.min(BUF_MAX, p.buffer + COMMENT_LIKES);
+        }
+        // bình luận "kéo": được Gồng miễn phí (kéo ×2 trong 3 giây + hồi chút thể lực), 10 giây một lần
+        if (phase === 'pull' && onField(p.team) && isPullWord(evt.text) && now - (p.lastChatGongAt || 0) > CHAT_GONG_COOLDOWN && lineOf(sideOf(p.team)).includes(p)) {
+          p.lastChatGongAt = now;
+          p.boostUntil = Math.max(p.boostUntil, now) + CHAT_GONG_MS;
+          p.stamina = Math.min(1, p.stamina + 0.15);
+          p.exhaustedUntil = 0;
+          p.buffer = Math.min(BUF_MAX, p.buffer + COMMENT_LIKES);
+          fxMsg('chatGong', { key: p.key, name: p.name, team: p.team });
+          award(null, { stats: { sk_gong: 1 } }, p);
         }
         return p;
       }

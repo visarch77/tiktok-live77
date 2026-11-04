@@ -75,7 +75,7 @@ x = x − v·dt
 **5. Điểm.** Điểm cá nhân = lực đã kéo (đội thắng +20%), đội vô địch +10. MVP trận / giải = người góp nhiều lực nhất.
 
 ## Thả tim liên tục + combo
-Cách chơi đúng là **thả tim liên tục suốt trận**. Thể lực tụt chậm (0,01 / tim) và vẫn hồi 0,004 mỗi nhịp ngay cả lúc đang kéo, nên thả vừa phải không bao giờ mệt, dồn hết cỡ cả trận mới hơi đuối về cuối (kiệt sức chỉ 1,2 giây). **Combo**: thả không ngừng (không hở quá 2 giây) thì lực tăng dần tới ×1,5 sau 10 giây, ngừng là mất; hiện 🔥×1,2…×1,5 dưới thanh thể lực. Màn hình nhắc "❤️ THẢ TIM LIÊN TỤC ĐỂ KÉO!" ngay dưới đồng hồ, giọng đọc nhắc lúc bắt đầu, giữa trận và lúc im ắng.
+Cách chơi đúng là **thả tim liên tục suốt trận**. Thể lực tụt chậm (0,01 / tim) và vẫn hồi 0,004 mỗi nhịp ngay cả lúc đang kéo, nên thả vừa phải không bao giờ mệt, dồn hết cỡ cả trận mới hơi đuối về cuối (kiệt sức chỉ 1,2 giây). **Combo**: thả không ngừng (không hở quá 2 giây) thì lực tăng dần tới ×1,5 sau 10 giây, ngừng là mất; hiện 🔥×1,2…×1,5 dưới thanh thể lực. **Bình luận "kéo"** (kéo, kéooo, keo, pull) lúc đội mình đang kéo = Gồng miễn phí 3 giây (kéo ×2, hồi chút thể lực), mỗi người 10 giây một lần. Màn hình nhắc "❤️ THẢ TIM LIÊN TỤC · 💬 CMT \"KÉO\" ĐỂ GỒNG!" ngay dưới đồng hồ, giọng đọc nhắc lúc bắt đầu, giữa trận và lúc im ắng.
 
 ## Kỹ năng (quà) — `src/modes/keoco/skills.js`
 

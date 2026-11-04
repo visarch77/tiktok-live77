@@ -244,6 +244,17 @@
         while (awardToasts.length > 2) awardToasts.shift();
         awardSfx(p.type === 'level');
         break;
+      case 'chatGong': {
+        // bình luận "kéo" → gồng miễn phí: biểu tượng 💪 trên đầu + chữ "GỒNG!" + tiếng "hây da" (thưa)
+        marks.set(p.key, { kind: 'gong', until: t + 3000 });
+        const m = curMatch();
+        const side = m && p.team === m.a ? 'a' : 'b';
+        const list = side === 'a' ? roster.lineA : roster.lineB;
+        const i = list.findIndex((x) => x.k === p.key);
+        if (i >= 0) popText(L('💪 GỒNG!', '💪 POWER!'), lineX(side, i), ROPE_Y - 110, '#ffd43b', t);
+        vox('gong', { gap: 2500, vol: 0.7 });
+        break;
+      }
       case 'exhaust':
         marks.set(p.key, { kind: 'tired', until: t + 2000 });
         vox('tired', { gap: 6000 });
@@ -2130,7 +2141,7 @@
     });
   }
   function drawJoinBar() {
-    text(L('💬 Bình luận 1 · 2 · 3 · 4 để vào đội · ❤️ thả tim LIÊN TỤC để kéo (combo 🔥 tới ×1,5)', '💬 Comment 1 · 2 · 3 · 4 to join · ❤️ keep tapping to pull (🔥 combo up to ×1.5)'), W / 2, Y_JOIN, { size: 18, weight: 800, color: '#ffe066', stroke: 4, maxW: CW });
+    text(L('💬 Bình luận 1 · 2 · 3 · 4 để vào đội · ❤️ thả tim LIÊN TỤC để kéo · 💬 "kéo" = gồng ×2', '💬 Comment 1 · 2 · 3 · 4 to join · ❤️ keep tapping · 💬 "pull" = power ×2'), W / 2, Y_JOIN, { size: 18, weight: 800, color: '#ffe066', stroke: 4, maxW: CW });
     text(roster.queueCount ? L(`🪑 Phòng chờ giải sau: ${roster.queueCount} người`, `🪑 Waiting for next cup: ${roster.queueCount}`) : L('Đội đầy tự sang đội vắng nhất · tối đa 20 người/đội', 'Full teams overflow to the emptiest · max 20 per team'), W / 2, Y_JOIN + 26, { size: 15, weight: 600, color: '#ddd', stroke: 3, maxW: CW });
   }
   // Hàng ảnh quà TikTok ngay dưới sân: ảnh quà ở trên, tên kỹ năng ở dưới
@@ -2388,7 +2399,7 @@
     g.save();
     g.translate(W / 2, Y_CLOSE + 156);
     g.scale(beat, beat);
-    text(L('❤️ THẢ TIM LIÊN TỤC ĐỂ KÉO!', '❤️ KEEP TAPPING TO PULL!'), 0, 0, { size: 20, weight: 900, color: '#ff8fab', stroke: 5 });
+    text(L('❤️ THẢ TIM LIÊN TỤC · 💬 CMT "KÉO" ĐỂ GỒNG!', '❤️ KEEP TAPPING · 💬 COMMENT "PULL" TO POWER UP!'), 0, 0, { size: 19, weight: 900, color: '#ff8fab', stroke: 5, maxW: 520 });
     g.restore();
     const ms = Math.max(0, ph.phaseEndsAt - now());
     const sec = Math.ceil(ms / 1000);
