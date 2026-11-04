@@ -1300,7 +1300,7 @@
           <div><div class="setting-name">Tình huống ngẫu nhiên</div><div class="setting-desc">Say nắng, chim ị, ong đốt, nhặt tiền, hắt xì, mắc ẻ, chó dí — lúc đèn xanh, chọn ngẫu nhiên một người đang chạy (mỗi người tối đa 1 lần / ván)</div></div>
           <label class="switch"><input type="checkbox" data-setting="mishaps" ${s.mishaps !== false ? 'checked' : ''} /><span></span></label>
         </div>
-        ${rlRange('mishapEverySec', 'Bao lâu có một tình huống', 'Trung bình (lệch ngẫu nhiên ±30%)', 8, 90, 1, 's')}
+        ${rlRange('mishapsPerRound', 'Số tình huống mỗi ván', 'Rải đều suốt ván (0 = không có); tỉ lệ từng loại ở các thanh bên dưới', 0, 20, 1, '')}
         ${rlRange('mishapW_sun', '🥵 Tỉ lệ say nắng', 'Chạy lùi một đoạn · 0 = tắt, số càng lớn càng hay xảy ra', 0, 10, 1, '')}
         ${rlRange('mishapW_poop', '🐦 Tỉ lệ chim ị', 'Hên: lao thêm mấy bước', 0, 10, 1, '')}
         ${rlRange('mishapW_bee', '🐝 Tỉ lệ ong đốt', 'Tự chạy nhanh gấp đôi 2 giây', 0, 10, 1, '')}

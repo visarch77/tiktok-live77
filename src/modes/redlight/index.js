@@ -1111,23 +1111,29 @@ function create(ctx, saved = {}) {
     sneeze: { emoji: '🤧', back: 3, lucky: false, stat: 'ev_sneeze',
       vi: ['Hắt xììì! {n} văng ra sau!', '{n} hắt xì một cái bay luôn mấy bước!'], en: ['Achoo! {n} sneezed backwards!'] }
   };
+  // Số tình huống mỗi ván (mishapsPerRound): rải đều suốt ván, lệch ngẫu nhiên; tới lượt mà đang đèn đỏ thì chờ đèn xanh
   let nextMishapAt = 0;
+  let mishapsLeft = 0;
   const fillName = (str, n) => str.replace(/\{n\}/g, n);
+  const mishapGap = () => (S().roundSeconds * 1000) / (Math.max(1, S().mishapsPerRound ?? 4) + 1);
+  // lần kế: chia đều thời gian còn lại của ván cho số tình huống còn thiếu (đèn đỏ làm trễ thì tự dồn lại cho đủ)
   function scheduleMishap(now) {
-    const every = (S().mishapEverySec ?? 20) * 1000;
-    nextMishapAt = now + every * (0.7 + Math.random() * 0.6);
+    const left = Math.max(0, phaseEndsAt - now - 3000);
+    nextMishapAt = now + Math.max(1500, (left / (mishapsLeft + 1)) * (0.7 + Math.random() * 0.4));
   }
   function mishapTick(now) {
-    if (S().mishaps === false || light !== 'green' || purge || !nextMishapAt || now < nextMishapAt) return;
-    if (lightEndsAt - now < 2500) return; // sắp đèn đỏ: để lần sau
-    scheduleMishap(now);
+    if (S().mishaps === false || mishapsLeft <= 0 || light !== 'green' || purge || !nextMishapAt || now < nextMishapAt) return;
+    if (lightEndsAt - now < 1500) return; // sắp đèn đỏ: để lần sau
     // bốc loại theo tỉ lệ cài đặt
     const weights = Object.keys(MISHAPS).map((k) => [k, Math.max(0, Number(S()[`mishapW_${k}`] ?? 5))]);
     const total = weights.reduce((a, [, w]) => a + w, 0);
     if (total <= 0) return;
     let r = Math.random() * total;
     const type = (weights.find(([, w]) => (r -= w) < 0) || weights[0])[0];
-    if (!triggerMishap(type, now)) nextMishapAt = now + 2000; // chưa ai hợp lệ: thử lại sau 2 giây
+    if (triggerMishap(type, now)) {
+      mishapsLeft--;
+      scheduleMishap(now);
+    } else nextMishapAt = now + 2000; // chưa ai hợp lệ: thử lại sau 2 giây
   }
   // gây một tình huống cho một người ngẫu nhiên đang chạy; trả về người bị / null
   function triggerMishap(type, now = Date.now(), { force = false } = {}) {
@@ -1163,7 +1169,8 @@ function create(ctx, saved = {}) {
     finishCount = 0;
     results = [];
     setLight('green', true);
-    scheduleMishap(Date.now() + 4000); // không đổ tình huống ngay đầu ván
+    mishapsLeft = S().mishapsPerRound ?? 4;
+    nextMishapAt = Date.now() + Math.max(4000, mishapGap() * (0.5 + Math.random() * 0.5)); // không đổ tình huống ngay đầu ván
     ctx.emitEvent({ type: 'rlRound', round, players: realPlayers().length });
     say(pick(lines().start));
   }
@@ -1724,7 +1731,7 @@ module.exports = {
   overlay: 'redlight.html',
   settingsSchema: {
     mishaps: 'boolean',
-    mishapEverySec: [8, 90],
+    mishapsPerRound: [0, 20],
     mishapW_sun: [0, 10],
     mishapW_poop: [0, 10],
     mishapW_bee: [0, 10],
@@ -1764,7 +1771,7 @@ module.exports = {
   },
   defaultSettings: {
     mishaps: true, // tình huống ngẫu nhiên hài hước (say nắng, tuột quần, chim ị...)
-    mishapEverySec: 20, // trung bình bao nhiêu giây một tình huống
+    mishapsPerRound: 4, // số tình huống mỗi ván (rải đều suốt ván)
     // tỉ lệ từng loại (0 = tắt): số càng lớn càng hay xảy ra
     mishapW_sun: 5,
     mishapW_poop: 5,
