@@ -626,6 +626,8 @@
         { icon: '🐝', name: 'Ong đốt', desc: 'Một người tự chạy nhanh gấp đôi 2 giây', method: 'redlight.mishap', params: { type: 'bee' } },
         { icon: '💵', name: 'Nhặt tiền', desc: 'Một người đứng lại cúi nhặt tiền 1,5 giây', method: 'redlight.mishap', params: { type: 'money' } },
         { icon: '🤧', name: 'Hắt xì', desc: 'Một người văng lùi vài bước', method: 'redlight.mishap', params: { type: 'sneeze' } },
+        { icon: '💩', name: 'Mắc ẻ', desc: 'Một người ngẫu nhiên "bật chế độ mắc ẻ" chạy như bay 2,6 giây', method: 'redlight.mishap', params: { type: 'poo' } },
+        { icon: '🐕', name: 'Chó dí', desc: 'Con chó đuổi sau lưng một người ngẫu nhiên, chạy như bay 3 giây', method: 'redlight.mishap', params: { type: 'dog' } },
         { icon: '⏸', name: 'Tạm dừng / tiếp tục', desc: 'Dừng đồng hồ và đèn', method: 'redlight.pause' },
         { icon: '🏁', name: 'Kết thúc ván', desc: 'Hiện kết quả ngay', method: 'redlight.endRound' },
         { icon: '🔄', name: 'Ván mới', desc: 'Về màn chờ vào', method: 'redlight.newLobby' },
@@ -1295,7 +1297,7 @@
           <label class="switch"><input type="checkbox" data-setting="autoLoop" ${s.autoLoop !== false ? 'checked' : ''} /><span></span></label>
         </div>
         <div class="setting">
-          <div><div class="setting-name">Tình huống ngẫu nhiên</div><div class="setting-desc">Say nắng, chim ị, ong đốt, nhặt tiền, hắt xì — lúc đèn xanh, chọn ngẫu nhiên một người đang chạy (mỗi người tối đa 1 lần / ván)</div></div>
+          <div><div class="setting-name">Tình huống ngẫu nhiên</div><div class="setting-desc">Say nắng, chim ị, ong đốt, nhặt tiền, hắt xì, mắc ẻ, chó dí — lúc đèn xanh, chọn ngẫu nhiên một người đang chạy (mỗi người tối đa 1 lần / ván)</div></div>
           <label class="switch"><input type="checkbox" data-setting="mishaps" ${s.mishaps !== false ? 'checked' : ''} /><span></span></label>
         </div>
         ${rlRange('mishapEverySec', 'Bao lâu có một tình huống', 'Trung bình (lệch ngẫu nhiên ±30%)', 8, 90, 1, 's')}
@@ -1304,6 +1306,8 @@
         ${rlRange('mishapW_bee', '🐝 Tỉ lệ ong đốt', 'Tự chạy nhanh gấp đôi 2 giây', 0, 10, 1, '')}
         ${rlRange('mishapW_money', '💵 Tỉ lệ nhặt tiền', 'Đứng lại 1,5 giây', 0, 10, 1, '')}
         ${rlRange('mishapW_sneeze', '🤧 Tỉ lệ hắt xì', 'Văng lùi vài bước', 0, 10, 1, '')}
+        ${rlRange('mishapW_poo', '💩 Tỉ lệ mắc ẻ', 'Chạy như bay 2,6 giây', 0, 10, 1, '')}
+        ${rlRange('mishapW_dog', '🐕 Tỉ lệ chó dí', 'Chó đuổi, chạy như bay 3 giây', 0, 10, 1, '')}
         <div class="setting">
           <div><div class="setting-name">Búp bê hát làm đèn xanh</div><div class="setting-desc">Hát xong câu là đèn đỏ. Tắt: đèn xanh dài ngẫu nhiên theo hai thanh bên dưới</div></div>
           <label class="switch"><input type="checkbox" data-setting="songEnabled" ${s.songEnabled !== false ? 'checked' : ''} /><span></span></label>

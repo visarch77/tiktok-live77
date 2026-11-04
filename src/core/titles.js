@@ -41,6 +41,8 @@ const TITLES = [
   { stat: 'ev_bee', emoji: '🐝', vi: 'Vua bị ong đốt', en: 'Bee Magnet', at: [3, 10, 30] },
   { stat: 'ev_money', emoji: '💵', vi: 'Vua nhặt tiền', en: 'Money Grabber', at: [3, 10, 30] },
   { stat: 'ev_sneeze', emoji: '🤧', vi: 'Vua hắt xì', en: 'Sneeze King', at: [3, 10, 30] },
+  { stat: 'ev_poo', emoji: '💩', vi: 'Vua mắc ẻ', en: 'Toilet Sprinter', at: [3, 10, 30] },
+  { stat: 'ev_dog', emoji: '🐕', vi: 'Vua bị chó dí', en: 'Dog Chased King', at: [3, 10, 30] },
   { stat: 'it_shove', emoji: '🤚', vi: 'Vua đẩy người', en: 'Shove King', at: [5, 25, 100] },
   { stat: 'it_wind', emoji: '📢', vi: 'Vua loa phường', en: 'Loudspeaker King', at: [3, 15, 60] },
   { stat: 'it_giant', emoji: '💪', vi: 'Vua khổng lồ', en: 'Giant King', at: [3, 15, 60] },

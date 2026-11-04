@@ -631,7 +631,7 @@
       case 'mishap': {
         // say nắng / chim ị / ong đốt / nhặt tiền / hắt xì: biểu tượng trên đầu + chữ to + hạt hiệu ứng + tiếng
         const v = sprites.get(e.id);
-        const LBL = { sun: ['🥵 SAY NẮNG!', '🥵 SUNSTROKE!'], poop: ['🐦 CHIM Ị! HÊN!', '🐦 LUCKY POOP!'], bee: ['🐝 ONG ĐỐT!', '🐝 BEE STING!'], money: ['💵 NHẶT TIỀN!', '💵 FREE MONEY!'], sneeze: ['🤧 HẮT XÌ!', '🤧 ACHOO!'] };
+        const LBL = { sun: ['🥵 SAY NẮNG!', '🥵 SUNSTROKE!'], poop: ['🐦 CHIM Ị! HÊN!', '🐦 LUCKY POOP!'], bee: ['🐝 ONG ĐỐT!', '🐝 BEE STING!'], money: ['💵 NHẶT TIỀN!', '💵 FREE MONEY!'], sneeze: ['🤧 HẮT XÌ!', '🤧 ACHOO!'], poo: ['💩 MẮC Ẻ!', '💩 GOTTA GO!'], dog: ['🐕 CHÓ DÍ!', '🐕 DOG CHASE!'] };
         const lbl = (LBL[e.type] || ['', ''])[settings.lang === 'en' ? 1 : 0];
         if (v) {
           v.mishap = { type: e.type, emoji: e.emoji, until: t0 + (e.ms || 1400) + 900 };
@@ -1186,6 +1186,16 @@
           text('💫', x + Math.cos(a) * 22, top + 6 + Math.sin(a) * 7, { size: 18 });
         }
       }
+      // chó dí: con chó chạy bám sát sau lưng (người chạy lên phía búp bê → chó ở phía dưới), sủa "GÂU!"
+      if (s.mishap.type === 'dog') {
+        // chéo phía sau, ngang chân người chạy (luôn thấy, kể cả sát vạch xuất phát), nhảy chồm chồm
+        const dy = p.y - 6 * p.scale - Math.abs(Math.sin(tn / 70)) * 12 * p.scale;
+        const dx = x - 46 * p.scale + Math.sin(tn / 180) * 6;
+        text('🐕', dx, dy, { size: Math.round(60 * p.scale) });
+        if (Math.floor(tn / 450) % 2 === 0) text(L('GÂU!', 'WOOF!'), dx + 34 * p.scale, dy - 30 * p.scale, { size: Math.round(20 * p.scale), weight: 900, color: '#fff', stroke: 4 });
+      }
+      // mắc ẻ: ôm bụng, khói "💨" phụt sau lưng
+      if (s.mishap.type === 'poo' && Math.floor(tn / 160) % 2 === 0) text('💨', x + (Math.random() - 0.5) * 14, p.y + 16 * p.scale, { size: Math.round(26 * p.scale) });
       text(s.mishap.emoji, x, my, { size: 34 });
     }
     g.restore();
@@ -1443,7 +1453,7 @@
     if (!c || !unlocked) return;
     if (!VOX.loading) {
       VOX.loading = true;
-      for (const n of ['tired', 'farted', 'fall', 'win', 'slip'].flatMap((k) => VOX.list[k] || [])) {
+      for (const n of ['tired', 'farted', 'fall', 'win', 'slip', 'drag'].flatMap((k) => VOX.list[k] || [])) {
         fetch(`/assets/keoco/voice/${n}`)
           .then((r) => r.arrayBuffer())
           .then((ab) => c.decodeAudioData(ab))
@@ -1487,6 +1497,20 @@
       o(1319, 0, 0.12, { type: 'triangle', vol: 0.09 });
       o(1760, 0.08, 0.35, { type: 'triangle', vol: 0.09 });
       voxPlay('win', 0.3);
+    } else if (type === 'poo') {
+      // bụng sôi "ọc ọc" rồi chạy
+      for (let k = 0; k < 3; k++) o(90 - k * 8, k * 0.16, 0.18, { type: 'sine', vol: 0.18, slide: -30 });
+      nz(0.05, 0.4, { vol: 0.05, type: 'lowpass', freq: 300 });
+      voxPlay('drag', 0.45);
+    } else if (type === 'dog') {
+      // "gâu gâu gâu": tiếng sủa ngắn (sóng vuông qua lọc + nhiễu)
+      for (let k = 0; k < 3; k++) {
+        const at = k * 0.32;
+        o(320, at, 0.12, { type: 'square', vol: 0.06, slide: -170 });
+        o(160, at, 0.12, { type: 'sawtooth', vol: 0.05, slide: -60 });
+        nz(at, 0.1, { vol: 0.08, type: 'bandpass', freq: 900, q: 1.5 });
+      }
+      voxPlay('fall', 0.5);
     } else if (type === 'sneeze') {
       o(500, 0, 0.35, { type: 'sine', vol: 0.06, slide: 300 }); // "hắt…"
       nz(0.4, 0.22, { vol: 0.18, type: 'highpass', freq: 1800 }); // "…xì!"
