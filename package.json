@@ -15,6 +15,7 @@
     "cors": "^2.8.5",
     "esbuild": "^0.25.12",
     "express": "^4.19.2",
+    "msedge-tts": "^2.1.0",
     "tiktok-live-connector": "^2.5.0",
     "ws": "^8.18.0"
   },

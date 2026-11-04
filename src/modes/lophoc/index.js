@@ -2,11 +2,13 @@ const fs = require('fs');
 const path = require('path');
 const { DATA_DIR, TTS_CACHE_DIR } = require('../../config');
 const { ensureBuilt } = require('./build');
+const edgeTts = require('./edgeTts');
+const macEn = require('../redlight/tts-en'); // giọng tiếng Anh offline của macOS (lệnh say), dùng khi chọn ZeroTTS
 
 // ============================================================================
 // CHẾ ĐỘ "LỚP HỌC CHỮ" — cô giáo áo dài đố chữ, người xem gõ đáp án vào bình luận
 // Lõi game (luật, câu hỏi, lời thoại) chép từ repo lop-hoc-chu, viết bằng TypeScript ở game/ và live/,
-// đóng gói thành core.cjs. File này chỉ nối lõi đó với phòng live: sự kiện TikTok, giọng ZeroTTS, lưu sổ lớp.
+// đóng gói thành core.cjs. File này chỉ nối lõi đó với phòng live: sự kiện TikTok, giọng đọc (Edge / ZeroTTS), lưu sổ lớp.
 // Bản gốc chạy game trong trình duyệt (trang stage); ở đây game chạy trên server, màn hình chỉ vẽ lại.
 // ============================================================================
 
@@ -65,13 +67,28 @@ function wavDurationMs(url) {
   } catch (_) {}
   return 0;
 }
+// độ dài file m4a (giọng tiếng Anh của macOS): đọc hộp 'mvhd' (timescale + duration)
+function m4aDurationMs(url) {
+  try {
+    const buf = fs.readFileSync(path.join(TTS_CACHE_DIR, path.basename(String(url))));
+    const i = buf.indexOf('mvhd');
+    if (i < 4) return 0;
+    const v1 = buf[i + 4] === 1;
+    const scale = buf.readUInt32BE(v1 ? i + 24 : i + 16);
+    const dur = v1 ? Number(buf.readBigUInt64BE(i + 28)) : buf.readUInt32BE(i + 20);
+    return scale ? Math.round((dur / scale) * 1000) : 0;
+  } catch (_) {
+    return 0;
+  }
+}
 // không có giọng (tắt TTS / worker chưa sẵn sàng): ước lượng thời gian đọc để nhịp game vẫn giống thật
 const estimateMs = (text) => Math.max(900, String(text).split(/\s+/).filter(Boolean).length * 230 + 400);
 
 /**
  * Lời thoại của lõi game có dạng "F: Câu 3. | E: cat | F: ..." — "|" tách đoạn, "M:/F:/E:" là giọng
- * (nam / nữ / tiếng Anh), "^" là hô to. ZeroTTS hiện chỉ có giọng Mai Chi nên mọi đoạn đọc bằng giọng phòng.
- * TODO giai đoạn 4: đoạn "E:" đọc bằng giọng tiếng Anh.
+ * (nam / nữ / tiếng Anh), "^" là hô to.
+ *   Edge (mặc định): M = Nam Minh, F = Hoài My, E = Ana (tiếng Anh), giống bản gốc; Edge lỗi thì đọc bằng ZeroTTS.
+ *   ZeroTTS: đoạn tiếng Việt đọc bằng giọng phòng (Mai Chi), đoạn "E:" bằng giọng tiếng Anh của macOS.
  */
 function speechParts(text) {
   let who = 'M';
@@ -83,8 +100,9 @@ function speechParts(text) {
       who = sp[1];
       raw = raw.slice(sp[0].length);
     }
+    const hype = raw.startsWith('^');
     const t = raw.replace(/^\^+/, '').trim();
-    if (t) out.push({ who, text: t });
+    if (t) out.push({ who, text: t, hype });
   }
   return out;
 }
@@ -109,15 +127,40 @@ class Speaker {
     return this.playing || this.normal.length + this.priority.length > 0;
   }
 
+  get edge() {
+    return this.ctx.settings.voiceEngine !== 'zero';
+  }
+  zeroReady() {
+    return !!(this.ctx.tts && this.ctx.tts.ready);
+  }
   ttsOn() {
-    const { ctx } = this;
-    return ctx.settings.ttsEnabled !== false && ctx.tts && ctx.tts.ready;
+    return this.ctx.settings.ttsEnabled !== false && (this.edge || this.zeroReady());
   }
 
-  /** Tổng hợp trước (ZeroTTS mất vài giây mỗi câu): tới lượt đọc là phát liền */
+  /** Tạo giọng cho 1 đoạn: { url, durMs } (durMs = 0 nếu không rõ), lỗi thì null */
+  async synth(part) {
+    const { ctx } = this;
+    // Edge vừa lỗi (mất mạng...): 60 giây sau mới thử lại, trong lúc đó đọc bằng ZeroTTS cho khỏi chờ
+    if (this.edge && Date.now() >= (this.edgeDownUntil || 0)) {
+      const res = await edgeTts.synthesize(part.text, { who: part.who, rate: ctx.settings.voiceRate, hype: part.hype }).catch(() => null);
+      if (res && res.ok) return { url: res.url, durMs: res.durMs };
+      this.edgeDownUntil = Date.now() + 60_000;
+      console.warn(`[lophoc ${ctx.roomId}] Edge TTS lỗi (${(res && res.error) || 'không rõ'}), 60 giây tới đọc bằng ZeroTTS`);
+    }
+    if (part.who === 'E') {
+      const res = await macEn.synthesize(part.text).catch(() => null);
+      if (res && res.ok) return { url: res.url, durMs: m4aDurationMs(res.url) };
+    }
+    if (!this.zeroReady()) return null;
+    const res = await ctx.tts.synthesize(part.text, ctx.settings.ttsVoice).catch(() => null);
+    if (!res || !res.ok || !res.url) return null;
+    return { url: res.url, durMs: res.durationSec ? Math.round(res.durationSec * 1000) : wavDurationMs(res.url) };
+  }
+
+  /** Tạo giọng trước: tới lượt đọc là phát liền */
   prefetch(text) {
     if (!this.ttsOn()) return;
-    for (const p of speechParts(text)) this.ctx.tts.synthesize(p.text, this.ctx.settings.ttsVoice).catch(() => {});
+    for (const p of speechParts(text)) this.synth(p).catch(() => {});
   }
 
   /**
@@ -176,12 +219,9 @@ class Speaker {
         let url = null;
         let durMs = 0;
         if (this.ttsOn()) {
-          const res = await this.ctx.tts.synthesize(part.text, this.ctx.settings.ttsVoice).catch(() => null);
+          const res = await this.synth(part);
           if (gen !== this.gen || this.isDisposed()) break;
-          if (res && res.ok && res.url) {
-            url = res.url;
-            durMs = res.durationSec ? Math.round(res.durationSec * 1000) : wavDurationMs(res.url);
-          }
+          if (res) ({ url, durMs } = res);
         }
         if (line.valid && !line.valid()) break;
         if (!durMs) durMs = estimateMs(part.text);
@@ -444,6 +484,20 @@ function create(ctx, saved = {}) {
     ctx.broadcast('lophoc.view', buildView(now));
   }
 
+  // Lúc hiện đáp án: tạo trước giọng đọc đề câu kế tiếp (lời đọc đề cố định theo câu), tới câu sau cô đọc liền
+  let prefetchedFor = '';
+  function prefetchNextQuestion() {
+    if (room.phase !== 'reveal') return;
+    const qs = Array.isArray(room.roundQs) ? room.roundQs : []; // trường private của lõi TS
+    const q = qs[room.qNo];
+    const key = `${room.round}:${room.qNo}`;
+    if (!q || prefetchedFor === key) return;
+    prefetchedFor = key;
+    try {
+      speaker.prefetch(`F: Câu ${room.qNo + 1}. ${room.intro(q)} ${q.clue}`);
+    } catch (_) {}
+  }
+
   // ---------- nhịp game ----------
   let lastTick = Date.now();
   say(room.newRound(Date.now()));
@@ -459,6 +513,7 @@ function create(ctx, saved = {}) {
         }
         lastTick = now;
         say(room.tick(now));
+        prefetchNextQuestion();
         flushChatter(now);
       } catch (err) {
         console.error(`[lophoc ${ctx.roomId}] Lỗi nhịp game:`, err);
@@ -680,5 +735,14 @@ module.exports = {
   name: 'Lớp Học Chữ',
   description: 'Cô giáo áo dài đố chữ trên bảng đen: người xem gõ đáp án, ai đúng nhanh nhất được điểm cao, ngồi bàn đầu',
   overlay: 'lophoc.html',
+  // voiceEngine: 'edge' = giọng Edge (nhanh, có giọng tiếng Anh, cần mạng) · 'zero' = ZeroTTS giọng phòng (chạy trên máy, chậm hơn)
+  settingsSchema: {
+    voiceEngine: { type: 'enum', values: ['edge', 'zero'] },
+    voiceRate: [0.8, 1.5]
+  },
+  defaultSettings: {
+    voiceEngine: 'edge',
+    voiceRate: 1.25 // bản gốc: cô nói nhanh cho tiết tấu dồn dập
+  },
   create
 };

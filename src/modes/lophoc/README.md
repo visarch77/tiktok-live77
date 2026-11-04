@@ -11,7 +11,8 @@ Cô giáo áo dài đố chữ trên bảng đen; người xem gõ đáp án và
 | `game/cau-hoi/*.txt` | 2076 câu hỏi. Đọc lúc khởi động server, sửa xong chỉ cần bật lại server |
 | `core-entry.ts` | Những gì server dùng từ lõi + đọc câu hỏi bằng `fs` (bản gốc dùng Vite) |
 | `build.js` | esbuild đóng gói lõi thành `core.cjs` (tự sinh, không đưa lên git; `index.js` tự đóng gói khi thiếu / cũ) |
-| `index.js` | Nối lõi với phòng live: sự kiện TikTok, giọng ZeroTTS (đồng hồ dừng khi cô đọc câu chính), sổ lớp, lệnh RPC |
+| `index.js` | Nối lõi với phòng live: sự kiện TikTok, giọng đọc (đồng hồ dừng khi cô đọc câu chính), sổ lớp, lệnh RPC |
+| `edgeTts.js` | Giọng Edge TTS như bản gốc (`msedge-tts`): Hoài My / Nam Minh / Ana (tiếng Anh), mp3 lưu trong `tts-cache` |
 | `game/GameStage.tsx`, `Hair.tsx`, `stage.css`, `sfx.ts`, `live/StageFrame.tsx` | Màn hình lớp học 2D của bản gốc (React + motion + Tailwind). Đường dẫn ảnh đã đổi `/assets/` → `/assets/lophoc/` |
 | `stage/main.tsx`, `stage/index.css` | Màn hình phòng: nhận `lophoc.view` / `lophoc.speak` qua WebSocket, vẽ bằng GameStage, phát giọng + hiệu ứng |
 | `public/assets/lophoc/` | Ảnh nền + nhân vật (thuộc tác giả lop-hoc-chu). Bỏ `sfx/<ting|drum|go|tick|bell|pop|clap|fanfare>.mp3` vào đây để thay tiếng tự tạo |
@@ -41,9 +42,17 @@ Màn hình phát: `lophoc.view` (ảnh chụp lớp, tối đa 4 lần/giây) v�
 - Sổ lớp (câu đã hỏi, câu bị bỏ, điểm tuần, điểm hôm nay, chuyên cần, tên lớp): trong trạng thái phòng `data/rooms/<id>.json`.
 - Báo cáo từng câu: `data/lophoc/<id>/bao-cao/<ngày>.json`.
 
-## Còn làm
+## Giọng đọc
 
-- Giai đoạn 4: giọng tiếng Anh cho đoạn `E:` (ZeroTTS chỉ có Mai Chi), tạo giọng nhanh hơn.
+Cài đặt phòng (thẻ ⚙️ trong trang quản lý): `voiceEngine` và `voiceRate`.
+
+| `voiceEngine` | Tiếng Việt | Đoạn `E:` (tiếng Anh) | Tạo 1 câu |
+| :--- | :--- | :--- | :--- |
+| `edge` (mặc định) | Hoài My (`F:`), Nam Minh (`M:`); tốc độ `voiceRate` (mặc định 1,25 như bản gốc) | Ana (Mỹ) | ~1 giây, cần mạng |
+| `zero` | Giọng ZeroTTS của phòng (Mai Chi) | Giọng Samantha của macOS (`redlight/tts-en.js`) | 5–15 giây |
+
+Edge lỗi (mất mạng...) thì 60 giây tới tự đọc bằng ZeroTTS. Lúc hiện đáp án, server tạo trước giọng đọc đề câu kế tiếp
+nên sang câu mới cô đọc liền (có ích nhất với ZeroTTS).
 
 ## Kéo bản cập nhật từ repo gốc
 
