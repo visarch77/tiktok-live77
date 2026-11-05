@@ -1,0 +1,41 @@
+# Lịch sử
+# Câu lịch sử lớp 4 (Lịch sử và Địa lí 4): Đền Hùng, Thăng Long Hà Nội, Văn Miếu, Cố đô Huế, phố cổ Hội An, Tây Nguyên, Nam Bộ.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách viết khác cũng tính đúng (cách nhau dấu phẩy)
+> Câu lịch sử nè.
+VĂN MINH | Cư dân xưa ở đồng bằng Bắc Bộ đã tạo nên nền gì sông Hồng? | 3
+DỜI ĐÔ | Năm một nghìn không trăm mười, vua Lý Thái Tổ làm việc gì từ Hoa Lư ra thành Đại La? | 2
+ĐẠI LA | Tên của thành cũ được vua Lý Thái Tổ chọn làm kinh đô rồi đổi tên thành Thăng Long. | 3
+RỒNG BAY LÊN | Tên gọi Thăng Long có nghĩa là gì? | 2 | RỒNG BAY
+VĂN HIẾN | Thăng Long Hà Nội được ca ngợi là mảnh đất nghìn năm gì? | 3
+RÙA ĐÁ | Các tấm bia tiến sĩ ở Văn Miếu được đặt trên lưng con vật gì làm bằng đá? | 2 | CON RÙA ĐÁ
+KHỔNG TỬ | Văn Miếu được xây năm một nghìn không trăm bảy mươi để thờ nhà hiền triết Trung Hoa nào? | 3
+CỐ ĐÔ | Huế từng là nơi các vua triều Nguyễn đóng đô, nay được gọi là gì Huế? | 1
+ĐẠI NỘI | Khu vực bên trong Kinh thành Huế, nơi nhà vua làm việc và sinh sống. | 3
+NÚI NGỰ BÌNH | Ngọn núi bên bờ sông Hương, như bức bình phong che chắn trước Kinh thành Huế. | 3 | NGỰ BÌNH
+NHÃ NHẠC | Âm nhạc cung đình thời Nguyễn ở Huế, được công nhận là di sản văn hóa của thế giới. | 3
+DI SẢN | Cố đô Huế và phố cổ Hội An đều được công nhận là gì văn hóa thế giới? | 1
+SÔNG THU BỒN | Phố cổ Hội An nằm ở hạ lưu con sông lớn nào? | 3 | THU BỒN
+THƯƠNG CẢNG | Hội An xưa là một gì nhộn nhịp, tàu buôn của nhiều nước ghé đến? | 3
+NHÀ RÔNG | Ngôi nhà to, mái cao vút như lưỡi rìu, nơi sinh hoạt chung của buôn làng Tây Nguyên. | 2
+NHÀ DÀI | Ngôi nhà truyền thống của người Ê đê ở Tây Nguyên, cả đại gia đình cùng ở. | 3
+LỄ MỪNG LÚA MỚI | Lễ hội của đồng bào Tây Nguyên sau mùa thu hoạch, vang tiếng cồng chiêng khắp buôn làng. | 3
+MÚA XÒE | Điệu múa nắm tay nhau thành vòng tròn của đồng bào Thái ở vùng núi Tây Bắc. | 2 | XÒE THÁI
+ĐỊA ĐẠO | Củ Chi nổi tiếng với hệ thống đường hầm dưới lòng đất, gọi là gì? | 1
+ĐẤT THÉP | Củ Chi được ca ngợi là vùng gì thành đồng? | 3
+CỨU NƯỚC | Năm một nghìn chín trăm mười một, từ Bến Nhà Rồng, Bác Hồ ra đi tìm đường làm việc gì? | 2
+VĂN BA | Tên Bác Hồ dùng khi xin làm phụ bếp trên con tàu rời Bến Nhà Rồng năm một nghìn chín trăm mười một. | 3 | ANH BA
+THỜ CÚNG | Tín ngưỡng gì Hùng Vương ở Phú Thọ được thế giới công nhận là di sản văn hóa của nhân loại? | 3
+HÁT XOAN | Lối hát dân gian của Phú Thọ, thường hát vào dịp đầu xuân ở đình, miếu, gắn với các vua Hùng. | 3
+PHỐ PHƯỜNG | Hà Nội xưa nổi tiếng với ba mươi sáu cái gì? | 2
+TIẾN SĨ | Văn Miếu có tám mươi hai tấm bia đá khắc tên những người đỗ học vị gì trong các khoa thi xưa? | 2
+TRƯỜNG ĐẠI HỌC | Quốc Tử Giám được coi là gì đầu tiên của nước ta? | 2 | ĐẠI HỌC
+LÝ NHÂN TÔNG | Vị vua nhà Lý cho lập Quốc Tử Giám năm một nghìn không trăm bảy mươi sáu. | 3
+KINH THÀNH | Tòa thành lớn có hào nước bao quanh ở Huế, được xây dưới thời nhà Nguyễn. | 2 | KINH THÀNH HUẾ
+CẦU TRƯỜNG TIỀN | Cây cầu sắt sáu nhịp nổi tiếng bắc qua sông Hương ở Huế. | 3
+NÓN BÀI THƠ | Chiếc nón lá mỏng của Huế, soi lên ánh sáng thấy hình và chữ ở bên trong. | 2
+SỬ THI | Những câu chuyện kể rất dài về các anh hùng của Tây Nguyên, như chuyện Đăm Săn. | 3
+ĐUA VOI | Lễ hội ở Buôn Đôn, Đắk Lắk, những chú voi to lớn chạy thi với nhau. | 2
+SÔNG SÀI GÒN | Bến Nhà Rồng nằm bên bờ con sông nào? | 2
+BẾP HOÀNG CẦM | Loại bếp nấu ăn trong địa đạo, khói tỏa ra sát mặt đất nên quân địch không phát hiện được. | 3
+DI TÍCH | Đền, chùa, đình cổ được giữ gìn vì có giá trị lịch sử thì gọi là gì? | 1
+BẢO TÀNG | Nơi trưng bày hiện vật để mọi người đến xem và tìm hiểu về lịch sử. | 1

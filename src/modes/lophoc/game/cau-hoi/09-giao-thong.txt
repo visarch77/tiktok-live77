@@ -1,0 +1,75 @@
+# Phương tiện, giao thông
+> Đây là thứ liên quan tới xe cộ, đi lại.
+XE ĐẠP | Hai bánh, đạp bằng chân, ngày xưa đạp đi học. | 1
+XE MÁY | Phương tiện phổ biến nhất ở Việt Nam. | 1
+Ô TÔ | Bốn bánh, có vô lăng. | 1 | XE HƠI
+XE BUÝT | Chở nhiều người, dừng ở trạm. | 2 | XE BUS
+XE KHÁCH | Chở người đi tỉnh xa. | 2
+XE TẢI | Chở hàng hóa nặng. | 2
+XE CỨU THƯƠNG | Hú còi chở người bệnh tới viện. | 3
+XE CỨU HỎA | Màu đỏ, có thang và vòi nước. | 3
+XE ĐẠP ĐIỆN | Xe không cần đạp, sạc pin là chạy. | 3
+XE LĂN | Xe dành cho người không đi được. | 2
+XÍCH LÔ | Xe ba bánh chở khách du lịch phố cổ. | 2
+TÀU HỎA | Chạy trên đường ray, kêu xình xịch. | 2 | XE LỬA
+TÀU ĐIỆN NGẦM | Chạy dưới lòng đất, gọi là metro. | 3 | METRO
+MÁY BAY | Bay trên trời chở khách. | 1
+TRỰC THĂNG | Có cánh quạt quay trên nóc. | 2
+TÀU THỦY | Đi trên biển, to lớn. | 2
+THUYỀN | Chèo trên sông. | 1
+CANO | Chạy vút trên mặt nước, có động cơ. | 2 | CA NÔ
+XUỒNG | Thuyền nhỏ miền Tây. | 2
+BÈ | Kết tre nứa nổi trên mặt nước. | 2
+KHINH KHÍ CẦU | Quả bóng khổng lồ bay lên nhờ khí nóng. | 3
+TÀU NGẦM | Lặn sâu dưới biển. | 3
+TÊN LỬA | Phóng lên vũ trụ. | 2
+ĐÈN ĐỎ | Gặp thì phải dừng lại. | 1
+ĐÈN XANH | Gặp thì được đi. | 1
+ĐÈN VÀNG | Đi chậm lại, chuẩn bị dừng. | 2
+VẠCH KẺ ĐƯỜNG | Sọc trắng cho người đi bộ qua đường. | 3 | VẠCH QUA ĐƯỜNG
+VỈA HÈ | Phần đường dành cho người đi bộ, giờ toàn quán trà đá. | 2
+NGÃ TƯ | Chỗ bốn con đường gặp nhau. | 2
+BÙNG BINH | Vòng xuyến giữa ngã đường. | 2 | VÒNG XUYẾN
+CAO TỐC | Đường chạy nhanh, không có xe máy. | 2 | ĐƯỜNG CAO TỐC
+CẦU VƯỢT | Bắc qua đường cho xe hoặc người đi bên trên. | 2
+ĐƯỜNG HẦM | Xuyên qua núi hoặc dưới sông. | 2
+BẾN XE | Nơi xe khách đón trả khách. | 2
+SÂN BAY | Nơi máy bay cất cánh, hạ cánh. | 2
+NHÀ GA | Nơi tàu hỏa dừng đón khách. | 2
+BẾN CẢNG | Nơi tàu biển cập bờ. | 2 | CẢNG
+TRẠM XĂNG | Đổ xăng cho xe. | 2 | CÂY XĂNG
+KẸT XE | Đường đông cứng, không nhúc nhích. | 1 | TẮC ĐƯỜNG
+BẰNG LÁI | Giấy phép được lái xe. | 2 | BẰNG LÁI XE
+VÔ LĂNG | Tay quay điều khiển ô tô. | 2
+PHANH | Bóp vào cho xe dừng lại. | 2 | THẮNG
+BÁNH XE | Hình tròn, lăn trên đường. | 1
+BIỂN SỐ | Tấm biển ghi số xe. | 2 | BIỂN SỐ XE
+CÒI XE | Bấm bíp bíp. | 1
+ĐÈN PHA | Đèn trước xe chiếu sáng ban đêm. | 2
+XĂNG | Nhiên liệu đổ vào bình xe máy. | 1
+LỐP XE | Vỏ cao su bọc quanh bánh. | 2 | VỎ XE
+THỦNG LỐP | Cán đinh, xe xẹp, phải đi vá. | 2 | THỦNG SĂM
+GỬI XE | Đưa xe cho người trông, nhận vé. | 2
+VÉ XE | Tờ giấy nhận khi gửi xe hay đi buýt. | 2
+DÂY AN TOÀN | Thắt vào khi ngồi ô tô. | 3
+GRAB | Ứng dụng gọi xe màu xanh lá. | 2
+XE ĐẠP ĐÔI | Hai người cùng đạp trên một xe. | 3
+VÁN TRƯỢT | Tấm ván có bánh, đứng lên lướt đi. | 3 | SKATEBOARD
+XE TRƯỢT | Đứng một chân đẩy, có tay lái. | 3 | XE SCOOTER
+TÀU LƯỢN | Trò chơi lao vun vút ở công viên. | 3 | TÀU LƯỢN SIÊU TỐC
+ĐU QUAY | Vòng tròn khổng lồ quay chậm ở công viên. | 2
+CÁP TREO | Cabin treo trên dây đưa người lên núi. | 2
+TÀU VŨ TRỤ | Đưa phi hành gia lên trời. | 3
+ĐƯỜNG RAY | Hai thanh sắt song song cho tàu chạy. | 2
+GA TÀU | Nơi chờ lên tàu hỏa. | 2
+LÀN ĐƯỜNG | Phần đường chia cho từng loại xe. | 3
+ĐI BỘ | Không dùng xe, chỉ dùng chân. | 1
+CẢNH SÁT | Đứng ngã tư, vẫy xe vào kiểm tra. | 2
+MŨ XE ĐẠP | Đội khi đạp xe đường dài. | 3
+XE ĐẠP THỂ THAO | Xe đạp có nhiều số, lốp to. | 3
+XE CÔNG NÔNG | Máy cày ở quê kéo thùng hàng. | 3
+MÁY CÀY | Thay con trâu cày ruộng. | 2
+XE BÒ | Bò kéo thùng gỗ ở quê. | 2
+XE NGỰA | Ngựa kéo, chở người thời xưa. | 2
+TÀU CAO TỐC | Tàu chạy hơn ba trăm cây số một giờ. | 3
+XE ĐIỆN | Xe chạy pin, không xả khói. | 2

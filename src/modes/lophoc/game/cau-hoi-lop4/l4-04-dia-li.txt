@@ -1,0 +1,27 @@
+# Địa lí
+# Bộ lớp 4: các vùng miền, núi sông, đồng bằng, cao nguyên, nghề và sản vật.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách viết khác cũng tính đúng (cách nhau dấu phẩy)
+> Đây là kiến thức môn Địa lí.
+HOÀNG LIÊN SƠN | Dãy núi cao và đồ sộ nhất nước ta, có đỉnh Phan xi păng. | 3
+TRUNG DU | Vùng đồi thấp nằm giữa miền núi và đồng bằng ở phía Bắc, nổi tiếng trồng chè. | 2
+ĐỒI CHÈ | Cảnh đẹp ở Thái Nguyên, Phú Thọ, những hàng cây xanh mướt trên đồi, người ta hái lá về pha trà. | 1 
+ĐỒNG BẰNG | Vùng đất thấp, bằng phẳng, rộng lớn, trồng rất nhiều lúa. | 1
+PHÙ SA | Lớp đất màu mỡ do nước sông bồi đắp nên các đồng bằng. | 2
+ĐẮP ĐÊ | Người dân đồng bằng Bắc Bộ làm việc này dọc hai bên bờ sông Hồng để ngăn lũ. | 2
+BÁT TRÀNG | Làng gốm nổi tiếng hàng trăm năm ở Hà Nội. | 2
+CAO NGUYÊN | Vùng đất cao, rộng lớn, khá bằng phẳng, như ở Tây Nguyên. | 2
+ĐẤT ĐỎ BA DAN | Loại đất màu mỡ ở Tây Nguyên, rất hợp để trồng cà phê. | 3 | ĐẤT BA DAN
+HỒ TIÊU | Cây công nghiệp có hạt nhỏ vị cay, được trồng nhiều ở Tây Nguyên. | 2
+ĐỒNG THÁP MƯỜI | Vùng đất trũng rộng lớn ở Nam Bộ, nổi tiếng với những đầm sen hồng. | 3
+KÊNH RẠCH | Ở Nam Bộ có rất nhiều thứ này chằng chịt, người dân đi lại bằng xuồng ghe. | 2
+LÀM MUỐI | Nghề phơi nước biển dưới nắng của người dân ven biển miền Trung. | 2
+DUYÊN HẢI | Vùng đất ven biển, miền Trung nước ta có dải đất này hẹp và dài. | 3
+ĐÈO HẢI VÂN | Con đèo nổi tiếng nằm giữa Huế và Đà Nẵng, được gọi là thiên hạ đệ nhất hùng quan. | 2
+DÃY TRƯỜNG SƠN | Dãy núi dài chạy dọc phía tây miền Trung nước ta. | 2 | TRƯỜNG SƠN
+THỦ ĐÔ | Hà Nội là gì của nước Việt Nam? | 1
+CHÚ GIẢI | Bảng nhỏ ở góc bản đồ, giải thích ý nghĩa các kí hiệu. | 3
+CỐM | Món quà làm từ hạt lúa non, nổi tiếng nhất là ở làng Vòng, Hà Nội. | 2
+DÂN TỘC | Nước ta có năm mươi tư cái này cùng chung sống như anh em. | 1
+BUÔN | Ở Tây Nguyên, làng của đồng bào được gọi là gì? | 2 
+LÚA NƯỚC | Nghề trồng loại cây này trên ruộng ngập nước là nghề chính của người dân đồng bằng. | 2
+VẠN PHÚC | Làng dệt lụa nổi tiếng ở Hà Đông, Hà Nội. | 3

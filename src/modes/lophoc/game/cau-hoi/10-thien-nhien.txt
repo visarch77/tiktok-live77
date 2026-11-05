@@ -1,0 +1,76 @@
+# Thiên nhiên, thời tiết
+> Đây là thứ trong thiên nhiên, trời đất.
+MẶT TRỜI | Mọc đằng đông, lặn đằng tây. | 1
+MẶT TRĂNG | Tròn nhất vào rằm. | 1 | ÔNG TRĂNG
+NGÔI SAO | Lấp lánh trên trời đêm. | 1 | SAO
+CẦU VỒNG | Bảy màu hiện ra sau cơn mưa. | 1
+MÂY | Trôi lững lờ trên trời, trắng như bông. | 1 | ĐÁM MÂY
+MƯA | Nước từ trên trời rơi xuống. | 1
+MƯA PHÙN | Mưa lất phất mùa xuân miền Bắc. | 2
+MƯA ĐÁ | Mưa ra cục nước đá. | 2
+SẤM SÉT | Đùng đoàng chớp lóe trong cơn giông. | 2 | SẤM, SÉT
+GIÓ | Không nhìn thấy nhưng làm lá bay. | 1
+BÃO | Gió giật mạnh, mưa lớn, thổi tốc mái nhà. | 1
+LỐC XOÁY | Cột gió xoáy cuốn mọi thứ lên trời. | 3
+SƯƠNG MÙ | Trắng xóa buổi sáng, nhìn không rõ đường. | 2
+TUYẾT | Bông trắng lạnh rơi mùa đông xứ lạnh. | 1
+BĂNG | Nước đông cứng lại. | 1
+GIÓ MÙA ĐÔNG BẮC | Đợt gió lạnh tràn về miền Bắc. | 3
+NẮNG NÓNG | Trời bốn mươi độ, ra đường như lò nướng. | 2
+LŨ LỤT | Nước dâng ngập nhà cửa. | 2 | LŨ, LỤT
+HẠN HÁN | Lâu ngày không mưa, ruộng nứt nẻ. | 2
+ĐỘNG ĐẤT | Mặt đất rung lắc dữ dội. | 2
+NÚI LỬA | Phun dung nham nóng chảy. | 2
+SÓNG THẦN | Sóng biển khổng lồ sau động đất. | 3
+NÚI | Cao hơn đồi, có đỉnh. | 1
+ĐỒI | Thấp hơn núi, người ta trồng chè trên đó. | 1
+SÔNG | Dòng nước chảy ra biển. | 1
+SUỐI | Nước trong róc rách trên núi. | 1
+THÁC | Nước đổ từ trên cao xuống trắng xóa. | 1 | THÁC NƯỚC
+HỒ | Nước đứng yên, rộng, giữa phố. | 1
+BIỂN | Nước mặn, có sóng vỗ, có cát. | 1
+ĐẠI DƯƠNG | Vùng nước rộng nhất, có Thái Bình Dương. | 2
+BÃI BIỂN | Chỗ nằm phơi nắng xây lâu đài cát. | 2
+ĐẢO | Đất nổi giữa biển. | 1 | HÒN ĐẢO
+HANG ĐỘNG | Lỗ lớn trong núi, có thạch nhũ. | 2 | HANG
+SA MẠC | Toàn cát, nóng, ít mưa. | 2
+RỪNG | Nhiều cây, nhiều thú. | 1 | KHU RỪNG
+RỪNG NHIỆT ĐỚI | Rừng rậm nóng ẩm như Amazon. | 3
+ĐỒNG LÚA | Cánh đồng xanh rì ở quê. | 2 | CÁNH ĐỒNG
+ĐẤT | Ta đứng trên nó, cây mọc từ nó. | 1
+ĐÁ | Cứng, có loại cuội, có loại granit. | 1 | HÒN ĐÁ
+CÁT | Hạt nhỏ li ti trên bãi biển. | 1
+BÙN | Đất nhão sau mưa. | 1
+LỬA | Nóng, đỏ, cháy. | 1
+KHÓI | Bay lên từ đám cháy. | 1
+NƯỚC | Không có thì không sống được. | 1
+KHÔNG KHÍ | Thứ ta hít thở mỗi giây. | 2
+OXY | Khí cây cối nhả ra cho ta thở. | 2 | Ô XI
+BẦU TRỜI | Màu xanh trên đầu ta. | 1
+BÌNH MINH | Lúc mặt trời mới mọc. | 2
+HOÀNG HÔN | Lúc mặt trời lặn, trời đỏ cam. | 2
+NỬA ĐÊM | Mười hai giờ đêm. | 2
+MÙA XUÂN | Mùa có Tết, hoa nở. | 1
+MÙA HÈ | Mùa nóng, nghỉ học. | 1 | MÙA HẠ
+MÙA THU | Mùa lá vàng rơi, có Trung thu. | 1
+MÙA ĐÔNG | Mùa lạnh, mặc áo khoác. | 1
+MÙA MƯA | Miền Nam có hai mùa, đây là một. | 2
+MÙA KHÔ | Miền Nam có hai mùa, mùa nắng ráo. | 2
+TRÁI ĐẤT | Hành tinh xanh ta đang sống. | 2
+SAO HỎA | Hành tinh đỏ. | 2
+SAO KIM | Hành tinh sáng nhất, còn gọi sao Mai. | 3
+SAO MỘC | Hành tinh lớn nhất hệ Mặt Trời. | 3
+SAO THỔ | Hành tinh có vành đai đẹp nhất. | 3
+SAO BĂNG | Vệt sáng vụt qua trời đêm, ước một điều. | 2
+NGÂN HÀ | Dải sáng trắng vắt ngang trời đêm. | 3 | DẢI NGÂN HÀ
+NHẬT THỰC | Mặt trăng che mặt trời giữa ban ngày. | 3
+NGUYỆT THỰC | Bóng trái đất che mặt trăng. | 3
+VŨ TRỤ | Bao la, chứa mọi vì sao. | 2
+NHIỆT ĐỘ | Đo bằng độ C. | 2
+DỰ BÁO THỜI TIẾT | Xem sau thời sự để biết mai mưa hay nắng. | 3
+SƯƠNG MUỐI | Lớp băng trắng phủ cây trên núi khi rét đậm. | 3
+RÉT ĐẬM | Dưới mười lăm độ, học sinh được nghỉ. | 3 | RÉT HẠI
+GIÓ LÀO | Gió khô nóng thổi miền Trung mùa hè. | 3
+TRIỀU CƯỜNG | Nước biển dâng cao ngập phố. | 3
+THẠCH NHŨ | Đá rủ xuống trong hang động. | 3
+MẠCH NƯỚC NGẦM | Nước chảy dưới lòng đất. | 3 | NƯỚC NGẦM

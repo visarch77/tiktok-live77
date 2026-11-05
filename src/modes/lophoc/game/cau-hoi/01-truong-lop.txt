@@ -1,0 +1,76 @@
+# Trường lớp
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách viết khác cũng tính đúng (cách nhau dấu phẩy)
+> Đây là thứ ở trường lớp.
+PHẤN | Cô cầm cái này viết lên bảng đen. | 1
+THƯỚC | Dùng để kẻ đường thẳng cho ngay. | 1
+TẨY | Viết bút chì sai thì lấy cái này chùi đi. | 1 | GÔM
+BÚT CHÌ | Ruột màu xám, càng gọt càng ngắn. | 1
+COMPA | Có một chân nhọn, dùng để vẽ hình tròn. | 2
+CẶP SÁCH | Ngày nào cũng đeo trên lưng tới trường. | 1
+BẢNG CON | Tấm bảng nhỏ học sinh lớp một giơ lên cho cô xem. | 2
+VỞ | Học sinh ghi bài vào đây, có dòng kẻ ô li. | 1 | TẬP
+MỰC TÍM | Ngày xưa chấm ngòi bút vào lọ này để viết. | 2
+GIẤY THẤM | Tờ giấy hồng đặt dưới tay cho khỏi lem mực. | 3
+BẢNG ĐEN | Cô giáo viết bài lên đây cho cả lớp chép. | 1
+LỚP TRƯỞNG | Bạn hô "đứng dậy" khi cô bước vào lớp. | 2
+TRỰC NHẬT | Tới phiên thì ở lại quét lớp, lau bảng. | 2
+TRỐNG TRƯỜNG | Đánh "tùng tùng" là hết giờ ra chơi. | 2
+SỔ ĐẦU BÀI | Cô ghi nhận xét tiết học vào đây, bị ghi tên là sợ. | 3
+KIỂM TRA MIỆNG | Đầu giờ cô gọi tên lên bảng trả bài. | 3
+RA CHƠI | Giờ cả trường chạy ùa ra sân. | 1
+KHĂN QUÀNG ĐỎ | Đội viên thắt cái này trên cổ. | 3
+HỌC BẠ | Cuốn sổ ghi điểm tổng kết cả năm, có lời phê của cô. | 2
+GIẤY KHEN | Học sinh giỏi cuối năm được phát tờ này. | 2
+HỌC SINH GIỎI | Danh hiệu cuối năm của bạn điểm cao nhất lớp. | 3
+HIỆU TRƯỞNG | Người đứng đầu cả trường. | 2
+BẢO VỆ | Chú ngồi ở cổng trường, mở cổng đóng cổng. | 2
+CĂNG TIN | Chỗ trong trường bán đồ ăn, nước uống. | 2
+THƯ VIỆN | Phòng trong trường đầy sách cho học sinh mượn. | 2
+SÂN TRƯỜNG | Chỗ chào cờ thứ hai đầu tuần. | 2
+CHÀO CỜ | Sáng thứ hai cả trường đứng nghiêm làm việc này. | 2
+ĐỒNG PHỤC | Quần áo giống nhau cả trường phải mặc. | 2
+KHAI GIẢNG | Ngày năm tháng chín, mở đầu năm học mới. | 2
+BẾ GIẢNG | Lễ cuối năm học trước khi nghỉ hè. | 3
+NGHỈ HÈ | Ba tháng không phải đi học. | 1
+BÀI TẬP | Cô giao về nhà làm. | 1
+ĐIỂM MƯỜI | Điểm cao nhất trong bài kiểm tra. | 1 | ĐIỂM 10
+ĐIỂM KÉM | Điểm thấp mang về sợ ba mẹ la. | 2
+PHIẾU BÉ NGOAN | Tờ giấy nhỏ mầm non cuối tuần mới được phát. | 3
+HỌP PHỤ HUYNH | Buổi ba mẹ lên trường gặp cô chủ nhiệm. | 3
+CHỦ NHIỆM | Cô giáo phụ trách cả lớp. | 2
+SÁCH GIÁO KHOA | Cuốn sách chính để học mỗi môn. | 3
+BAO SÁCH | Lớp giấy bọc ngoài cho sách khỏi rách. | 2
+NHÃN VỞ | Miếng giấy dán ngoài bìa ghi tên, lớp. | 2
+HỘP BÚT | Đồ đựng bút, thước, tẩy. | 1
+GỌT BÚT CHÌ | Đồ quay quay cho đầu bút chì nhọn lại. | 3 | CHUỐT BÚT CHÌ
+BÚT MÁY | Cây bút bơm mực, nét thanh nét đậm. | 2
+BÚT BI | Cây bút bấm tạch tạch, đầu có viên bi nhỏ. | 1
+BÚT CHÌ MÀU | Hộp mười hai cây dùng để tô tranh. | 3
+GIẤY KIỂM TRA | Tờ giấy có ô ghi điểm và lời phê. | 3
+LỜI PHÊ | Dòng chữ đỏ cô ghi bên cạnh điểm. | 2
+MỰC ĐỎ | Màu mực cô dùng để chấm bài. | 2
+GHẾ ĐÁ | Chỗ ngồi dưới gốc cây sân trường. | 2
+CỔNG TRƯỜNG | Tan học ba mẹ đứng chờ ở đây. | 2
+TAN HỌC | Lúc trống đánh, cả lớp về nhà. | 1
+ĐI MUỘN | Tới lớp trễ giờ, phải đứng ngoài cửa. | 2
+TRỐN HỌC | Không tới lớp mà đi chơi lén. | 2
+CHÉP PHẠT | Viết đi viết lại một câu nhiều lần vì bị phạt. | 3
+QUAY CÓP | Lén nhìn tài liệu trong giờ thi. | 2
+BÀI THI | Làm xong phải nộp lên cho giám thị. | 1
+GIÁM THỊ | Người canh phòng thi. | 2
+PHÒNG THI | Ngồi đây làm bài, có số báo danh. | 2
+SỐ BÁO DANH | Dãy số mỗi thí sinh được phát khi đi thi. | 3
+TỐT NGHIỆP | Học xong một cấp được trao bằng này. | 2
+ĐẠI HỌC | Học xong cấp ba thì thi vào đây. | 2
+MẪU GIÁO | Lớp học của các bé trước khi vào lớp một. | 2 | MẦM NON
+CÔ GIÁO | Người mặc áo dài đứng lớp đây nè. | 1
+HỌC TRÒ | Cách gọi khác của học sinh. | 1
+BẠN THÂN | Người bạn ngồi cạnh chia nhau từng cái kẹo. | 1
+BÀN ĐẦU | Chỗ ngồi gần bảng nhất. | 1
+CUỐI LỚP | Chỗ ngồi xa bảng nhất, hay nói chuyện riêng. | 2
+LAU BẢNG | Việc làm bằng khăn ướt sau mỗi tiết học. | 1
+GIỜ TRUY BÀI | Mười lăm phút đầu giờ lớp trưởng kiểm tra bài. | 3 | TRUY BÀI
+SINH HOẠT LỚP | Tiết cuối tuần cô nhận xét cả lớp. | 3
+HỌC THÊM | Tan trường xong còn phải đi học ở nhà cô. | 2
+THỜI KHÓA BIỂU | Bảng ghi hôm nào học môn gì. | 3
+NGÀY NHÀ GIÁO | Ngày hai mươi tháng mười một tặng hoa thầy cô. | 3

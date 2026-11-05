@@ -1,0 +1,34 @@
+# Toán
+# Bộ lớp 4: số lớp triệu, góc, đường thẳng, đơn vị đo, phân số, trung bình cộng, biểu đồ.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách viết khác cũng tính đúng (cách nhau dấu phẩy)
+> Đây là kiến thức môn Toán.
+GÓC NHỌN | Góc bé hơn góc vuông. | 1 
+GÓC TÙ | Góc lớn hơn góc vuông nhưng bé hơn góc bẹt. | 2
+GÓC BẸT | Góc có hai cạnh nằm thẳng hàng trên một đường thẳng, bằng hai góc vuông. | 2
+VUÔNG GÓC | Hai đường thẳng cắt nhau tạo thành bốn góc vuông thì được gọi là hai đường thẳng gì? | 2
+SONG SONG | Hai đường thẳng không bao giờ cắt nhau, giống như hai thanh ray đường tàu. | 2
+HÌNH BÌNH HÀNH | Hình tứ giác có từng cặp cạnh đối diện song song và bằng nhau. | 2
+LỚP TRIỆU | Lớp gồm ba hàng: hàng triệu, hàng chục triệu và hàng trăm triệu. | 2
+HÀNG ĐƠN VỊ | Hàng đứng cuối cùng bên phải của một số tự nhiên. | 2
+SỐ TỰ NHIÊN | Các số không, một, hai, ba, bốn và cứ thế tiếp mãi được gọi là các số gì? | 2
+YẾN | Mười ki lô gam bằng một đơn vị đo khối lượng này. | 2
+TẠ | Một trăm ki lô gam bằng một đơn vị đo khối lượng này. | 2
+TẤN | Một nghìn ki lô gam bằng một đơn vị đo khối lượng này. | 1
+MÉT VUÔNG | Đơn vị đo diện tích, bằng diện tích hình vuông có cạnh dài một mét. | 2
+ĐỀ XI MÉT VUÔNG | Đơn vị đo diện tích bằng một trăm xăng ti mét vuông. | 3
+TRUNG BÌNH CỘNG | Lấy tổng các số chia cho số các số hạng thì được số gì của các số đó? | 3
+BIỂU ĐỒ CỘT | Loại biểu đồ dùng những hình chữ nhật cao thấp khác nhau để so sánh số liệu. | 3
+TỬ SỐ | Số viết ở phía trên gạch ngang của một phân số. | 1
+MẪU SỐ | Số viết ở phía dưới gạch ngang của một phân số, luôn khác không. | 1
+RÚT GỌN | Chia cả tử số và mẫu số cho cùng một số để được phân số gọn hơn, gọi là làm gì phân số? | 2 
+QUY ĐỒNG | Làm cho các phân số có chung mẫu số, gọi là làm gì mẫu số? | 3
+LÀM TRÒN | Viết hai triệu thay cho một triệu chín trăm tám mươi nghìn, đó là em đã làm gì số? | 3
+GIAO HOÁN | Đổi chỗ các số hạng trong một tổng thì tổng không thay đổi, đó là tính chất gì? | 3
+KẾT HỢP | Tính chất của phép cộng cho phép nhóm hai số hạng lại cộng trước rồi mới cộng số còn lại. | 3
+LỚP NGHÌN | Lớp gồm ba hàng: hàng nghìn, hàng chục nghìn và hàng trăm nghìn. | 2
+TỨ GIÁC | Hình có bốn cạnh và bốn góc gọi chung là hình gì? | 2
+TÍNH NHẨM | Tính ở trong đầu mà không cần đặt tính hay dùng máy tính. | 1
+ĐẶT TÍNH | Viết các số thẳng hàng thẳng cột với nhau rồi mới cộng, trừ, nhân, chia. | 1
+BIỂU THỨC | Dãy các số nối với nhau bằng dấu phép tính, như ba cộng năm nhân hai, gọi là gì? | 3
+CHIA HẾT | Mười chia cho năm không còn dư, ta nói mười làm gì cho năm? | 2
+PHÂN SỐ TỐI GIẢN | Phân số không thể rút gọn được nữa gọi là phân số gì? | 3

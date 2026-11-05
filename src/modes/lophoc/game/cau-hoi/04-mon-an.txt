@@ -1,0 +1,73 @@
+# Món ăn Việt
+> Đây là món ăn trong bữa cơm người Việt.
+PHỞ | Món nước nổi tiếng của Hà Nội, bánh dẹt, nước dùng xương. | 1
+BÁNH MÌ | Ổ bánh giòn kẹp pate, chả, đồ chua. | 1
+BÚN CHẢ | Bún ăn với thịt nướng than, chấm nước mắm chua ngọt. | 2
+BÁNH CHƯNG | Bánh vuông gói lá dong, ăn ngày Tết. | 2
+BÁNH TÉT | Bánh tròn dài gói lá chuối, Tết miền Nam. | 2
+CƠM TẤM | Món cơm Sài Gòn có sườn nướng, bì, chả. | 2
+NEM RÁN | Cuốn bánh đa nem rồi chiên vàng giòn. | 2 | CHẢ GIÒ
+BÁNH XÈO | Đổ bột kêu xèo xèo, ăn cuốn rau sống. | 2
+GỎI CUỐN | Bánh tráng cuốn tôm, thịt, bún, rau, không chiên. | 2
+BÚN BÒ HUẾ | Bún sợi to, nước cay, có sả và giò heo. | 3
+MÌ QUẢNG | Đặc sản Quảng Nam, sợi vàng, ít nước. | 3
+CAO LẦU | Đặc sản Hội An, sợi dai, dùng nước giếng Bá Lễ. | 3
+HỦ TIẾU | Món sợi nhỏ trong nổi tiếng Nam Vang. | 2
+BÁNH CUỐN | Bột tráng mỏng cuốn nhân thịt mộc nhĩ. | 2
+BÁNH BAO | Bánh tròn trắng hấp, nhân thịt trứng cút. | 2
+XÔI | Nếp đồ chín, ăn sáng gói lá chuối. | 1
+CHÁO | Gạo nấu nhừ, ăn khi ốm. | 1
+CƠM | Món ăn bữa nào cũng có. | 1
+CANH CHUA | Nấu với me, cà chua, thơm, giá. | 2
+CÁ KHO TỘ | Kho trong nồi đất, nước sánh màu cánh gián. | 3
+THỊT KHO TRỨNG | Món Tết miền Nam, nước dừa kho. | 3
+RAU MUỐNG XÀO TỎI | Món rau xào xanh giòn, thơm mùi tỏi phi. | 3
+ĐẬU PHỤ | Khối trắng mềm làm từ đậu nành, rán hay sốt cà. | 2 | ĐẬU HŨ
+NƯỚC MẮM | Nước chấm làm từ cá, Phú Quốc nổi tiếng. | 1
+MẮM TÔM | Chấm bún đậu, mùi nồng đặc trưng. | 2
+BÚN ĐẬU | Đi kèm mắm tôm và chả cốm. | 2 | BÚN ĐẬU MẮM TÔM
+CHẢ CÁ | Món Lã Vọng ăn với thì là. | 3
+BÚN RIÊU | Bún có gạch cua nổi trên mặt. | 2
+BÁNH CĂN | Bánh nhỏ đổ khuôn đất, đặc sản Phan Thiết, Đà Lạt. | 3
+BÁNH KHỌT | Bánh nhỏ giòn rụm, đặc sản Vũng Tàu. | 3
+BÁNH BÈO | Bánh nhỏ trong chén, rắc tôm chấy, đặc sản Huế. | 3
+BÁNH ĐA | Bánh tráng nướng giòn, ăn với ốc hoặc cua. | 2 | BÁNH TRÁNG
+BÁNH GIÒ | Bánh gói lá chuối hình chóp, nhân thịt mộc nhĩ. | 3
+BÁNH TRÔI | Viên bột nếp nhân đường, ăn Tết Hàn thực. | 3
+BÁNH CHAY | Ăn cùng bánh trôi ngày ba tháng ba. | 3
+BÁNH DÀY | Bánh tròn trắng tượng trưng cho trời. | 3
+BÁNH CỐM | Đặc sản Hàng Than, màu xanh lá cốm. | 3
+NEM CHUA | Đặc sản Thanh Hóa, chua nhẹ, gói lá chuối. | 3
+GIÒ LỤA | Gói lá chuối, khoanh tròn trắng hồng, ăn Tết. | 3 | CHẢ LỤA
+LẨU | Nồi nước sôi giữa bàn, nhúng rau thịt. | 1
+CƠM CHÁY | Lớp cơm giòn dính đáy nồi. | 2
+BÒ BÍA | Cuốn bánh tráng với củ sắn, lạp xưởng, trứng. | 3
+BÁNH ƯỚT | Bánh mỏng mềm ăn với chả lụa. | 3
+BÚN MẮM | Món miền Tây nấu từ mắm cá linh, cá sặc. | 3
+BÁNH CANH | Sợi bột to dai, nấu với cua hoặc giò heo. | 2
+MÌ TÔM | Ăn cứu đói lúc nửa đêm, gói vài nghìn. | 1 | MÌ GÓI
+TRỨNG VỊT LỘN | Luộc ăn với rau răm, muối tiêu. | 3 | HỘT VỊT LỘN
+CHÁO LÒNG | Cháo nấu với lòng heo, ăn với quẩy. | 3
+BÁNH TRÁNG TRỘN | Món ăn vặt Sài Gòn, trộn khô bò, trứng cút. | 3
+XÔI XÉO | Xôi phủ đậu xanh và hành phi. | 3
+BÚN THANG | Bún Hà Nội có trứng tráng, giò, gà xé. | 3
+CÁ VIÊN CHIÊN | Xiên que ăn vặt trước cổng trường. | 3
+CHÈ | Món ngọt đủ loại: đậu đỏ, bưởi, khúc bạch. | 1
+BÁNH FLAN | Bánh trứng mềm mịn, có lớp caramen. | 2 | BÁNH PLAN, CARAMEN
+SỮA CHUA | Ăn lạnh, men tốt cho tiêu hóa. | 2 | DA UA
+BÁNH TRUNG THU | Bánh nướng, bánh dẻo ăn rằm tháng tám. | 3
+MỨT | Món ngọt bày khay ngày Tết, có loại dừa, gừng. | 2
+DƯA HÀNH | Ăn với thịt mỡ ngày Tết, chua giòn. | 3
+GÀ LUỘC | Mâm cúng giao thừa không thể thiếu món này. | 2
+NỘM | Rau củ trộn chua ngọt, còn gọi gỏi. | 2 | GỎI
+BÁNH QUẨY | Que bột chiên giòn, chấm cháo hoặc phở. | 3 | QUẨY, GIÒ CHÁO QUẨY
+CƠM RANG | Cơm nguội đảo chảo với trứng. | 2 | CƠM CHIÊN
+TRỨNG ỐP LA | Trứng chiên giữ nguyên lòng đỏ tròn. | 3
+XÚC XÍCH | Thịt xay nhồi vỏ dài, nướng ăn vặt. | 2
+LẠP XƯỞNG | Thịt nhồi phơi khô, màu đỏ, ăn với xôi. | 3
+BÁNH GẠO | Món ăn vặt giòn, có loại Hàn Quốc nhúng sốt cay. | 3
+NƯỚC CHẤM | Pha chua cay mặn ngọt, chén nhỏ giữa mâm. | 2
+CANH CUA | Nấu với rau đay, mồng tơi, ăn với cà pháo. | 3
+CÀ PHÁO | Quả nhỏ tròn muối chua giòn tan. | 3
+BÁNH TÔM | Đặc sản Hồ Tây, chiên giòn với khoai lang. | 3
+BÚN CÁ | Bún nấu với cá rán, thì là, đặc sản Hải Phòng. | 3

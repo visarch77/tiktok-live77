@@ -1,0 +1,40 @@
+# Tiếng Việt
+# Lớp 3: từ chỉ sự vật, hoạt động, đặc điểm; dấu câu; so sánh; ca dao, tục ngữ; từ tả âm thanh.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách viết khác cũng tính đúng (cách nhau dấu phẩy)
+> Đây là kiến thức môn Tiếng Việt.
+SO SÁNH | Câu trẻ em như búp trên cành dùng biện pháp gì? | 2
+TỪ TRÁI NGHĨA | Cao với thấp, to với nhỏ, đêm với ngày là những cặp từ có nghĩa ngược nhau, gọi là gì? | 2
+DẤU CHẤM HỎI | Cuối câu dùng để hỏi phải đặt dấu này. | 1
+DẤU CHẤM THAN | Câu Ôi, bông hoa đẹp quá, cuối câu đặt dấu gì? | 2
+DẤU PHẨY | Dấu nhỏ dùng để ngăn cách các từ cùng loại trong câu. | 1
+DẤU HAI CHẤM | Dấu đặt trước lời nói của nhân vật, hoặc trước khi kể ra nhiều thứ. | 3
+DẤU GẠCH NGANG | Dấu đặt ở đầu dòng khi viết lời đối thoại của nhân vật. | 3
+CHỮ HOA | Chữ cái đầu câu và tên riêng phải viết bằng loại chữ này. | 1
+TÊN RIÊNG | Lan, Hà Nội, sông Hồng là loại tên gì, phải viết hoa? | 2
+BẢNG CHỮ CÁI | Có hai mươi chín chữ, bắt đầu từ a, á, ớ. | 1
+ĐOẠN VĂN | Nhiều câu viết liền nhau, chữ đầu viết hoa và lùi vào đầu dòng. | 2
+NHÂN HÓA | Gọi con vật, đồ vật như gọi người, ví dụ chị Gió, anh Mây, là biện pháp gì? | 3
+TỪ CHỈ SỰ VẬT | Bàn, ghế, con mèo, cây bàng thuộc nhóm từ này. | 2
+TỪ CHỈ HOẠT ĐỘNG | Chạy, nhảy, đọc, viết thuộc nhóm từ này. | 2
+TỪ CHỈ ĐẶC ĐIỂM | Xanh, đỏ, cao, thấp, ngọt, chua thuộc nhóm từ này. | 3
+CÂU CẢM | Câu bộc lộ cảm xúc như ôi, đẹp quá, là kiểu câu gì? | 2
+CÂU KHIẾN | Câu bạn hãy đóng cửa lại giúp mình, dùng để nhờ, yêu cầu, là kiểu câu gì? | 3
+QUÊ HƯƠNG | Bài thơ của Đỗ Trung Quân viết: hai từ này là chùm khế ngọt, cho con trèo hái mỗi ngày. | 1
+CÔNG CHA | Câu ca dao bắt đầu bằng hai từ này, tiếp theo là như núi Thái Sơn, nghĩa mẹ như nước trong nguồn chảy ra. | 2
+ĂN QUẢ | Câu tục ngữ bắt đầu bằng hai từ này, tiếp theo là nhớ kẻ trồng cây. | 1
+BẦU ƠI | Câu ca dao bắt đầu bằng hai tiếng này, tiếp theo là thương lấy bí cùng. | 2
+LÁ LÀNH | Câu tục ngữ khuyên giúp đỡ nhau, có hai từ này rồi tới đùm lá rách. | 1
+NÊN HÒN NÚI CAO | Một cây làm chẳng nên non, ba cây chụm lại thì thành gì? | 2
+CẦN CÙ | Từ có nghĩa giống với siêng năng. | 2
+KHỔNG LỒ | Từ có nghĩa giống với to lớn, hay dùng tả người cao to trong truyện cổ tích. | 2
+SÁNG DẠ | Từ có nghĩa giống với thông minh, học đâu nhớ đó. | 3
+CHẬM CHẠP | Từ trái nghĩa với nhanh nhẹn. | 1
+HÈN NHÁT | Từ trái nghĩa với dũng cảm. | 2
+RÓC RÁCH | Từ tả tiếng suối chảy qua khe đá. | 2
+LỘP ĐỘP | Từ tả tiếng mưa rơi trên mái tôn. | 2
+XÀO XẠC | Từ tả tiếng gió thổi qua lá cây, lá tre. | 2
+LÍU LO | Từ tả tiếng chim hót trong trẻo. | 1
+LẤP LÁNH | Từ tả những ngôi sao sáng nhấp nháy trên trời. | 1
+GIẤY MỜI | Muốn mời bố mẹ đến dự buổi văn nghệ của lớp, em viết tờ này. | 2
+ĐỌC SÁCH | Giờ ra chơi, em vào thư viện để làm việc này. | 1
+TRUYỆN CỔ TÍCH | Tấm Cám, Cây khế, Sọ Dừa là loại truyện gì? | 1

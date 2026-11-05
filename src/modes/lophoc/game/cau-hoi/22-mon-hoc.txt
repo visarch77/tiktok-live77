@@ -1,0 +1,33 @@
+# Môn học
+> Đây là một môn học.
+TOÁN | Môn có cộng trừ nhân chia. | 1
+TIẾNG VIỆT | Môn tập đọc, tập viết, chính tả ở tiểu học. | 2
+NGỮ VĂN | Môn viết văn tả mẹ, phân tích bài thơ. | 2 | VĂN
+LỊCH SỬ | Môn học về các triều đại, năm tháng xưa. | 2 | SỬ
+ĐỊA LÝ | Môn học về sông núi, bản đồ. | 2 | ĐỊA LÍ, ĐỊA
+THỂ DỤC | Môn học ngoài sân, chạy nhảy. | 1
+HÓA HỌC | Môn có bảng tuần hoàn và ống nghiệm. | 2 | HÓA
+SINH HỌC | Môn học về tế bào, cây cối, con vật. | 2 | SINH
+VẬT LÝ | Môn có định luật Newton. | 2 | VẬT LÍ, LÝ, LÍ
+MỸ THUẬT | Môn vẽ tranh, tô màu. | 2 | MĨ THUẬT
+ÂM NHẠC | Môn tập hát, học nốt nhạc. | 1 | NHẠC
+TIN HỌC | Môn học máy tính. | 2 | TIN
+NGOẠI NGỮ | Môn học tiếng nước ngoài. | 2
+GIÁO DỤC CÔNG DÂN | Môn dạy đạo đức, pháp luật. | 3 | GDCD
+CÔNG NGHỆ | Môn học trồng cây, nấu ăn, lắp mạch điện. | 3
+ĐẠO ĐỨC | Môn dạy lễ phép ở tiểu học. | 2
+TẬP VIẾT | Môn tô chữ trong vở ô li. | 2
+CHÍNH TẢ | Cô đọc cả lớp viết, sai dấu là trừ điểm. | 2
+KỂ CHUYỆN | Tiết học đứng trước lớp kể lại câu chuyện. | 2
+KHOA HỌC | Môn tìm hiểu tự nhiên ở lớp bốn, lớp năm. | 2
+HÌNH HỌC | Phần toán về tam giác, đường tròn. | 2
+ĐẠI SỐ | Phần toán có x, y, phương trình. | 3
+TIẾNG ANH | Môn học có "hello", "how are you". | 1
+QUỐC PHÒNG | Môn học tháo lắp súng, đi đều bước ở cấp ba. | 3 | GIÁO DỤC QUỐC PHÒNG
+LUYỆN TỪ VÀ CÂU | Phân môn tiếng Việt học danh từ, động từ. | 3
+TẬP ĐỌC | Đứng lên đọc to bài văn trong sách. | 2
+TẬP LÀM VĂN | Phân môn viết bài văn ngắn. | 3
+THỦ CÔNG | Môn cắt dán giấy màu. | 2
+HÁT NHẠC | Tiết cả lớp vỗ tay hát theo cô. | 2
+LÝ THUYẾT | Phần học trên sách, chưa thực hành. | 3
+THỰC HÀNH | Phần làm thật trong phòng thí nghiệm. | 3

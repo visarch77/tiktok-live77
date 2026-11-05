@@ -13,3 +13,5 @@ public/assets/bg_chant.m4a
 public/music/*
 !public/music/README.md
 .env
+# lõi Lớp Học Chữ đóng gói tự sinh từ src/modes/lophoc/*.ts (index.js tự đóng gói lại khi thiếu)
+src/modes/lophoc/core.cjs

@@ -692,6 +692,35 @@
         return { icon: '✨', text: `${u} tương tác` };
       }
     };
+    // Lớp Học Chữ: nút cần nhập chữ (sinh nhật, cô nói, tên lớp) và trạng thái câu đang hỏi ở thẻ "🍎 Điều khiển lớp"
+    const LHC_SETS = [['chung', 'Chung (mọi lứa tuổi)'], ['lop3', 'Lớp 3'], ['lop4', 'Lớp 4'], ['lop5', 'Lớp 5']];
+    const LHC_PHASE = { intro: 'Mở đầu tiết', question: 'Đang hỏi', bonus: 'Câu thưởng', reveal: 'Hiện đáp án', praise: 'Khen bạn giỏi', results: 'Tổng kết tiết', recess: 'Ra chơi', vote: 'Chọn chủ đề' };
+    MODE_UI.lophoc = {
+      pointsLabel: 'Điểm tích luỹ (trả lời đúng, nhanh được thêm điểm)',
+      actions: [
+        { icon: '✅', name: '1 bạn trả lời đúng', desc: 'Một bạn ảo gõ đáp án câu đang hỏi (chỉ khi chưa live)', method: 'lophoc.testCrowd', params: { count: 1 } },
+        { icon: '👥', name: '40 bạn cùng đoán', desc: 'Phần lớn đúng, rải trong vài giây (chỉ khi chưa live)', method: 'lophoc.testCrowd', params: { count: 40 } },
+        { icon: '👥', name: '150 bạn cùng đoán', desc: 'Thử lớp đông, có bạn đứng ngoài cửa (chỉ khi chưa live)', method: 'lophoc.testCrowd', params: { count: 150 } },
+        { icon: '💬', name: '1 bình luận ngẫu nhiên', desc: '"vào lớp", "chào cô ạ"… (chỉ khi chưa live)', method: 'lophoc.testChat' },
+        { icon: '🌹', name: 'Tặng quà thử', desc: 'Quà to lúc chưa ai đúng: cô mở thêm 1 chữ (chỉ khi chưa live)', method: 'lophoc.testGift' },
+        { icon: '❤️', name: 'Thả 60 tim', desc: 'Đủ tim thì cả lớp vỗ tay (chỉ khi chưa live)', method: 'lophoc.testLike', params: { count: 60 } }
+      ],
+      commentHint: 'Ví dụ: vào lớp · đáp án câu đang hỏi · hôm nay sinh nhật con cô ơi',
+      stats: (st) => {
+        const v = st.lophoc || {};
+        return [
+          { label: 'Tiết · câu', value: v.round ? `${fmt(v.round)} · ${fmt(v.qNo)}/${fmt(v.total)}` : '—', hint: LHC_PHASE[v.phase] || '' },
+          { label: 'Học sinh', value: fmt(v.classSize), hint: `${fmt(v.players)} bạn đang chơi` },
+          { label: 'Ngân hàng câu', value: fmt(st.bankSize), hint: `Bộ ${(LHC_SETS.find(([k]) => k === st.questionSet) || LHC_SETS[0])[1]}` }
+        ];
+      },
+      dangerActions: [],
+      describe: (e) => {
+        const u = `<b>${esc(e.user || 'Người xem')}</b>`;
+        if (e.type === 'gift') return { icon: '🌹', text: `${u} tặng ${esc(e.giftName || 'quà')} cho cô` };
+        return { icon: '✨', text: `${u} tương tác` };
+      }
+    };
     const DEFAULT_MODE_UI = { pointsLabel: 'Điểm', actions: [], stats: () => [], dangerActions: [], describe: (e) => ({ icon: '✨', text: `<b>${esc(e.user || 'Người xem')}</b> tương tác` }) };
 
     // ======================================================================
@@ -875,6 +904,13 @@
               { id: 'lag', label: '📏 Độ trễ' },
               { id: 'play', label: '🎮 Chơi thử' }
             ]
+          : room.mode === 'lophoc'
+          ? [
+              { id: 'lhc', label: '🍎 Điều khiển lớp' },
+              { id: 'interact', label: '🧪 Thử tương tác' },
+              { id: 'feed', label: '📡 Hoạt động' },
+              { id: 'settings', label: '⚙️ Cài đặt' }
+            ]
           : room.mode === 'keoco'
           ? [
               { id: 'interact', label: '🕹 Điều khiển giải' },
@@ -1049,6 +1085,47 @@
                   <div class="rl-gifts" id="rlGifts"><div class="muted">Đang tải danh sách quà…</div></div>
                 </div></div>` : ''}
 
+                ${room.mode === 'lophoc' ? `
+                <div class="spanel" data-spanel="lhc"><div class="rlplay">
+                  <div class="rl-status" id="lhcStatus"><div class="rl-stat"><b>—</b><span>Đang tải…</span></div></div>
+                  <div class="help" id="lhcQuestion"></div>
+                  <div class="rl-row">
+                    <button class="btn primary" data-act="lhc-rpc" data-method="lophoc.skip">⏭ Qua phần tiếp</button>
+                    <button class="btn" data-act="lhc-rpc" data-method="lophoc.newRound" data-confirm="Bỏ tiết đang học, bắt đầu tiết mới?">🔄 Tiết mới</button>
+                    <button class="btn danger" data-act="lhc-ban" id="lhcBan">🚫 Bỏ câu này</button>
+                    <a class="btn" href="/lophoc-bao-cao.html?room=${encodeURIComponent(room.id)}" target="_blank" rel="noopener">📊 Báo cáo hôm nay</a>
+                  </div>
+                  <div class="rl-row">
+                    <b style="width:100%">Ra chơi ngay</b>
+                    <button class="btn" data-act="lhc-rpc" data-method="lophoc.recess" data-game="rps">✊ Oẳn tù tì</button>
+                    <button class="btn" data-act="lhc-rpc" data-method="lophoc.recess" data-game="callup">📢 Kiểm tra miệng</button>
+                    <button class="btn" data-act="lhc-rpc" data-method="lophoc.recess" data-game="pick">⚖️ Chọn phe</button>
+                    <button class="btn" data-act="lhc-rpc" data-method="lophoc.recess" data-game="roll">🙋 Điểm danh</button>
+                    <button class="btn" data-act="lhc-rpc" data-method="lophoc.recess" data-game="heart">❤️ Thả tim</button>
+                  </div>
+                  <div class="field">
+                    <label for="lhcBirthday">🎂 Chúc mừng sinh nhật (tên bạn nhỏ, đúng tên trong lớp thì bạn đó được lên bục)</label>
+                    <div class="input-group">
+                      <input class="input" id="lhcBirthday" maxlength="40" placeholder="Tên bạn nhỏ" />
+                      <button class="btn" data-act="lhc-birthday">Chúc</button>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="lhcSay">🗣 Cô nói ngay (đọc chen trước các câu khác)</label>
+                    <div class="input-group">
+                      <input class="input" id="lhcSay" maxlength="300" placeholder="Ví dụ: Các con nhớ thả tim cho cô nhé" />
+                      <button class="btn" data-act="lhc-say">Nói</button>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="lhcName">🏫 Tên lớp (hiện trên bảng, cô đọc khi chào)</label>
+                    <div class="input-group">
+                      <input class="input" id="lhcName" maxlength="40" value="${esc(roomState?.lophoc?.channelName || '')}" />
+                      <button class="btn" data-act="lhc-name">Lưu</button>
+                    </div>
+                  </div>
+                </div></div>` : ''}
+
                 ${room.mode === 'keoco' ? `
                 <div class="spanel" data-spanel="kcplay"><div class="rlplay">
                   <span class="help">Chỉ dùng khi <b>chưa live</b>. Chọn đội rồi thêm người, cho cả đội thả tim, hoặc bấm một quà để thấy kỹ năng chạy thế nào. Đội chưa ra sân thì kỹ năng được <b>để dành</b>, tự dùng khi đội ra sân.</span>
@@ -1195,12 +1272,8 @@
       $('#alertSlot').style.gap = '8px';
     }
 
-    function renderRoomState() {
-      const room = currentRoom();
-      if (!room || !roomState || !$('#statsRow')) return;
-      const ui = modeUI(room.mode);
-      const t = roomState.tiktok || {};
-
+    function renderStatsRow(room, ui, t) {
+      if (!$('#statsRow')) return;
       const stats = [
         { label: 'Người xem lúc này', value: t.connected ? fmt(t.viewerCount) : '—', hint: t.connected ? `@${t.username}` : 'Chưa live' },
         ...(room.mode === 'temple' ? [{ label: 'Người xem đã ghi nhận', value: fmt(room.viewers), hint: 'Tất cả phiên live' }] : []),
@@ -1212,6 +1285,15 @@
           <div class="stat-value">${esc(s.value)}</div>
           ${s.hint ? `<div class="stat-hint">${esc(s.hint)}</div>` : ''}
         </div>`).join('');
+    }
+
+    function renderRoomState() {
+      const room = currentRoom();
+      if (!room || !roomState || !$('#statsRow')) return;
+      const ui = modeUI(room.mode);
+      const t = roomState.tiktok || {};
+      renderLhcStatus();
+      renderStatsRow(room, ui, t);
 
       // Bảng xếp hạng
       const lb = (roomState.leaderboard || []).slice(0, 10);
@@ -1384,7 +1466,21 @@
         ${rlRange('npcMin', 'Người máy lấp chỗ', 'Mỗi bên trên sân được lấp người máy (🤖, kéo yếu hơn) tới max(số người thật bên đông hơn, số này)', 0, 20, 1, ' người')}
         ${rlRange('championSeconds', 'Thời gian vinh danh vô địch', '', 5, 60, 1, 's')}
         ${rlRange('sideMargin', 'Lề hai bên màn hình', 'Điện thoại / TikTok cắt mất hai mép thì tăng lên để dồn mọi thứ vào giữa', 40, 220, 4, ' px')}`;
-      body.innerHTML = `${rlExtra}${kcExtra}
+      const lhcExtra = currentRoom()?.mode !== 'lophoc' ? '' : `
+        <div class="setting">
+          <div><div class="setting-name">Bộ câu hỏi</div><div class="setting-desc">Chung: 2.076 câu đủ chủ đề (bản gốc) · Lớp 3 / 4 / 5: câu theo chương trình lớp đó, toán nhẩm cũng theo lớp. Đổi xong áp dụng từ tiết sau (bấm "Tiết mới" để đổi ngay)</div></div>
+          <select class="input" data-setting="questionSet">${LHC_SETS.map(([v, n]) => `<option value="${v}" ${v === (s.questionSet || 'chung') ? 'selected' : ''}>${n}</option>`).join('')}</select>
+        </div>
+        <div class="setting">
+          <div><div class="setting-name">Gõ không dấu cũng đúng</div><div class="setting-desc">Bật: "cai chao" hay "cái chảo" đều tính đúng câu CÁI CHẢO · Tắt: phải gõ đủ dấu như bản gốc (gõ thiếu dấu bị tính sai và mất lượt câu đó)</div></div>
+          <label class="switch"><input type="checkbox" data-setting="acceptNoDiacritics" ${s.acceptNoDiacritics !== false ? 'checked' : ''} /><span></span></label>
+        </div>
+        <div class="setting">
+          <div><div class="setting-name">Giọng cô giáo</div><div class="setting-desc">Edge: tạo giọng ~1 giây, giọng nữ Hoài My, đọc từ tiếng Anh bằng giọng Mỹ (cần mạng; lỗi thì tự đọc bằng ZeroTTS) · ZeroTTS: giọng chọn ở dưới, chạy trên máy nhưng mỗi câu chờ 5–15 giây, từ tiếng Anh đọc bằng giọng macOS</div></div>
+          <select class="input" data-setting="voiceEngine">${[['edge', 'Edge (nhanh, như bản gốc)'], ['zero', 'ZeroTTS (giọng phòng)']].map(([v, n]) => `<option value="${v}" ${v === (s.voiceEngine || 'edge') ? 'selected' : ''}>${n}</option>`).join('')}</select>
+        </div>
+        ${rlRange('voiceRate', 'Tốc độ nói (giọng Edge)', '1 = bình thường; bản gốc để 1,25 cho tiết tấu dồn dập', 0.8, 1.5, 0.05, '×')}`;
+      body.innerHTML = `${rlExtra}${kcExtra}${lhcExtra}
         <div class="setting">
           <div><div class="setting-name">Giọng đọc</div><div class="setting-desc">Đọc tên & lời nhắn của người xem</div></div>
           <label class="switch"><input type="checkbox" data-setting="ttsEnabled" ${s.ttsEnabled !== false ? 'checked' : ''} /><span></span></label>
@@ -2270,6 +2366,32 @@
     let kcTeam = Number(lsGet('kc_test_team')) || 1;
     let kcTimer = null;
     const KC_GIFT_IMG = { gong: 'turbo', energy: 'clones', tickle: 'shove', glue: 'shield', cheer: 'revive', grease: 'wind', strong: 'giant', fart: 'fart', heave: 'teamShield', banana: 'stomp' };
+    // Trạng thái lớp học trong thẻ "🍎 Điều khiển lớp" (cập nhật theo lophoc.view, mỗi giây)
+    function renderLhcStatus() {
+      const box = $('#lhcStatus');
+      const v = roomState?.lophoc;
+      if (!box || !v || currentRoom()?.mode !== 'lophoc') return;
+      const left = v.endsAt ? Math.max(0, Math.ceil((v.endsAt - (v.serverNow || Date.now())) / 1000)) : 0;
+      const cell = (b, sp, cls = '') => `<div class="rl-stat ${cls}"><b>${b}</b><span>${sp}</span></div>`;
+      box.innerHTML = [
+        cell(esc(LHC_PHASE[v.phase] || v.phase || '—'), `Tiết ${fmt(v.round)} · câu ${fmt(v.qNo)}/${fmt(v.total)}`),
+        cell(left ? `${left}s` : '—', v.speaking ? 'Cô đang nói (đồng hồ dừng)' : 'Còn lại'),
+        cell(fmt(v.correctCount), 'Bạn trả lời đúng', v.correctCount ? 'good' : ''),
+        cell(`${fmt(v.players)} / ${fmt(v.classSize)}`, 'Đang chơi / trong lớp')
+      ].join('');
+      const asking = ['question', 'bonus', 'reveal'].includes(v.phase);
+      const q = $('#lhcQuestion');
+      if (q) {
+        q.innerHTML = asking && v.answer
+          ? `Đáp án: <b>${esc(v.answer)}</b> · ${esc(v.category)}${v.math ? ` · ${esc(v.math)}` : v.clue ? ` · <i>${esc(v.clue)}</i>` : ''}${v.speaking ? `<br>🗣 ${esc(v.speaking.text)}` : ''}`
+          : v.speaking ? `🗣 ${esc(v.speaking.text)}` : '';
+      }
+      const ban = $('#lhcBan');
+      if (ban) ban.disabled = !asking || !v.answer || !!v.math;
+      const nameInp = $('#lhcName');
+      if (nameInp && !nameInp.value && document.activeElement !== nameInp) nameInp.value = v.channelName || '';
+    }
+
     async function renderKcPlay() {
       const room = currentRoom();
       if (!room || room.mode !== 'keoco') return;
@@ -2503,6 +2625,42 @@
           } catch (_) {}
           renderKcPlay();
           break;
+        case 'lhc-rpc': {
+          if (btn.dataset.confirm && !(await confirmDialog({ title: btn.textContent.replace(/^\S+\s/, ''), text: btn.dataset.confirm, ok: 'Đồng ý' }))) break;
+          btn.disabled = true;
+          try {
+            await rpc(btn.dataset.method, { roomId: room.id, ...(btn.dataset.game ? { game: btn.dataset.game } : {}) });
+          } catch (_) {}
+          setTimeout(() => (btn.disabled = false), 400);
+          break;
+        }
+        case 'lhc-ban': {
+          const v = roomState?.lophoc || {};
+          if (await confirmDialog({ title: 'Bỏ câu này?', text: `Câu “${v.answer || ''}” sẽ không bao giờ được hỏi lại (xem lại ở trang báo cáo).`, ok: 'Bỏ câu' })) {
+            await rpc('lophoc.ban', { roomId: room.id }).then(() => toast('Đã bỏ câu')).catch(() => {});
+          }
+          break;
+        }
+        case 'lhc-birthday': {
+          const name = ($('#lhcBirthday')?.value || '').trim();
+          if (!name) break;
+          await rpc('lophoc.birthday', { roomId: room.id, name }).then(() => ($('#lhcBirthday').value = '')).catch(() => {});
+          break;
+        }
+        case 'lhc-say': {
+          const text = ($('#lhcSay')?.value || '').trim();
+          if (!text) break;
+          await rpc('lophoc.sayText', { roomId: room.id, text }).then(() => ($('#lhcSay').value = '')).catch(() => {});
+          break;
+        }
+        case 'lhc-name': {
+          const r = await rpc('lophoc.setName', { roomId: room.id, name: $('#lhcName')?.value || '' }).catch(() => null);
+          if (r) {
+            $('#lhcName').value = r.channelName;
+            toast(`Tên lớp: ${r.channelName}`);
+          }
+          break;
+        }
         case 'kc-rpc':
           try {
             await rpc(btn.dataset.method, { roomId: room.id });
@@ -2745,6 +2903,14 @@
             if (msg.params?.event?.id) freshEventIds.add(msg.params.event.id);
             roomState = msg.params?.state || roomState;
             renderRoomState();
+            break;
+          case 'lophoc.view':
+            if (roomState) {
+              roomState.lophoc = msg.params;
+              renderLhcStatus();
+              const r = currentRoom();
+              if (r?.mode === 'lophoc') renderStatsRow(r, modeUI('lophoc'), roomState.tiktok || {});
+            }
             break;
           case 'room.viewerCount':
             if (roomState?.tiktok) {

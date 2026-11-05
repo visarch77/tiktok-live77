@@ -1,0 +1,77 @@
+# Thế giới
+> Đây là một quốc gia.
+NHẬT BẢN | Xứ sở hoa anh đào. | 1 | NHẬT
+HÀN QUỐC | Quê hương Kpop, kim chi. | 1 | HÀN
+TRUNG QUỐC | Có Vạn Lý Trường Thành. | 1
+THÁI LAN | Xứ sở chùa vàng. | 1
+LÀO | Nước láng giềng có thủ đô Viêng Chăn. | 1
+CAMPUCHIA | Có đền Angkor Wat. | 2 | CĂM PU CHIA
+SINGAPORE | Đảo quốc sư tử. | 2 | XING GA PO
+MALAYSIA | Có tháp đôi Petronas. | 2 | MA LAI XI A
+INDONESIA | Đất nước vạn đảo, có Bali. | 2
+PHILIPPINES | Đất nước có Manila. | 3 | PHI LÍP PIN
+ẤN ĐỘ | Có đền Taj Mahal, phim nhảy múa. | 1
+NGA | Đất nước rộng nhất thế giới. | 1
+MỸ | Có tượng Nữ thần Tự do. | 1 | HOA KỲ
+ANH | Có tháp đồng hồ Big Ben. | 1 | NƯỚC ANH
+PHÁP | Có tháp Eiffel. | 1
+ĐỨC | Thủ đô Berlin, ô tô nổi tiếng. | 1
+NƯỚC Ý | Hình chiếc ủng, có pizza. | 1 | Ý
+TÂY BAN NHA | Có đấu bò, Real Madrid. | 3
+BỒ ĐÀO NHA | Quê Ronaldo. | 3
+HÀ LAN | Xứ sở hoa tulip, cối xay gió. | 2
+BRAZIL | Xứ sở samba, vũ điệu bóng đá. | 2 | BRA XIN
+ARGENTINA | Quê Messi. | 2 | ÁC HEN TI NA
+AI CẬP | Có kim tự tháp, sông Nin. | 2
+ÚC | Có chuột túi, Sydney. | 1 | NƯỚC ÚC
+CANADA | Lá phong đỏ trên quốc kỳ. | 2 | CA NA ĐA
+THỤY SĨ | Đồng hồ, sô cô la, núi Alps. | 3
+HY LẠP | Quê thần thoại, Olympic cổ đại. | 2
+> Đây là một thành phố trên thế giới.
+TOKYO | Thủ đô Nhật Bản. | 2
+SEOUL | Thủ đô Hàn Quốc. | 2 | XƠ UN
+BẮC KINH | Thủ đô Trung Quốc. | 2
+BANGKOK | Thủ đô Thái Lan. | 2 | BĂNG CỐC
+PARIS | Kinh đô ánh sáng. | 2 | PA RI
+LONDON | Thủ đô nước Anh. | 2 | LUÂN ĐÔN
+NEW YORK | Thành phố không ngủ, có Quảng trường Thời đại. | 3 | NIU OÓC
+VIÊNG CHĂN | Thủ đô của Lào. | 3
+> Đây là kỳ quan, danh thắng thế giới.
+KIM TỰ THÁP | Lăng mộ hình chóp của pharaoh. | 2
+THÁP EIFFEL | Tháp sắt ở Paris. | 3 | EIFFEL
+NỮ THẦN TỰ DO | Bức tượng cầm ngọn đuốc ở New York. | 3
+ANGKOR WAT | Quần thể đền cổ Campuchia. | 3
+ĐẤU TRƯỜNG LA MÃ | Nơi giác đấu thời cổ ở Ý. | 3
+NÚI PHÚ SĨ | Ngọn núi biểu tượng của Nhật. | 3 | PHÚ SĨ
+EVEREST | Đỉnh núi cao nhất thế giới. | 2
+SÔNG NIN | Con sông dài nhất châu Phi. | 2
+AMAZON | Rừng mưa lớn nhất thế giới. | 2
+BẮC CỰC | Nơi có gấu trắng. | 2
+NAM CỰC | Nơi có chim cánh cụt. | 2
+> Đây là châu lục, vùng đất trên trái đất.
+CHÂU Á | Châu lục rộng nhất, Việt Nam thuộc đây. | 1
+CHÂU ÂU | Có Pháp, Đức, Ý. | 1
+CHÂU PHI | Có sa mạc Sahara, sư tử. | 1
+CHÂU MỸ | Có Mỹ, Brazil. | 1
+CHÂU ĐẠI DƯƠNG | Có Úc, New Zealand. | 2
+SAHARA | Sa mạc lớn nhất châu Phi. | 2
+THÁI BÌNH DƯƠNG | Đại dương lớn nhất. | 3
+ĐƯỜNG XÍCH ĐẠO | Vòng chia trái đất làm hai bán cầu. | 3 | XÍCH ĐẠO
+QUẢ ĐỊA CẦU | Mô hình trái đất xoay được. | 3
+BẢN ĐỒ | Tờ giấy vẽ đường đi, quốc gia. | 2
+> Đây là thứ gắn với nước ngoài.
+HỘ CHIẾU | Sổ nhỏ cần có khi ra nước ngoài. | 2 | PASSPORT
+VISA | Giấy cho phép nhập cảnh. | 2 | THỊ THỰC
+ĐÔ LA | Tiền của Mỹ. | 2 | USD
+EURO | Tiền chung châu Âu. | 2
+YÊN | Tiền Nhật. | 2
+WON | Tiền Hàn Quốc. | 2
+TIẾNG ANH | Ngôn ngữ quốc tế phổ biến nhất. | 2
+TIẾNG NHẬT | Có chữ Hiragana, Katakana. | 2
+LIÊN HỢP QUỐC | Tổ chức của gần như mọi quốc gia, viết tắt UN. | 3
+ASEAN | Hiệp hội các nước Đông Nam Á. | 2
+CƠM CÀ RI | Món nổi tiếng của Ấn Độ. | 3 | CÀ RI
+MÌ Ý | Spaghetti sốt cà chua. | 2 | SPAGHETTI
+TACO | Bánh kẹp của Mexico. | 3
+KANGAROO | Thú có túi của Úc. | 2
+KOALA | Gấu ôm cây ở Úc. | 3 | GẤU KOALA

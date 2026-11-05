@@ -7,12 +7,23 @@
     "start": "node server.js",
     "dev": "node --watch server.js",
     "start:bun": "bun run server.js",
-    "dev:bun": "bun --watch server.js"
+    "dev:bun": "bun --watch server.js",
+    "build:lophoc": "node src/modes/lophoc/build.js",
+    "test:lophoc": "node src/modes/lophoc/build.js --check"
   },
   "dependencies": {
     "cors": "^2.8.5",
+    "esbuild": "^0.25.12",
     "express": "^4.19.2",
+    "msedge-tts": "^2.1.0",
     "tiktok-live-connector": "^2.5.0",
     "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.4",
+    "motion": "^12.43.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "tailwindcss": "^4.3.4"
   }
 }

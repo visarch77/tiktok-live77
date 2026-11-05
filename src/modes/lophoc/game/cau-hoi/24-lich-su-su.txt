@@ -1,0 +1,107 @@
+# Lịch sử Việt Nam
+# Câu lịch sử: chỉ hỏi ở câu 9 và câu 17 của mỗi tiết (GAME.roundPlan 'su'), không lẫn vào câu chữ thường.
+# Phạm vi: lịch sử Việt Nam tới năm 1945, kiến thức sách giáo khoa, tránh chuyện còn tranh cãi.
+# Chi tiết nào các nguồn ghi khác nhau thì KHÔNG đưa vào gợi ý (vd năm sinh, lý do tên gọi).
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách trả lời khác cũng tính đúng
+> Câu lịch sử nè.
+HAI BÀ TRƯNG | Hai chị em khởi nghĩa đánh đuổi quân Đông Hán năm 40. | 1 | TRƯNG TRẮC, TRƯNG NHỊ
+BÀ TRIỆU | Người phụ nữ khởi nghĩa chống quân Ngô năm 248, nói muốn cưỡi cơn gió mạnh, đạp luồng sóng dữ. | 2 | TRIỆU THỊ TRINH
+NGÔ QUYỀN | Người đánh tan quân Nam Hán trên sông Bạch Đằng năm 938. | 1
+BẠCH ĐẰNG | Con sông có trận cắm cọc gỗ dưới lòng sông, nơi Ngô Quyền đánh thắng năm 938. | 2 | SÔNG BẠCH ĐẰNG
+ĐINH BỘ LĨNH | Người dẹp loạn mười hai sứ quân, lên ngôi hoàng đế năm 968. | 2 | ĐINH TIÊN HOÀNG
+ĐẠI CỒ VIỆT | Tên nước ta thời nhà Đinh. | 3
+LÊ HOÀN | Vị vua đánh thắng quân Tống năm 981, lập ra nhà Tiền Lê. | 3 | LÊ ĐẠI HÀNH
+LÝ CÔNG UẨN | Vị vua dời đô từ Hoa Lư ra thành Đại La năm 1010. | 2 | LÝ THÁI TỔ
+THĂNG LONG | Tên kinh đô đặt năm 1010, nghĩa là rồng bay lên. | 1
+CHIẾU DỜI ĐÔ | Bài chiếu Lý Công Uẩn ban ra năm 1010 khi chuyển kinh đô. | 3 | THIÊN ĐÔ CHIẾU
+HOA LƯ | Kinh đô của nhà Đinh và nhà Tiền Lê, nay thuộc Ninh Bình. | 2
+LÝ THƯỜNG KIỆT | Vị tướng nhà Lý chặn đánh quân Tống trên sông Như Nguyệt năm 1077. | 2
+NAM QUỐC SƠN HÀ | Bài thơ thời Lý được xem là bản tuyên ngôn độc lập đầu tiên của nước ta. | 3
+VĂN MIẾU | Nơi thờ Khổng Tử ở Thăng Long, xây năm 1070 thời vua Lý Thánh Tông. | 2
+QUỐC TỬ GIÁM | Được xem là trường đại học đầu tiên của nước ta, lập năm 1076. | 2
+LÝ THÁNH TÔNG | Vị vua nhà Lý đặt quốc hiệu Đại Việt năm 1054. | 3
+ĐẠI VIỆT | Quốc hiệu nước ta đặt từ năm 1054 thời nhà Lý. | 2
+TRẦN HƯNG ĐẠO | Vị tướng nhà Trần chỉ huy đánh thắng quân Nguyên Mông năm 1285 và 1288. | 1 | TRẦN QUỐC TUẤN, HƯNG ĐẠO VƯƠNG
+HỊCH TƯỚNG SĨ | Bài hịch Trần Hưng Đạo viết để khích lệ tướng sĩ đánh giặc Nguyên Mông. | 3
+DIÊN HỒNG | Hội nghị các bô lão thời Trần, cả hội nghị đồng thanh hô "Đánh". | 2 | HỘI NGHỊ DIÊN HỒNG
+SÁT THÁT | Hai chữ quân sĩ nhà Trần thích lên cánh tay, thề đánh giặc Nguyên Mông. | 3
+TRẦN QUỐC TOẢN | Thiếu niên nhà Trần bóp nát quả cam vì không được bàn việc nước. | 2
+TRẦN BÌNH TRỌNG | Tướng nhà Trần nói: ta thà làm quỷ nước Nam chứ không thèm làm vương đất Bắc. | 2
+TRẦN THỦ ĐỘ | Thái sư nhà Trần nói: đầu thần chưa rơi xuống đất, xin bệ hạ đừng lo. | 3
+TRẦN NHÂN TÔNG | Vị vua nhà Trần chống Nguyên Mông, sau đi tu và lập ra Thiền phái Trúc Lâm. | 3
+YÊN TỬ | Ngọn núi nơi vua Trần Nhân Tông tu hành. | 2 | NÚI YÊN TỬ
+YẾT KIÊU | Tướng nhà Trần bơi lặn rất giỏi, lặn xuống đục thuyền giặc. | 3
+PHẠM NGŨ LÃO | Theo sử kể, vị tướng này ngồi đan sọt bên đường mải nghĩ việc nước, bị giáo đâm vào đùi vẫn không hay. | 3
+VÂN ĐỒN | Nơi Trần Khánh Dư đánh tan đoàn thuyền lương của quân Nguyên năm 1288. | 3
+LÝ CHIÊU HOÀNG | Nữ hoàng duy nhất trong lịch sử nước ta, nhường ngôi cho chồng là Trần Cảnh. | 2
+CHU VĂN AN | Người thầy nổi tiếng thời Trần, dâng sớ xin chém bảy tên nịnh thần. | 2
+TUỆ TĨNH | Danh y thời Trần, có câu: thuốc Nam chữa bệnh cho người Nam. | 3
+MẠC ĐĨNH CHI | Trạng nguyên thời Trần, người nhỏ bé mà tài giỏi, viết bài phú Ngọc tỉnh liên. | 3
+HỒ QUÝ LY | Người lập ra nhà Hồ năm 1400, đổi tên nước là Đại Ngu. | 3
+THÀNH NHÀ HỒ | Tòa thành xây bằng đá lớn ở Thanh Hóa, là di sản thế giới. | 2
+LÊ LỢI | Người lãnh đạo khởi nghĩa Lam Sơn, đánh đuổi quân Minh, lập ra nhà Hậu Lê. | 1 | LÊ THÁI TỔ
+LAM SƠN | Tên cuộc khởi nghĩa do Lê Lợi lãnh đạo, bắt đầu năm 1418. | 2 | KHỞI NGHĨA LAM SƠN
+NGUYỄN TRÃI | Người viết Bình Ngô đại cáo, mưu sĩ giúp Lê Lợi đánh quân Minh. | 1
+BÌNH NGÔ ĐẠI CÁO | Áng văn được xem là bản tuyên ngôn độc lập thứ hai, viết sau khi thắng quân Minh. | 2
+LÊ LAI | Vị tướng mặc áo giả làm Lê Lợi, hi sinh để cứu chủ tướng. | 2
+CHI LĂNG | Ải nơi nghĩa quân Lam Sơn chém tướng giặc Liễu Thăng năm 1427. | 3 | ẢI CHI LĂNG
+HỒ GƯƠM | Hồ ở Hà Nội gắn với truyền thuyết vua Lê Lợi trả gươm thần cho Rùa Vàng. | 1 | HỒ HOÀN KIẾM, HOÀN KIẾM
+LÊ THÁNH TÔNG | Vị vua nhà Lê cho soạn bộ luật Hồng Đức. | 3
+LUẬT HỒNG ĐỨC | Bộ luật nổi tiếng thời vua Lê Thánh Tông. | 3 | QUỐC TRIỀU HÌNH LUẬT
+LƯƠNG THẾ VINH | Trạng nguyên giỏi toán thời Lê, được dân gian gọi là Trạng Lường. | 3
+BIA TIẾN SĨ | Những tấm bia đá đặt trên lưng rùa ở Văn Miếu, khắc tên người đỗ tiến sĩ. | 2
+TRẠNG NGUYÊN | Danh hiệu dành cho người đỗ đầu kỳ thi Đình thời phong kiến. | 2
+LÊ QUÝ ĐÔN | Nhà bác học lớn thời Lê, tác giả sách Vân đài loại ngữ. | 3
+LÊ HỮU TRÁC | Danh y nổi tiếng thời Lê, hiệu là Hải Thượng Lãn Ông. | 3
+NGUYỄN HUỆ | Người đại phá quân Thanh vào mùa xuân năm 1789. | 1 | QUANG TRUNG, VUA QUANG TRUNG
+ĐỐNG ĐA | Gò đất ở Hà Nội ghi dấu chiến thắng quân Thanh năm 1789. | 2 | GÒ ĐỐNG ĐA
+RẠCH GẦM | Trận đánh năm 1785 trên sông Tiền, Nguyễn Huệ đánh tan quân Xiêm, cùng với Xoài Mút. | 3 | RẠCH GẦM XOÀI MÚT
+TÂY SƠN | Phong trào do ba anh em Nguyễn Nhạc, Nguyễn Huệ, Nguyễn Lữ lãnh đạo. | 2 | NHÀ TÂY SƠN
+BÙI THỊ XUÂN | Nữ tướng nhà Tây Sơn nổi tiếng chỉ huy đội voi chiến. | 3
+GIA LONG | Niên hiệu của vị vua đầu tiên nhà Nguyễn, lên ngôi năm 1802. | 2
+VIỆT NAM | Quốc hiệu vua Gia Long đặt năm 1804. | 2
+HUẾ | Kinh đô của nhà Nguyễn. | 1 | PHÚ XUÂN
+MINH MẠNG | Vị vua thứ hai nhà Nguyễn, đổi quốc hiệu thành Đại Nam. | 3 | MINH MỆNH
+CỬU ĐỈNH | Chín cái vạc đồng lớn đặt trước Thế Miếu trong Hoàng thành Huế. | 3
+NGỌ MÔN | Cổng chính phía nam của Hoàng thành Huế. | 3 | CỬA NGỌ MÔN
+HÀM NGHI | Vị vua nhỏ tuổi nhà Nguyễn ra chiếu Cần Vương năm 1885, kêu gọi chống Pháp. | 3 | VUA HÀM NGHI
+CẦN VƯƠNG | Phong trào giúp vua chống Pháp, hưởng ứng chiếu của vua Hàm Nghi năm 1885. | 3
+TÔN THẤT THUYẾT | Quan phụ chính đưa vua Hàm Nghi rời kinh thành Huế năm 1885 để chống Pháp. | 3
+PHAN ĐÌNH PHÙNG | Lãnh tụ khởi nghĩa Hương Khê, hưởng ứng phong trào Cần Vương. | 3
+TRƯƠNG ĐỊNH | Lãnh tụ nghĩa quân chống Pháp ở Gò Công, được dân tôn là Bình Tây đại nguyên soái. | 3
+HOÀNG DIỆU | Tổng đốc Hà Nội tuẫn tiết khi thành Hà Nội rơi vào tay Pháp năm 1882. | 3
+HOÀNG HOA THÁM | Thủ lĩnh khởi nghĩa Yên Thế, được gọi là Hùm xám Yên Thế. | 2 | ĐỀ THÁM
+PHAN BỘI CHÂU | Người khởi xướng phong trào Đông Du, đưa thanh niên sang Nhật Bản học. | 3
+ĐÔNG DU | Phong trào đưa thanh niên Việt Nam sang Nhật Bản học đầu thế kỷ hai mươi. | 3 | PHONG TRÀO ĐÔNG DU
+PHAN CHÂU TRINH | Nhà yêu nước chủ trương khai dân trí, chấn dân khí, hậu dân sinh. | 3
+NGUYỄN TẤT THÀNH | Tên của Bác Hồ khi ra đi tìm đường cứu nước từ bến Nhà Rồng năm 1911. | 2
+BẾN NHÀ RỒNG | Nơi Bác Hồ ra đi tìm đường cứu nước năm 1911. | 2 | NHÀ RỒNG
+PÁC BÓ | Nơi ở Cao Bằng Bác Hồ sống và làm việc khi về nước năm 1941. | 2 | HANG PÁC BÓ
+SUỐI LÊ NIN | Con suối ở Pác Bó được Bác Hồ đặt theo tên một lãnh tụ nước ngoài. | 3
+KIM ĐỒNG | Đội trưởng đầu tiên của đội nhi đồng cứu quốc ở làng Nà Mạ, Cao Bằng, hi sinh năm 1943. | 1 | NÔNG VĂN DỀN
+LÝ TỰ TRỌNG | Người thanh niên hi sinh năm 1931, nói: con đường của thanh niên chỉ có thể là con đường cách mạng. | 3
+BA ĐÌNH | Quảng trường nơi Bác Hồ đọc Tuyên ngôn Độc lập ngày 2 tháng 9 năm 1945. | 1 | QUẢNG TRƯỜNG BA ĐÌNH
+VĂN LANG | Nhà nước đầu tiên của người Việt, do các vua Hùng đứng đầu. | 1
+VUA HÙNG | Các vị vua dựng nước Văn Lang, có ngày giỗ tổ mùng mười tháng ba âm lịch. | 1 | HÙNG VƯƠNG
+ÂU LẠC | Nhà nước do An Dương Vương lập ra sau nước Văn Lang. | 2
+AN DƯƠNG VƯƠNG | Vị vua xây thành Cổ Loa. | 2 | THỤC PHÁN
+CỔ LOA | Tòa thành có các vòng thành xoắn ốc nổi tiếng ở Đông Anh, Hà Nội. | 2 | THÀNH CỔ LOA
+TRỐNG ĐỒNG | Hiện vật nổi tiếng của văn hóa Đông Sơn, mặt có hình ngôi sao và chim lạc. | 1
+ĐÔNG SƠN | Nền văn hóa thời đồ đồng nổi tiếng với trống đồng, đặt theo tên một làng ở Thanh Hóa. | 3 | VĂN HÓA ĐÔNG SƠN
+LÝ BÍ | Người lập ra nước Vạn Xuân năm 544. | 3 | LÝ NAM ĐẾ
+VẠN XUÂN | Tên nước do Lý Bí đặt năm 544, mong đất nước muôn mùa xuân. | 3
+TRIỆU QUANG PHỤC | Người lãnh đạo đánh giặc từ đầm lầy, được gọi là Dạ Trạch Vương. | 3
+MAI THÚC LOAN | Vị thủ lĩnh khởi nghĩa ở Hoan Châu chống nhà Đường, được gọi là Hắc Đế. | 3
+PHÙNG HƯNG | Người khởi nghĩa chống nhà Đường, được dân tôn là Bố Cái Đại Vương. | 3
+KHÚC THỪA DỤ | Người giành quyền tự chủ cho nước ta năm 905. | 3
+HOÀNG THÀNH | Khu di tích Thăng Long ở Hà Nội được công nhận là di sản văn hóa thế giới. | 2 | HOÀNG THÀNH THĂNG LONG
+CHÙA MỘT CỘT | Ngôi chùa ở Hà Nội dựng năm 1049 thời nhà Lý, hình bông sen nở trên một cột đá. | 2 | CHÙA DIÊN HỰU
+HỘI AN | Phố cổ có Chùa Cầu, từng là thương cảng sầm uất có nhiều thương nhân Nhật Bản và người Hoa. | 2 | PHỐ CỔ HỘI AN
+SÔNG NHƯ NGUYỆT | Dòng sông nơi Lý Thường Kiệt chặn quân Tống năm 1077, nay gọi là sông Cầu. | 3 | NHƯ NGUYỆT
+NHÀ LÝ | Triều đại do Lý Công Uẩn lập ra năm 1009. | 2 | TRIỀU LÝ
+NHÀ TRẦN | Triều đại ba lần đánh thắng quân Nguyên Mông. | 1 | TRIỀU TRẦN
+NHÀ NGUYỄN | Triều đại phong kiến cuối cùng của nước ta. | 1 | TRIỀU NGUYỄN
+NGUYỄN DU | Đại thi hào, tác giả Truyện Kiều. | 1
+HỒ XUÂN HƯƠNG | Nữ sĩ được mệnh danh là Bà chúa thơ Nôm. | 2
+CHỮ NÔM | Chữ người Việt xưa tạo ra dựa trên chữ Hán để ghi tiếng Việt. | 2
+CHỮ QUỐC NGỮ | Chữ viết bằng chữ cái La-tinh mà các bạn nhỏ đang học hằng ngày. | 2 | QUỐC NGỮ

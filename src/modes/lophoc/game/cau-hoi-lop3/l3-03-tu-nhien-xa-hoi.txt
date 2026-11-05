@@ -1,0 +1,43 @@
+# Tự nhiên và Xã hội
+# Lớp 3: gia đình, cộng đồng, thực vật, động vật, cơ quan tiêu hóa, tuần hoàn, thần kinh, Trái Đất và phương hướng.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách viết khác cũng tính đúng (cách nhau dấu phẩy)
+> Đây là kiến thức môn Tự nhiên và Xã hội.
+HỌ NỘI | Ông bà, cô chú bên bố là họ hàng bên nào? | 1
+HỌ NGOẠI | Ông bà, cậu dì bên mẹ là họ hàng bên nào? | 1
+THẾ HỆ | Ông bà, bố mẹ, con cháu là ba lớp người này trong gia đình. | 2
+RỄ CỌC | Loại rễ có một rễ to dài, nhiều rễ con mọc ra hai bên, như rễ cây bưởi. | 2
+RỄ CHÙM | Loại rễ gồm nhiều rễ con dài gần bằng nhau, như rễ cây lúa, cây hành. | 2
+THÂN LEO | Cây mồng tơi, cây mướp có loại thân này, phải bám vào giàn mà lên. | 2
+THÂN BÒ | Thân cây bí, cây rau má nằm sát trên mặt đất. | 2
+THÂN GỖ | Thân cây cứng và to, như cây lim, cây xoan. | 2
+THÂN THẢO | Thân cây mềm và nhỏ, như cây rau cải, cây cỏ. | 3
+THỰC VẬT | Cây cối, hoa lá nói chung trong môn khoa học gọi là gì? | 1
+XƯƠNG SỐNG | Cá, chim, thú đều có cái xương này chạy dọc giữa lưng. | 2
+BÒ SÁT | Rắn, thằn lằn, cá sấu thuộc nhóm động vật này. | 3
+LÔNG VŨ | Thứ phủ khắp thân chim, giúp chim giữ ấm và bay. | 2
+VẢY | Thân cá được phủ bởi lớp này, sờ vào trơn trơn. | 1
+MANG | Cá ở dưới nước thở bằng bộ phận này. | 2
+ĐẺ TRỨNG | Gà, vịt, rùa sinh con bằng cách này. | 1
+THÚ | Nhóm động vật có lông mao, đẻ con, nuôi con bằng sữa như chó, mèo, trâu. | 2
+THỰC QUẢN | Ống dẫn thức ăn từ miệng xuống dạ dày. | 3
+RUỘT NON | Đoạn ruột dài, thức ăn được tiêu hóa và hút chất bổ vào máu ở đây. | 3
+RUỘT GIÀ | Đoạn cuối của ống tiêu hóa, chứa chất bã trước khi thải ra ngoài. | 3
+TUYẾN NƯỚC BỌT | Tuyến trong miệng tiết ra chất làm mềm thức ăn khi ta nhai. | 3
+MẠCH MÁU | Những ống nhỏ dẫn máu đi khắp cơ thể. | 2
+NHỊP TIM | Đặt tay lên ngực trái, đếm số lần tim đập trong một phút. | 2
+TỦY SỐNG | Bộ phận thần kinh nằm bên trong cột xương sống. | 3
+DÂY THẦN KINH | Những sợi nối não với khắp cơ thể, truyền tin cảm giác và điều khiển cử động. | 3
+CHẤT KÍCH THÍCH | Rượu, bia, thuốc lá gây hại cho cơ quan thần kinh, gọi chung là gì? | 3
+TỰ QUAY | Trái Đất vừa chạy quanh Mặt Trời, vừa làm việc này quanh trục của nó. | 2
+NGÀY VÀ ĐÊM | Trái Đất quay quanh trục nên mới có hai khoảng thời gian sáng và tối này. | 2
+HƯỚNG BẮC | Buổi sáng, đứng giang tay phải chỉ về phía Mặt Trời mọc, thì trước mặt em là hướng nào? | 3
+HƯỚNG NAM | Đứng quay mặt về hướng bắc thì sau lưng là hướng nào? | 2
+ĐỚI NÓNG | Đới khí hậu nằm hai bên đường xích đạo, nóng quanh năm. | 3
+ĐỚI LẠNH | Đới khí hậu ở gần hai vùng cực, băng tuyết quanh năm. | 3
+LỤC ĐỊA | Phần đất liền rộng lớn trên bề mặt Trái Đất gọi là gì? | 2
+NÔNG NGHIỆP | Trồng lúa, trồng rau, chăn nuôi là hoạt động sản xuất gì? | 2
+CÔNG NGHIỆP | Sản xuất trong nhà máy như làm xi măng, may quần áo, đóng giày là hoạt động gì? | 3
+LÀNG NGHỀ | Làng có nhiều nhà cùng làm một nghề thủ công như làm gốm, đan mây tre. | 2
+ÁNH NẮNG | Cây xanh cần thứ này từ Mặt Trời để lớn lên. | 1
+TƯỚI CÂY | Cây bị khô héo, em lấy bình nước làm việc này. | 1
+CHĂN NUÔI | Nuôi gà, vịt, lợn, bò ở nhà gọi là gì? | 1

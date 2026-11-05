@@ -1,0 +1,25 @@
+# Đạo đức
+# Bộ lớp 4: biết ơn người lao động, cảm thông giúp đỡ, tôn trọng tài sản, bảo vệ của công, bạn bè, quyền và bổn phận trẻ em.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách viết khác cũng tính đúng (cách nhau dấu phẩy)
+> Đây là kiến thức môn Đạo đức.
+NGƯỜI LAO ĐỘNG | Bác nông dân, cô lao công, chú công nhân đều là những ai mà em cần biết ơn? | 2
+CẢM THÔNG | Hiểu và chia sẻ với nỗi buồn, nỗi khó khăn của người khác. | 2
+SIÊNG NĂNG | Chăm chỉ, chịu khó làm việc, trái nghĩa với lười biếng. | 1
+CỦA CÔNG | Bàn ghế ở trường, cây xanh, đèn đường là tài sản chung, gọi là gì? | 2
+BẤT HÒA | Hai bạn cãi nhau, giận nhau, không còn hòa thuận, gọi là gì? | 2
+LÀM LÀNH | Sau khi giận nhau, hai bạn xin lỗi rồi lại chơi với nhau. | 1
+QUYỀN TRẺ EM | Được học hành, được vui chơi, được chăm sóc là những gì của các bạn nhỏ? | 3
+BỔN PHẬN | Kính trọng ông bà, vâng lời cha mẹ, chăm học là những điều trẻ em cần làm, gọi là gì? | 3
+TRẢ LẠI | Nhặt được của rơi, em nên làm gì cho người đánh mất? | 1
+TỪ THIỆN | Quyên góp sách vở, áo ấm gửi các bạn vùng khó khăn là hoạt động gì? | 2
+CHĂM LÀM | Bạn nhỏ ngày nào cũng quét nhà, rửa bát giúp mẹ, ta khen bạn ấy thế nào? | 1 | CHĂM CHỈ
+VẼ BẬY | Cầm bút vẽ lên tường, lên bàn ghế trong lớp là việc làm sai gì? | 1 | VIẾT BẬY
+KHÓ KHĂN | Bạn ở xa trường, nhà nghèo hay bị ốm lâu ngày là đang gặp điều gì cần được giúp đỡ? | 1
+HÒA GIẢI | Đứng ra giúp hai bạn đang giận nhau hiểu nhau và làm lành, gọi là gì? | 3
+TÌNH BẠN | Tình cảm gắn bó, quý mến giữa những người bạn với nhau. | 1
+LẮNG NGHE | Khi bạn đang nói, em chú ý nghe và không ngắt lời, gọi là biết làm gì? | 1
+QUÝ TRỌNG | Ăn hết suất cơm, không làm rơi vãi là biết làm gì với công sức của bác nông dân? | 3
+BẢO QUẢN | Giữ gìn đồ dùng cẩn thận để dùng được lâu, gọi là làm gì đồ dùng? | 2
+HỎI MƯỢN | Muốn dùng đồ của bạn, em phải làm việc này trước, không được tự ý lấy. | 1
+BÌNH TĨNH | Khi không đồng ý với bạn, em cần giữ thái độ gì, không cáu giận? | 2
+TỐT BỤNG | Hay giúp đỡ người khác, lúc nào cũng sẵn lòng làm điều tốt. | 1

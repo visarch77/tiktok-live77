@@ -1,0 +1,30 @@
+# Đoán quốc gia
+# Đoán nước qua món ăn, công trình, con vật biểu tượng. Chỉ dùng điều ai cũng biết, chắc chắn đúng.
+# (Chủ đề 19-the-gioi cũng có quốc gia, khác gợi ý nên vẫn được.)
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách viết khác cũng tính đúng
+> Đây là tên một quốc gia.
+NHẬT BẢN | Đất nước có món sushi và núi Phú Sĩ. | 1 | NHẬT
+HÀN QUỐC | Đất nước có món kim chi nổi tiếng. | 1 | HÀN
+TRUNG QUỐC | Đất nước có Vạn Lý Trường Thành và gấu trúc. | 1
+PHÁP | Đất nước có tháp Eiffel ở thủ đô Paris. | 1 | NƯỚC PHÁP
+NƯỚC Ý | Đất nước có tháp nghiêng Pisa, quê hương món pizza. | 2 | Ý, ITALIA
+AI CẬP | Đất nước có kim tự tháp và con sông Nin. | 1
+ẤN ĐỘ | Đất nước có lăng Taj Mahal trắng muốt. | 2
+MỸ | Đất nước có tượng Nữ thần Tự do. | 1 | HOA KỲ, NƯỚC MỸ
+ANH | Đất nước có tháp đồng hồ Big Ben ở London. | 2 | NƯỚC ANH, VƯƠNG QUỐC ANH
+ÚC | Đất nước có chuột túi và gấu koala. | 1 | NƯỚC ÚC
+NGA | Đất nước có búp bê gỗ lồng vào nhau, thủ đô Mát-xcơ-va. | 2 | NƯỚC NGA
+BRAZIL | Đất nước có lễ hội hóa trang Rio và tượng Chúa trên núi cao. | 2 | BRAXIN
+HÀ LAN | Đất nước nổi tiếng với cối xay gió và hoa tulip. | 2
+THỤY SĨ | Đất nước nổi tiếng với sô cô la, đồng hồ và núi tuyết. | 3
+TÂY BAN NHA | Đất nước có điệu nhảy flamenco và món cơm paella. | 3
+MEXICO | Đất nước có mũ rộng vành sombrero và món taco. | 3 | MÊ HI CÔ
+HY LẠP | Đất nước nơi bắt đầu Thế vận hội thời cổ đại. | 3
+CAMPUCHIA | Nước láng giềng có đền Angkor Wat. | 2 | CĂM PU CHIA
+LÀO | Nước láng giềng phía tây nước ta, thủ đô là Viêng Chăn. | 2 | NƯỚC LÀO
+THÁI LAN | Đất nước có món canh chua cay Tom Yum, thủ đô Bangkok. | 2
+SINGAPORE | Đất nước có tượng sư tử đầu cá phun nước. | 3 | XINH GA PO, SINGAPO
+CANADA | Đất nước có lá phong đỏ trên quốc kỳ. | 2 | CA NA ĐA
+ĐỨC | Đất nước nổi tiếng với xúc xích, thủ đô Berlin. | 2 | NƯỚC ĐỨC
+PERU | Đất nước có thành cổ Machu Picchu trên núi cao. | 3 | PÊ RU
+VIỆT NAM | Đất nước có phở, áo dài và chữ S trên bản đồ. | 1

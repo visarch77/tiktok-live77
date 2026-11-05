@@ -1,0 +1,28 @@
+# An toàn và trải nghiệm
+# Lớp 3: phòng tránh tai nạn, an toàn giao thông, giữ gìn môi trường, nề nếp ở trường.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách viết khác cũng tính đúng (cách nhau dấu phẩy)
+> Đây là bài học về an toàn và trải nghiệm.
+BÌNH CHỮA CHÁY | Bình màu đỏ treo trên tường, dùng để xịt dập lửa. | 2
+SỐ MỘT MỘT BỐN | Khi thấy cháy nhà, cần gọi số điện thoại này. | 2 | 114
+ĐUỐI NƯỚC | Không tắm sông, tắm ao một mình để phòng tránh tai nạn này. | 2
+ĐIỆN GIẬT | Không thò tay, thò que vào ổ điện để tránh bị cái này. | 1
+BỎNG | Không chạm vào nồi nước sôi, bàn là nóng kẻo bị thế này. | 1
+NGƯỜI LẠ | Không đi theo, không nhận quà của ai mà mình không quen biết. Đó là ai? | 1
+ÁO PHAO | Đi thuyền, đi đò phải mặc cái này để không bị chìm. | 1
+ĐÈN TÍN HIỆU | Đèn ba màu xanh, đỏ, vàng ở ngã tư gọi chung là gì? | 2
+BIỂN BÁO | Tấm biển hình tròn, tam giác bên đường để nhắc người đi đường. | 2
+BÊN PHẢI | Ở nước ta, người đi đường phải đi về bên nào của đường? | 2
+SƠ CỨU | Bạn bị đứt tay, em rửa sạch vết thương rồi dán băng, đó là làm gì? | 3
+LỐI THOÁT HIỂM | Lối có biển chữ màu xanh, dùng để chạy ra ngoài khi có cháy. | 3
+KHĂN ƯỚT | Khi có khói, lấy thứ này bịt mũi rồi cúi thấp người chạy ra ngoài. | 2
+TRỒNG CÂY | Đào hố, đặt cây con, lấp đất, tưới nước là đang làm gì? | 1
+PHÂN LOẠI RÁC | Bỏ vỏ chai vào thùng tái chế, vỏ trái cây vào thùng riêng, gọi là gì? | 2
+THÙNG RÁC | Ăn kẹo xong, vỏ kẹo phải bỏ vào đâu? | 1
+THỜI GIAN BIỂU | Bảng em tự ghi giờ dậy, giờ học, giờ chơi của mỗi ngày. | 3
+NỘI QUY | Những điều học sinh phải làm theo ở trường, thường dán ở cửa lớp. | 2
+XẾP HÀNG | Mua vé, lên xe buýt phải làm việc này, không chen lấn. | 1
+NHI ĐỒNG | Các em nhỏ chưa vào Đội được sinh hoạt trong sao gì? | 2
+TIẾNG ỒN | Loa mở quá to, còi xe inh ỏi gây ra ô nhiễm gì? | 2
+QUYÊN GÓP | Gom sách vở cũ, quần áo ấm gửi tặng các bạn vùng khó khăn. | 2
+KẾ HOẠCH NHỎ | Phong trào thu gom giấy vụn của đội viên, nhi đồng. | 3
+QUA ĐƯỜNG | Muốn sang bên kia phố, em đi trên vạch kẻ trắng để làm việc này. | 1

@@ -1,0 +1,57 @@
+# Ca dao, thành ngữ (điền từ còn thiếu)
+> Đây là ca dao tục ngữ, điền chữ còn thiếu.
+NƯỚC | "Uống ... nhớ nguồn." | 1
+CÂY | "Ăn quả nhớ kẻ trồng ..." | 1
+THẦY | "Không ... đố mày làm nên." | 1
+MƯA | "Chuồn chuồn bay thấp thì ..., bay cao thì nắng, bay vừa thì râm." | 1
+KIM | "Có công mài sắt, có ngày nên ..." | 1
+CHA | "Công ... như núi Thái Sơn." | 1
+MẸ | "Nghĩa ... như nước trong nguồn chảy ra." | 1
+BẦU | "... ơi thương lấy bí cùng." | 1
+NGỰA | "Một con ... đau, cả tàu bỏ cỏ." | 2
+CHÙA | "Bụt ... nhà không thiêng." | 2
+TÂM | "Lực bất tòng ...": muốn lắm mà sức không theo kịp. | 3
+TRE | "... già măng mọc." | 1
+NGAY | "Ăn ... nói thật, mọi tật mọi lành." | 2
+ĐÈN | "Gần mực thì đen, gần ... thì rạng." | 1
+MỰC | "Gần ... thì đen, gần đèn thì rạng." | 1
+CHỮ | "Một ... cũng là thầy, nửa ... cũng là thầy." | 1
+MIẾNG | "Một ... khi đói bằng một gói khi no." | 2
+DÂY | "Đứt ... động rừng." | 2
+ĐẮNG | "Ai ơi bưng bát cơm đầy, dẻo thơm một hạt ... cay muôn phần." | 2
+GÀ | "... cùng một mẹ chớ hoài đá nhau." | 1
+LÁ | "... lành đùm ... rách." | 1
+MÁU | "Một giọt ... đào hơn ao nước lã." | 2
+MÈO | "... khen ... dài đuôi." | 1
+CHUỘT | "Cháy nhà ra mặt ..." | 1
+VOI | "Đầu ... đuôi chuột." | 1
+ẾCH | "... ngồi đáy giếng." | 1
+TRÂU | "... chậm uống nước đục." | 1
+NỒI | "... nào úp vung nấy." | 1
+CHỒNG | "Thuận vợ thuận ..., tát biển Đông cũng cạn." | 1
+VỢ | "Thuận ... thuận chồng, tát biển Đông cũng cạn." | 1
+GIÓ | "Gieo ... gặt bão." | 2
+KIẾN | "... tha lâu cũng đầy tổ." | 2
+HỌC | "... ăn ... nói, ... gói ... mở." | 1
+ĂN | "... trông nồi, ngồi trông hướng." | 1
+CHÂN | "... cứng đá mềm": đồng lòng thì việc gì cũng xong. | 2
+> Đây là một câu thành ngữ, tục ngữ.
+NƯỚC CHẢY ĐÁ MÒN | Kiên trì mãi thì việc khó cũng xong. | 3
+CÓ CÔNG MÀI SẮT | Vế đầu của câu "... có ngày nên kim." | 3
+TIÊN HỌC LỄ | Vế đầu khẩu hiệu treo trên bảng lớp mình. | 3
+HẬU HỌC VĂN | Vế sau khẩu hiệu treo trên bảng lớp mình. | 3
+ĐI MỘT NGÀY ĐÀNG | "... học một sàng khôn." | 3
+MƯA DẦM THẤM LÂU | Dạy từ từ mà ngấm sâu. | 3
+NƯỚC ĐỔ ĐẦU VỊT | Nói mãi mà không vào đầu. | 3
+ĐÀN GẢY TAI TRÂU | Nói chuyện với người không hiểu gì. | 3
+CƯỚP CƠM CHIM | Lấy của người yếu thế, chim cũng không tha. | 3
+MÈO MÙ VỚ CÁ RÁN | Gặp may bất ngờ, không giỏi mà vẫn trúng. | 3
+CHÓ CẮN ÁO RÁCH | Đã khổ lại còn khổ thêm. | 3
+GIẬU ĐỔ BÌM LEO | Thấy người sa cơ thì xúm vào bắt nạt. | 3
+TRÈO CAO TÉ ĐAU | Tham vọng quá sức thì ngã nặng. | 3 | TRÈO CAO NGÃ ĐAU
+CHỊ NGÃ EM NÂNG | Anh em đùm bọc nhau. | 3
+ĂN CHÁO ĐÁ BÁT | Được giúp rồi quay lại phản bội. | 3
+NÓI ÍT HIỂU NHIỀU | Người khôn không cần nói dài. | 3
+CHẬM MÀ CHẮC | Từ từ mà chắc ăn. | 2
+KHÔN NHÀ DẠI CHỢ | Ở nhà thì giỏi, ra ngoài thì lóng ngóng. | 3
+GẦN NHÀ XA NGÕ | Ở gần nhau mà ít gặp. | 3

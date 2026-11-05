@@ -1,0 +1,40 @@
+# Lịch sử lớp 5
+# Phạm vi: Lịch sử và Địa lí 5 (GDPT 2018), kiến thức sách giáo khoa, tránh chi tiết các nguồn ghi khác nhau.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách trả lời khác cũng tính đúng
+> Câu lịch sử nè.
+MỊ CHÂU | Con gái An Dương Vương trong truyền thuyết nỏ thần, rắc lông ngỗng dọc đường chạy. | 2
+PHÙ NAM | Vương quốc cổ ở vùng Nam Bộ ngày nay, có thương cảng Óc Eo buôn bán tấp nập. | 2
+ÓC EO | Thương cảng nổi tiếng của vương quốc Phù Nam, nay thuộc tỉnh An Giang. | 3
+CHĂM PA | Vương quốc cổ ở miền Trung, để lại nhiều đền tháp bằng gạch đỏ. | 2
+NAM HÁN | Đội quân xâm lược bị Ngô Quyền đánh tan trên sông Bạch Đằng năm chín trăm ba mươi tám. | 2 | QUÂN NAM HÁN
+CỌC GỖ | Ngô Quyền cho đóng thứ này, đầu bịt sắt nhọn, xuống lòng sông Bạch Đằng. | 2 | CỌC NHỌN
+THỦY TRIỀU | Ngô Quyền tính kĩ lúc nước sông lên xuống để nhử thuyền giặc vào bãi cọc. Hiện tượng nước lên xuống đó gọi là gì? | 3
+QUÂN TỐNG | Lý Thường Kiệt chỉ huy đánh tan đội quân xâm lược này bên bờ sông Như Nguyệt. | 2 | NHÀ TỐNG, TỐNG
+MÔNG NGUYÊN | Quân xâm lược bị nhà Trần ba lần đánh thắng. | 2 | NGUYÊN MÔNG, MÔNG CỔ
+QUÂN MINH | Khởi nghĩa Lam Sơn do Lê Lợi lãnh đạo đã đánh đuổi quân xâm lược nào? | 2 | NHÀ MINH, MINH
+QUANG TRUNG | Niên hiệu của Nguyễn Huệ khi lên ngôi hoàng đế năm một nghìn bảy trăm tám mươi tám. | 1
+QUÂN THANH | Vua Quang Trung đại phá đội quân xâm lược này vào dịp Tết Kỷ Dậu. | 2 | NHÀ THANH, THANH
+NGỌC HỒI | Đồn giặc lớn phía nam Thăng Long bị quân Tây Sơn đánh tan cùng với trận Đống Đa, Tết Kỷ Dậu. | 3
+TÂN TRÀO | Nơi có cây đa lịch sử ở Tuyên Quang, gắn với những ngày chuẩn bị Cách mạng tháng Tám. | 3
+TỔNG KHỞI NGHĨA | Mùa thu năm một nghìn chín trăm bốn mươi lăm, nhân dân cả nước nổi dậy giành chính quyền trong cuộc gì? | 3
+THÁNG TÁM | Cuộc cách mạng mùa thu năm một nghìn chín trăm bốn mươi lăm được gọi là Cách mạng gì? | 1 | THÁNG 8
+THỰC DÂN PHÁP | Quân xâm lược bị ta đánh bại ở Điện Biên Phủ năm một nghìn chín trăm năm mươi tư. | 2
+VÕ NGUYÊN GIÁP | Vị đại tướng chỉ huy chiến dịch Điện Biên Phủ. | 1
+TÔ VĨNH DIỆN | Anh hùng lấy thân mình chèn pháo trong chiến dịch Điện Biên Phủ. | 2
+PHAN ĐÌNH GIÓT | Anh hùng lấy thân mình lấp lỗ châu mai trong chiến dịch Điện Biên Phủ. | 2
+THỐNG NHẤT | Năm một nghìn chín trăm bảy mươi sáu, cả nước bầu chung một Quốc hội. Đó là sự kiện đất nước hoàn toàn làm gì về mặt nhà nước? | 1
+ĐỔI MỚI | Công cuộc bắt đầu từ năm một nghìn chín trăm tám mươi sáu, giúp đất nước phát triển mạnh mẽ. | 2
+PHA RA ÔNG | Tên gọi các vị vua của Ai Cập cổ đại. | 2 | PHARAOH, PHARAON
+CHỮ TƯỢNG HÌNH | Loại chữ viết bằng những hình vẽ nhỏ của người Ai Cập cổ đại. | 3
+A TEN | Thành bang nổi tiếng của Hy Lạp cổ đại, có đền Pác tê nông trên đồi cao. | 3 | ATHENS
+TRƯỜNG THÀNH | Bức tường dài hàng nghìn ki lô mét của Trung Quốc thời cổ đại, gọi là Vạn Lí ... | 2 | VẠN LÍ TRƯỜNG THÀNH
+GIẤY | Người Trung Quốc thời cổ đại làm ra thứ này để viết, thay cho thẻ tre nặng nề. | 1
+BẮC BĂNG DƯƠNG | Đại dương nhỏ nhất thế giới, nằm quanh Bắc Cực, quanh năm có băng. | 2
+ẤN ĐỘ DƯƠNG | Đại dương nằm giữa châu Phi, châu Á và châu Đại Dương. | 2
+ĐẠI TÂY DƯƠNG | Đại dương lớn thứ hai thế giới, nằm giữa châu Mỹ với châu Âu và châu Phi. | 2
+TRẦN QUANG KHẢI | Vị tướng nhà Trần có câu thơ: Chương Dương cướp giáo giặc, Hàm Tử bắt quân thù. | 2
+PHÚ XUÂN | Kinh đô của vua Quang Trung, nay là thành phố Huế. | 3
+TAM ĐIỆP | Phòng tuyến ở Ninh Bình, nơi quân Tây Sơn lui về giữ để chờ vua Quang Trung kéo quân ra Bắc. | 3
+ĐỜ CÁT | Viên tướng Pháp chỉ huy tập đoàn cứ điểm Điện Biên Phủ, bị quân ta bắt sống ngày bảy tháng năm năm một nghìn chín trăm năm mươi tư. | 3
+BẾ VĂN ĐÀN | Anh hùng lấy thân mình làm giá súng cho đồng đội bắn trong kháng chiến chống thực dân Pháp. | 2
+THUỐC SÚNG | Thứ bột gây nổ do người Trung Quốc thời cổ đại tìm ra, sau dùng làm pháo hoa. | 2

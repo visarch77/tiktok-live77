@@ -1,0 +1,44 @@
+# Tiếng Việt
+# Bộ câu hỏi lớp 5 (GDPT 2018): từ loại, từ đồng nghĩa, từ đa nghĩa, câu ghép, liên kết câu, từ ngữ theo chủ điểm.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách viết khác cũng tính đúng (cách nhau dấu phẩy)
+> Đây là kiến thức môn Tiếng Việt.
+TỪ ĐỒNG NGHĨA | Những từ có nghĩa giống nhau hoặc gần giống nhau, ví dụ siêng năng và chăm chỉ. | 1
+TỪ ĐA NGHĨA | Từ có nhiều nghĩa liên quan với nhau, như từ chân trong chân người, chân bàn, chân núi. | 2
+TỪ ĐỒNG ÂM | Những từ phát âm giống hệt nhau nhưng nghĩa khác hẳn, như hòn đá và đá bóng. | 2
+ĐẠI TỪ | Từ dùng để xưng hô hoặc để thay thế, ví dụ tôi, nó, chúng ta, vậy, thế. | 2
+KẾT TỪ | Những từ như và, với, nhưng, của, để, dùng nối các từ ngữ hoặc các vế câu với nhau. | 2
+CÂU GHÉP | Câu gồm hai vế trở lên, mỗi vế đều có chủ ngữ và vị ngữ riêng. | 2
+ĐIỆP TỪ | Biện pháp lặp đi lặp lại một từ ngữ nhiều lần để nhấn mạnh ý muốn nói. | 3 | ĐIỆP NGỮ
+LIÊN KẾT CÂU | Lặp từ ngữ, thay thế từ ngữ, dùng từ nối là các cách làm việc này giữa những câu trong đoạn văn. | 3
+HỢP TÁC | Cùng chung sức làm một việc vì lợi ích chung, ví dụ các nước cùng nhau bảo vệ môi trường. | 3
+HỮU NGHỊ | Tình cảm thân thiện giữa các nước, như tình ... Việt Nam và Lào. | 2
+TỤC NGỮ | Câu nói ngắn gọn, có vần, đúc kết kinh nghiệm của nhân dân, như ăn quả nhớ kẻ trồng cây. | 2
+NGHĨA GỐC | Nghĩa ban đầu của một từ, ví dụ mắt trong đôi mắt của em bé, khác với mắt lưới, quả na mở mắt. | 3
+NGHĨA CHUYỂN | Nghĩa được suy ra từ nghĩa ban đầu của từ, như lưỡi trong lưỡi dao, lưỡi cày. | 3
+CÂU ĐƠN | Câu chỉ có một cụm chủ ngữ và vị ngữ, ví dụ: Em đi học. | 2
+GIANG SƠN | Từ Hán Việt đồng nghĩa với non sông, đất nước. | 3
+DÀN Ý | Trước khi viết bài văn, em ghi ra các ý chính của mở bài, thân bài, kết bài. Việc đó gọi là lập gì? | 2
+DẤU NGOẶC ĐƠN | Dấu câu gồm hai nửa vòng cung, đặt hai bên phần chú thích thêm. | 2
+BẠN | Điền từ còn thiếu vào câu tục ngữ: Học thầy không tày học ... | 1
+HAY | Điền từ còn thiếu: Ăn vóc học ... | 1
+KHÔN | Điền từ còn thiếu: Đi một ngày đàng học một sàng ... | 1
+TỔ | Điền từ còn thiếu: Kiến tha lâu cũng đầy ... | 1
+NÊN | Điền từ còn thiếu: Có chí thì ... | 1
+CA DAO | Những câu thơ dân gian truyền miệng, thường theo thể lục bát, như Công cha như núi Thái Sơn. | 2
+TỪ HÁN VIỆT | Những từ có gốc từ tiếng Hán như phụ mẫu, huynh đệ, thiên nhiên. | 3
+PHÉP LẶP | Cách liên kết câu bằng cách dùng lại một từ ngữ đã có ở câu trước. | 3
+PHÉP THẾ | Cách liên kết câu bằng cách dùng từ như nó, họ, vậy để thay cho từ ngữ ở câu trước. | 3
+PHÉP NỐI | Cách liên kết câu bằng các từ như vì vậy, tuy nhiên, rồi, nhưng. | 3
+NHÂN VẬT | Người hoặc con vật được kể đến trong câu chuyện, ví dụ Dế Mèn, Thạch Sanh. | 1
+CỐT TRUYỆN | Chuỗi sự việc chính trong một câu chuyện, có mở đầu, diễn biến và kết thúc. | 3
+KHỔ THƠ | Mỗi đoạn nhỏ của một bài thơ, thường gồm bốn dòng. | 1
+DẤU CHẤM | Dấu câu đặt ở cuối câu kể, viết xong phải viết hoa chữ đầu câu sau. | 1
+TÁC GIẢ | Người viết ra bài thơ, câu chuyện hay cuốn sách. | 1
+NHAN ĐỀ | Tên của một bài văn, bài thơ hay cuốn sách. | 1
+GIÁ GƯƠNG | Điền từ còn thiếu: Nhiễu điều phủ lấy ..., người trong một nước phải thương nhau cùng. | 2
+ẤY | Điền từ còn thiếu: Ăn cây nào rào cây ... | 2
+NẢN | Điền từ còn thiếu: Thắng không kiêu, bại không ... | 2
+TRUYỆN NGỤ NGÔN | Truyện ngắn mượn chuyện con vật để khuyên răn con người, như Rùa và Thỏ. | 2
+ĐỘC ÁC | Từ trái nghĩa với hiền lành, nhân hậu. | 1
+XINH XẮN | Từ láy đồng nghĩa với xinh đẹp, dễ thương. | 1
+ĐỒNG DAO | Những bài hát vui trẻ em vừa hát vừa chơi, như bài Nu na nu nống. | 2

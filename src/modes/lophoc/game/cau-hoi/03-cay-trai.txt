@@ -1,0 +1,84 @@
+# Cây cối, hoa quả
+> Đây là một loại quả.
+QUẢ CHUỐI | Vỏ vàng, khỉ mê nhất. | 1 | TRÁI CHUỐI, CHUỐI
+QUẢ CAM | Nhiều vitamin C, vắt lấy nước uống. | 1 | TRÁI CAM, CAM
+QUẢ TÁO | Quả đỏ rơi trúng đầu Newton. | 1 | TRÁI TÁO, TÁO
+QUẢ DƯA HẤU | Vỏ xanh ruột đỏ, ăn mùa hè. | 2 | DƯA HẤU, TRÁI DƯA HẤU
+SẦU RIÊNG | Vua các loại trái cây, mùi thơm nức, gai tua tủa. | 2
+MĂNG CỤT | Vỏ tím dày, ruột trắng như tép tỏi. | 2
+CHÔM CHÔM | Quả đỏ có lông xù xì. | 2
+THANH LONG | Vỏ hồng có tai xanh, ruột trắng chấm đen. | 2
+MÍT | Quả to nhất, múi vàng, nhiều xơ. | 1
+XOÀI | Chín vàng, ăn với muối ớt khi còn xanh. | 1
+ỔI | Quả xanh giòn, chấm muối ớt. | 1
+ĐU ĐỦ | Chín ruột cam, xanh thì nộm. | 2
+NHÃN | Quả nhỏ vỏ nâu, cùi trắng ngọt lịm, đặc sản Hưng Yên. | 2
+VẢI THIỀU | Đặc sản Lục Ngạn, vỏ đỏ sần. | 2
+QUẢ BƯỞI | Múi to, Trung thu hay bày lên mâm. | 1 | BƯỞI, TRÁI BƯỞI
+QUẢ DỪA | Uống nước xong nạo cơm. | 1 | DỪA, TRÁI DỪA
+QUẢ KHẾ | Cắt ra hình ngôi sao, ăn một quả trả cục vàng. | 2 | KHẾ
+QUẢ MẬN | Miền Bắc màu tím chua, miền Nam đỏ giòn. | 2 | MẬN, TRÁI MẬN
+QUẢ NHO | Mọc thành chùm, làm rượu vang. | 1 | NHO
+DÂU TÂY | Quả đỏ có hạt li ti ngoài vỏ, trồng ở Đà Lạt. | 2
+VÚ SỮA | Bóp mềm rồi mút, nước trắng như sữa. | 2
+MÃNG CẦU | Vỏ có mắt, ruột trắng nhiều hạt đen. | 3 | NA
+QUẢ LÊ | Giòn nhiều nước, hình như cái hồ lô. | 2 | LÊ
+QUẢ HỒNG | Chín đỏ mềm, ăn vào mùa thu. | 2 | HỒNG
+QUẢ CÓC | Chua giòn, ăn với muối tôm. | 2 | CÓC
+QUẢ ME | Chua lè, làm mứt hoặc nấu canh. | 2 | ME
+QUẢ CHANH | Vắt vào nước mắm cho chua. | 1 | CHANH
+QUẢ ỚT | Ăn vào cay xé lưỡi. | 1 | ỚT
+QUẢ CÀ CHUA | Đỏ mọng, nấu canh hoặc làm sốt. | 1 | CÀ CHUA
+DƯA CHUỘT | Thái lát ăn kèm cơm, mát. | 2 | DƯA LEO
+> Đây là một loại rau củ.
+CÀ RỐT | Củ màu cam, thỏ thích ăn. | 1
+KHOAI LANG | Củ nướng thơm lừng mùa đông. | 2
+KHOAI TÂY | Củ dùng để chiên thành que. | 2
+CỦ HÀNH | Phi lên thơm phức. | 2 | HÀNH
+CỦ TỎI | Ma cà rồng sợ nhất. | 2 | TỎI
+CỦ GỪNG | Cay nồng, pha trà uống ấm bụng. | 2 | GỪNG
+BẮP CẢI | Lá cuộn tròn thành bắp. | 2
+RAU MUỐNG | Rau luộc chấm nước tương, món quốc dân. | 2
+SU HÀO | Củ xanh nhạt, xào hoặc nấu canh. | 3
+BÍ ĐỎ | Ma Halloween khoét làm đèn. | 2 | BÍ NGÔ
+MƯỚP ĐẮNG | Ăn đắng nhưng mát, còn gọi là khổ qua. | 3 | KHỔ QUA
+> Đây là một loại cây.
+CÂY TRE | Mọc quanh lũy làng, Thánh Gióng nhổ đánh giặc. | 2 | TRE
+CÂY ĐA | Cây cổ thụ đầu làng, có rễ buông thõng. | 2 | ĐA
+CÂY PHƯỢNG | Nở đỏ rực mùa hè, báo hiệu nghỉ học. | 2 | HOA PHƯỢNG
+CÂY BÀNG | Lá đỏ mùa đông, trồng ở sân trường. | 3 | BÀNG
+CÂY THÔNG | Lá kim, trang trí ngày Noel. | 2 | THÔNG
+CÂY XƯƠNG RỒNG | Cây đầy gai sống ở sa mạc. | 3 | XƯƠNG RỒNG
+CÂY LÚA | Cây cho ra hạt gạo. | 1 | LÚA
+CÂY NGÔ | Bắp có râu, luộc hay nướng đều ngon. | 2 | BẮP, CÂY BẮP
+CÂY MÍA | Ép lấy nước ngọt uống mùa hè. | 2 | MÍA
+> Đây là một loài hoa.
+HOA SEN | Quốc hoa Việt Nam, gần bùn mà chẳng hôi. | 2
+HOA HỒNG | Đẹp mà có gai, tặng người yêu. | 1
+HOA MAI | Hoa vàng chưng Tết miền Nam. | 2
+HOA ĐÀO | Hoa hồng chưng Tết miền Bắc. | 2
+HOA CÚC | Hoa vàng nhiều cánh nhỏ, nở mùa thu. | 2
+HOA HƯỚNG DƯƠNG | Luôn quay theo mặt trời. | 3
+HOA LAN | Hoa quý, treo chậu ở hiên nhà. | 2
+HOA SỮA | Mùa thu Hà Nội thơm nồng mùi hoa này. | 3
+HOA BAN | Hoa trắng của núi rừng Tây Bắc. | 3
+HOA GẠO | Hoa đỏ nở tháng ba trên cây cao đầu làng. | 3
+HOA MƯỜI GIỜ | Hoa nhỏ nở đúng giữa buổi sáng. | 3
+HOA TULIP | Hoa nổi tiếng của Hà Lan. | 3 | TULIP
+HOA OẢI HƯƠNG | Hoa tím nổi tiếng ở Pháp, còn gọi lavender. | 3 | LAVENDER
+> Đây là một loại cây cỏ.
+CÂY CAU | Thân thẳng tắp, quả ăn với trầu. | 3 | CAU
+LÁ TRẦU | Lá têm với cau, mở đầu câu chuyện. | 3 | TRẦU
+CÂY DỪA | Thân cao, quả cho nước ngọt mát. | 2
+NẤM | Mọc sau mưa, có loại ăn được, có loại độc. | 2
+CỎ | Mọc khắp sân, trâu bò thích gặm. | 1
+RÊU | Lớp xanh trơn mọc trên đá ẩm. | 2
+> Đây là một loại quả.
+QUẢ ĐÀO | Tôn Ngộ Không ăn trộm ở vườn của Vương Mẫu. | 3 | ĐÀO TIÊN
+> Đây là một loại hạt hoặc củ.
+HẠT ĐIỀU | Hạt rang muối, đặc sản Bình Phước. | 3 | ĐIỀU
+HẠT SEN | Nấu chè, giúp ngủ ngon. | 3
+ĐẬU PHỘNG | Rang lên ăn với xôi, còn gọi lạc. | 2 | LẠC, CỦ LẠC
+CỦ SẮN | Luộc chấm đường, còn gọi khoai mì. | 3 | SẮN, KHOAI MÌ
+> Đây là một loại quả.
+QUẢ BƠ | Xay sinh tố béo ngậy. | 2 | BƠ

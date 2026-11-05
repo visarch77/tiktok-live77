@@ -1,0 +1,38 @@
+# Đố mẹo
+# Câu đố mẹo lớp 4: chỉ hỏi ở chỗ 'meo' của mỗi tiết, không lẫn vào câu chữ thường.
+# Mỗi dòng: ĐÁP ÁN | câu đố | độ khó (để 2) | cách trả lời khác cũng tính đúng (cách nhau dấu phẩy)
+> Câu đố mẹo nè, cẩn thận bị cô lừa nha.
+CON TÀU | Con gì ăn than, uống nước, chạy trên đường ray, kêu tu tu? | 2 | TÀU HỎA, TÀU
+KHÔNG CON | Trên cành có mười con chim, chú thợ săn bắn rơi một con. Hỏi trên cành còn mấy con? | 2 | KHÔNG CÒN CON NÀO, KHÔNG CON NÀO
+XE CHỈ | Xe gì không có bánh mà khâu vá ai cũng cần? | 2
+CON NGƯỜI | Sở thú bị cháy, con gì chạy ra ngoài đầu tiên? | 2 | NGƯỜI
+TAY PHẢI | Cái gì tay trái của em nắm được, còn tay kia thì không bao giờ nắm được? | 2 | KHUỶU TAY PHẢI
+CON SÔNG | Cái gì chở được cả khúc gỗ to mà không chở nổi một hòn sỏi nhỏ? | 2 | DÒNG SÔNG, SÔNG
+BÓNG TỐI | Cái gì càng nhiều thì ta càng không nhìn thấy gì? | 2
+SÁU NGƯỜI | Nhà kia có năm chị em gái, chị nào cũng có một em trai. Hỏi nhà đó có mấy người con? | 2 | SÁU, SÁU NGƯỜI CON
+CÁNH CỬA | Cái gì có cánh mà không bao giờ bay được? | 2 | CỬA
+BẰNG NHAU | Một cân sắt và một cân bông, cái nào nặng hơn? | 2 | NHƯ NHAU
+KHÔNG CÓ TRỨNG | Một con gà trống đẻ một quả trứng trên mái nhà. Hỏi quả trứng lăn về phía nào? | 2 | KHÔNG CÓ, KHÔNG LĂN
+BA NGƯỜI | Hai người cha và hai người con đi câu, ai cũng câu được một con cá, cả nhóm chỉ có ba con. Hỏi có mấy người đi câu? | 2 | BA
+CHỦ NHẬT | Trong tuần, ngày nào không bắt đầu bằng chữ thứ? | 2
+MỘT GIỜ | Đồng hồ đang chỉ mười giờ tối, thêm ba tiếng nữa thì kim đồng hồ chỉ mấy giờ? | 2 | MỘT GIỜ SÁNG
+HỌ | Cái gì của bố mà con mang theo suốt đời, luôn đứng trước tên mình? | 2 | DÒNG HỌ
+CHỮ TAI | Chữ gì mất đầu thì thành câu hỏi, mất đuôi thì thành câu trả lời? | 2 | TAI
+BÀN TÁN | Bàn gì không có chân, không có mặt, mà ai cũng xúm vào nói? | 2 | BÀN BẠC
+BẰNG ĐŨA | Em ăn cơm bằng tay trái hay tay phải? | 2 | ĐŨA
+CÁI TÚI | Cái gì có miệng mà không có răng, có bụng mà không có ruột? | 2 | TÚI
+IM LẶNG | Cái gì bị phá vỡ ngay khi em gọi tên nó? | 2 | SỰ IM LẶNG
+BẮP TAY | Bắp gì không luộc, không nướng, mà ai chăm tập thể dục thì càng to? | 2
+VẪN MƯỜI | Lớp học có mười bạn, cô tắt đèn đi thì trong lớp còn mấy bạn? | 2 | MƯỜI BẠN, MƯỜI
+MỞ CỬA TỦ | Muốn cất con voi vào tủ lạnh thì việc đầu tiên phải làm là gì? | 2 | MỞ TỦ, MỞ CỬA
+TAI NẠN | Tai gì không dùng để nghe, mà ai cũng sợ, không ai muốn gặp? | 2
+MẶT BÀN | Mặt gì không có mắt, mũi, miệng, mà ngày nào cũng có bát cơm đặt lên? | 2
+MŨI GIÀY | Mũi gì nằm ở phía trước bàn chân mà không ngửi được mùi gì? | 2
+HỒ DÁN | Hồ gì không có nước, không có cá, chỉ dùng để dán giấy? | 2 | LỌ HỒ
+ỐC VÍT | Ốc gì không biết bò, không sống dưới nước, mà thợ sửa xe lúc nào cũng có? | 2
+HẠT MƯA | Hạt gì từ trên trời rơi xuống mà không ai gieo trồng? | 2
+NGỰA GỖ | Ngựa gì không ăn cỏ, không chạy đi đâu, mà các bạn nhỏ vẫn cưỡi đung đưa? | 2 | NGỰA BẬP BÊNH
+CON NGƯƠI | Con gì không ăn, không uống, nằm ngay giữa mắt em? | 2
+LÁ CỜ | Lá gì không mọc trên cây mà bay phấp phới trên cột cao? | 2
+RUỘT CHÌ | Ruột gì không nằm trong bụng mà nằm trong cây bút, càng viết càng ngắn? | 2 | RUỘT BÚT CHÌ
+BÓNG MÁT | Bóng gì không đá được, mùa hè ai cũng thích ngồi dưới gốc cây để hưởng? | 2

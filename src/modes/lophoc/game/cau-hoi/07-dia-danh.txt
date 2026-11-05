@@ -1,0 +1,78 @@
+# Đất nước Việt Nam
+> Đây là địa danh của Việt Nam.
+HÀ NỘI | Thủ đô của Việt Nam. | 1
+SÀI GÒN | Tên cũ của Thành phố Hồ Chí Minh. | 1
+ĐÀ NẴNG | Thành phố có cầu Rồng phun lửa. | 2
+HẢI PHÒNG | Thành phố hoa phượng đỏ, quê bánh đa cua. | 2
+HUẾ | Cố đô có Đại Nội, sông Hương. | 1
+HỘI AN | Phố cổ đèn lồng ở Quảng Nam. | 2
+ĐÀ LẠT | Thành phố ngàn hoa, sương mù, se lạnh. | 2
+NHA TRANG | Thành phố biển nổi tiếng ở Khánh Hòa. | 2
+VŨNG TÀU | Thành phố biển gần Sài Gòn nhất, có tượng Chúa. | 2
+PHÚ QUỐC | Hòn đảo lớn nhất Việt Nam. | 2
+CÔN ĐẢO | Quần đảo có nhà tù xưa, nay là nơi du lịch. | 3
+HẠ LONG | Vịnh có hàng nghìn đảo đá, di sản thế giới. | 2
+SA PA | Thị trấn trong sương ở Lào Cai, có ruộng bậc thang. | 2
+MỘC CHÂU | Cao nguyên hoa mận trắng, đồi chè xanh ở Sơn La. | 3
+HÀ GIANG | Tỉnh cực Bắc, có cột cờ Lũng Cú. | 2
+CÀ MAU | Mũi đất cực Nam Tổ quốc. | 2
+CẦN THƠ | Thủ phủ miền Tây, có chợ nổi Cái Răng. | 2
+SÔNG HỒNG | Con sông nước đỏ nặng phù sa chảy qua Hà Nội. | 2
+SÔNG HƯƠNG | Dòng sông thơ mộng chảy qua Huế. | 2
+SÔNG CỬU LONG | Chín nhánh sông đổ ra biển ở miền Tây. | 3 | SÔNG MÊ KÔNG
+HỒ GƯƠM | Hồ có tháp Rùa giữa lòng Hà Nội. | 2 | HỒ HOÀN KIẾM
+HỒ TÂY | Hồ lớn nhất Hà Nội, có bánh tôm. | 2
+VĂN MIẾU | Trường đại học đầu tiên của Việt Nam. | 2 | QUỐC TỬ GIÁM
+LĂNG BÁC | Nơi viếng Bác ở quảng trường Ba Đình. | 2
+CHỢ BẾN THÀNH | Khu chợ có tháp đồng hồ ở Sài Gòn. | 3
+DINH ĐỘC LẬP | Xe tăng húc đổ cổng ngày ba mươi tháng tư. | 3
+NHÀ THỜ ĐỨC BÀ | Nhà thờ gạch đỏ ở trung tâm Sài Gòn. | 3
+PHỐ CỔ | Khu ba mươi sáu phố phường Hà Nội. | 2
+FANSIPAN | Nóc nhà Đông Dương. | 2 | PHAN XI PĂNG
+CẦU LONG BIÊN | Cây cầu sắt cũ bắc qua sông Hồng. | 3
+CẦU VÀNG | Cây cầu có đôi bàn tay khổng lồ ở Bà Nà. | 2
+BÀ NÀ | Khu du lịch trên núi ở Đà Nẵng, đi cáp treo. | 2
+MŨI NÉ | Đồi cát bay ở Phan Thiết. | 3
+PHONG NHA | Động nổi tiếng ở Quảng Bình. | 2 | PHONG NHA KẺ BÀNG
+SƠN ĐOÒNG | Hang động lớn nhất thế giới. | 3
+TÂY NGUYÊN | Vùng đất đỏ ba dan, cà phê, cồng chiêng. | 2
+BUÔN MA THUỘT | Thủ phủ cà phê Việt Nam. | 3
+MIỀN TÂY | Vùng sông nước, xuồng ba lá, đờn ca tài tử. | 2
+HOÀNG SA | Quần đảo của Việt Nam thuộc Đà Nẵng. | 2
+TRƯỜNG SA | Quần đảo của Việt Nam thuộc Khánh Hòa. | 2
+NGHỆ AN | Quê Bác Hồ, nói giọng "mô tê răng rứa". | 2
+THANH HÓA | Quê nem chua, xứ Thanh. | 2
+QUẢNG NINH | Tỉnh có vịnh Hạ Long, than đá. | 2
+LẠNG SƠN | Tỉnh biên giới, có nàng Tô Thị, vịt quay. | 3
+CAO BẰNG | Có thác Bản Giốc. | 3
+NINH BÌNH | Tràng An, Tam Cốc, cố đô Hoa Lư. | 2
+BẮC NINH | Quê quan họ, liền anh liền chị. | 2
+HƯNG YÊN | Đất nhãn lồng. | 3
+PHÚ THỌ | Có đền Hùng, giỗ tổ mùng mười tháng ba. | 3
+QUẢNG BÌNH | Vương quốc hang động. | 3
+QUẢNG NAM | Có phố cổ Hội An và mì Quảng. | 3
+BÌNH ĐỊNH | Đất võ, quê Quang Trung. | 3
+KHÁNH HÒA | Tỉnh có Nha Trang, yến sào. | 3
+LÂM ĐỒNG | Tỉnh có Đà Lạt. | 3
+BẾN TRE | Xứ dừa. | 2
+AN GIANG | Có núi Cấm, rừng tràm Trà Sư. | 3
+KIÊN GIANG | Tỉnh có đảo Phú Quốc. | 3
+TÂY NINH | Có núi Bà Đen, bánh tráng phơi sương. | 3
+CỦ CHI | Địa đạo nổi tiếng gần Sài Gòn. | 3
+ĐIỆN BIÊN PHỦ | Chiến thắng lừng lẫy năm châu chấn động địa cầu năm 1954. | 3
+BA ĐÌNH | Quảng trường nơi Bác đọc Tuyên ngôn Độc lập. | 2
+> Đây là thứ gắn với đất nước Việt Nam.
+MÚA RỐI NƯỚC | Loại hình biểu diễn trên mặt ao, có chú Tễu. | 3
+ÁO DÀI | Trang phục truyền thống, cô giáo hay mặc màu trắng. | 2
+NÓN LÁ | Đội đầu che nắng, hình chóp, làm bằng lá. | 2
+QUỐC KỲ | Lá cờ đỏ sao vàng. | 2 | CỜ ĐỎ SAO VÀNG
+QUỐC CA | Bài "Tiến quân ca" hát khi chào cờ. | 2
+TIỀN ĐỒNG | Đơn vị tiền tệ của Việt Nam. | 2 | ĐỒNG
+> Đây là địa danh của Việt Nam.
+CHỢ NỔI | Chợ họp trên ghe thuyền ở miền Tây. | 2
+RUỘNG BẬC THANG | Ruộng lúa xếp tầng trên sườn núi. | 3
+CỘT CỜ LŨNG CÚ | Nơi cắm cờ ở cực Bắc. | 3
+CHÙA MỘT CỘT | Ngôi chùa đứng trên một trụ đá giữa hồ. | 3
+CHÙA HƯƠNG | Đi lễ đầu xuân, đi đò suối Yến. | 3
+NÚI BÀ ĐEN | Nóc nhà Nam Bộ ở Tây Ninh. | 3
+ĐẢO LÝ SƠN | Vương quốc tỏi ở Quảng Ngãi. | 3 | LÝ SƠN

@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Báo cáo Lớp Học Chữ</title>
+  <!-- Mở từ trang quản lý: /lophoc-bao-cao.html?room=<id>&ngay=YYYY-MM-DD -->
+  <style>
+    :root {
+      --bg: #fdf8ec; --card: #fff; --text: #3b2a14; --muted: #8a7350; --line: #e9d8a6; --code: #f3e9cf;
+      --accent: #b8621b; --bad: #b42318; --good: #1f7a3a;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #17130c; --card: #221c12; --text: #f1e6cf; --muted: #b9a47e; --line: #4a3c22; --code: #33291a;
+        --accent: #f0a35a; --bad: #ff8a80; --good: #7bd88f; }
+    }
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; max-width: 900px; margin: 0 auto; padding: 16px;
+      background: var(--bg); color: var(--text); line-height: 1.45; }
+    h1 { margin: 0 0 4px; font-size: 24px; }
+    h2 { margin-top: 28px; border-bottom: 2px solid var(--line); padding-bottom: 4px; font-size: 18px; }
+    .muted { color: var(--muted); }
+    .bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 8px 0 4px; }
+    select, button { font: inherit; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--text); }
+    button { cursor: pointer; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-top: 14px; }
+    .stat { background: var(--card); border-radius: 12px; padding: 10px 16px; box-shadow: 0 1px 3px #0002; }
+    .stat b { display: block; font-size: 28px; }
+    ol { padding-left: 24px; } li { margin: 5px 0; }
+    code { background: var(--code); padding: 1px 5px; border-radius: 4px; font-size: 12px; word-break: break-all; }
+    .unban { margin-left: 6px; padding: 1px 8px; font-size: 12px; }
+    .err { color: var(--bad); }
+  </style>
+</head>
+<body>
+  <h1>📊 Báo cáo buổi live <span id="channel" class="muted" style="font-size:16px;font-weight:400"></span></h1>
+  <div class="bar">
+    <label>Ngày <select id="day"></select></label>
+    <button id="reload">↻ Tải lại</button>
+    <span class="muted" id="roomLabel"></span>
+  </div>
+  <div id="body"><p class="muted">Đang tải…</p></div>
+
+  <script>
+  (function () {
+    const params = new URLSearchParams(location.search);
+    const roomId = params.get('room') || 'main';
+    let day = params.get('ngay') || '';
+    const $ = (s) => document.querySelector(s);
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+    const list = (items, empty) => (items.length ? `<ol>${items.map((i) => `<li>${i}</li>`).join('')}</ol>` : `<p class="muted">${empty}</p>`);
+    $('#roomLabel').textContent = `Phòng: ${roomId}`;
+
+    async function rpc(method, p = {}) {
+      const res = await fetch('/rpc', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', id: Date.now(), method, params: { roomId, ...p } })
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error.message);
+      return data.result;
+    }
+
+    function render(r) {
+      document.title = `Báo cáo Lớp Học Chữ ${r.day}`;
+      $('#channel').textContent = r.channelName ? `· ${r.channelName}` : '';
+      const days = r.days.includes(r.day) ? r.days : [r.day, ...r.days];
+      $('#day').innerHTML = days.map((d) => `<option value="${esc(d)}"${d === r.day ? ' selected' : ''}>${esc(d)}${d === r.today ? ' (hôm nay)' : ''}</option>`).join('');
+      $('#body').innerHTML = `
+        <div class="stats">
+          <div class="stat"><b>${r.asked}</b>câu đã hỏi</div>
+          <div class="stat"><b>${r.attended}</b>bạn nhỏ vào lớp</div>
+          <div class="stat"><b>${r.hard.length}</b>câu không ai đúng</div>
+          <div class="stat"><b>${r.easy.length}</b>câu quá dễ</div>
+        </div>
+        <h2>❌ Câu không ai trả lời đúng</h2>
+        <p class="muted">Có ít nhất 3 bạn thử mà vẫn sai: có thể câu quá khó hoặc gợi ý chưa rõ, nên xem lại.</p>
+        ${list(r.hard.map((x) => `<b>${esc(x.answer)}</b> · ${esc(x.category)} · ${x.attempts} lượt thử <code>${esc(x.id)}</code>`), 'Không có câu nào.')}
+        <h2>✅ Câu quá dễ (90% trở lên trả lời đúng)</h2>
+        ${list(r.easy.map((x) => `<b>${esc(x.answer)}</b> · ${esc(x.category)} · ${x.correct}/${x.attempts} đúng`), 'Không có câu nào.')}
+        <h2>🏆 Điểm cao hôm nay</h2>
+        ${list(r.top.map((s) => `${esc(s.nickname)} · ${s.points} điểm`), r.day === r.today ? 'Chưa có điểm.' : 'Chỉ lưu điểm của ngày hôm nay.')}
+        <h2>🎒 Chuyên cần (đi học nhiều ngày liền)</h2>
+        ${list(r.loyal.map((a) => `${esc(a.nickname)} · ${a.streak} ngày liền · tổng ${a.total} ngày`), 'Chưa có ai.')}
+        <h2>🚫 Câu đã bấm "Bỏ câu này"</h2>
+        <p class="muted">Sửa câu trong <code>src/modes/lophoc/game/cau-hoi/</code> (đổi đáp án hoặc xoá dòng) rồi bật lại server. Đổi đáp án là thành câu mới, game sẽ hỏi lại. Bỏ nhầm thì bấm “Hỏi lại”.</p>
+        ${list(r.banned.map((b) => `<b>${esc(b.answer)}</b> · ${esc(b.clue)} <code>${esc(b.id)}</code><button class="unban" data-id="${esc(b.id)}">Hỏi lại</button>`), 'Chưa bỏ câu nào.')}`;
+    }
+
+    async function load() {
+      try {
+        render(await rpc('lophoc.report', day ? { day } : {}));
+      } catch (err) {
+        $('#body').innerHTML = `<p class="err">Không tải được báo cáo: ${esc(err.message)}</p>`;
+      }
+    }
+
+    $('#day').addEventListener('change', (e) => {
+      day = e.target.value;
+      const u = new URL(location.href);
+      u.searchParams.set('ngay', day);
+      history.replaceState(null, '', u);
+      load();
+    });
+    $('#reload').addEventListener('click', load);
+    document.addEventListener('click', async (e) => {
+      const b = e.target.closest('.unban');
+      if (!b || !confirm('Cho câu này được hỏi lại?')) return;
+      try {
+        await rpc('lophoc.unban', { id: b.dataset.id });
+        load();
+      } catch (err) {
+        alert(err.message);
+      }
+    });
+    load();
+  })();
+  </script>
+</body>
+</html>

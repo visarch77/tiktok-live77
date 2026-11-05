@@ -1,0 +1,76 @@
+# Con vật
+> Đây là một con vật.
+CON MÈO | Kêu meo meo, hay bắt chuột. | 1 | MÈO
+CON CHÓ | Giữ nhà, thấy người lạ là sủa gâu gâu. | 1 | CHÓ
+CON GÀ | Sáng nào cũng gáy ò ó o. | 1 | GÀ
+CON VỊT | Kêu cạp cạp, bơi giỏi dưới ao. | 1 | VỊT
+CON HEO | Ăn xong rồi ngủ, kêu ụt ịt. | 1 | CON LỢN, HEO, LỢN
+CON TRÂU | Bạn của nhà nông, cày ruộng giỏi. | 1 | TRÂU
+CON BÒ | Cho sữa tươi, kêu ò ò. | 1 | BÒ
+CON NGỰA | Phi nước đại, có bờm dài. | 2 | NGỰA
+CON DÊ | Có râu dưới cằm, kêu be be. | 2 | DÊ
+CON THỎ | Tai dài, thích ăn cà rốt. | 1 | THỎ
+CON CHUỘT | Gặm nhấm lén lút, sợ mèo. | 1 | CHUỘT
+CON VOI | Con vật to nhất trên cạn, có vòi dài. | 1 | VOI
+CON HỔ | Chúa sơn lâm, vằn vện. | 1 | CON CỌP, HỔ, CỌP
+SƯ TỬ | Con đực có bờm, được gọi là vua của muôn thú. | 2
+CON KHỈ | Leo trèo giỏi, thích ăn chuối. | 1 | KHỈ
+HƯƠU CAO CỔ | Con vật có cổ dài nhất. | 3
+NGỰA VẰN | Ngựa sọc đen trắng ở châu Phi. | 2
+CÁ SẤU | Nằm phơi nắng bên sông, răng nhọn hoắt. | 2
+CON RẮN | Bò trườn không có chân. | 1 | RẮN
+CON RÙA | Đi chậm, mang mai trên lưng. | 1 | RÙA
+CON ẾCH | Kêu ộp ộp sau cơn mưa. | 1 | ẾCH
+CON CUA | Bò ngang, có hai cái càng. | 1 | CUA
+CON TÔM | Lột vỏ chấm muối tiêu chanh, có râu dài. | 1 | TÔM
+CON MỰC | Phun mực đen khi gặp nguy. | 2 | MỰC
+BẠCH TUỘC | Có tám cái xúc tu. | 2
+CÁ HEO | Thông minh, hay nhào lộn trên mặt biển. | 2
+CÁ VOI | Loài to nhất đại dương, phun nước lên trời. | 2
+CÁ MẬP | Hung dữ nhất biển, vây lưng nhọn. | 2
+CÁ VÀNG | Nuôi trong bể kính, đuôi xòe. | 2
+CHIM SẺ | Loài chim nhỏ xíu hay nhảy trên mái nhà. | 2
+CHIM CÁNH CỤT | Chim không biết bay, sống ở xứ băng tuyết. | 3
+CON CÚ | Mắt tròn to, thức đêm. | 2 | CÚ MÈO
+CON VẸT | Bắt chước tiếng người. | 2 | VẸT
+ĐẠI BÀNG | Chim săn mồi bay cao nhất. | 2
+CHIM BỒ CÂU | Biểu tượng của hòa bình. | 3 | BỒ CÂU
+CON CÒ | Lặn lội bờ ao trong ca dao. | 2 | CÒ
+CHIM CÔNG | Xòe đuôi sặc sỡ như cái quạt. | 3 | CON CÔNG
+CON ONG | Hút mật hoa, có ngòi chích. | 1 | ONG
+CON BƯỚM | Cánh sặc sỡ bay quanh vườn hoa. | 1 | BƯỚM
+CON KIẾN | Nhỏ xíu, đi thành hàng dài tha mồi. | 1 | KIẾN
+CON MUỖI | Đêm vo ve, đốt sưng tay. | 1 | MUỖI
+CON RUỒI | Bay vo ve quanh mâm cơm. | 1 | RUỒI
+CON GIÁN | Ai thấy nó bay là hét toáng lên. | 2 | GIÁN
+CON NHỆN | Giăng tơ ở góc nhà. | 2 | NHỆN
+CHUỒN CHUỒN | Bay thấp thì mưa, bay cao thì nắng. | 2
+ĐOM ĐÓM | Ban đêm bay lập lòe, đuôi phát sáng. | 2
+CÀO CÀO | Côn trùng nhảy xa trên đồng cỏ. | 3
+CON VE | Kêu ra rả mùa hè. | 2 | VE SẦU
+CON DẾ | Đá nhau trong hộp diêm, kêu re re. | 2 | DẾ
+CON ỐC | Mang nhà trên lưng, luộc chấm gừng. | 2 | ỐC
+CON SÒ | Hai mảnh vỏ, nướng mỡ hành. | 3 | SÒ
+CON NGHÊU | Sống dưới cát biển, nấu canh chua ngon. | 3 | CON NGAO, NGHÊU, NGAO
+CON GẤU | Thích ăn mật ong, ngủ đông. | 2 | GẤU
+GẤU TRÚC | Lông trắng đen, mê ăn tre. | 2
+CON SÓC | Đuôi xù, ôm hạt dẻ trên cây. | 2 | SÓC
+CON CÁO | Lông đỏ, nổi tiếng gian xảo trong truyện. | 2 | CÁO
+CON SÓI | Tru lên mỗi đêm trăng tròn. | 2 | SÓI, CHÓ SÓI
+CHUỘT TÚI | Nhảy bằng hai chân, có túi trước bụng, ở Úc. | 3 | KANGAROO
+CON DƠI | Treo ngược mình ngủ ban ngày. | 2 | DƠI
+CON NGỖNG | Kêu quác quác, hay rượt người lạ. | 2 | NGỖNG
+CON CHIM | Có cánh, có lông vũ, biết hót. | 1 | CHIM
+CON LƯƠN | Trơn tuột, nấu cháo rất ngon. | 3 | LƯƠN
+CON CHẠCH | Giống lươn nhưng nhỏ, câu "đầu voi đuôi..." | 3 | CHẠCH
+CON TẰM | Ăn lá dâu, nhả tơ. | 3 | TẰM
+CON SÂU | Gặm lá cây, lớn lên thành bướm. | 2 | SÂU
+CON GIUN | Sống trong đất, mưa xong bò lên mặt đường. | 2 | GIUN, CON TRÙN
+CON TẮC KÈ | Đổi màu theo nơi đứng. | 3 | TẮC KÈ
+CON THẰN LẰN | Đứt đuôi rồi mọc lại. | 3 | THẰN LẰN
+CON LẠC ĐÀ | Có bướu trên lưng, đi sa mạc. | 3 | LẠC ĐÀ
+CON HẢI CẨU | Vỗ tay giữ bóng trong rạp xiếc. | 3 | HẢI CẨU
+CON SAO BIỂN | Hình ngôi sao năm cánh nằm dưới đáy biển. | 3 | SAO BIỂN
+CON SỨA | Trong suốt như thạch, chạm vào bị ngứa rát. | 3 | SỨA
+CON NAI | Có gạc trên đầu, chạy trong rừng. | 2 | NAI
+CON TÊ GIÁC | Có sừng trên mũi, da dày. | 3 | TÊ GIÁC

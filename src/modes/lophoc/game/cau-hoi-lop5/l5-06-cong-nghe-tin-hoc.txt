@@ -1,0 +1,35 @@
+# Công nghệ và Tin học
+# Bộ câu hỏi lớp 5: sáng chế, thiết kế, mô hình điện, sử dụng đồ điện; thư mục, tìm kiếm, soạn thảo, lập trình.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách viết khác cũng tính đúng (cách nhau dấu phẩy)
+> Đây là kiến thức môn Công nghệ và Tin học.
+SÁNG CHẾ | Tạo ra một sản phẩm hoặc một cách làm mới chưa từng có, có thể được cấp bằng bảo hộ. | 3
+BẢN VẼ | Hình vẽ thể hiện hình dạng và kích thước của sản phẩm, làm ra trước khi chế tạo. | 2
+THIẾT KẾ | Công việc nghĩ ra hình dáng, cấu tạo, chọn vật liệu và vẽ ra sản phẩm trước khi làm. | 2
+MÔ TƠ | Bộ phận nhỏ nối với pin thì trục quay tít, làm bánh xe đồ chơi chạy được. | 2 | ĐỘNG CƠ, ĐỘNG CƠ ĐIỆN
+MÁY PHÁT ĐIỆN | Cánh quạt quay nhờ gió làm chiếc máy này tạo ra điện. | 2
+NGĂN ĐÁ | Ngăn lạnh nhất của tủ lạnh, dùng để làm kem và cấp đông thịt cá. | 1
+CẤP CỨU | Số điện thoại một một năm dùng để gọi dịch vụ gì khi có người ốm nặng? | 2
+DANH BẠ | Nơi lưu tên và số điện thoại của mọi người trong máy điện thoại. | 2
+VÒNG LẶP | Cấu trúc trong chương trình giúp một lệnh được làm đi làm lại nhiều lần. | 3
+RẼ NHÁNH | Cấu trúc nếu điều kiện đúng thì làm việc này, sai thì làm việc khác, gọi là cấu trúc gì? | 3
+BIẾN | Trong lập trình, chiếc hộp có tên dùng để lưu một giá trị như điểm số gọi là gì? | 3
+PHÔNG CHỮ | Kiểu dáng của chữ trong văn bản, có thể chọn nhiều kiểu khác nhau. | 2 | FONT, PHÔNG
+IN ĐẬM | Chữ có nét dày và to hơn để làm nổi bật tiêu đề. | 1
+VẬT LIỆU | Gỗ, nhựa, giấy, kim loại dùng để làm ra sản phẩm gọi chung là gì? | 2
+CÁNH QUẠT | Bộ phận quay tròn đón gió trên mô hình máy phát điện gió. | 1
+DÂY DẪN | Sợi dây đồng bọc nhựa nối pin với bóng đèn. | 1
+PHÍCH CẮM | Đầu dây điện có chân kim loại, cắm vào ổ điện. | 2
+THẺ NHỚ | Miếng nhựa nhỏ cắm vào máy ảnh, điện thoại để lưu thêm ảnh và video. | 2
+CHÈN ẢNH | Lệnh đưa một bức hình vào trong văn bản đang soạn. | 2 | CHÈN HÌNH
+IN NGHIÊNG | Chữ được làm xiêu sang bên phải, hay dùng cho lời chú thích. | 2
+GẠCH CHÂN | Kẻ một đường ngay dưới chữ để làm nổi bật. | 1 | GẠCH DƯỚI
+CĂN GIỮA | Lệnh đặt dòng tiêu đề vào chính giữa trang. | 2
+CÂU LỆNH | Mỗi chỉ dẫn em ra cho máy tính trong một chương trình gọi là gì? | 2
+THUẬT TOÁN | Các bước giải quyết một bài toán, sắp xếp theo đúng thứ tự để máy tính làm theo. | 3
+TIN GIẢ | Tin tức sai sự thật lan truyền trên mạng, cần kiểm tra kĩ trước khi chia sẻ. | 2
+BẾP TỪ | Loại bếp mặt kính, nấu không có lửa, phải dùng nồi có đáy hút được nam châm. | 2
+ĐÈN PIN | Chiếc đèn cầm tay nhỏ gọn, soi đường khi mất điện hay đi trong đêm. | 1
+KEO DÁN | Thứ dùng để gắn các miếng bìa, que gỗ lại với nhau khi làm mô hình. | 1
+MÁY TÍNH XÁCH TAY | Chiếc máy tính gập lại được, mang theo bên người. | 1 | LAPTOP
+MÁY HÚT BỤI | Máy dùng để hút sạch bụi bẩn trên sàn nhà, trên thảm. | 1
+ĐIỀU KHIỂN | Cái hộp nhỏ có nhiều nút bấm để bật tắt tivi, máy lạnh từ xa. | 1

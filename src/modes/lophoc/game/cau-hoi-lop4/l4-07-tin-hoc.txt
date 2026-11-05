@@ -1,0 +1,25 @@
+# Tin học
+# Bộ lớp 4: phần cứng, bàn phím, tìm kiếm thông tin, thư mục và tệp, bản quyền, trình chiếu, soạn thảo, lập trình.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách viết khác cũng tính đúng (cách nhau dấu phẩy)
+> Đây là kiến thức môn Tin học.
+PHẦN CỨNG | Màn hình, bàn phím, chuột là những bộ phận gì của máy tính mà ta cầm nắm được? | 2
+GÕ MƯỜI NGÓN | Cách gõ bàn phím nhanh, dùng đủ các ngón của cả hai bàn tay. | 2 
+TÌM KIẾM | Gõ vài chữ vào ô trên trang web để máy giúp em làm việc gì với thông tin? | 1
+TỪ KHÓA | Những chữ em gõ vào ô tìm kiếm để tìm thông tin trên mạng. | 2
+TỆP | Mỗi bài văn, mỗi bức ảnh lưu trong máy tính được gọi là một gì? | 2 | TỆP TIN
+BẢN QUYỀN | Phần mềm có cái này thì không được tự ý sao chép, dùng lậu. | 3
+TRÌNH CHIẾU | Phần mềm dùng để làm các trang chiếu khi thuyết trình trước lớp. | 2
+SOẠN THẢO | Phần mềm dùng để gõ chữ và chỉnh sửa văn bản. | 2
+LẬP TRÌNH | Ghép các khối lệnh để nhân vật trên máy tính di chuyển, nhảy múa, gọi là làm gì? | 2
+KHỞI ĐỘNG | Bật máy tính lên rồi chờ máy sẵn sàng làm việc, gọi là gì máy? | 2
+TẮT MÁY | Dùng máy tính xong phải làm việc này đúng cách, không rút điện đột ngột. | 1
+LƯU | Làm bài trên máy tính xong phải bấm nút này kẻo mất bài. | 1 | LƯU BÀI
+SAO CHÉP | Tạo thêm một bản giống hệt của một tệp hay một đoạn văn bản. | 2
+DÁN | Sau khi sao chép, em làm việc này để đặt bản sao vào chỗ mới. | 2
+TƯ THẾ | Khi dùng máy tính, ngồi thẳng lưng, mắt cách màn hình vừa phải là ngồi đúng điều gì? | 2
+MÁY CHIẾU | Thiết bị chiếu hình từ máy tính lên tấm màn lớn cho cả lớp cùng xem. | 1
+GÕ DẤU | Gõ thêm phím để có dấu sắc, huyền, hỏi, ngã, nặng cho chữ tiếng Việt. | 2
+ĐỔI TÊN | Bấm chuột phải vào một tệp rồi chọn lệnh này để đặt lại tên khác cho nó. | 2
+KHỐI LỆNH | Trong phần mềm lập trình cho thiếu nhi, mỗi lệnh có hình như một mảnh ghép, gọi là gì? | 3
+TRANG CHIẾU | Mỗi trang trong một bài trình chiếu được gọi là gì? | 2
+HIỆU ỨNG | Làm cho chữ và hình trên trang chiếu bay vào, xoay tròn khi trình chiếu, gọi là thêm gì? | 3

@@ -1,0 +1,35 @@
+# Khoa học
+# Bộ lớp 4: nước, không khí, ánh sáng, âm thanh, nhiệt, thực vật, nấm, dinh dưỡng, an toàn.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách viết khác cũng tính đúng (cách nhau dấu phẩy)
+> Đây là kiến thức môn Khoa học.
+VÒNG TUẦN HOÀN | Nước bốc hơi, ngưng tụ thành mây, rồi mưa rơi xuống, cứ lặp đi lặp lại, gọi là gì của nước? | 3
+NGƯNG TỤ | Hơi nước gặp lạnh biến thành những giọt nước nhỏ, gọi là hiện tượng gì? | 3
+ĐÔNG ĐẶC | Nước để trong ngăn đá biến thành nước đá, gọi là hiện tượng gì? | 2 
+LỌC NƯỚC | Cho nước đục chảy qua cát, sỏi, than củi để nước trong hơn, gọi là làm gì? | 2
+ĐUN SÔI | Muốn uống nước an toàn, sau khi lọc em phải làm gì với nước? | 2
+KHÔNG MÀU | Nước tinh khiết không mùi, không vị và còn như thế nào nữa? | 2
+HÒA TAN | Muối, đường bỏ vào nước khuấy lên thì biến mất, vì nước có thể làm gì chúng? | 2
+KHÍ CÁC BÔ NÍC | Khí do con người thở ra, còn cây xanh lại dùng nó để làm thức ăn. | 3 | CÁC BÔ NÍC
+NGUỒN SÁNG | Vật tự phát ra ánh sáng như Mặt Trời, ngọn đèn đang bật. | 2
+TRUYỀN THẲNG | Ánh sáng đi trong không khí theo đường như thế nào? | 3
+TRONG SUỐT | Kính cửa sổ cho ánh sáng đi qua gần hết, nên ta nói tấm kính như thế nào? | 2
+NGUỒN ÂM | Vật phát ra âm thanh, như cái trống, cái chuông, cái kèn. | 2
+RUNG ĐỘNG | Âm thanh được tạo ra khi các vật làm gì? | 2 | DAO ĐỘNG
+DẪN NHIỆT | Để thìa kim loại trong cốc nước nóng một lúc thì cán thìa nóng lên, vì kim loại làm việc gì rất tốt? | 3
+CÁCH NHIỆT | Tay cầm nồi làm bằng gỗ hoặc nhựa cho đỡ bỏng, vì gỗ và nhựa có tính chất gì? | 3
+NẤM MỐC | Lớp mốc xanh, mốc trắng mọc trên bánh mì để lâu, ăn vào rất có hại. | 1 
+NẤM RƠM | Loại nấm ăn được, màu xám, được trồng trên đống rơm rạ. | 2
+NẤM MEN | Loại nấm rất nhỏ giúp bột bánh mì nở xốp. | 2 
+CHẤT ĐẠM | Nhóm chất dinh dưỡng có nhiều trong thịt, cá, trứng, đậu, giúp cơ thể lớn lên. | 2
+CHẤT BÉO | Nhóm chất dinh dưỡng có nhiều trong dầu ăn, mỡ, lạc, vừng. | 2
+CHẤT BỘT ĐƯỜNG | Nhóm chất dinh dưỡng có nhiều trong gạo, ngô, khoai, bánh mì, cho ta năng lượng. | 3 | CHẤT BỘT
+CHẤT XƠ | Có nhiều trong rau xanh và hoa quả, giúp tiêu hóa tốt. | 2
+CHẤT KHOÁNG | Cây hút nước và những chất này từ đất qua rễ để nuôi cây. | 2
+THÁP DINH DƯỠNG | Hình tháp cho biết mỗi loại thức ăn nên ăn nhiều hay ăn ít. | 2 
+BÉO PHÌ | Bệnh do ăn quá nhiều đồ ngọt, đồ chiên rán mà lại ít vận động. | 1 
+SUY DINH DƯỠNG | Trẻ em ăn thiếu chất nên gầy còm, chậm lớn. | 3
+PHAO BƠI | Đồ dùng giúp người mới tập bơi nổi được trên mặt nước. | 1 | ÁO PHAO
+CHUỖI THỨC ĂN | Cỏ, thỏ, cáo nối với nhau theo quan hệ con này ăn con kia, gọi là gì? | 3
+DIỆP LỤC | Chất làm cho lá cây có màu xanh. | 3
+NƯỚC SẠCH | Nước trong, không màu, không mùi, không có vi khuẩn, dùng được cho ăn uống. | 1
+HÍT THỞ | Con người và động vật cần không khí để làm việc gì? | 1
