@@ -1475,8 +1475,7 @@
           <div><div class="setting-name">Giọng cô giáo</div><div class="setting-desc">Edge: tạo giọng ~1 giây, giọng nữ Hoài My, đọc từ tiếng Anh bằng giọng Mỹ (cần mạng; lỗi thì tự đọc bằng ZeroTTS) · ZeroTTS: giọng chọn ở dưới, chạy trên máy nhưng mỗi câu chờ 5–15 giây, từ tiếng Anh đọc bằng giọng macOS</div></div>
           <select class="input" data-setting="voiceEngine">${[['edge', 'Edge (nhanh, như bản gốc)'], ['zero', 'ZeroTTS (giọng phòng)']].map(([v, n]) => `<option value="${v}" ${v === (s.voiceEngine || 'edge') ? 'selected' : ''}>${n}</option>`).join('')}</select>
         </div>
-        ${rlRange('voiceRate', 'Tốc độ nói (giọng Edge)', '1 = bình thường; bản gốc để 1,25 cho tiết tấu dồn dập', 0.8, 1.5, 0.05, '×')}
-        ${rlRange('sideMargin', 'Lề hai bên màn hình', 'Điện thoại / TikTok cắt mất hai mép thì tăng lên: cả lớp học thu nhỏ vào giữa (0 = sát mép như bản gốc)', 0, 200, 4, ' px')}`;
+        ${rlRange('voiceRate', 'Tốc độ nói (giọng Edge)', '1 = bình thường; bản gốc để 1,25 cho tiết tấu dồn dập', 0.8, 1.5, 0.05, '×')}`;
       body.innerHTML = `${rlExtra}${kcExtra}${lhcExtra}
         <div class="setting">
           <div><div class="setting-name">Giọng đọc</div><div class="setting-desc">Đọc tên & lời nhắn của người xem</div></div>
