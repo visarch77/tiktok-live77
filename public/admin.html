@@ -1472,6 +1472,10 @@
           <select class="input" data-setting="questionSet">${LHC_SETS.map(([v, n]) => `<option value="${v}" ${v === (s.questionSet || 'chung') ? 'selected' : ''}>${n}</option>`).join('')}</select>
         </div>
         <div class="setting">
+          <div><div class="setting-name">Gõ không dấu cũng đúng</div><div class="setting-desc">Bật: "cai chao" hay "cái chảo" đều tính đúng câu CÁI CHẢO · Tắt: phải gõ đủ dấu như bản gốc (gõ thiếu dấu bị tính sai và mất lượt câu đó)</div></div>
+          <label class="switch"><input type="checkbox" data-setting="acceptNoDiacritics" ${s.acceptNoDiacritics !== false ? 'checked' : ''} /><span></span></label>
+        </div>
+        <div class="setting">
           <div><div class="setting-name">Giọng cô giáo</div><div class="setting-desc">Edge: tạo giọng ~1 giây, giọng nữ Hoài My, đọc từ tiếng Anh bằng giọng Mỹ (cần mạng; lỗi thì tự đọc bằng ZeroTTS) · ZeroTTS: giọng chọn ở dưới, chạy trên máy nhưng mỗi câu chờ 5–15 giây, từ tiếng Anh đọc bằng giọng macOS</div></div>
           <select class="input" data-setting="voiceEngine">${[['edge', 'Edge (nhanh, như bản gốc)'], ['zero', 'ZeroTTS (giọng phòng)']].map(([v, n]) => `<option value="${v}" ${v === (s.voiceEngine || 'edge') ? 'selected' : ''}>${n}</option>`).join('')}</select>
         </div>

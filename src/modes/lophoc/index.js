@@ -37,6 +37,8 @@ const bankOf = (set) => (BANKS[set] && BANKS[set].length ? set : 'chung');
 const gradeOf = (set) => ({ lop3: 3, lop4: 4, lop5: 5 })[set] || 0;
 
 const TICK_MS = 200;
+const CHAT_BATCH_MS = 300; // gom bình luận cùng đợt rồi xử lý theo giờ gửi
+const LATE_GRACE_MS = 1500; // hết giờ hỏi vẫn nhận bình luận tới trễ thêm chừng này
 const VIEW_MIN_GAP_MS = 250; // gửi ảnh chụp lớp học tối đa 4 lần/giây
 const LOG_FLUSH_MS = 2000; // dồn câu đã hỏi / điểm tuần / báo cáo vào sổ lớp
 const SPEECH_MAX_WAIT_MS = 60_000; // câu chờ quá lâu thì bỏ (chuyện đã cũ)
@@ -415,6 +417,34 @@ function create(ctx, saved = {}) {
   let likeAcc = 0;
   let lastGift = null;
 
+  // Bình luận TikTok tới theo từng đợt và không đúng thứ tự gửi: gom CHAT_BATCH_MS rồi chấm theo giờ TikTok ghi nhận
+  // (createTime), để "bạn đúng đầu tiên" cô khen là người gửi sớm nhất chứ không phải người tới máy trước.
+  // Điểm vốn đã xếp theo createTime trong lõi game; phần này chỉ sửa lời khen và thứ tự xử lý.
+  let chatQueue = [];
+  let chatFlushTimer = null;
+  function queueChat(evt) {
+    chatQueue.push(evt);
+    if (!chatFlushTimer) chatFlushTimer = setTimeout(flushChats, CHAT_BATCH_MS);
+  }
+  function flushChats() {
+    chatFlushTimer = null;
+    const batch = chatQueue;
+    chatQueue = [];
+    const ts = (e) => {
+      const t = Number(e.createTime) || 0;
+      return t < 1e12 ? t * 1000 : t;
+    };
+    batch.sort((a, b) => ts(a) - ts(b));
+    for (const evt of batch) {
+      if (disposed) return;
+      try {
+        onChat(evt);
+      } catch (err) {
+        console.error(`[lophoc ${ctx.roomId}] Lỗi xử lý bình luận:`, err);
+      }
+    }
+  }
+
   function onChat(evt) {
     const p = person(evt.user);
     const text = String(evt.text || '').slice(0, 200);
@@ -422,6 +452,9 @@ function create(ctx, saved = {}) {
     if (createTime < 1e12) createTime *= 1000; // phòng khi thư viện trả giây
     const isNew = !room.students.has(p.username);
     const now = Date.now();
+    // Bản gốc bắt gõ đủ dấu ("phan" không ăn "phấn"); phòng live để mặc định gõ không dấu cũng tính đúng.
+    // GAME dùng chung mọi phòng Lớp Học nên đặt lại ngay trước mỗi lần chấm.
+    GAME.requireDiacritics = ctx.settings.acceptNoDiacritics === false;
     say(room.chat({ ...p, comment: text, createTime, safe: !containsBanned(text) }, now));
     if (isNew && p.spoken !== 'bạn' && GAME.joinKeywords.includes(plain(text))) talk.greeter.add(p.username, p.spoken);
     if (isNew) {
@@ -550,7 +583,10 @@ function create(ctx, saved = {}) {
         }
         lastTick = now;
         applyQuestionSet();
-        say(room.tick(now));
+        // Hết giờ hỏi: chờ thêm LATE_GRACE_MS mới chốt, vì TikTok gửi bình luận theo từng đợt, tới máy chậm 0,1–1,1 giây
+        // (đo 2026-11-05) — bạn gõ ở giây cuối vẫn được tính. Đồng hồ trên bảng vẫn về 0 đúng giờ.
+        const asking = room.phase === 'question' || room.phase === 'bonus';
+        if (!(asking && now >= room.phaseEndsAt && now < room.phaseEndsAt + LATE_GRACE_MS)) say(room.tick(now));
         prefetchNextQuestion();
         flushChatter(now);
       } catch (err) {
@@ -706,7 +742,7 @@ function create(ctx, saved = {}) {
       if (disposed || !evt) return null;
       switch (evt.type) {
         case 'chat':
-          return onChat(evt);
+          return queueChat(evt);
         case 'gift':
           return onGift(evt);
         case 'like':
@@ -777,12 +813,14 @@ module.exports = {
   settingsSchema: {
     questionSet: { type: 'enum', values: QUESTION_SETS },
     voiceEngine: { type: 'enum', values: ['edge', 'zero'] },
-    voiceRate: [0.8, 1.5]
+    voiceRate: [0.8, 1.5],
+    acceptNoDiacritics: 'boolean'
   },
   defaultSettings: {
     questionSet: 'chung',
     voiceEngine: 'edge',
-    voiceRate: 1.25 // bản gốc: cô nói nhanh cho tiết tấu dồn dập
+    voiceRate: 1.25, // bản gốc: cô nói nhanh cho tiết tấu dồn dập
+    acceptNoDiacritics: true // gõ "cai chao" cũng đúng câu "CÁI CHẢO" (bản gốc: phải đủ dấu)
   },
   create
 };
