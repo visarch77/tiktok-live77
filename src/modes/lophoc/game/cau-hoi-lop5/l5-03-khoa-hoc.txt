@@ -1,0 +1,41 @@
+# Khoa học
+# Bộ câu hỏi lớp 5: hỗn hợp, dung dịch, biến đổi chất, năng lượng, điện, sinh sản, vòng đời, môi trường.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách viết khác cũng tính đúng (cách nhau dấu phẩy)
+> Đây là kiến thức môn Khoa học.
+HỖN HỢP | Trộn cát với sỏi, mỗi chất vẫn giữ nguyên tính chất của nó, ta được cái này. | 2
+DUNG DỊCH | Hòa tan đường vào nước, ta được một chất lỏng đồng nhất gọi là gì? | 2
+CHẤT TAN | Trong cốc nước muối, muối được gọi là gì? | 3
+CHƯNG CẤT | Đun nước muối cho bay hơi rồi để hơi nước gặp lạnh, lấy được nước tinh khiết. Cách làm này gọi là gì? | 3
+GỈ SẮT | Lớp màu nâu đỏ phủ trên chiếc đinh để lâu ngoài trời ẩm. | 2 | RỈ SẮT
+BIẾN ĐỔI HÓA HỌC | Đốt tờ giấy thành tro, chất mới tạo ra khác hẳn chất ban đầu. Đó là sự gì? | 3
+NĂNG LƯỢNG | Ánh sáng, nhiệt và điện đều là các dạng của thứ này, mọi hoạt động đều cần nó. | 2
+PIN MẶT TRỜI | Những tấm phẳng màu xanh đen lắp trên mái nhà, biến ánh nắng thành điện. | 2
+CỐI XAY GIÓ | Cái máy có cánh quạt lớn quay nhờ sức gió, dùng để xay hạt hoặc bơm nước. | 1
+THAN ĐÁ | Chất đốt màu đen đào lên từ mỏ, ở Quảng Ninh có rất nhiều. | 2
+DẦU MỎ | Chất lỏng sánh màu đen khai thác dưới lòng đất và ngoài biển, dùng làm ra xăng. | 2
+KHÍ SINH HỌC | Khí đốt tạo ra khi ủ kín phân và rác thải của vật nuôi, dùng để đun nấu. | 3
+MẠCH ĐIỆN | Pin, dây dẫn và bóng đèn nối với nhau thành một vòng kín thì gọi là gì? | 2
+VẬT DẪN ĐIỆN | Những vật như dây đồng, đinh sắt cho dòng điện chạy qua gọi là gì? | 2
+VẬT CÁCH ĐIỆN | Nhựa, gỗ khô, cao su không cho dòng điện chạy qua, gọi là gì? | 2
+NHỊ | Cơ quan sinh sản đực của hoa, đầu có chứa nhiều hạt phấn. | 3
+NHỤY | Cơ quan sinh sản cái của hoa, nằm ở giữa bông hoa. | 3
+THỤ PHẤN | Hạt phấn từ nhị rơi vào đầu nhụy, hiện tượng đó gọi là sự gì? | 3
+GIÂM CÀNH | Cắm một đoạn thân sắn hay cành rau muống xuống đất ẩm để mọc thành cây mới, gọi là gì? | 2
+CHIẾT CÀNH | Bóc vỏ một đoạn cành bưởi, bó đất cho ra rễ rồi cắt xuống đem trồng, gọi là gì? | 3
+ĐẺ CON | Chó, mèo, trâu, bò sinh sản bằng cách này. | 1
+VÒNG ĐỜI | Trứng nở thành sâu, sâu thành nhộng, nhộng thành bướm. Cả quá trình này gọi là gì của con bướm? | 2
+NÒNG NỌC | Con ếch lúc còn nhỏ, có đuôi, sống dưới nước, gọi là gì? | 1
+NHỘNG | Giai đoạn nằm im trong kén trước khi hóa thành bướm. | 2
+TUỔI DẬY THÌ | Giai đoạn cơ thể lớn nhanh và có nhiều thay đổi, chuyển dần từ trẻ em thành người lớn. | 2
+TÀI NGUYÊN | Đất, nước, rừng, khoáng sản là những ... thiên nhiên cần được bảo vệ. | 2
+KHOÁNG SẢN | Than, sắt, đá vôi khai thác dưới lòng đất gọi chung là gì? | 2
+XÓI MÒN | Đồi trọc bị nước mưa cuốn trôi lớp đất màu mỡ, hiện tượng đó gọi là gì? | 2
+MÙN | Chất màu đen trong đất do lá cây và xác sinh vật mục rữa tạo thành, làm đất tơi xốp. | 2
+TRỒNG RỪNG | Việc làm giúp phủ xanh đồi trọc, chống xói mòn đất. | 1
+LẮNG | Để cốc nước đục yên một lúc, đất cát chìm xuống đáy. Cách làm sạch nước này gọi là để gì? | 2 | LẮNG CẶN
+NƯỚC CẤT | Nước tinh khiết thu được sau khi chưng cất, dùng trong phòng thí nghiệm. | 2
+CON NON | Con vật mới được sinh ra, còn bé, gọi chung là gì? | 1
+ĐỘNG VẬT | Chó, mèo, cá, chim, ếch gọi chung là gì? | 1
+TIẾT KIỆM NƯỚC | Khóa vòi khi đang đánh răng là việc làm gì? | 1
+KHÍ THẢI | Khói xả ra từ ô tô, xe máy, nhà máy làm bẩn không khí. | 1
+CÂY CON | Hạt nảy mầm rồi lớn lên thành cái gì? | 1

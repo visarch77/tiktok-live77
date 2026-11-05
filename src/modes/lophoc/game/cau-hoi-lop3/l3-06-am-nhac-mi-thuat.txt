@@ -1,0 +1,31 @@
+# Âm nhạc và Mĩ thuật
+# Lớp 3: khuông nhạc, nhạc cụ gõ, hát tập thể; màu sắc, pha màu, các loại tranh, xé dán, nặn.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách viết khác cũng tính đúng (cách nhau dấu phẩy)
+> Đây là kiến thức môn Âm nhạc và Mĩ thuật.
+KHUÔNG NHẠC | Năm dòng kẻ song song để viết nốt nhạc lên đó. | 2
+KHÓA SON | Kí hiệu uốn lượn đặt ở đầu năm dòng kẻ nhạc. | 3 | KHÓA SOL
+TIẾT TẤU | Vỗ tay theo tiếng dài, tiếng ngắn của bài hát là gõ đệm theo cái này. | 3
+NHẠC CỤ | Đàn, trống, sáo, kèn gọi chung là gì? | 1
+SONG LOAN | Nhạc cụ gõ bằng gỗ, hình tròn, gõ kêu cốc cốc để giữ nhịp. | 3
+THANH PHÁCH | Hai thanh tre gõ vào nhau để giữ nhịp khi hát. | 2 | PHÁCH
+LĨNH XƯỚNG | Một bạn hát trước một câu, cả lớp hát theo. Bạn hát trước làm việc gì? | 3
+MÀU CƠ BẢN | Đỏ, vàng, lam là ba màu gì, pha với nhau ra được nhiều màu khác? | 2
+PHA MÀU | Trộn hai màu với nhau trên bảng để ra màu mới, việc này gọi là gì? | 1
+MÀU LỤC | Trộn màu vàng với màu lam sẽ được màu gì? | 2 | MÀU XANH LÁ, XANH LÁ, XANH LÁ CÂY, MÀU XANH LÁ CÂY
+MÀU NÓNG | Đỏ, cam, vàng gợi cảm giác ấm áp, gọi là nhóm màu gì? | 2
+MÀU LẠNH | Xanh lam, xanh lục, tím gợi cảm giác mát mẻ, gọi là nhóm màu gì? | 2
+ĐẬM NHẠT | Màu chỗ sẫm, chỗ nhạt trong bức tranh gọi là gì? | 3
+TRANH CHÂN DUNG | Bức tranh vẽ khuôn mặt một người. | 3
+TRANH TĨNH VẬT | Tranh vẽ lọ hoa, quả cây, đồ vật đặt trên bàn. | 3
+TRANH PHONG CẢNH | Tranh vẽ núi, sông, cây cối, làng quê. | 2
+XÉ DÁN | Xé giấy màu rồi dán thành hình con vật, cây cối gọi là gì? | 2
+ĐẤT NẶN | Thứ mềm, nhiều màu, dùng để nặn hình con vật, quả cây. | 1
+BÚT SÁP | Loại bút màu làm bằng sáp, tô lên giấy rất tươi. | 1
+MÀU NƯỚC | Loại màu pha với nước rồi dùng cọ để vẽ. | 2
+ĐƯỜNG DIỀM | Họa tiết lặp lại thành dải chạy quanh viền khăn, viền áo, viền đĩa. | 3
+MẶT NẠ | Đeo lên mặt khi đóng vai con vật trong buổi múa hát. | 1
+ĐỒNG CA | Cả lớp cùng hát chung một bài gọi là gì? | 2
+TỐP CA | Một nhóm vài bạn cùng đứng hát gọi là gì? | 2
+ĐƠN CA | Một bạn đứng hát một mình gọi là gì? | 1
+VỖ TAY | Bạn hát xong, cả lớp làm gì để khen bạn? | 1
+TÔ MÀU | Vẽ xong hình, em lấy bút màu để làm việc gì? | 1

@@ -1,0 +1,28 @@
+# Âm nhạc và Mĩ thuật
+# Bộ lớp 4: khuông nhạc, nốt nhạc, nhạc cụ gõ, hình thức hát, màu sắc, thể loại tranh.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách viết khác cũng tính đúng (cách nhau dấu phẩy)
+> Đây là kiến thức môn Âm nhạc hoặc Mĩ thuật.
+ĐỒ RÊ MI | Ba nốt nhạc đầu tiên trong bảy nốt nhạc. | 1
+NỐT ĐEN | Nốt nhạc có thân tô kín màu và có đuôi, ngân dài một phách. | 2 
+NỐT TRẮNG | Nốt nhạc có thân rỗng ruột, ngân dài gấp đôi nốt đen. | 3
+NHỊP | Bài hát được chia thành từng ô bằng vạch dọc, mỗi ô gọi là một gì? | 2 | Ô NHỊP
+MÕ | Nhạc cụ bằng gỗ, rỗng ruột, gõ kêu cốc cốc. | 1
+XẮC XÔ | Nhạc cụ gõ hình tròn, viền có gắn những miếng kim loại nhỏ, lắc kêu xủng xoẻng. | 2
+SONG CA | Hai người cùng hát chung một bài thì gọi là hát gì? | 1 
+TĨNH VẬT | Tranh vẽ lọ hoa, quả cây đặt trên bàn. | 3
+PHONG CẢNH | Tranh vẽ núi sông, cây cối, làng quê. | 1 
+NẶN | Dùng đôi tay biến cục đất sét thành con vật, gọi là làm gì? | 1
+HỌA TIẾT | Những hình trang trí như hoa lá, chấm tròn, đường sọc lặp lại trên đồ vật. | 3
+NỐT MÓC ĐƠN | Nốt nhạc có một cái móc ở đuôi, ngân bằng một nửa nốt đen. | 3
+ĐÀN TÍNH | Nhạc cụ của người Tày, bầu đàn làm từ vỏ quả bầu khô, cần đàn dài. | 3
+KHÈN | Nhạc cụ thổi làm từ nhiều ống trúc ghép lại, gắn với người Mông. | 2
+ĐÀN ĐÁ | Nhạc cụ cổ gồm những thanh đá dài ngắn khác nhau, gõ vào phát ra tiếng ngân. | 2
+DÂN CA | Những bài hát do nhân dân sáng tác, truyền miệng qua nhiều đời, như hò, lý, quan họ. | 2
+HÒA TẤU | Nhiều nhạc cụ cùng chơi chung một bản nhạc thì gọi là gì? | 3
+GÕ ĐỆM | Vừa hát vừa dùng thanh phách hoặc vỗ tay theo nhịp bài hát, gọi là làm gì? | 2
+XANH LÁ | Pha màu vàng với màu lam thì được màu gì? | 1 | XANH LÁ CÂY, MÀU XANH LÁ
+PHÙ ĐIÊU | Hình nổi được chạm khắc trên một mặt phẳng như tường đá, tường gỗ. | 3
+KHUNG TRANH | Viền gỗ bao quanh bức tranh treo tường. | 1
+GIẤY MÀU | Loại giấy có nhiều màu sắc dùng để cắt dán, gấp hình. | 1
+BẢNG PHA MÀU | Tấm nhựa có nhiều ô nhỏ để đổ màu vẽ ra trộn với nhau. | 2
+ĐỐI XỨNG | Hai nửa của chiếc lá hay con bướm giống hệt nhau như soi gương, gọi là gì? | 3

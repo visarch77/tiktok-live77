@@ -1,0 +1,24 @@
+# Âm nhạc và Mĩ thuật
+# Bộ câu hỏi lớp 5: kí hiệu nhạc, hình thức hát, nhạc cụ; thể loại tranh, màu sắc, bố cục.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách viết khác cũng tính đúng (cách nhau dấu phẩy)
+> Đây là kiến thức Âm nhạc và Mĩ thuật.
+ĐÀN NGUYỆT | Đàn dân tộc có hộp đàn tròn như mặt trăng, có hai dây. | 3
+KÈN PHÍM | Nhạc cụ có bàn phím nhỏ, em vừa thổi qua ống ngậm vừa bấm phím. | 2
+BỐ CỤC | Cách sắp xếp hình ảnh chính, hình ảnh phụ trong một bức tranh. | 3
+PHÁC THẢO | Vẽ nhẹ tay những nét chính trước khi vẽ chi tiết và tô màu. | 2
+TRANH CỔ ĐỘNG | Tranh có khẩu hiệu ngắn, kêu gọi mọi người cùng làm việc tốt như bảo vệ môi trường. | 3
+DẤU LẶNG | Kí hiệu cho biết chỗ phải ngừng, không hát cũng không đàn. | 2
+VẠCH NHỊP | Vạch thẳng đứng chia bản nhạc thành từng ô nhịp. | 2
+DẤU CHẤM DÔI | Dấu chấm nhỏ bên phải nốt nhạc, làm nốt dài thêm một nửa. | 3
+ĐỘC TẤU | Một người chơi một nhạc cụ một mình trên sân khấu, gọi là hình thức gì? | 2
+ĐÀN TÌ BÀ | Đàn dân tộc có thân hình giống quả lê bổ đôi, có bốn dây. | 3
+TRANH SƠN DẦU | Loại tranh vẽ bằng màu pha dầu trên vải căng khung. | 2
+ĐƯỜNG NÉT | Nét thẳng, nét cong, nét gấp khúc là các loại gì trong mĩ thuật? | 2
+HÌNH KHỐI | Khối hộp, khối cầu, khối trụ có chiều dày, gọi chung là gì trong mĩ thuật? | 2
+MÀU NHỊ HỢP | Màu cam, xanh lá, tím do pha hai màu cơ bản với nhau mà có. | 3
+ĐÀN ORGAN | Đàn phím điện tử thầy cô thường dùng để đệm trong giờ âm nhạc. | 1 | ĐÀN OÓC GAN
+TRIỂN LÃM | Buổi trưng bày tranh của học sinh cho mọi người đến xem. | 2
+BIỂU DIỄN | Đứng trên sân khấu hát, múa cho mọi người xem gọi là gì? | 1
+GIẤY VẼ | Tờ giấy dày, trắng, dùng để vẽ tranh trong giờ mĩ thuật. | 1
+GIAI ĐIỆU | Chuỗi âm thanh cao thấp nối tiếp nhau tạo nên bài hát, nghe một lần là nhớ. | 2
+TƯƠNG PHẢN | Hai màu đặt cạnh nhau làm nhau nổi bật hẳn lên, như đen với trắng. Đó là gì? | 3

@@ -1,0 +1,38 @@
+# Đố mẹo lớp 3
+# Câu đố mẹo: chỉ hỏi ở chỗ 'meo' của tiết, không lẫn vào câu chữ thường.
+# Mỗi dòng: ĐÁP ÁN | câu đố | độ khó (để 2) | cách trả lời khác cũng tính đúng (cách nhau dấu phẩy)
+> Câu đố mẹo nè, cẩn thận bị cô lừa nha.
+CON DỐC | Con gì đầu dê, mình ốc? | 2 | DỐC
+CÁI ÁO | Cái gì có cổ mà không có đầu, có tay mà không có ngón? | 2 | ÁO
+GÃY TAY | Bệnh gì bác sĩ phải bó tay? | 2
+TƯƠNG LAI | Cái gì luôn ở phía trước mà không ai nhìn thấy được? | 2
+BÓNG TRĂNG | Cái gì bằng cái vung, vùng xuống ao, đào chẳng thấy, lấy chẳng được? | 2 | MẶT TRĂNG, ÔNG TRĂNG
+HẠNG HAI | Chạy thi, em vượt qua bạn đang đứng thứ hai. Vậy em đang đứng thứ mấy? | 2 | THỨ HAI, THỨ 2
+HAI QUẢ CAM | Có năm quả cam, em lấy đi hai quả. Hỏi em có mấy quả? | 2 | HAI QUẢ, HAI, 2 QUẢ
+BÀN CHÂN | Cái gì đi cũng nằm, đứng cũng nằm, nằm cũng nằm? | 2
+TẤT CẢ | Tháng nào trong năm có hai mươi tám ngày? | 2 | MỌI THÁNG, THÁNG NÀO CŨNG CÓ, CẢ MƯỜI HAI THÁNG
+BA CON VỊT | Hai con vịt đi trước một con vịt, hai con vịt đi sau một con vịt, hai con vịt đi giữa một con vịt. Có mấy con vịt? | 2 | BA, 3, 3 CON
+MIẾNG BỌT BIỂN | Cái gì đầy lỗ mà vẫn giữ được nước? | 2 | BỌT BIỂN
+TỪ ĐIỂN | Ở đâu chủ nhật đứng trước thứ bảy? | 2 | CUỐN TỪ ĐIỂN
+CON TEM | Cái gì đi khắp thế giới mà chỉ nằm yên một góc? | 2 | TEM
+CHỮ SAI | Chữ gì mà ai viết cũng sai? | 2 | SAI
+QUẢ BÓNG | Quả gì không ăn được mà ai cũng thích đá? | 2
+QUẢ ĐẤT | Quả gì to nhất, cả loài người cùng ở trên đó? | 2
+CÂY BÚT | Cây gì không có rễ, không có lá, ngày nào cũng theo em đến lớp? | 2 | BÚT
+CHÂN TRỜI | Chân gì ở xa tít mà không ai chạm tới được? | 2
+MẶT ĐẤT | Mặt gì rộng nhất mà ai cũng đứng lên được? | 2
+BÀN TAY | Bàn gì không kê được đồ, mỗi người có hai cái, mỗi cái năm ngón? | 2
+CẦU THỦ | Cầu gì không bắc qua sông mà chạy khắp sân cỏ? | 2
+ĐƯỜNG PHÈN | Đường gì không để đi mà để ăn, viên trong như đá? | 2
+HÀNG RÀO | Hàng gì không mua, không bán, đứng bao quanh vườn nhà? | 2
+LÁ THƯ | Lá gì không mọc trên cây mà gửi đi xa được? | 2 | BỨC THƯ
+GÀ MÁI | Gà gì không biết gáy mà biết đẻ trứng? | 2
+QUE DIÊM | Phòng tối có cây nến và đèn dầu, em chỉ có một hộp diêm. Em phải đốt cái gì trước tiên? | 2 | DIÊM
+MẮT CÁ | Mắt gì nằm ở chân mà không nhìn thấy gì? | 2 | MẮT CÁ CHÂN
+RĂNG CƯA | Răng gì không mọc trong miệng, dùng để cắt gỗ? | 2
+MŨI KIM | Mũi gì rất nhọn mà không ngửi được, dùng để khâu áo? | 2
+CỔ CHAI | Cổ gì không nằm trên vai, rót nước ra từ đó? | 2
+ĐẦU TÀU | Đầu gì không có tóc mà kéo cả đoàn toa chạy? | 2 | ĐẦU MÁY
+LƯỠI DAO | Lưỡi gì không nếm được mà sắc lẹm? | 2
+TAY ÁO | Tay gì có hai cái mà không có ngón, mặc lên người? | 2
+GIỌT NƯỚC | Một cộng một bằng một khi cộng hai thứ gì lại với nhau? | 2 | HẠT NƯỚC

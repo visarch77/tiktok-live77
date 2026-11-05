@@ -1,0 +1,31 @@
+# Đạo đức
+# Lớp 3: trung thực, giữ lời hứa, tự lập, ham học hỏi, quan tâm hàng xóm, tôn trọng, yêu Tổ quốc.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách viết khác cũng tính đúng (cách nhau dấu phẩy)
+> Đây là bài học môn Đạo đức.
+TRUNG THỰC | Không nói dối, làm sai thì nhận lỗi, là người có đức tính gì? | 2
+GIỮ LỜI HỨA | Đã hẹn với bạn điều gì thì phải làm đúng như đã nói. | 2
+TỰ LẬP | Tự làm lấy việc của mình, không dựa dẫm vào người khác. | 2
+HAM HỌC HỎI | Hay đặt câu hỏi, thích tìm hiểu điều mới là đức tính gì? | 2
+QUAN TÂM | Hỏi han, chăm sóc khi ông bà bị ốm là thể hiện điều gì? | 1
+TÔN TRỌNG | Lắng nghe người khác nói, không chê cười bạn khác mình. | 2
+LỄ PHÉP | Chào hỏi người lớn, nói lời thưa gửi là ngoan và có điều này. | 1
+XIN LỖI | Lỡ làm đổ nước vào vở bạn, em cần nói lời gì? | 1
+CẢM ƠN | Được bạn cho mượn bút, em nói lời gì? | 1
+NHƯỜNG NHỊN | Anh chị lớn để phần đồ chơi cho em nhỏ, không tranh giành. | 2
+ĐOÀN KẾT | Cả lớp cùng chung sức, thương yêu nhau, không chia bè phái. | 1
+LÁNG GIỀNG | Người sống cạnh nhà mình, tối lửa tắt đèn có nhau. | 2
+TỔ QUỐC | Đất nước nơi em sinh ra và lớn lên, em luôn yêu quý và tự hào. | 2
+VƯỢT KHÓ | Thầy Nguyễn Ngọc Ký bị liệt hai tay, tập viết bằng chân, là tấm gương về việc này. | 3
+TIẾT KIỆM | Tắt điện khi ra khỏi phòng, khóa vòi nước khi dùng xong là đức tính gì? | 2
+GỌN GÀNG | Sách vở xếp ngay ngắn, góc học tập sạch sẽ là em sống thế nào? | 1
+ĐÚNG GIỜ | Đi học không bao giờ muộn là bạn có thói quen gì? | 1
+CỦA RƠI | Nhặt được chiếc ví ai đánh mất trên đường, chiếc ví ấy gọi là gì? | 2
+TÀI SẢN | Xe đạp, sách vở, đồ dùng của người khác là thứ gì của họ, em không được tự ý lấy? | 2
+TRÁCH NHIỆM | Làm hỏng thì nhận lỗi và sửa chữa, được giao việc thì làm đến nơi đến chốn. | 3
+CHIA SẺ | Có bánh ngon em mời bạn cùng ăn, gọi là gì? | 1
+GIÚP ĐỠ | Bạn bị ngã, em đỡ bạn dậy là hành động gì? | 1
+TỰ GIÁC | Không cần ai nhắc mà vẫn tự ngồi vào bàn học bài. | 2
+KHIÊM TỐN | Học giỏi nhưng không khoe khoang, không kiêu căng. | 3
+NHÂN HẬU | Tấm lòng thương người, hiền lành, hay giúp đỡ người khác. | 3
+VÂNG LỜI | Bố mẹ dặn điều hay lẽ phải, con nghe theo, gọi là gì? | 1
+CHÀO HỎI | Gặp người lớn tuổi, em làm việc này trước tiên. | 1

@@ -17,8 +17,24 @@ const core = require('./core.cjs');
 const { Classroom, GAME, plain, speakableName, containsBanned, GiftThanker, OncePerPerson, NameBatcher } = core;
 
 const QUESTION_DIR = path.join(__dirname, 'game', 'cau-hoi');
-const { questions: BANK, errors: BANK_ERRORS } = core.loadBank(QUESTION_DIR);
-if (BANK_ERRORS.length) console.warn(`[lophoc] ${BANK_ERRORS.length} dòng câu hỏi sai cú pháp, vd: ${BANK_ERRORS[0]}`);
+const { makeGradeMath } = require('./gradeMath');
+
+// Bộ câu hỏi: 'chung' (bản gốc, game/cau-hoi) hoặc theo lớp (game/cau-hoi-lop3, -lop4, -lop5). Chọn trong cài đặt phòng.
+const QUESTION_SETS = ['chung', 'lop3', 'lop4', 'lop5'];
+const BANKS = {};
+for (const set of QUESTION_SETS) {
+  const dir = set === 'chung' ? QUESTION_DIR : path.join(__dirname, 'game', `cau-hoi-${set}`);
+  if (!fs.existsSync(dir)) {
+    BANKS[set] = [];
+    continue;
+  }
+  const { questions, errors } = core.loadBank(dir);
+  if (errors.length) console.warn(`[lophoc] Bộ ${set}: ${errors.length} dòng câu hỏi sai cú pháp, vd: ${errors[0]}`);
+  BANKS[set] = questions;
+}
+/** bộ đang chọn còn trống (chưa có file) thì dùng bộ chung */
+const bankOf = (set) => (BANKS[set] && BANKS[set].length ? set : 'chung');
+const gradeOf = (set) => ({ lop3: 3, lop4: 4, lop5: 5 })[set] || 0;
 
 const TICK_MS = 200;
 const VIEW_MIN_GAP_MS = 250; // gửi ảnh chụp lớp học tối đa 4 lần/giây
@@ -283,7 +299,28 @@ function create(ctx, saved = {}) {
     return book.today.scores;
   };
 
-  const room = new Classroom(BANK, Date.now(), Math.random, book.used, Object.keys(book.banned));
+  let activeSet = bankOf(ctx.settings.questionSet);
+  const room = new Classroom(BANKS[activeSet], Date.now(), Math.random, book.used, Object.keys(book.banned));
+  // Bộ theo lớp: câu toán nhẩm đổi theo chương trình lớp đó (gradeMath.js). Bọc pickRound của lõi (hàm private của TS,
+  // JS vẫn gọi được): bốc câu xong thì thay các câu toán của bản gốc bằng câu toán theo lớp, cùng vị trí, cùng cấp.
+  const pickRound = room.pickRound;
+  room.pickRound = function (now, from = 0) {
+    pickRound.call(this, now, from);
+    const grade = gradeOf(activeSet);
+    if (!grade || !Array.isArray(this.roundQs)) return;
+    this.roundQs = this.roundQs.map((q, i) => {
+      const slot = GAME.roundPlan[i];
+      return i >= from && q && q.math && /^math\d$/.test(slot) ? makeGradeMath(grade, Number(slot.slice(4))) : q;
+    });
+  };
+  /** cài đặt đổi bộ câu hỏi: tiết sau bốc câu từ bộ mới (tiết đang học giữ nguyên) */
+  function applyQuestionSet() {
+    const set = bankOf(ctx.settings.questionSet);
+    if (set === activeSet) return;
+    activeSet = set;
+    room.bank = BANKS[set]; // trường private của lõi TS
+    dirty = true;
+  }
   const refreshWeekLeader = () => {
     const top = topOf(weekBook(), 1)[0];
     room.weekLeader = top ? speakableName(top.nickname) : '';
@@ -512,6 +549,7 @@ function create(ctx, saved = {}) {
           dirty = true;
         }
         lastTick = now;
+        applyQuestionSet();
         say(room.tick(now));
         prefetchNextQuestion();
         flushChatter(now);
@@ -700,7 +738,7 @@ function create(ctx, saved = {}) {
     },
 
     getPublicState() {
-      return { lophoc: buildView(), bankSize: BANK.length };
+      return { lophoc: buildView(), bankSize: BANKS[activeSet].length, questionSet: activeSet };
     },
 
     serialize() {
@@ -737,10 +775,12 @@ module.exports = {
   overlay: 'lophoc.html',
   // voiceEngine: 'edge' = giọng Edge (nhanh, có giọng tiếng Anh, cần mạng) · 'zero' = ZeroTTS giọng phòng (chạy trên máy, chậm hơn)
   settingsSchema: {
+    questionSet: { type: 'enum', values: QUESTION_SETS },
     voiceEngine: { type: 'enum', values: ['edge', 'zero'] },
     voiceRate: [0.8, 1.5]
   },
   defaultSettings: {
+    questionSet: 'chung',
     voiceEngine: 'edge',
     voiceRate: 1.25 // bản gốc: cô nói nhanh cho tiết tấu dồn dập
   },

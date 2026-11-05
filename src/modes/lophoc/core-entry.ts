@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { parseBank } from './game/questions';
 
-export { Classroom, plain } from './game/quiz';
+export { Classroom, plain, compactVi, normVi } from './game/quiz';
 export { GAME } from './game/config';
 export { speakableName } from './live/names';
 export { containsBanned, maskBanned } from './live/bannedWords';

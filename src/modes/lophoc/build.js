@@ -103,6 +103,9 @@ function runChecks() {
       fs.rmSync(out, { force: true });
     }
   }
+  // bộ câu hỏi theo lớp (game/cau-hoi-lop3, -lop4, -lop5)
+  console.log('\n▶ check-banks.js');
+  execFileSync(process.execPath, [path.join(DIR, 'check-banks.js')], { stdio: 'inherit', cwd: DIR });
 }
 
 module.exports = { ensureBuilt, build, buildStage };

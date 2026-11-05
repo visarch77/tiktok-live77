@@ -1,0 +1,51 @@
+# Lịch sử và văn hóa lớp 3
+# Câu lịch sử: chỉ hỏi ở chỗ 'su' của tiết, không lẫn vào câu chữ thường.
+# Phạm vi: truyền thuyết, Bác Hồ, ngày lễ, di tích và lễ hội học sinh lớp 3 đã đọc, đã học. Chi tiết nào các nguồn ghi khác nhau thì không đưa vào.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách trả lời khác cũng tính đúng
+> Câu lịch sử nè.
+LẠC LONG QUÂN | Người cha thuộc nòi rồng trong truyện Con Rồng cháu Tiên. | 1
+ÂU CƠ | Người mẹ thuộc nòi tiên, sinh ra một trăm người con. | 1
+BỌC TRĂM TRỨNG | Truyền thuyết kể mẹ Âu Cơ sinh ra thứ này, nở ra một trăm người con. | 2
+ĐỒNG BÀO | Người Việt gọi nhau bằng từ này, nghĩa là cùng một bọc sinh ra. | 3
+NGỰA SẮT | Thánh Gióng cưỡi con vật này, phun lửa đánh giặc. | 1
+GIẶC ÂN | Thánh Gióng đánh tan đội quân giặc nào? | 2
+NÚI SÓC | Đánh tan giặc, Thánh Gióng cưỡi ngựa lên ngọn núi này rồi bay về trời. | 3 | SÓC SƠN, NÚI SÓC SƠN
+VƯƠN VAI | Ăn bao nhiêu cũng không no, cậu bé Gióng làm động tác này rồi thành tráng sĩ. | 2
+SỨ GIẢ | Người nhà vua sai đi tìm người tài đánh giặc, cậu bé Gióng nghe tiếng liền biết nói. | 3
+LANG LIÊU | Hoàng tử làm bánh chưng, bánh giầy dâng vua Hùng. | 1
+MỊ NƯƠNG | Con gái vua Hùng thứ mười tám, được Sơn Tinh và Thủy Tinh cùng đến cầu hôn. | 1
+VOI CHÍN NGÀ | Vua Hùng đòi sính lễ có cơm nếp, bánh chưng và con vật nào có chín cái ngà? | 2
+GÀ CHÍN CỰA | Sính lễ vua Hùng đòi, ngoài voi chín ngà còn có con vật nào có chín cái cựa? | 3
+NỎ THẦN | Chiếc nỏ của An Dương Vương, bắn một phát ra nhiều mũi tên. | 2
+RÙA VÀNG | Thần Kim Quy giúp An Dương Vương xây thành Cổ Loa là con vật gì? | 2 | KIM QUY, THẦN KIM QUY
+CHỬ ĐỒNG TỬ | Chàng trai nghèo khó ở bãi sông, sau lấy công chúa Tiên Dung. | 3
+MAI AN TIÊM | Người trồng được giống dưa hấu trên đảo hoang. | 2
+BÁC HỒ | Thiếu niên nhi đồng cả nước học Năm điều do người này dạy. | 1 | HỒ CHÍ MINH
+NGUYỄN SINH CUNG | Tên của Bác Hồ lúc nhỏ. | 2
+LÀNG SEN | Quê nội của Bác Hồ ở xã Kim Liên, Nghệ An, là làng gì? | 2 | KIM LIÊN
+HOÀNG TRÙ | Làng quê ngoại của Bác Hồ, nơi Bác cất tiếng khóc chào đời. | 3 | LÀNG CHÙA
+NAM ĐÀN | Vùng quê Bác Hồ ở Nghệ An, có làng Sen và làng Hoàng Trù. | 3
+NHÀ SÀN | Ngôi nhà gỗ đơn sơ Bác Hồ ở và làm việc trong khu Phủ Chủ tịch. | 2 | NHÀ SÀN BÁC HỒ
+AO CÁ BÁC HỒ | Cái ao trong Phủ Chủ tịch nơi Bác thường cho cá ăn. | 2 | AO CÁ
+ĐỘC LẬP | Ngày hai tháng chín năm 1945, Bác Hồ đọc bản Tuyên ngôn gì? | 2 | TUYÊN NGÔN ĐỘC LẬP
+MƯỜI THÁNG BA | Ngày Giỗ Tổ Hùng Vương theo âm lịch là ngày nào? | 1 | MÙNG MƯỜI THÁNG BA, MỒNG MƯỜI THÁNG BA, 10 THÁNG 3, MÙNG 10 THÁNG 3
+ĐỀN HÙNG | Khu di tích ở Phú Thọ thờ các vua Hùng. | 1
+NÚI NGHĨA LĨNH | Ngọn núi ở Phú Thọ, nơi có Đền Hùng. | 3
+BA MƯƠI THÁNG TƯ | Ngày giải phóng miền Nam, thống nhất đất nước năm 1975. | 2 | 30 THÁNG 4
+HAI THÁNG CHÍN | Ngày Quốc khánh nước Việt Nam là ngày nào? | 1 | MÙNG HAI THÁNG CHÍN, 2 THÁNG 9
+TẾT NGUYÊN ĐÁN | Tết lớn nhất của người Việt, đón năm mới âm lịch. | 1
+CỜ ĐỎ SAO VÀNG | Lá cờ Tổ quốc Việt Nam được gọi là cờ gì? | 1
+TIẾN QUÂN CA | Tên bài hát được chọn làm Quốc ca Việt Nam. | 3
+VĂN CAO | Nhạc sĩ sáng tác bài Quốc ca Việt Nam. | 3
+TRƯNG TRẮC | Người chị trong Hai Bà Trưng. | 2
+TRƯNG NHỊ | Người em trong Hai Bà Trưng. | 2
+MÊ LINH | Vùng đất quê hương của Hai Bà Trưng. | 3
+THÁP RÙA | Ngọn tháp nhỏ đứng giữa Hồ Gươm. | 1
+ĐỀN NGỌC SƠN | Ngôi đền trên đảo nhỏ ở Hồ Gươm, đi vào bằng cây cầu gỗ sơn đỏ. | 2
+CẦU THÊ HÚC | Cây cầu gỗ sơn đỏ cong cong ở Hồ Gươm. | 2
+KHUÊ VĂN CÁC | Gác có cửa sổ tròn trong Văn Miếu, được chọn làm biểu tượng của Thủ đô Hà Nội. | 3
+CHÙA THIÊN MỤ | Ngôi chùa cổ bên bờ sông Hương ở Huế, có tháp Phước Duyên bảy tầng. | 3
+CHÙA CẦU | Cây cầu có mái che nổi tiếng ở phố cổ Hội An. | 2
+MỸ SƠN | Khu đền tháp Chăm cổ ở miền Trung, là di sản văn hóa thế giới. | 3 | THÁNH ĐỊA MỸ SƠN
+HỘI GIÓNG | Lễ hội ở Phù Đổng và Sóc Sơn tưởng nhớ người anh hùng đánh giặc Ân. | 2
+HỘI LIM | Lễ hội ở Bắc Ninh nổi tiếng với những làn điệu dân ca quan họ. | 2

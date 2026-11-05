@@ -1,0 +1,36 @@
+# Đố mẹo lớp 5
+# Mỗi dòng: ĐÁP ÁN | câu đố | độ khó (để 2) | cách trả lời khác cũng tính đúng (cách nhau dấu phẩy)
+> Câu đố mẹo nè, cẩn thận bị cô lừa nha.
+XE TĂNG | Xe gì chẳng bao giờ giảm? | 2
+HOA TAY | Hoa gì không nở trong vườn mà nằm ngay trên đầu ngón tay? | 2
+NƯỚC NGOÀI | Nước gì không uống được, phải đi máy bay mới tới? | 2
+NIỀM VUI | Cái gì càng chia cho nhiều người thì lại càng nhiều thêm? | 2
+ỐC SÊN | Con gì đi đâu cũng cõng cả cái nhà trên lưng, bò rất chậm? | 2 | CON ỐC SÊN
+SỐ SÁU | Số nào lộn ngược lại thì tăng thêm ba? | 2 | SÁU, 6
+THỜI GIAN | Cái gì không có chân mà cứ trôi đi, không ai giữ lại được? | 2
+TÍNH SAI | Khi nào thì hai cộng hai không bằng bốn? | 2 | KHI TÍNH SAI
+ĂN ẢNH | Ăn gì không cần dùng miệng, chụp hình lên lúc nào cũng đẹp? | 2
+MŨI TÊN | Mũi gì không ngửi được, bắn ra từ cây cung? | 2
+RĂNG LƯỢC | Răng gì không biết nhai, ngày nào cũng chải tóc cho em? | 2
+BÚT DANH | Bút gì không cầm được, nhà văn dùng thay cho tên thật? | 2
+HOA HẬU | Hoa gì không mọc trong vườn mà được đội vương miện? | 2
+CÁ TÍNH | Cá gì không có vây, không biết bơi, mà ai cũng có riêng? | 2
+MÈO MÁY | Mèo gì không ăn cá, không bắt chuột, chạy bằng pin? | 2 | CHÚ MÈO MÁY
+BÁNH LÁI | Bánh gì không ăn được, thuyền trưởng cầm để điều khiển con tàu? | 2
+ÔNG MẶT TRỜI | Ông gì sáng sớm thức dậy, chiều tối đi ngủ, sống mãi mà không bao giờ già? | 2 | MẶT TRỜI
+CỘT SỐNG | Cột gì không ai leo được, nằm ngay giữa lưng em? | 2
+XUỐNG ĐẤT | Con trâu đứng quay đầu về hướng đông. Hỏi đuôi nó chỉ về hướng nào? | 2 | DƯỚI ĐẤT
+BỐN CON MÈO | Căn phòng có bốn góc, mỗi góc có một con mèo, mỗi con mèo thấy ba con mèo khác. Hỏi trong phòng có mấy con mèo? | 2 | BỐN, 4, BỐN CON
+TRỨNG LUỘC | Trứng gì gà mẹ ấp mãi cũng không bao giờ nở ra gà con? | 2 | QUẢ TRỨNG LUỘC
+VỊT QUAY | Vịt gì không biết bơi, không biết kêu, nằm trên đĩa? | 2
+MẶT ĐỒNG HỒ | Mặt gì không có mắt mũi, chỉ có các con số và mấy cái kim? | 2
+MƯỜI PHÚT | Luộc chín một quả trứng hết một phần sáu giờ. Bỏ ba quả cùng vào một nồi thì hết mấy phút? | 2 | 10 PHÚT, MƯỜI
+ĐI NGỦ | Đi gì mà nằm yên trên giường, nhắm mắt lại? | 2
+HÒN ĐẢO | Hòn gì không ném được, nằm giữa biển khơi? | 2 | ĐẢO
+KIM CƯƠNG | Kim gì không khâu được áo mà sáng lấp lánh trên nhẫn? | 2
+LÁ VÀNG | Vàng gì không đeo được, mùa thu rơi đầy sân? | 2
+ĐUÔI SAM | Đuôi gì không phải của con vật, bạn gái tết sau gáy? | 2 | BÍM TÓC
+BÔNG TAI | Bông gì không mọc trên cây, các bạn gái đeo ở hai bên? | 2 | KHUYÊN TAI
+GƯƠNG MẪU | Gương gì không soi được mặt mà cả lớp nên học theo? | 2
+BÔNG TUYẾT | Bông gì không mọc trên cây mà rơi trắng trời mùa đông? | 2
+ĐÁ VIÊN | Đá gì không phải đá núi, ngậm vào miệng là tan? | 2 | VIÊN ĐÁ

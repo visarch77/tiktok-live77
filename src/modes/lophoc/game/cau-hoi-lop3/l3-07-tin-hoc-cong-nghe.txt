@@ -1,0 +1,26 @@
+# Tin học và Công nghệ
+# Lớp 3: máy tính, chuột, bàn phím, thư mục, trang web; đồ dùng điện trong nhà, làm đồ dùng học tập.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách viết khác cũng tính đúng (cách nhau dấu phẩy)
+> Đây là kiến thức môn Tin học và Công nghệ.
+THÂN MÁY | Cái hộp chứa các bộ phận xử lý của máy tính để bàn. | 2
+NHÁY ĐÚP | Nháy nút trái chuột hai lần thật nhanh gọi là gì? | 2 | NHÁY ĐÚP CHUỘT
+KÉO THẢ | Nhấn giữ nút chuột, di chuyển chuột rồi buông ra, gọi là thao tác gì? | 3
+CON TRỎ | Mũi tên nhỏ trên màn hình, di chuyển theo con chuột. | 2 | CON TRỎ CHUỘT
+PHÍM CÁCH | Phím dài nhất trên bàn phím, bấm vào để cách chữ. | 2 | PHÍM SPACE
+HÀNG PHÍM CƠ SỞ | Hàng phím có hai phím chữ F và chữ J có gờ nhỏ để đặt ngón tay. | 3
+THƯ MỤC | Nơi cất và sắp xếp các tệp trong máy tính, giống chiếc cặp đựng hồ sơ. | 3
+BIỂU TƯỢNG | Hình ảnh nhỏ trên màn hình nền, nháy vào để mở phần mềm. | 2
+TRANG WEB | Mở trình duyệt để xem cái này trên mạng. | 2
+TRÌNH DUYỆT | Phần mềm dùng để mở và xem các trang web. | 3
+TƯ THẾ NGỒI | Ngồi thẳng lưng, mắt cách màn hình vừa phải là ngồi đúng cái gì? | 2
+THÔNG TIN | Bản tin thời tiết, biển báo đường cho ta biết điều gì đó, gọi chung là gì? | 2
+ĐÈN HỌC | Chiếc đèn đặt trên bàn giúp em đọc sách buổi tối. | 1
+MÁY THU THANH | Đồ dùng để nghe đài, nghe tin tức và ca nhạc, không có hình. | 2 | ĐÀI, RADIO, ĐÀI RADIO
+ĐỒ CHƠI | Búp bê, ô tô nhỏ, con quay gọi chung là gì? | 1
+ỐNG ĐỰNG BÚT | Dùng giấy bìa cuộn tròn, dán đáy, làm chỗ cắm bút trên bàn. | 2
+TỰ NHIÊN | Cây cối, sông núi, mặt trời không do con người làm ra, có sẵn trong đâu? | 3 | THIÊN NHIÊN
+HỌC TRỰC TUYẾN | Học qua mạng, thầy cô giảng bài trên màn hình máy tính. | 3 | HỌC ONLINE
+NÚT NGUỒN | Nhấn nút này để bật máy tính lên. | 1
+NHÁY CHUỘT | Nhấn nút trái chuột một lần rồi buông ra gọi là gì? | 1
+GÕ PHÍM | Dùng các ngón tay bấm lên bàn phím để nhập chữ gọi là gì? | 1
+MÁY TÍNH BẢNG | Máy tính mỏng, màn hình cảm ứng, cầm gọn trên tay. | 1

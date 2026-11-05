@@ -1,0 +1,39 @@
+# Tiếng Việt
+# Bộ lớp 4: từ loại, câu, dấu câu, biện pháp tu từ, từ ngữ theo chủ điểm, thành ngữ tục ngữ.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách viết khác cũng tính đúng (cách nhau dấu phẩy)
+> Đây là kiến thức môn Tiếng Việt.
+DANH TỪ | Loại từ chỉ người, vật, hiện tượng, ví dụ như bàn ghế, cơn mưa, cô giáo. | 1
+ĐỘNG TỪ | Loại từ chỉ hoạt động, trạng thái, ví dụ như chạy, nhảy, ngủ, vui mừng. | 1
+TÍNH TỪ | Loại từ chỉ đặc điểm, tính chất, ví dụ như xanh biếc, cao vút, chăm chỉ. | 2
+DANH TỪ RIÊNG | Tên riêng của một người, một con sông hay một thành phố, phải viết hoa. | 2
+CHỦ NGỮ | Bộ phận chính của câu, trả lời cho câu hỏi ai, cái gì, con gì. | 2
+VỊ NGỮ | Bộ phận chính của câu, trả lời cho câu hỏi làm gì, thế nào, là gì. | 2
+TRẠNG NGỮ | Thành phần phụ cho biết thời gian, nơi chốn, thường đứng ở đầu câu. | 3
+DẤU NGOẶC KÉP | Dấu câu dùng để đánh dấu tên một tác phẩm hoặc lời nói trực tiếp được dẫn lại. | 3
+CÂU HỎI | Kiểu câu dùng để hỏi điều mình chưa biết, cuối câu có dấu chấm hỏi. | 1
+TỪ GHÉP | Loại từ phức như xe đạp, bàn ghế, quần áo, ghép các tiếng có nghĩa lại với nhau. | 2
+TỪ LÁY | Loại từ có các tiếng giống nhau ở âm đầu hoặc vần, như lấp lánh, xinh xinh. | 2
+MỞ BÀI | Phần đầu tiên của bài văn, giới thiệu điều em sắp kể hoặc tả. | 1
+KẾT BÀI | Phần cuối cùng của bài văn, nêu cảm nghĩ của em. | 1
+THÂN BÀI | Phần ở giữa và dài nhất của bài văn. | 2
+VIẾT HOA | Chữ cái đầu của tên người, tên địa danh Việt Nam phải viết như thế nào? | 1
+ƯỚC MƠ | Điều tốt đẹp em mong muốn đạt được sau này, như trở thành bác sĩ, phi công. | 1
+SÁNG TẠO | Nghĩ ra cái mới, cách làm mới mà trước đó chưa ai làm. | 2
+KHÁM PHÁ | Tìm ra điều mới mẻ mà mình chưa biết, như các nhà thám hiểm. | 2
+TRẢI NGHIỆM | Tự mình làm, tự mình đi qua để hiểu thêm về cuộc sống. | 2 
+HÒA BÌNH | Không có chiến tranh, mọi người sống yên vui, biểu tượng là chim bồ câu trắng. | 1
+NGUYỄN HIỀN | Ông trạng thả diều ngày xưa, nhà nghèo mà học giỏi, đỗ trạng nguyên khi mới mười ba tuổi. | 3
+THÂN | Điền từ còn thiếu vào câu tục ngữ: Thương người như thể thương gì? | 2
+LÀNH | Điền từ còn thiếu vào câu tục ngữ: Ở hiền gặp gì? | 1
+NGUỒN | Điền từ còn thiếu vào câu tục ngữ: Uống nước nhớ gì? | 1
+RÁCH | Điền từ còn thiếu vào câu tục ngữ: Lá lành đùm lá gì? | 1
+BÍ | Câu ca dao: Bầu ơi thương lấy cái gì cùng, tuy rằng khác giống nhưng chung một giàn? | 1 
+THÀNH CÔNG | Câu tục ngữ nói: Thất bại là mẹ của điều gì? | 1 
+NƯỚC SƠN | Điền vào câu tục ngữ: Tốt gỗ hơn tốt gì? Ý nói phẩm chất bên trong quý hơn vẻ ngoài. | 3
+CÂU CHỦ ĐỀ | Câu nêu ý chính của cả đoạn văn, thường đứng ở đầu đoạn. | 3
+MIÊU TẢ | Kiểu bài văn dùng lời để vẽ lại con vật, cây cối, đồ vật cho người đọc như đang nhìn thấy. | 2
+THÀNH NGỮ | Cụm từ cố định có nghĩa hoàn chỉnh, như chân cứng đá mềm, một nắng hai sương. | 2
+TÀI NĂNG | Khả năng đặc biệt hơn người, như vẽ rất đẹp, hát rất hay. | 2
+TRUYỀN THỐNG | Nếp sống tốt đẹp ông cha để lại qua nhiều đời, như hiếu học, uống nước nhớ nguồn. | 3
+NGHỊ LỰC | Sức mạnh tinh thần giúp con người vượt qua khó khăn, không nản lòng. | 3
+RẠNG | Điền từ còn thiếu vào câu tục ngữ: Gần mực thì đen, gần đèn thì gì? | 2

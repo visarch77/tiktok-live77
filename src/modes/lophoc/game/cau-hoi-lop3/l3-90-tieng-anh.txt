@@ -1,0 +1,60 @@
+# Tiếng Anh lớp 3
+# Câu tiếng Anh: chỉ hỏi ở chỗ 'anh' của tiết, không lẫn vào câu chữ thường.
+# Từ vựng Tiếng Anh 3: trường lớp, lời cô dặn, đồ chơi, gia đình, thú cưng, cơ thể, nhà cửa, đồ ăn, thời tiết, số đếm, hoạt động, lời chào.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách trả lời khác cũng tính đúng
+> Câu tiếng Anh nè.
+LIBRARY | Thư viện tiếng Anh là gì? | 1
+PLAYGROUND | Sân chơi của trường tiếng Anh là gì? | 2
+MUSIC ROOM | Phòng âm nhạc tiếng Anh là gì? | 2
+ART ROOM | Phòng mĩ thuật tiếng Anh là gì? | 2
+COMPUTER ROOM | Phòng máy tính tiếng Anh là gì? | 2
+PENCIL CASE | Hộp bút tiếng Anh là gì? | 2
+CRAYON | Bút sáp màu tiếng Anh là gì? | 2
+SHARPENER | Cái gọt bút chì tiếng Anh là gì? | 3 | PENCIL SHARPENER
+STAND UP | Cô bảo cả lớp đứng lên, tiếng Anh nói thế nào? | 1
+SIT DOWN | Cô bảo cả lớp ngồi xuống, tiếng Anh nói thế nào? | 1
+COME IN | Mời bạn vào lớp, tiếng Anh nói thế nào? | 2
+OPEN YOUR BOOK | Cô bảo mở sách ra, tiếng Anh nói thế nào? | 2 | OPEN YOUR BOOKS
+BE QUIET | Cô bảo cả lớp giữ trật tự, tiếng Anh nói thế nào? | 2 | KEEP QUIET
+TEDDY BEAR | Con gấu bông tiếng Anh là gì? | 1 | TEDDY
+TRUCK | Xe tải tiếng Anh là gì? | 2 | LORRY
+SHIP | Con tàu thủy lớn đi trên biển tiếng Anh là gì? | 2
+PUZZLE | Trò chơi ghép hình tiếng Anh là gì? | 3 | JIGSAW
+UNCLE | Chú, bác, cậu tiếng Anh là gì? | 2
+AUNT | Cô, dì, thím tiếng Anh là gì? | 2 | AUNTIE
+COUSIN | Anh chị em họ tiếng Anh là gì? | 3
+PARROT | Con vẹt tiếng Anh là gì? | 2
+GOLDFISH | Con cá vàng tiếng Anh là gì? | 2
+NECK | Cái cổ tiếng Anh là gì? | 2
+LEG | Cái chân, phần từ hông xuống tới cổ chân, tiếng Anh là gì? | 2
+LIVING ROOM | Phòng khách tiếng Anh là gì? | 2 | SITTING ROOM
+BEDROOM | Phòng ngủ tiếng Anh là gì? | 2
+KITCHEN | Nhà bếp tiếng Anh là gì? | 2
+BATHROOM | Phòng tắm tiếng Anh là gì? | 2
+GARDEN | Khu vườn tiếng Anh là gì? | 2
+SUNNY | Trời nắng tiếng Anh là gì? | 2
+RAINY | Trời mưa tiếng Anh là gì? | 2
+WINDY | Trời nhiều gió tiếng Anh là gì? | 2
+CLOUDY | Trời nhiều mây tiếng Anh là gì? | 2
+WARM | Ấm áp tiếng Anh là gì? | 2
+ELEVEN | Số mười một tiếng Anh là gì? | 2
+TWELVE | Số mười hai tiếng Anh là gì? | 2
+FIFTEEN | Số mười lăm tiếng Anh là gì? | 2
+FIFTY | Số năm mươi tiếng Anh là gì? | 3
+MEAT | Thịt tiếng Anh là gì? | 2
+CARROT | Củ cà rốt tiếng Anh là gì? | 2
+POTATO | Củ khoai tây tiếng Anh là gì? | 2
+DRAW | Vẽ tranh bằng bút chì, vẽ tiếng Anh là gì? | 2
+FOOTBALL | Môn bóng đá tiếng Anh là gì? | 1 | SOCCER
+BADMINTON | Môn cầu lông tiếng Anh là gì? | 2
+CHESS | Cờ vua tiếng Anh là gì? | 2
+SKATING | Trượt pa tanh tiếng Anh là gì? | 3 | ROLLER SKATING
+PICNIC | Đi dã ngoại, mang đồ ăn ra công viên ngồi ăn, tiếng Anh là gì? | 3
+CLASSMATE | Bạn cùng lớp tiếng Anh là gì? | 3
+BOY | Bạn nam, cậu bé tiếng Anh là gì? | 1
+GIRL | Bạn nữ, cô bé tiếng Anh là gì? | 1
+BREAK TIME | Giờ ra chơi tiếng Anh là gì? | 2
+GOOD MORNING | Lời chào buổi sáng tiếng Anh là gì? | 1
+GOOD NIGHT | Lời chúc ngủ ngon tiếng Anh là gì? | 1
+NICE TO MEET YOU | Rất vui được gặp bạn tiếng Anh nói thế nào? | 2
+HOW ARE YOU | Hỏi bạn có khỏe không, tiếng Anh nói thế nào? | 2

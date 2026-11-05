@@ -1,0 +1,42 @@
+# Toán
+# Lớp 3: hình tròn, góc, khối, đơn vị đo, xem đồng hồ, số La Mã, phép nhân chia, số đến 100 000.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách viết khác cũng tính đúng (cách nhau dấu phẩy)
+> Đây là kiến thức môn Toán lớp ba.
+TÂM HÌNH TRÒN | Điểm nằm chính giữa của một hình tròn gọi là gì? | 2 | TÂM
+Ê KE | Dụng cụ hình tam giác dùng để kiểm tra và vẽ góc vuông. | 2
+GÓC KHÔNG VUÔNG | Đặt ê ke vào mà hai cạnh không khớp thì đó là loại góc gì? | 3
+ĐỈNH | Điểm chung của hai cạnh tạo thành một góc gọi là gì? | 2
+CẠNH | Hình tam giác có ba cái này, hình vuông có bốn cái. | 1
+MI LI MÉT | Đơn vị đo độ dài rất nhỏ, mười cái này bằng một xăng ti mét. | 2
+XĂNG TI MÉT | Một mét bằng một trăm đơn vị này. | 1
+ĐỀ XI MÉT | Đơn vị đo độ dài bằng mười xăng ti mét. | 2
+GAM | Đơn vị đo khối lượng, một nghìn cái này bằng một cân. | 2
+MI LI LÍT | Đơn vị đo nước rất nhỏ, một lít bằng một nghìn cái này. | 2
+CÂN ĐĨA | Loại cân có hai cái đĩa hai bên, đặt quả cân một bên để so. | 2
+QUẢ CÂN | Khối kim loại nhỏ có ghi số gam, đặt lên cân để so khối lượng. | 2
+KIM GIỜ | Chiếc kim ngắn nhất trên mặt đồng hồ. | 1
+KIM PHÚT | Chiếc kim dài trên đồng hồ, chạy hết một vòng là một giờ. | 1
+KIM GIÂY | Chiếc kim mảnh nhất trên đồng hồ, chạy nhanh nhất, tích tắc tích tắc. | 2
+THÁNG MƯỜI HAI | Tháng cuối cùng trong năm là tháng nào? | 1 | THÁNG 12
+SỐ LIỀN SAU | Chín mươi chín thêm một là một trăm, vậy một trăm là số gì của chín mươi chín? | 1
+SỐ LIỀN TRƯỚC | Số bé hơn một số đúng một đơn vị, đứng ngay trước số đó. | 2
+THỪA SỐ | Trong phép nhân, các số được nhân với nhau gọi là gì? | 2
+TÍCH | Kết quả của phép nhân gọi là gì? | 2
+THƯƠNG | Kết quả của phép chia gọi là gì? | 2
+SỐ BỊ CHIA | Trong phép mười hai chia cho ba, số mười hai gọi là gì? | 2
+TỔNG | Kết quả của phép cộng gọi là gì? | 1
+HIỆU | Kết quả của phép trừ gọi là gì? | 2
+SỐ DƯ | Chia mười ba cái kẹo cho bốn bạn, mỗi bạn ba cái, còn thừa một cái. Số một đó gọi là gì? | 3
+MỘT PHẦN HAI | Chia cái bánh làm hai phần bằng nhau, mỗi phần là bao nhiêu cái bánh? | 2 | MỘT NỬA
+TRUNG ĐIỂM | Điểm nằm chính giữa một đoạn thẳng, chia nó thành hai phần dài bằng nhau. | 3
+KHỐI HỘP CHỮ NHẬT | Hình khối giống viên gạch, hộp bánh, có sáu mặt. | 3
+KHỐI TRỤ | Hình khối giống lon nước, hai đầu là hai hình tròn. | 3
+XĂNG TI MÉT VUÔNG | Đơn vị đo diện tích, bằng diện tích hình vuông có cạnh một xăng ti mét. | 3
+LÀM TRÒN SỐ | Viết bốn mươi bảy thành năm mươi cho gọn, ta đã làm gì đến hàng chục? | 3
+HÀNG NGHÌN | Trong số bốn nghìn năm trăm, chữ số bốn đứng ở hàng nào? | 2
+MƯỜI NGHÌN | Số nhỏ nhất có năm chữ số là số nào? | 2 | 10000, 10 000
+BỐN | Trong số La Mã, chữ I đứng trước chữ V là số mấy? | 3 | 4
+MƯỜI MỘT | Số La Mã gồm chữ X, sau đó là chữ I, là số mấy? | 3 | 11
+BẢY GIỜ RƯỠI | Kim ngắn nằm giữa số bảy và số tám, kim dài chỉ số sáu. Đó là mấy giờ? | 3 | BẢY GIỜ BA MƯƠI, 7 GIỜ 30, 7 GIỜ RƯỠI
+KHÔNG THỂ | Hộp chỉ toàn bi xanh. Lấy ra được bi đỏ là việc chắc chắn, có thể hay là gì? | 2
+SỐ TRÒN CHỤC | Các số mười, hai mươi, ba mươi, bốn mươi gọi là số gì? | 1

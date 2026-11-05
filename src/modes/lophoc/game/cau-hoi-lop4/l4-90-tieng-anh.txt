@@ -1,0 +1,63 @@
+# Tiếng Anh
+# Câu tiếng Anh lớp 4: quốc gia, quốc tịch, môn học, thứ, tháng, nghề nghiệp, nơi chốn, sinh hoạt, quần áo, đồ ăn, con vật ở sở thú.
+# Cô đọc gợi ý tiếng Việt, người xem gõ từ tiếng Anh. Nghĩa nào có nhiều từ tiếng Anh đúng thì ghi thêm ở cột cách viết khác.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách trả lời khác cũng tính đúng
+> Câu tiếng Anh nè.
+JAPAN | Nước Nhật Bản tiếng Anh là gì? | 1
+AMERICA | Nước Mỹ tiếng Anh là gì? | 2 | USA
+AUSTRALIA | Nước Úc tiếng Anh là gì? | 2
+ENGLAND | Nước Anh tiếng Anh là gì? | 2
+THAILAND | Nước Thái Lan tiếng Anh là gì? | 2
+VIETNAMESE | Người Việt Nam, quốc tịch Việt Nam, tiếng Anh là gì? | 3
+JAPANESE | Người Nhật Bản, quốc tịch Nhật Bản, tiếng Anh là gì? | 3
+ENGLISH | Môn tiếng Anh, viết bằng tiếng Anh là gì? | 1
+MATHS | Môn Toán tiếng Anh là gì? | 2 | MATH
+SCIENCE | Môn Khoa học tiếng Anh là gì? | 2
+MUSIC | Môn Âm nhạc tiếng Anh là gì? | 1
+ART | Môn Mĩ thuật tiếng Anh là gì? | 1
+IT | Môn Tin học tiếng Anh viết tắt là gì? | 2
+PE | Môn Thể dục tiếng Anh viết tắt là gì? | 3
+TUESDAY | Thứ Ba tiếng Anh là gì? | 2
+WEDNESDAY | Thứ Tư tiếng Anh là gì? | 3
+THURSDAY | Thứ Năm tiếng Anh là gì? | 3
+FRIDAY | Thứ Sáu tiếng Anh là gì? | 2
+SATURDAY | Thứ Bảy tiếng Anh là gì? | 2
+JANUARY | Tháng Một tiếng Anh là gì? | 2
+FEBRUARY | Tháng Hai tiếng Anh là gì? | 3
+MARCH | Tháng Ba tiếng Anh là gì? | 2
+APRIL | Tháng Tư tiếng Anh là gì? | 2
+JUNE | Tháng Sáu tiếng Anh là gì? | 2
+SEPTEMBER | Tháng Chín tiếng Anh là gì? | 3
+OCTOBER | Tháng Mười tiếng Anh là gì? | 3
+DECEMBER | Tháng Mười Hai tiếng Anh là gì? | 3
+DOCTOR | Bác sĩ tiếng Anh là gì? | 1
+NURSE | Y tá tiếng Anh là gì? | 2
+FARMER | Nông dân tiếng Anh là gì? | 2
+DRIVER | Tài xế tiếng Anh là gì? | 2
+WORKER | Công nhân tiếng Anh là gì? | 2
+SINGER | Ca sĩ tiếng Anh là gì? | 1
+HOSPITAL | Bệnh viện tiếng Anh là gì? | 2
+PARK | Công viên tiếng Anh là gì? | 1
+ZOO | Sở thú tiếng Anh là gì? | 1
+SUPERMARKET | Siêu thị tiếng Anh là gì? | 2
+CINEMA | Rạp chiếu phim tiếng Anh là gì? | 3 | MOVIE THEATER
+BOOKSHOP | Hiệu sách tiếng Anh là gì? | 3 | BOOKSTORE
+SWIMMING POOL | Bể bơi tiếng Anh là gì? | 3 | POOL
+GET UP | Thức dậy, ra khỏi giường buổi sáng, tiếng Anh là gì? | 2 | WAKE UP
+BREAKFAST | Bữa sáng tiếng Anh là gì? | 2
+LUNCH | Bữa trưa tiếng Anh là gì? | 1
+DINNER | Bữa tối tiếng Anh là gì? | 1 | SUPPER
+HOMEWORK | Bài tập về nhà tiếng Anh là gì? | 2
+JACKET | Áo khoác tiếng Anh là gì? | 2 | COAT
+SKIRT | Chân váy tiếng Anh là gì? | 2
+JEANS | Quần bò tiếng Anh là gì? | 2
+SHOES | Đôi giày tiếng Anh là gì? | 1
+DRESS | Cái váy liền tiếng Anh là gì? | 2
+BEEF | Thịt bò tiếng Anh là gì? | 2
+PORK | Thịt heo tiếng Anh là gì? | 2
+CROCODILE | Con cá sấu tiếng Anh là gì? | 3
+PEACOCK | Con công tiếng Anh là gì? | 3
+CYCLE | Đạp xe tiếng Anh là gì? | 2 | RIDE A BIKE
+CLIMB | Leo trèo tiếng Anh là gì? | 3
+HIPPO | Con hà mã tiếng Anh là gì? | 2 | HIPPOPOTAMUS
+CAMEL | Con lạc đà tiếng Anh là gì? | 2

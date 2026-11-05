@@ -169,7 +169,8 @@ function Board({ v, now }: { v: StageView; now: number }) {
               key={v.math}
               initial={{ scale: 0.6, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className={`mt-4 shrink-0 text-center text-[76px] font-extrabold leading-[96px] text-[#ffe680] ${v.phase === 'reveal' ? 'opacity-50' : ''}`}
+              // tiktok-live77: câu toán theo lớp có phép tính dài (vd "Tam giác đáy 18, cao 7: S?") thì chữ nhỏ lại cho vừa 1 dòng
+              className={`mt-4 shrink-0 text-center ${v.math.length > 13 ? 'text-[56px]' : 'text-[76px]'} font-extrabold leading-[96px] text-[#ffe680] ${v.phase === 'reveal' ? 'opacity-50' : ''}`}
             >
               {v.math}
             </motion.div>

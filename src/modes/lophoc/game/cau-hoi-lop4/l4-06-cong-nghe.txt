@@ -1,0 +1,25 @@
+# Công nghệ
+# Bộ lớp 4: hoa và cây cảnh, trồng cây trong chậu, lắp ghép mô hình, đồ chơi dân gian.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách viết khác cũng tính đúng (cách nhau dấu phẩy)
+> Đây là kiến thức môn Công nghệ.
+CÂY CẢNH | Cây trồng trong chậu để trang trí nhà cửa cho thêm đẹp. | 1
+ĐẤT TRỒNG | Thứ phải cho vào chậu trước khi gieo hạt hoặc trồng cây con. | 1
+PHÂN BÓN | Bón thứ này để cây xanh tốt, ra nhiều hoa. | 1
+XẺNG | Dụng cụ nhỏ có cán để xúc đất cho vào chậu. | 1
+BÌNH TƯỚI | Dụng cụ có vòi hoa sen dùng để tưới nước cho cây. | 1
+GIEO HẠT | Rắc hạt giống xuống đất để hạt nảy mầm thành cây con. | 1 
+TƯỚI NƯỚC | Việc chăm sóc hằng ngày giúp cây không bị héo khô. | 1
+NHỔ CỎ | Loại bỏ cây dại mọc trong chậu để chúng không giành chất dinh dưỡng của cây hoa. | 1
+TỈA CÀNH | Cắt bớt những nhánh sâu, nhánh héo để cây gọn gàng và đẹp hơn. | 2
+LỖ THOÁT NƯỚC | Cái lỗ nhỏ dưới đáy chậu để nước thừa chảy ra ngoài. | 3
+CÂY KIM TIỀN | Cây cảnh lá xanh bóng, tên gọi mang ý mong nhiều tiền bạc. | 2 
+CÂY LƯỠI HỔ | Cây cảnh lá dài, cứng, có vằn như da hổ, đặt trong nhà giúp không khí trong lành. | 2
+HOA GIẤY | Hoa có cánh mỏng như giấy, nhiều màu, hay leo trên cổng nhà, trời càng nắng càng nở nhiều. | 2
+HOA ĐỒNG TIỀN | Loài hoa cánh xòe tròn, nhiều màu, có tên giống đồng xu ngày xưa, hay cắm vào dịp Tết. | 2
+LẮP GHÉP | Bộ đồ chơi gồm nhiều tấm, thanh, ốc vít để tạo thành mô hình, gọi là bộ gì mô hình kĩ thuật? | 2
+CỜ LÊ | Dụng cụ dùng để giữ chặt đai ốc khi vặn vít lắp mô hình. | 3
+ĐAI ỐC | Chi tiết nhỏ vặn vào đầu con vít để giữ chặt các tấm lắp ghép. | 3
+MÔ HÌNH | Bản làm nhỏ lại của một vật thật, như chiếc ô tô đồ chơi, ngôi nhà tí hon. | 1 
+THĂNG BẰNG | Chú chuồn chuồn tre đặt lên đầu ngón tay mà không rơi, vì nó giữ được điều gì? | 2
+ĐỒ CHƠI DÂN GIAN | Diều giấy, tò he, chong chóng là những loại đồ chơi gì? | 2 
+CHONG CHÓNG | Đồ chơi có cánh giấy gắn vào que, gặp gió là quay tít. | 1

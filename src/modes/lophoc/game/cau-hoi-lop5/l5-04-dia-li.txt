@@ -1,0 +1,38 @@
+# Địa lí
+# Bộ câu hỏi lớp 5 (phần Địa lí của Lịch sử và Địa lí 5): vị trí, địa hình, khí hậu, biển đảo, dân cư.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách viết khác cũng tính đúng (cách nhau dấu phẩy)
+> Đây là kiến thức Địa lí.
+BIỂN ĐÔNG | Vùng biển rộng lớn bao bọc phía đông và phía nam phần đất liền nước ta. | 1
+CHỮ S | Phần đất liền Việt Nam hẹp ngang, kéo dài, có hình giống chữ cái nào? | 1
+ĐÔNG NAM Á | Việt Nam nằm ở khu vực nào của châu Á? | 1
+NHIỆT ĐỚI GIÓ MÙA | Khí hậu nước ta nóng ẩm, mưa nhiều và gió đổi chiều theo mùa, gọi là khí hậu gì? | 3
+ĐỒI NÚI | Khoảng ba phần tư diện tích phần đất liền nước ta là dạng địa hình này. | 2
+DÂN TỘC KINH | Dân tộc đông người nhất ở nước ta. | 2 | NGƯỜI KINH, KINH
+NĂM MƯƠI TƯ | Nước ta có bao nhiêu dân tộc anh em cùng chung sống? | 2 | 54, NĂM TƯ
+MIỀN NÚI | Vùng đất cao, dân cư thưa thớt, nơi nhiều dân tộc ít người sinh sống. | 2
+THỀM LỤC ĐỊA | Phần đáy biển nông nối liền với đất liền. | 3
+HẢI SẢN | Tôm, cá, mực đánh bắt từ biển gọi chung là gì? | 1
+RỪNG NGẬP MẶN | Loại rừng mọc ở vùng ven biển nước lợ, có cây đước, cây sú, cây vẹt. | 2
+KHÍ HẬU | Nắng, mưa, nóng, lạnh của một vùng trong thời gian dài, lặp đi lặp lại hằng năm, gọi chung là gì? | 2
+DÂN SỐ | Tổng số người sống trong một nước hay một vùng gọi là gì? | 1
+THÀNH THỊ | Nơi đông dân, nhiều nhà cao tầng, nhà máy, trái với nông thôn. | 1
+NÔNG THÔN | Vùng làng quê với cánh đồng, lũy tre, đa số người dân làm nông nghiệp. | 1
+XUẤT KHẨU | Bán gạo, cà phê, hải sản ra nước ngoài gọi là gì? | 2
+VỰA LÚA | Đồng bằng sông Cửu Long được gọi là ... lớn nhất nước ta. | 2
+TRUNG BỘ | Miền đất hẹp ngang ở giữa nước ta, có Huế và Đà Nẵng. | 2
+CHỦ QUYỀN | Quyền làm chủ của một nước đối với vùng đất, vùng trời, vùng biển của mình. | 3
+MŨI CÀ MAU | Nơi tận cùng phía nam trên phần đất liền nước ta. | 2
+SÔNG NGÒI | Nước ta có mạng lưới ... dày đặc, nhiều sông nhỏ, nước lên xuống theo mùa. | 2
+BIÊN GIỚI | Đường ranh giới trên đất liền giữa nước ta với Trung Quốc, Lào và Campuchia. | 2
+SÔNG MÊ CÔNG | Con sông lớn chảy qua nhiều nước, khi vào nước ta được gọi là sông Cửu Long. | 2
+MÙA LŨ | Ở đồng bằng sông Cửu Long, mỗi năm nước sông dâng cao tràn đồng, đó là mùa gì? | 2
+HẢI ĐĂNG | Ngọn tháp cao trên đảo hay mũi đất, ban đêm chiếu đèn chỉ đường cho tàu thuyền. | 2
+NGƯ TRƯỜNG | Vùng biển có nhiều tôm cá, nơi ngư dân ra khơi đánh bắt. | 3
+MẬT ĐỘ DÂN SỐ | Số người trung bình sống trên một ki lô mét vuông. | 3
+BÁN ĐẢO | Phần đất có ba mặt giáp biển, một mặt nối với đất liền, như Sơn Trà. | 2
+VỊNH | Phần biển ăn sâu vào đất liền, như ... Hạ Long, ... Cam Ranh. | 2
+LÀNG CHÀI | Xóm nhỏ ven biển, nơi người dân sống bằng nghề đánh cá. | 1
+CÂY CÔNG NGHIỆP | Cà phê, cao su, hồ tiêu được trồng để làm nguyên liệu và xuất khẩu, gọi là loại cây gì? | 3
+GẠO | Nước ta xuất khẩu rất nhiều thứ này, xay xát từ hạt lúa mà ra. | 1
+BẮC BỘ | Miền đất phía bắc nước ta, có thủ đô Hà Nội. | 1
+NAM BỘ | Miền đất phía nam nước ta, có đồng bằng sông Cửu Long. | 1

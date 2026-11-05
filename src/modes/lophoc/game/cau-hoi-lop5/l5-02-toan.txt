@@ -1,0 +1,40 @@
+# Toán
+# Bộ câu hỏi lớp 5: số thập phân, tỉ số phần trăm, hình học, thể tích, đo diện tích, chuyển động.
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách viết khác cũng tính đúng (cách nhau dấu phẩy)
+> Đây là kiến thức môn Toán.
+SỐ THẬP PHÂN | Số như hai phẩy năm hay không phẩy bảy mươi lăm, có phần nguyên đứng trước dấu phẩy. | 1
+PHẦN NGUYÊN | Trong số mười hai phẩy năm, số mười hai là phần này. | 2
+HÀNG PHẦN MƯỜI | Trong số không phẩy năm, chữ số năm đứng ở hàng nào? | 3
+TỈ SỐ PHẦN TRĂM | Muốn tìm cái này của hai số, ta lấy số thứ nhất chia số thứ hai, nhân với một trăm rồi viết thêm kí hiệu phần trăm. | 2
+HÌNH HỘP CHỮ NHẬT | Hình có sáu mặt đều là hình chữ nhật, giống bao diêm hay hộp sữa. | 2
+HÌNH LẬP PHƯƠNG | Hình có sáu mặt là sáu hình vuông bằng nhau, giống con xúc xắc. | 2
+THỂ TÍCH | Đại lượng cho biết một vật chiếm bao nhiêu chỗ trong không gian, đo bằng xăng ti mét khối. | 2
+MÉT KHỐI | Đơn vị đo thể tích bằng thể tích hình lập phương có cạnh dài một mét. | 2
+VẬN TỐC | Lấy quãng đường chia cho thời gian thì được đại lượng này. | 2
+QUÃNG ĐƯỜNG | Lấy vận tốc nhân với thời gian thì được đại lượng này. | 2
+HÉC TA | Đơn vị đo diện tích ruộng đất, bằng mười nghìn mét vuông. | 2
+KI LÔ MÉT VUÔNG | Đơn vị đo diện tích rất lớn như diện tích một thành phố, bằng một triệu mét vuông. | 3
+BIỂU ĐỒ HÌNH QUẠT | Biểu đồ hình tròn được chia thành nhiều phần, thường ghi tỉ số phần trăm của từng phần. | 3
+ĐÁY | Hình thang có hai cạnh song song với nhau, hai cạnh đó gọi là hai cạnh gì? | 2
+CHIỀU DÀI | Diện tích hình chữ nhật bằng chiều rộng nhân với cái này. | 1
+SỐ HẠNG | Trong phép cộng, các số được cộng với nhau gọi là gì? | 2
+TỈ LỆ BẢN ĐỒ | Dòng chữ một trên một nghìn ghi ở góc bản đồ cho biết điều này. | 3
+TOÀN PHẦN | Diện tích ... của hình lập phương bằng diện tích một mặt nhân với sáu. | 3
+KI LÔ MÉT | Một nghìn mét bằng một đơn vị này. | 1
+TAM GIÁC VUÔNG | Hình tam giác có một góc bằng chín mươi độ. | 2
+ĐƯỜNG CAO | Đoạn thẳng kẻ từ một đỉnh xuống, vuông góc với cạnh đáy của hình tam giác. | 3
+MẶT BÊN | Hình hộp chữ nhật có hai mặt đáy và bốn mặt này. | 2
+XUNG QUANH | Diện tích ... của hình hộp chữ nhật bằng chu vi mặt đáy nhân với chiều cao. | 3
+TỈ SỐ | Số học sinh nam bằng ba phần năm số học sinh nữ. Ba phần năm là gì của hai số đó? | 2
+GIẢM GIÁ | Cửa hàng treo biển bớt hai mươi phần trăm cho mọi món hàng, gọi là gì? | 1
+TIỀN LÃI | Gửi tiết kiệm ở ngân hàng, số tiền nhận thêm ngoài tiền gốc gọi là gì? | 3
+KI LÔ MÉT GIỜ | Đơn vị đo vận tốc thường dùng cho ô tô, xe máy. | 2
+NGƯỢC CHIỀU | Hai xe đi từ hai đầu quãng đường, tiến lại gặp nhau. Đó là chuyển động gì? | 2
+HỖN SỐ | Số như hai và một phần ba, gồm một số tự nhiên và một phân số. | 2
+MỘT PHẦN TƯ | Một nửa của một nửa cái bánh là bao nhiêu cái bánh? | 2
+MỘT NỬA | Năm mươi phần trăm của một cái bánh là bao nhiêu? | 1
+GẤP ĐÔI | Nhân một số với hai thì số đó được làm thế nào? | 1
+CHIA ĐỀU | Mười cái kẹo cho năm bạn, mỗi bạn hai cái, không ai hơn ai. Ta đã làm gì với số kẹo? | 1
+ĐƯỜNG CHÉO | Đoạn thẳng nối hai góc đối diện của hình chữ nhật. | 2
+HÌNH THANG VUÔNG | Hình thang có một cạnh bên vuông góc với hai đáy. | 2
+SỐ CHIA | Trong phép chia mười cho hai, số hai gọi là gì? | 1

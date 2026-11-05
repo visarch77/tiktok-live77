@@ -693,6 +693,7 @@
       }
     };
     // Lớp Học Chữ: nút cần nhập chữ (sinh nhật, cô nói, tên lớp) và trạng thái câu đang hỏi ở thẻ "🍎 Điều khiển lớp"
+    const LHC_SETS = [['chung', 'Chung (mọi lứa tuổi)'], ['lop3', 'Lớp 3'], ['lop4', 'Lớp 4'], ['lop5', 'Lớp 5']];
     const LHC_PHASE = { intro: 'Mở đầu tiết', question: 'Đang hỏi', bonus: 'Câu thưởng', reveal: 'Hiện đáp án', praise: 'Khen bạn giỏi', results: 'Tổng kết tiết', recess: 'Ra chơi', vote: 'Chọn chủ đề' };
     MODE_UI.lophoc = {
       pointsLabel: 'Điểm tích luỹ (trả lời đúng, nhanh được thêm điểm)',
@@ -710,7 +711,7 @@
         return [
           { label: 'Tiết · câu', value: v.round ? `${fmt(v.round)} · ${fmt(v.qNo)}/${fmt(v.total)}` : '—', hint: LHC_PHASE[v.phase] || '' },
           { label: 'Học sinh', value: fmt(v.classSize), hint: `${fmt(v.players)} bạn đang chơi` },
-          { label: 'Ngân hàng câu', value: fmt(st.bankSize), hint: 'câu hỏi trong cau-hoi/*.txt' }
+          { label: 'Ngân hàng câu', value: fmt(st.bankSize), hint: `Bộ ${(LHC_SETS.find(([k]) => k === st.questionSet) || LHC_SETS[0])[1]}` }
         ];
       },
       dangerActions: [],
@@ -1466,6 +1467,10 @@
         ${rlRange('championSeconds', 'Thời gian vinh danh vô địch', '', 5, 60, 1, 's')}
         ${rlRange('sideMargin', 'Lề hai bên màn hình', 'Điện thoại / TikTok cắt mất hai mép thì tăng lên để dồn mọi thứ vào giữa', 40, 220, 4, ' px')}`;
       const lhcExtra = currentRoom()?.mode !== 'lophoc' ? '' : `
+        <div class="setting">
+          <div><div class="setting-name">Bộ câu hỏi</div><div class="setting-desc">Chung: 2.076 câu đủ chủ đề (bản gốc) · Lớp 3 / 4 / 5: câu theo chương trình lớp đó, toán nhẩm cũng theo lớp. Đổi xong áp dụng từ tiết sau (bấm "Tiết mới" để đổi ngay)</div></div>
+          <select class="input" data-setting="questionSet">${LHC_SETS.map(([v, n]) => `<option value="${v}" ${v === (s.questionSet || 'chung') ? 'selected' : ''}>${n}</option>`).join('')}</select>
+        </div>
         <div class="setting">
           <div><div class="setting-name">Giọng cô giáo</div><div class="setting-desc">Edge: tạo giọng ~1 giây, giọng nữ Hoài My, đọc từ tiếng Anh bằng giọng Mỹ (cần mạng; lỗi thì tự đọc bằng ZeroTTS) · ZeroTTS: giọng chọn ở dưới, chạy trên máy nhưng mỗi câu chờ 5–15 giây, từ tiếng Anh đọc bằng giọng macOS</div></div>
           <select class="input" data-setting="voiceEngine">${[['edge', 'Edge (nhanh, như bản gốc)'], ['zero', 'ZeroTTS (giọng phòng)']].map(([v, n]) => `<option value="${v}" ${v === (s.voiceEngine || 'edge') ? 'selected' : ''}>${n}</option>`).join('')}</select>

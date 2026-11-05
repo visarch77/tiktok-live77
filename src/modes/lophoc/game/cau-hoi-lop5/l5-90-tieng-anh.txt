@@ -1,0 +1,57 @@
+# Tiếng Anh
+# Câu tiếng Anh lớp 5: địa chỉ, nơi chốn, hoạt động hằng ngày, lễ hội, sức khỏe, du lịch, nhân vật truyện, mùa và thời tiết, thể thao, môi trường, tính cách.
+# Cô đọc gợi ý tiếng Việt, người xem gõ từ tiếng Anh (không cần dấu).
+# Mỗi dòng: ĐÁP ÁN | gợi ý | độ khó (1 dễ, 2 vừa, 3 khó) | cách trả lời khác cũng tính đúng
+> Câu tiếng Anh nè.
+ADDRESS | Địa chỉ nhà tiếng Anh là gì? | 2
+VILLAGE | Ngôi làng tiếng Anh là gì? | 2
+CITY | Thành phố tiếng Anh là gì? | 1
+STREET | Đường phố tiếng Anh là gì? | 1 | ROAD
+APARTMENT | Căn hộ chung cư tiếng Anh là gì? | 3 | FLAT
+COUNTRYSIDE | Vùng nông thôn tiếng Anh là gì? | 3
+EXERCISE | Tập thể dục tiếng Anh là gì? | 2
+HOLIDAY | Kì nghỉ tiếng Anh là gì? | 2 | VACATION
+FESTIVAL | Lễ hội tiếng Anh là gì? | 2
+CHRISTMAS | Lễ Giáng sinh tiếng Anh là gì? | 2 | XMAS
+LANTERN | Cái đèn lồng tiếng Anh là gì? | 2
+FIREWORKS | Pháo hoa tiếng Anh là gì? | 2 | FIREWORK
+HEADACHE | Bị đau đầu tiếng Anh là gì? | 2
+TOOTHACHE | Bị đau răng tiếng Anh là gì? | 2
+STOMACH ACHE | Bị đau bụng tiếng Anh là gì? | 3
+FEVER | Bị sốt tiếng Anh là gì? | 2
+COUGH | Bị ho tiếng Anh là gì? | 2
+SORE THROAT | Bị đau họng tiếng Anh là gì? | 3
+DENTIST | Nha sĩ tiếng Anh là gì? | 2
+SEASIDE | Bờ biển, nơi đi tắm biển, tiếng Anh là gì? | 2 | BEACH
+MUSEUM | Viện bảo tàng tiếng Anh là gì? | 2
+MOTORBIKE | Xe máy tiếng Anh là gì? | 1 | MOTORCYCLE
+UNDERGROUND | Tàu điện ngầm tiếng Anh là gì? | 3 | SUBWAY, METRO
+PRINCESS | Công chúa tiếng Anh là gì? | 2
+PRINCE | Hoàng tử tiếng Anh là gì? | 2
+KING | Nhà vua tiếng Anh là gì? | 1
+QUEEN | Hoàng hậu hoặc nữ hoàng tiếng Anh là gì? | 1
+DRAGON | Con rồng tiếng Anh là gì? | 1
+FAIRY | Bà tiên trong truyện cổ tích tiếng Anh là gì? | 2
+SPRING | Mùa xuân tiếng Anh là gì? | 1
+SUMMER | Mùa hè tiếng Anh là gì? | 1
+AUTUMN | Mùa thu tiếng Anh là gì? | 2 | FALL
+WINTER | Mùa đông tiếng Anh là gì? | 1
+STORM | Cơn bão tiếng Anh là gì? | 2 | TYPHOON
+VOLLEYBALL | Môn bóng chuyền tiếng Anh là gì? | 2
+TABLE TENNIS | Môn bóng bàn tiếng Anh là gì? | 3 | PING PONG
+ENVIRONMENT | Môi trường tiếng Anh là gì? | 3
+RECYCLE | Tái chế tiếng Anh là gì? | 3
+RUBBISH | Rác thải tiếng Anh là gì? | 2 | TRASH, GARBAGE, LITTER
+FRIENDLY | Thân thiện, dễ gần tiếng Anh là gì? | 2
+KIND | Tốt bụng tiếng Anh là gì? | 2
+CLEVER | Thông minh tiếng Anh là gì? | 2 | SMART, INTELLIGENT
+HARDWORKING | Chăm chỉ tiếng Anh là gì? | 3
+FUNNY | Vui tính, hài hước tiếng Anh là gì? | 2
+SHY | Nhút nhát, hay ngại tiếng Anh là gì? | 2
+BRAVE | Dũng cảm tiếng Anh là gì? | 2
+PILOT | Phi công tiếng Anh là gì? | 2
+TRAVEL | Đi du lịch tiếng Anh là gì? | 2
+PARTY | Bữa tiệc tiếng Anh là gì? | 1
+YESTERDAY | Hôm qua tiếng Anh là gì? | 2
+TOMORROW | Ngày mai tiếng Anh là gì? | 2
+WEEKEND | Cuối tuần tiếng Anh là gì? | 2
