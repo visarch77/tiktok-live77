@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { GameStage } from '../game/GameStage';
 import { StageFrame } from '../live/StageFrame';
+import { STAGE_H, STAGE_W } from '../live/page';
 import { sfx } from '../game/sfx';
 import type { StageView } from '../game/useGame';
 // stage/index.css (Tailwind) đóng gói riêng bằng Tailwind CLI, xem build.js
@@ -14,6 +15,8 @@ const PREVIEW = params.get('preview') === '1'; // khung xem trước trong trang
 const OBS = params.get('obs') === '1' || /\/live\.html$/.test(location.pathname);
 const roomMatch = location.pathname.match(/^\/room\/([^/?#]+)/);
 const ROOM_ID = decodeURIComponent((roomMatch && roomMatch[1]) || params.get('room') || 'main');
+
+const DEFAULT_SIDE_MARGIN = 80; // giống defaultSettings.sideMargin ở index.js
 
 type View = StageView & {
   serverNow: number;
@@ -66,6 +69,7 @@ function shiftTimes<T>(v: T, skew: number): T {
 function App() {
   const [view, setView] = useState<View | null>(null);
   const [unlocked, setUnlocked] = useState(audio.unlocked);
+  const [sideMargin, setSideMargin] = useState(DEFAULT_SIDE_MARGIN);
   const prev = useRef<View | null>(null);
   const viewRef = useRef<View | null>(null);
 
@@ -95,8 +99,9 @@ function App() {
       viewRef.current = v;
       setView(v);
     };
-    const applySettings = (s: { ttsEnabled?: boolean; sfxEnabled?: boolean; ttsVolume?: number } | undefined) => {
+    const applySettings = (s: { ttsEnabled?: boolean; sfxEnabled?: boolean; ttsVolume?: number; sideMargin?: number } | undefined) => {
       if (!s) return;
+      if (typeof s.sideMargin === 'number') setSideMargin(Math.max(0, Math.min(200, s.sideMargin)));
       audio.ttsOn = s.ttsEnabled !== false;
       audio.sfxOn = s.sfxEnabled !== false;
       if (typeof s.ttsVolume === 'number') audio.ttsVolume = Math.max(0, Math.min(1, s.ttsVolume));
@@ -169,8 +174,29 @@ function App() {
   return (
     <div className="flex h-screen w-screen items-center justify-center bg-black">
       <StageFrame>
-        {/* GameStage chỉ đọc view / channelName / lastGift */}
-        <GameStage game={game as never} />
+        {/* Lề hai bên (cài đặt sideMargin): điện thoại màn dài hơn 9:16 nên TikTok cắt hai mép khung 1080x1920.
+            Thu nhỏ cả lớp học vào giữa; phần lề là nền lớp làm mờ + tối để thành viền, không lộ chỗ nối hai lớp ảnh. */}
+        {sideMargin > 0 && (
+          <div
+            className="stage-bg absolute left-0 top-0"
+            style={{ width: STAGE_W, height: STAGE_H, filter: 'blur(18px) brightness(0.55)', transform: 'scale(1.06)' }}
+          />
+        )}
+        <div
+          className="stage-bg absolute left-0 top-0"
+          style={{
+            width: STAGE_W,
+            height: STAGE_H,
+            transform: `scale(${(STAGE_W - 2 * sideMargin) / STAGE_W})`,
+            transformOrigin: 'center center',
+            boxShadow: sideMargin > 0 ? '0 0 40px 6px rgba(0,0,0,0.55)' : undefined,
+            borderRadius: sideMargin > 0 ? 18 : undefined,
+            overflow: 'hidden',
+          }}
+        >
+          {/* GameStage chỉ đọc view / channelName / lastGift */}
+          <GameStage game={game as never} />
+        </div>
       </StageFrame>
       {!unlocked && !PREVIEW && (
         <div className="fixed bottom-[18px] left-1/2 -translate-x-1/2 cursor-pointer rounded-full bg-black/70 px-[14px] py-[8px] text-[13px] text-white">

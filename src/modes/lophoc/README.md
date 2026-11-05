@@ -17,7 +17,7 @@ Cô giáo áo dài đố chữ trên bảng đen; người xem gõ đáp án và
 | `index.js` | Nối lõi với phòng live: sự kiện TikTok, giọng đọc (đồng hồ dừng khi cô đọc câu chính), sổ lớp, lệnh RPC |
 | `edgeTts.js` | Giọng Edge TTS như bản gốc (`msedge-tts`): Hoài My / Nam Minh / Ana (tiếng Anh), mp3 lưu trong `tts-cache` |
 | `game/GameStage.tsx`, `Hair.tsx`, `stage.css`, `sfx.ts`, `live/StageFrame.tsx` | Màn hình lớp học 2D của bản gốc (React + motion + Tailwind). Đường dẫn ảnh đã đổi `/assets/` → `/assets/lophoc/`; GameStage thêm 1 chỗ: phép tính dài hơn 13 kí tự thì chữ 56px (ghi chú `tiktok-live77`, giữ lại khi kéo bản cập nhật) |
-| `stage/main.tsx`, `stage/index.css` | Màn hình phòng: nhận `lophoc.view` / `lophoc.speak` qua WebSocket, vẽ bằng GameStage, phát giọng + hiệu ứng |
+| `stage/main.tsx`, `stage/index.css` | Màn hình phòng: nhận `lophoc.view` / `lophoc.speak` qua WebSocket, vẽ bằng GameStage, phát giọng + hiệu ứng; cài đặt `sideMargin` (mặc định 80 px) thu nhỏ lớp học vào giữa vì điện thoại / TikTok cắt hai mép |
 | `public/assets/lophoc/` | Ảnh nền + nhân vật (thuộc tác giả lop-hoc-chu). Bỏ `sfx/<ting|drum|go|tick|bell|pop|clap|fanfare>.mp3` vào đây để thay tiếng tự tạo |
 
 Khác bản gốc: game chạy trên **server** (bản gốc chạy trong trang stage), màn hình chỉ vẽ lại ảnh chụp `lophoc.view`.

@@ -777,12 +777,14 @@ module.exports = {
   settingsSchema: {
     questionSet: { type: 'enum', values: QUESTION_SETS },
     voiceEngine: { type: 'enum', values: ['edge', 'zero'] },
-    voiceRate: [0.8, 1.5]
+    voiceRate: [0.8, 1.5],
+    sideMargin: [0, 200]
   },
   defaultSettings: {
     questionSet: 'chung',
     voiceEngine: 'edge',
-    voiceRate: 1.25 // bản gốc: cô nói nhanh cho tiết tấu dồn dập
+    voiceRate: 1.25, // bản gốc: cô nói nhanh cho tiết tấu dồn dập
+    sideMargin: 80 // lề hai bên (px trên khung 1080): điện thoại / TikTok cắt hai mép
   },
   create
 };
